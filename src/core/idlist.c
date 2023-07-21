@@ -1,5 +1,5 @@
-#include <fejix/idlist.h>
-#include <fejix/utils.h>
+#include <fejix/core/idlist.h>
+#include <fejix/core/utils.h>
 
 #include <malloc.h>
 #include <string.h>
@@ -76,10 +76,10 @@ fj_result_t fj_idlist_insert(fj_idlist_t * list, uint32_t index, fj_id_t elem)
         return FJ_INTERNAL_ERROR;
     }
 
-    if (index != list->length - 1) {
+    if (list->length != 0 && index != list->length - 1) {
         fj_id_t * start = list->elements + index;
         uint32_t move_count = list->length - index;
-        memmove(start, start + 1, move_count * sizeof(fj_id_t));
+        memmove(start + 1, start, move_count * sizeof(fj_id_t));
     }
 
     list->elements[index] = elem;
@@ -101,7 +101,7 @@ fj_result_t fj_idlist_remove(fj_idlist_t * list, uint32_t index)
     if (index != list->length - 1) {
         fj_id_t * start = list->elements + index + 1;
         uint32_t move_count = list->length - index - 1;
-        memmove(start, start - 1, move_count * sizeof(fj_id_t));
+        memmove(start - 1, start, move_count * sizeof(fj_id_t));
     }
 
     list->length--;

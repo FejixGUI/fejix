@@ -2,7 +2,7 @@
 #define FEJIX_MAP_H_
 
 
-#include <fejix/types.h>
+#include <fejix/core/types.h>
 
 
 struct fj_map_element;

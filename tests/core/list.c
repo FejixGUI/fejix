@@ -7,18 +7,17 @@
 
 int main() {
 
+    fj_result_t res;
+
     fj_idlist_t * list = fj_idlist_new();
 
-    for (int i=0; i<100; i++) {
-        fj_idlist_insert(list, 0, i);
+    for (int i=0; i<10000; i++) {
+        res = fj_idlist_insert(list, 0, i);
+        assert(res == FJ_OK);
     }
 
-    // for (int i=0; i<10000; i++) {
-    //     assert(list->elements[i] == 10000-i-1);
-    // }
-
-    for (int i=0; i<100; i++) {
-        printf("%d ", list->elements[i]);
+    for (int i=0; i<list->length; i++) {
+        assert(list->elements[i] == 10000-i-1);
     }
 
     fj_idlist_del(list);

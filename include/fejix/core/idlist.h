@@ -2,7 +2,7 @@
 #define FEJIX_IDLIST_H_
 
 
-#include <fejix/types.h>
+#include <fejix/core/types.h>
 
 
 struct fj_idlist;

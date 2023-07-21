@@ -1,5 +1,5 @@
-#include <fejix/map.h>
-#include <fejix/utils.h>
+#include <fejix/core/map.h>
+#include <fejix/core/utils.h>
 
 #include <malloc.h>
 #include <string.h>
