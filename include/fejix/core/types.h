@@ -11,6 +11,7 @@ typedef uint32_t fj_bool_t;
 typedef void * fj_ptr_t;
 typedef char * fj_string_t;
 
+
 enum fj_result_values {
     FJ_OK = 0,
     FJ_ALLOCATION_FAILED = 1,

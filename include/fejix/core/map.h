@@ -5,17 +5,20 @@
 #include <fejix/core/types.h>
 
 
-struct fj_map_element;
-struct fj_map_node;
 struct fj_map;
+struct fj_map_element;
 struct fj_map_iter;
+struct fj_map_node;
 
-typedef struct fj_map_element fj_map_element_t;
-typedef struct fj_map_node fj_map_node_t;
+
+/// Hash table of `fj_id_t` -> `fj_ptr_t`.
 typedef struct fj_map fj_map_t;
+typedef struct fj_map_element fj_map_element_t;
 typedef struct fj_map_iter fj_map_iter_t;
+typedef struct fj_map_node fj_map_node_t;
 
 typedef uint32_t fj_map_iter_status_t;
+
 
 enum fj_map_iter_status_values {
     FJ_MAP_ITER_CONTINUED = 0,
@@ -33,9 +36,6 @@ struct fj_map_node {
     fj_map_element_t element;
 };
 
-/// @struct fj_map
-///
-/// Hash table of `fj_id_t` -> `fj_ptr_t`.
 struct fj_map {
     fj_map_node_t ** buckets;
     uint32_t buckets_count;

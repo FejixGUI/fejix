@@ -5,6 +5,7 @@
 #include <fejix/core/utils.h>
 #include <fejix/core/idlist.h>
 #include <fejix/core/map.h>
+#include <fejix/core/sys.h>
 
 
 #endif

@@ -5,26 +5,6 @@
 #include <assert.h>
 
 
-void print_map(fj_map_t * map) {
-    printf("\nMAP\n");
-
-    for (int i=0; i<map->buckets_count; i++) {
-        printf("bucket #%d\n", i);
-
-        fj_map_node_t * node = map->buckets[i];
-
-        while (node != NULL) {
-            printf("    node key %d value %p\n",
-                node->element.key,
-                node->element.value
-            );
-
-            node = node->next;
-        }
-    }
-}
-
-
 int main() {
     fj_map_t * map = fj_map_new();
 
@@ -42,8 +22,6 @@ int main() {
     assert(fj_map_find(map, 1) != NULL);
     assert(fj_map_find(map, 2) != NULL);
     assert(fj_map_find(map, 3) != NULL);
-
-    print_map(map);
 
     fj_map_iter_t iter;
     fj_map_iter_init(map, &iter);

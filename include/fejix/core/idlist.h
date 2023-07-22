@@ -7,9 +7,11 @@
 
 struct fj_idlist;
 
-typedef struct fj_idlist fj_idlist_t;
 
 /// Linear array of identifiers (`fj_id_t`).
+typedef struct fj_idlist fj_idlist_t;
+
+
 struct fj_idlist {
     fj_id_t * elements;
     uint32_t length;
