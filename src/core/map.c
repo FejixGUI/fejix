@@ -9,7 +9,7 @@
 #define MIN_LOAD_FACTOR (MAX_LOAD_FACTOR/4.0f)
 
 
-uint32_t hash(fj_id_t key)
+static uint32_t hash(fj_id_t key)
 {
     uint32_t x = key;
     x = ((x >> 16) ^ x) * 0x45d9f3b;
@@ -19,26 +19,26 @@ uint32_t hash(fj_id_t key)
 }
 
 
-fj_id_t get_key(fj_map_node_t * node)
+static fj_id_t get_key(fj_map_node_t * node)
 {
     return node->element.key;
 }
 
 
-uint32_t get_bucket_index(fj_id_t key, uint32_t buckets_count)
+static uint32_t get_bucket_index(fj_id_t key, uint32_t buckets_count)
 {
     return hash(key) % buckets_count;
 }
 
 
-fj_map_node_t ** get_bucket(fj_map_t * map, fj_id_t key)
+static fj_map_node_t ** get_bucket(fj_map_t * map, fj_id_t key)
 {
     uint32_t index = get_bucket_index(key, map->buckets_count);
     return &map->buckets[index];
 }
 
 
-fj_map_node_t * get_tail_node(fj_map_node_t * list_head)
+static fj_map_node_t * get_tail_node(fj_map_node_t * list_head)
 {
     fj_map_node_t * node = list_head;
 
@@ -50,7 +50,7 @@ fj_map_node_t * get_tail_node(fj_map_node_t * list_head)
 }
 
 
-void insert_node_to_bucket(fj_map_node_t ** bucket, fj_map_node_t * node)
+static void insert_node_to_bucket(fj_map_node_t ** bucket, fj_map_node_t * node)
 {
     fj_map_node_t * next = *bucket;
     *bucket = node;
@@ -58,7 +58,7 @@ void insert_node_to_bucket(fj_map_node_t ** bucket, fj_map_node_t * node)
 }
 
 
-void remove_node_from_bucket(
+static void remove_node_from_bucket(
     fj_map_node_t ** bucket,
     fj_map_node_t * prev_node,
     fj_map_node_t * node
@@ -74,20 +74,20 @@ void remove_node_from_bucket(
 }
 
 
-void clear_buckets(fj_map_t * map)
+static void clear_buckets(fj_map_t * map)
 {
     memset(map->buckets, 0, map->buckets_count * sizeof(fj_map_node_t *));
 }
 
 
-void raw_insert(fj_map_t * map, fj_map_node_t * node)
+static void raw_insert(fj_map_t * map, fj_map_node_t * node)
 {
     fj_map_node_t ** bucket = get_bucket(map, get_key(node));
     insert_node_to_bucket(bucket, node);
 }
 
 
-void raw_find(
+static void raw_find(
     fj_map_node_t * list_head,
     fj_id_t key,
     fj_map_node_t ** found_node,
@@ -116,7 +116,7 @@ void raw_find(
 }
 
 
-fj_map_node_t * raw_remove(fj_map_t * map, fj_id_t key)
+static fj_map_node_t * raw_remove(fj_map_t * map, fj_id_t key)
 {
     fj_map_node_t ** bucket = get_bucket(map, key);
     fj_map_node_t * prev_node;
@@ -133,7 +133,7 @@ fj_map_node_t * raw_remove(fj_map_t * map, fj_id_t key)
 }
 
 
-fj_map_node_t * extract_nodes(fj_map_t * map)
+static fj_map_node_t * extract_nodes(fj_map_t * map)
 {
     fj_map_node_t * head_node = NULL;
     fj_map_node_t * tail_node = NULL;
@@ -160,7 +160,7 @@ fj_map_node_t * extract_nodes(fj_map_t * map)
 }
 
 
-void reinsert_nodes(fj_map_t * map, fj_map_node_t * list_head)
+static void reinsert_nodes(fj_map_t * map, fj_map_node_t * list_head)
 {
     clear_buckets(map);
 
@@ -174,7 +174,7 @@ void reinsert_nodes(fj_map_t * map, fj_map_node_t * list_head)
 }
 
 
-void free_nodes(fj_map_node_t * list_head)
+static void free_nodes(fj_map_node_t * list_head)
 {
     fj_map_node_t * node = list_head;
 
@@ -186,32 +186,32 @@ void free_nodes(fj_map_node_t * list_head)
 }
 
 
-float get_load_factor(fj_map_t * map)
+static float get_load_factor(fj_map_t * map)
 {
     return (float) map->elements_count / (float) map->buckets_count;
 }
 
 
-fj_bool_t map_needs_to_grow(float load_factor)
+static fj_bool_t map_needs_to_grow(float load_factor)
 {
     return load_factor > MAX_LOAD_FACTOR;
 }
 
 
-fj_bool_t map_needs_to_shrink(float load_factor)
+static fj_bool_t map_needs_to_shrink(float load_factor)
 {
     return load_factor < MIN_LOAD_FACTOR;
 }
 
 
-fj_bool_t map_is_validated(float load_factor)
+static fj_bool_t map_is_validated(float load_factor)
 {
     return !map_needs_to_grow(load_factor)
         && !map_needs_to_shrink(load_factor);
 }
 
 
-fj_result_t resize_buckets(fj_map_t * map, uint32_t buckets_count)
+static fj_result_t resize_buckets(fj_map_t * map, uint32_t buckets_count)
 {
     size_t size = buckets_count * sizeof(fj_map_node_t *);
     map->buckets = realloc(map->buckets, size);
@@ -228,7 +228,7 @@ fj_result_t resize_buckets(fj_map_t * map, uint32_t buckets_count)
 }
 
 
-fj_result_t resize_map(fj_map_t * map, fj_bool_t grow)
+static fj_result_t resize_map(fj_map_t * map, fj_bool_t grow)
 {
     if (grow) {
         return resize_buckets(map, map->buckets_count * 2);
@@ -238,7 +238,7 @@ fj_result_t resize_map(fj_map_t * map, fj_bool_t grow)
 }
 
 
-fj_result_t rehash(fj_map_t * map, fj_bool_t grow)
+static fj_result_t rehash(fj_map_t * map, fj_bool_t grow)
 {
     fj_map_node_t * list_head = extract_nodes(map);
 
@@ -255,7 +255,7 @@ fj_result_t rehash(fj_map_t * map, fj_bool_t grow)
 }
 
 
-fj_result_t validate_map(fj_map_t * map)
+static fj_result_t validate_map(fj_map_t * map)
 {
     float load_factor = get_load_factor(map);
 
@@ -267,7 +267,7 @@ fj_result_t validate_map(fj_map_t * map)
 }
 
 
-fj_result_t map_update(fj_map_t * map, fj_id_t key, fj_ptr_t value)
+static fj_result_t map_update(fj_map_t * map, fj_id_t key, fj_ptr_t value)
 {
     fj_map_element_t * element = fj_map_find(map, key);
 
@@ -364,18 +364,18 @@ fj_map_element_t * fj_map_find(fj_map_t * map, fj_id_t key)
 }
 
 
-fj_map_iter_status_t iter_go_to_next_node_in_bucket(fj_map_iter_t * iter)
+static void iter_go_to_next_node_in_bucket(fj_map_iter_t * iter)
 {
-    if (iter->current_node != NULL && iter->current_node->next != NULL) {
+    if (iter->current_node != NULL) {
         iter->current_node = iter->current_node->next;
-        return FJ_MAP_ITER_CONTINUED;
     }
-
-    return FJ_MAP_ITER_FINISHED;
 }
 
 
-fj_map_node_t ** find_next_used_bucket(fj_map_t * map, uint32_t start_index)
+static fj_map_node_t ** find_next_used_bucket(
+    fj_map_t * map,
+    uint32_t start_index
+)
 {
     for (uint32_t index = start_index; index < map->buckets_count; index++) {
         if (map->buckets[index] != NULL) {
@@ -387,7 +387,7 @@ fj_map_node_t ** find_next_used_bucket(fj_map_t * map, uint32_t start_index)
 }
 
 
-uint32_t get_bucket_search_start_index(fj_map_iter_t * iter)
+static uint32_t get_bucket_search_start_index(fj_map_iter_t * iter)
 {
     uint32_t start_index = iter->current_bucket_index;
 
@@ -401,7 +401,7 @@ uint32_t get_bucket_search_start_index(fj_map_iter_t * iter)
 }
 
 
-fj_map_iter_status_t iter_go_to_next_bucket(fj_map_iter_t * iter)
+static void iter_go_to_next_bucket(fj_map_iter_t * iter)
 {
     fj_map_t * map = iter->map;
     uint32_t start_index = get_bucket_search_start_index(iter);
@@ -409,13 +409,11 @@ fj_map_iter_status_t iter_go_to_next_bucket(fj_map_iter_t * iter)
 
     if (bucket == NULL) {
         iter->current_node = NULL;
-        return FJ_MAP_ITER_FINISHED;
+        return;
     }
 
     iter->current_bucket_index = bucket - map->buckets;
     iter->current_node = *bucket;
-
-    return FJ_MAP_ITER_CONTINUED;
 }
 
 
@@ -427,21 +425,15 @@ void fj_map_iter_init(fj_map_t * map, fj_map_iter_t * iter)
 }
 
 
-fj_map_iter_status_t fj_map_iter_next(fj_map_iter_t * iter)
+fj_map_element_t * fj_map_iter_next(fj_map_iter_t * iter)
 {
-    if (iter_go_to_next_node_in_bucket(iter) == FJ_MAP_ITER_CONTINUED) {
-        return FJ_MAP_ITER_CONTINUED;
+    iter_go_to_next_node_in_bucket(iter);
+
+    if (iter->current_node != NULL) {
+        return &iter->current_node->element;
     }
 
-    return iter_go_to_next_bucket(iter);
-}
-
-
-fj_map_element_t * fj_map_iter_get_element(fj_map_iter_t * iter)
-{
-    if (iter->current_node == NULL) {
-        return NULL;
-    }
+    iter_go_to_next_bucket(iter);
 
     return &iter->current_node->element;
 }

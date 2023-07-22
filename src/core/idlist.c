@@ -6,7 +6,7 @@
 
 
 /// Modifies the capacity, but leaves length as is
-fj_result_t idlist_resize(fj_idlist_t * list, uint32_t capacity)
+static fj_result_t idlist_resize(fj_idlist_t * list, uint32_t capacity)
 {
     list->elements = realloc(list->elements, capacity * sizeof(fj_id_t));
     
@@ -23,7 +23,7 @@ fj_result_t idlist_resize(fj_idlist_t * list, uint32_t capacity)
 }
 
 
-fj_result_t idlist_grow(fj_idlist_t * list)
+static fj_result_t idlist_grow(fj_idlist_t * list)
 {
     if (list->length + 1 <= list->capacity) {
         return FJ_OK;
@@ -35,7 +35,7 @@ fj_result_t idlist_grow(fj_idlist_t * list)
 }
 
 
-fj_result_t idlist_shrink(fj_idlist_t * list)
+static fj_result_t idlist_shrink(fj_idlist_t * list)
 {
     if (list->length >= list->capacity / 2) {
         return FJ_OK;

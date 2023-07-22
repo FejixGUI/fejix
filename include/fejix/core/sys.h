@@ -22,11 +22,11 @@ struct fj_sys {
     /// service_id -> interface_id -> *interface_object
     fj_map_t * service_interfaces;
 
+    /// service_id -> entity_id -> *data
+    fj_map_t * entity_data;
+
     /// entity_id -> event_id -> receiving_service_ids[]
     fj_map_t * event_bindings;
-
-    /// entity_id -> service_id -> *data
-    fj_map_t * entity_data;
 };
 
 
