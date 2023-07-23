@@ -50,7 +50,10 @@ static fj_map_node_t * get_tail_node(fj_map_node_t * list_head)
 }
 
 
-static void insert_node_to_bucket(fj_map_node_t ** bucket, fj_map_node_t * node)
+static void insert_node_to_bucket(
+    fj_map_node_t ** bucket,
+    fj_map_node_t * node
+)
 {
     fj_map_node_t * next = *bucket;
     *bucket = node;
@@ -280,6 +283,59 @@ static fj_result_t map_update(fj_map_t * map, fj_id_t key, fj_ptr_t value)
 }
 
 
+static void iter_go_to_next_node_in_bucket(fj_map_iter_t * iter)
+{
+    if (iter->current_node != NULL) {
+        iter->current_node = iter->current_node->next;
+    }
+}
+
+
+static fj_map_node_t ** find_next_used_bucket(
+    fj_map_t * map,
+    uint32_t start_index
+)
+{
+    for (uint32_t index = start_index; index < map->buckets_count; index++) {
+        if (map->buckets[index] != NULL) {
+            return &map->buckets[index];
+        }
+    }
+
+    return NULL;
+}
+
+
+static uint32_t get_bucket_search_start_index(fj_map_iter_t * iter)
+{
+    uint32_t start_index = iter->current_bucket_index;
+
+    // If the iterator has already started
+    if (iter->current_node != NULL) {
+        // Search *after* the current index
+        start_index++;
+    }
+
+    return start_index;
+}
+
+
+static void iter_go_to_next_bucket(fj_map_iter_t * iter)
+{
+    fj_map_t * map = iter->map;
+    uint32_t start_index = get_bucket_search_start_index(iter);
+    fj_map_node_t ** bucket = find_next_used_bucket(map, start_index);
+
+    if (bucket == NULL) {
+        iter->current_node = NULL;
+        return;
+    }
+
+    iter->current_bucket_index = bucket - map->buckets;
+    iter->current_node = *bucket;
+}
+
+
 fj_map_t * fj_map_new()
 {
     fj_map_t * map = calloc(1, sizeof(fj_map_t));
@@ -364,59 +420,6 @@ fj_map_element_t * fj_map_find(fj_map_t * map, fj_id_t key)
 }
 
 
-static void iter_go_to_next_node_in_bucket(fj_map_iter_t * iter)
-{
-    if (iter->current_node != NULL) {
-        iter->current_node = iter->current_node->next;
-    }
-}
-
-
-static fj_map_node_t ** find_next_used_bucket(
-    fj_map_t * map,
-    uint32_t start_index
-)
-{
-    for (uint32_t index = start_index; index < map->buckets_count; index++) {
-        if (map->buckets[index] != NULL) {
-            return &map->buckets[index];
-        }
-    }
-
-    return NULL;
-}
-
-
-static uint32_t get_bucket_search_start_index(fj_map_iter_t * iter)
-{
-    uint32_t start_index = iter->current_bucket_index;
-
-    // If the iterator has already started
-    if (iter->current_node != NULL) {
-        // Search *after* the current index
-        start_index += 1;
-    }
-
-    return start_index;
-}
-
-
-static void iter_go_to_next_bucket(fj_map_iter_t * iter)
-{
-    fj_map_t * map = iter->map;
-    uint32_t start_index = get_bucket_search_start_index(iter);
-    fj_map_node_t ** bucket = find_next_used_bucket(map, start_index);
-
-    if (bucket == NULL) {
-        iter->current_node = NULL;
-        return;
-    }
-
-    iter->current_bucket_index = bucket - map->buckets;
-    iter->current_node = *bucket;
-}
-
-
 void fj_map_iter_init(fj_map_t * map, fj_map_iter_t * iter)
 {
     iter->map = map;
@@ -435,5 +438,9 @@ fj_map_element_t * fj_map_iter_next(fj_map_iter_t * iter)
 
     iter_go_to_next_bucket(iter);
 
-    return &iter->current_node->element;
+    if (iter->current_node != NULL) {
+        return &iter->current_node->element;
+    }
+
+    return NULL;
 }
