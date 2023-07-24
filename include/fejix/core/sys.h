@@ -37,7 +37,7 @@ struct fj_sys {
 };
 
 
-fj_sys_t * fj_sys_new();
+fj_sys_t * fj_sys_new(void);
 
 void fj_sys_del(fj_sys_t * sys);
 

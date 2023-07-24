@@ -19,7 +19,7 @@ struct fj_idlist {
 };
 
 
-fj_idlist_t * fj_idlist_new();
+fj_idlist_t * fj_idlist_new(void);
 
 void fj_idlist_del(fj_idlist_t * list);
 

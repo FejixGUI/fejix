@@ -10,47 +10,39 @@ int main() {
 
     assert(map != NULL);
 
-    fj_result_t result = FJ_OK;
-
-    result = fj_map_insert(map, 1, "a");
-    assert(result == FJ_OK);
-    result = fj_map_insert(map, 2, "b");
-    assert(result == FJ_OK);
-    result = fj_map_insert(map, 3, "c");
-    assert(result == FJ_OK);
+    assert(fj_map_insert(map, 1, "a") == FJ_OK);
+    assert(fj_map_insert(map, 2, "b") == FJ_OK);
+    assert(fj_map_insert(map, 3, "c") == FJ_OK);
 
     assert(fj_map_find(map, 1) != NULL);
     assert(fj_map_find(map, 2) != NULL);
     assert(fj_map_find(map, 3) != NULL);
 
-    fj_map_iter_t iter;
-    fj_map_iter_init(map, &iter);
-    while (fj_map_iter_next(&iter) != FJ_MAP_ITER_FINISHED) {
-        fj_map_element_t * elem = fj_map_iter_get_element(&iter);
-        printf("%d %s\n", elem->key, (char *) elem->value);
-    }
-
-    result = fj_map_remove(map, 2);
-    assert(result == FJ_OK);
+    assert(fj_map_remove(map, 2) == FJ_OK);
     assert(fj_map_find(map, 1) != NULL);
     assert(fj_map_find(map, 2) == NULL);
     assert(fj_map_find(map, 3) != NULL);
 
-    result = fj_map_remove(map, 2);
-    assert(result != FJ_OK);
+    assert(fj_map_remove(map, 2) != FJ_OK);
     assert(fj_map_find(map, 1) != NULL);
     assert(fj_map_find(map, 2) == NULL);
     assert(fj_map_find(map, 3) != NULL);
 
-    result = fj_map_remove(map, 1);
-    assert(result == FJ_OK);
+    assert(fj_map_remove(map, 1) == FJ_OK);
     assert(fj_map_find(map, 1) == NULL);
     assert(fj_map_find(map, 2) == NULL);
     assert(fj_map_find(map, 3) != NULL);
 
+    fj_string_t s1 = "s1";
+    fj_string_t s2 = "s2";
+    assert(fj_map_insert(map, 3, s1) == FJ_OK);
+    assert(fj_map_find(map, 3)->value == s1);
+    assert(fj_map_insert(map, 3, s2) == FJ_OK);
+    assert(fj_map_find(map, 3)->value == s2);
+    assert(fj_map_remove(map, 3) == FJ_OK);
+
     for (int i=0; i<10000; i++) {
-        result = fj_map_insert(map, i, "a");
-        assert(result == FJ_OK);
+        assert(fj_map_insert(map, i, "a") == FJ_OK);
     }
 
     for (int i=0; i<10000; i++) {

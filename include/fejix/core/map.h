@@ -41,7 +41,7 @@ struct fj_map_iter {
 };
 
 
-fj_map_t * fj_map_new();
+fj_map_t * fj_map_new(void);
 
 void fj_map_del(fj_map_t * map);
 
@@ -56,6 +56,8 @@ fj_map_element_t * fj_map_find(fj_map_t * map, fj_id_t key);
 /// To point it to the first element, use `fj_map_iter_next`
 void fj_map_iter_init(fj_map_t * map, fj_map_iter_t * iter);
 
+/// Returns the current element or NULL if the iterator is exhausted.
+/// Modifying the map while iterating over its elements is undefined behavior.
 fj_map_element_t * fj_map_iter_next(fj_map_iter_t * iter);
 
 

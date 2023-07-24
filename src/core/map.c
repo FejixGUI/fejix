@@ -222,7 +222,7 @@ static fj_result_t resize_buckets(fj_map_t * map, uint32_t buckets_count)
     if (map->buckets == NULL) {
         map->buckets_count = 0;
         map->elements_count = 0;
-        return FJ_ALLOCATION_FAILED;
+        return FJ_MALLOC_FAIL;
     }
 
     map->buckets_count = buckets_count;
@@ -247,6 +247,7 @@ static fj_result_t rehash(fj_map_t * map, fj_bool_t grow)
 
     fj_result_t result = resize_map(map, grow);
     if (result != FJ_OK) {
+        free_nodes(list_head);
         return result;
     }
 
@@ -279,7 +280,7 @@ static fj_result_t map_update(fj_map_t * map, fj_id_t key, fj_ptr_t value)
         return FJ_OK;
     }
 
-    return FJ_INTERNAL_ERROR;
+    return FJ_INTERNAL_FAIL;
 }
 
 
@@ -336,7 +337,7 @@ static void iter_go_to_next_bucket(fj_map_iter_t * iter)
 }
 
 
-fj_map_t * fj_map_new()
+fj_map_t * fj_map_new(void)
 {
     fj_map_t * map = calloc(1, sizeof(fj_map_t));
 
@@ -375,7 +376,7 @@ fj_result_t fj_map_insert(fj_map_t * map, fj_id_t key, fj_ptr_t value)
     fj_map_node_t * node = calloc(1, sizeof(fj_map_node_t));
 
     if (node == NULL) {
-        return FJ_ALLOCATION_FAILED;
+        return FJ_MALLOC_FAIL;
     }
 
     node->element.key = key;
@@ -393,7 +394,7 @@ fj_result_t fj_map_remove(fj_map_t * map, fj_id_t key)
     fj_map_node_t * node = raw_remove(map, key);
 
     if (node == NULL) {
-        return FJ_INTERNAL_ERROR;
+        return FJ_INTERNAL_FAIL;
     }
 
     free(node);

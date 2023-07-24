@@ -5,16 +5,29 @@
 #include <string.h>
 
 
+#define ELEMENT_SIZE sizeof(fj_id_t)
+
+
+static fj_bool_t is_empty(fj_idlist_t * list)
+{
+    return list->length == 0;
+}
+
+static uint32_t last_index(fj_idlist_t * list)
+{
+    return list->length - 1;
+}
+
 /// Modifies the capacity, but leaves length as is
 static fj_result_t idlist_resize(fj_idlist_t * list, uint32_t capacity)
 {
-    list->elements = realloc(list->elements, capacity * sizeof(fj_id_t));
+    list->elements = realloc(list->elements, capacity * ELEMENT_SIZE);
     
     if (list->elements == NULL) {
         list->capacity = 0;
         list->length = 0;
 
-        return FJ_ALLOCATION_FAILED;
+        return FJ_MALLOC_FAIL;
     }
 
     list->capacity = capacity;
@@ -45,7 +58,23 @@ static fj_result_t idlist_shrink(fj_idlist_t * list)
 }
 
 
-fj_idlist_t * fj_idlist_new()
+static void shift_elements_right(fj_idlist_t * list, uint32_t index)
+{
+    fj_id_t * start = list->elements + index;
+    uint32_t move_count = list->length - index;
+    memmove(start + 1, start, move_count * ELEMENT_SIZE);
+}
+
+
+static void shift_elements_left(fj_idlist_t * list, uint32_t index)
+{
+    fj_id_t * start = list->elements + index + 1;
+    uint32_t move_count = list->length - index - 1;
+    memmove(start - 1, start, move_count * ELEMENT_SIZE);
+}
+
+
+fj_idlist_t * fj_idlist_new(void)
 {
     fj_idlist_t * list = calloc(1, sizeof(fj_idlist_t));
 
@@ -65,6 +94,10 @@ void fj_idlist_del(fj_idlist_t * list)
 
 fj_result_t fj_idlist_insert(fj_idlist_t * list, uint32_t index, fj_id_t elem)
 {
+    if (index > last_index(list)+1) {
+        return FJ_INTERNAL_FAIL;
+    }
+
     fj_result_t result = idlist_grow(list);
     if (result != FJ_OK) {
         return result;
@@ -72,14 +105,8 @@ fj_result_t fj_idlist_insert(fj_idlist_t * list, uint32_t index, fj_id_t elem)
 
     list->length++;
 
-    if (index > list->length) {
-        return FJ_INTERNAL_ERROR;
-    }
-
-    if (list->length != 0 && index != list->length - 1) {
-        fj_id_t * start = list->elements + index;
-        uint32_t move_count = list->length - index;
-        memmove(start + 1, start, move_count * sizeof(fj_id_t));
+    if (!is_empty(list) && index != last_index(list)) {
+        shift_elements_right(list, index);
     }
 
     list->elements[index] = elem;
@@ -90,18 +117,12 @@ fj_result_t fj_idlist_insert(fj_idlist_t * list, uint32_t index, fj_id_t elem)
 
 fj_result_t fj_idlist_remove(fj_idlist_t * list, uint32_t index)
 {
-    if (list->length == 0) {
-        return FJ_OK;
+    if (is_empty(list) || index > last_index(list)) {
+        return FJ_INTERNAL_FAIL;
     }
 
-    if (index > list->length - 1) {
-        return FJ_INTERNAL_ERROR;
-    }
-
-    if (index != list->length - 1) {
-        fj_id_t * start = list->elements + index + 1;
-        uint32_t move_count = list->length - index - 1;
-        memmove(start - 1, start, move_count * sizeof(fj_id_t));
+    if (index != last_index(list)) {
+        shift_elements_left(list, index);
     }
 
     list->length--;
@@ -112,11 +133,11 @@ fj_result_t fj_idlist_remove(fj_idlist_t * list, uint32_t index)
 
 fj_result_t fj_idlist_push(fj_idlist_t * list, fj_id_t element)
 {
-    return fj_idlist_insert(list, list->length, element);
+    return fj_idlist_insert(list, last_index(list)+1, element);
 }
 
 
 fj_result_t fj_idlist_pop(fj_idlist_t * list)
 {
-    return fj_idlist_remove(list, list->length-1);
+    return fj_idlist_remove(list, last_index(list));
 }
