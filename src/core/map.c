@@ -276,11 +276,11 @@ static fj_result_t validate_map(struct fj_map * map)
 {
     float load_factor = get_load_factor(map);
 
-    if (map_is_validated(load_factor)) {
-        return FJ_OK;
+    if (!map_is_validated(load_factor)) {
+        return rehash(map, map_needs_to_grow(load_factor));
     }
 
-    return rehash(map, map_needs_to_grow(load_factor));
+    return FJ_OK;
 }
 
 
@@ -289,7 +289,7 @@ static fj_result_t map_remove(struct fj_map * map, fj_id_t key)
     struct fj_map_node * node = raw_remove(map, key);
 
     if (node == NULL) {
-        return FJ_INTERNAL_FAIL;
+        return FJ_OK;
     }
 
     free(node);

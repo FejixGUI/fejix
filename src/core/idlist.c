@@ -144,7 +144,7 @@ fj_result_t fj_idlist_remove_item(struct fj_idlist * list, fj_id_t item)
         }
     }
 
-    return FJ_INTERNAL_FAIL;
+    return FJ_OK;
 }
 
 

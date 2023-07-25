@@ -23,7 +23,7 @@ int main() {
     assert(fj_map_get(map, 2) == NULL);
     assert(fj_map_get(map, 3) != NULL);
 
-    assert(fj_map_set(map, 2, NULL) != FJ_OK);
+    assert(fj_map_set(map, 2, NULL) == FJ_OK);
     assert(fj_map_get(map, 1) != NULL);
     assert(fj_map_get(map, 2) == NULL);
     assert(fj_map_get(map, 3) != NULL);
