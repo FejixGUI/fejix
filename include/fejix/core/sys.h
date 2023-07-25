@@ -22,11 +22,15 @@ enum fj_sys_standard_events {
 struct fj_sys;
 
 
+struct fj_event_data {
+    fj_ptr_t event;
+    fj_id_t event_id;
+    fj_id_t entity_id;
+};
+
 typedef fj_result_t (*fj_event_handler_t)(
     struct fj_sys * sys,
-    fj_id_t entity_id,
-    fj_id_t event_id,
-    fj_ptr_t event
+    struct fj_event_data * event_data
 );
 
 struct fj_event_handler_interface {

@@ -138,6 +138,46 @@ static struct fj_idlist * get_or_insert_new_list(
 }
 
 
+static struct fj_idlist * get_or_create_handlers(
+    struct fj_sys * sys,
+    fj_id_t entity_id,
+    fj_id_t event_id
+)
+{
+    struct fj_map * bindings = get_or_insert_new_map(
+        sys->event_bindings,
+        entity_id
+    );
+
+    if (bindings == NULL) {
+        return NULL;
+    }
+
+    struct fj_idlist * handlers = get_or_insert_new_list(
+        bindings, 
+        entity_id
+    );
+
+    return handlers;
+}
+
+
+static struct fj_idlist * get_handlers(
+    struct fj_sys * sys,
+    fj_id_t entity_id,
+    fj_id_t event_id
+)
+{
+    struct fj_map * bindings = fj_map_get(sys->event_bindings, entity_id);
+
+    if (bindings == NULL) {
+        return NULL;
+    }
+
+    return fj_map_get(bindings, event_id);
+}
+
+
 struct fj_sys * fj_sys_new(void)
 {
     struct fj_sys * sys = calloc(1, sizeof(struct fj_sys));
@@ -264,22 +304,6 @@ fj_ptr_t fj_sys_get_resource(
 }
 
 
-static struct fj_idlist * get_handlers(
-    struct fj_sys * sys,
-    fj_id_t entity_id,
-    fj_id_t event_id
-)
-{
-    struct fj_map * bindings = fj_map_get(sys->event_bindings, entity_id);
-
-    if (bindings == NULL) {
-        return NULL;
-    }
-
-    return fj_map_get(bindings, event_id);
-}
-
-
 fj_result_t fj_sys_bind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
@@ -287,18 +311,8 @@ fj_result_t fj_sys_bind_event(
     fj_id_t handler_module_id
 )
 {
-    struct fj_map * bindings = get_or_insert_new_map(
-        sys->event_bindings,
-        entity_id
-    );
-
-    if (bindings == NULL) {
-        return FJ_MALLOC_FAIL;
-    }
-
-    struct fj_idlist * handlers = get_or_insert_new_list(
-        bindings, 
-        entity_id
+    struct fj_idlist * handlers = get_or_create_handlers(
+        sys, entity_id, event_id
     );
 
     if (handlers == NULL) {
@@ -326,22 +340,40 @@ fj_result_t fj_sys_unbind_event(
 }
 
 
-static fj_result_t handle_event(
+static fj_result_t invoke_handler(
     struct fj_sys * sys,
-    fj_id_t entity_id,
-    fj_id_t event_id,
-    fj_ptr_t event,
-    fj_id_t handler_id
+    fj_id_t handler_id,
+    struct fj_event_data * event_data
 )
 {
     struct fj_event_handler_interface * interface;
-    interface = fj_sys_get_interface(sys, handler_id, event_id);
+    interface = fj_sys_get_interface(sys, handler_id, event_data->event_id);
 
     if (interface == NULL) {
         return FJ_INTERNAL_FAIL;
     }
 
-    return interface->handle_event(sys, entity_id, event_id, event);
+    return interface->handle_event(sys, event_data);
+}
+
+
+static fj_result_t handle_event(
+    struct fj_sys * sys,
+    struct fj_idlist * handlers,
+    struct fj_event_data * event_data
+)
+{
+    for (uint32_t i = 0; i < handlers->length; i++) {
+        fj_result_t result = invoke_handler(
+            sys, handlers->elements[i], event_data
+        );
+
+        if (result != FJ_OK) {
+            return result;
+        }
+    }
+
+    return FJ_OK;
 }
 
 
@@ -352,21 +384,16 @@ fj_result_t fj_sys_emit_event(
     fj_ptr_t event
 )
 {
+    struct fj_event_data event_data = { 0 };
+    event_data.entity_id = entity_id;
+    event_data.event_id = event_id;
+    event_data.event = event;
+
     struct fj_idlist * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
         return FJ_OK;
     }
 
-    for (uint32_t i = 0; i < handlers->length; i++) {
-        fj_result_t result = handle_event(
-            sys, entity_id, event_id, event, handlers->elements[i]
-        );
-
-        if (result != FJ_OK) {
-            return result;
-        }
-    }
-
-    return FJ_OK;
+    return handle_event(sys, handlers, &event_data);
 }
