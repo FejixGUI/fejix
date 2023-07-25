@@ -9,7 +9,7 @@ int main() {
 
     fj_result_t res;
 
-    fj_idlist_t * list = fj_idlist_new();
+    struct fj_idlist * list = fj_idlist_new();
 
     for (int i=0; i<10000; i++) {
         res = fj_idlist_insert(list, 0, i);

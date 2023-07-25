@@ -5,60 +5,44 @@
 #include <fejix/core/types.h>
 
 
+/// Hash table of `fj_id_t` -> `fj_ptr_t`, whose elements are not NULL.
 struct fj_map;
-struct fj_map_element;
-struct fj_map_iter;
-struct fj_map_node;
-
-
-/// Hash table of `fj_id_t` -> `fj_ptr_t`.
-typedef struct fj_map fj_map_t;
-typedef struct fj_map_element fj_map_element_t;
-typedef struct fj_map_iter fj_map_iter_t;
-typedef struct fj_map_node fj_map_node_t;
-
 
 struct fj_map_element {
     fj_ptr_t value;
     fj_id_t key;
 };
 
-struct fj_map_node {
-    fj_map_node_t * next;
-    fj_map_element_t element;
-};
 
-struct fj_map {
-    fj_map_node_t ** buckets;
-    uint32_t buckets_count;
-    uint32_t elements_count;
-};
+typedef uint32_t fj_map_foreach_result_t;
 
-struct fj_map_iter {
-    fj_map_t * map;
-    fj_map_node_t * current_node;
-    uint32_t current_bucket_index;
+typedef fj_map_foreach_result_t (*fj_map_foreach_callback_t)(
+    struct fj_map_element * element,
+    fj_ptr_t data
+);
+
+
+enum fj_map_foreach_result_values {
+    FJ_MAP_FOREACH_CONTINUE = 0,
+    FJ_MAP_FOREACH_STOP = 0,
 };
 
 
-fj_map_t * fj_map_new(void);
+struct fj_map * fj_map_new(void);
 
-void fj_map_del(fj_map_t * map);
+void fj_map_del(struct fj_map * map);
 
-fj_result_t fj_map_insert(fj_map_t * map, fj_id_t key, fj_ptr_t value);
+/// Removes the element if `value` is NULL.
+fj_result_t fj_map_set(struct fj_map * map, fj_id_t key, fj_ptr_t value);
 
-fj_result_t fj_map_remove(fj_map_t * map, fj_id_t key);
+/// Returns NULL if the element was not found.
+fj_ptr_t fj_map_get(struct fj_map * map, fj_id_t key);
 
-fj_map_element_t * fj_map_find(fj_map_t * map, fj_id_t key);
-
-/// Initialises the iterator, but does not guarantee that it points to an
-/// existing element.
-/// To point it to the first element, use `fj_map_iter_next`
-void fj_map_iter_init(fj_map_t * map, fj_map_iter_t * iter);
-
-/// Returns the current element or NULL if the iterator is exhausted.
-/// Modifying the map while iterating over its elements is undefined behavior.
-fj_map_element_t * fj_map_iter_next(fj_map_iter_t * iter);
+void fj_map_foreach(
+    struct fj_map * map,
+    fj_map_foreach_callback_t callback,
+    fj_ptr_t data
+);
 
 
 #endif

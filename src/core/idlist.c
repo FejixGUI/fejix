@@ -3,23 +3,24 @@
 
 #include <malloc.h>
 #include <string.h>
+#include <stdbool.h>
 
 
 #define ELEMENT_SIZE sizeof(fj_id_t)
 
 
-static fj_bool_t is_empty(fj_idlist_t * list)
+static bool is_empty(struct fj_idlist * list)
 {
     return list->length == 0;
 }
 
-static uint32_t last_index(fj_idlist_t * list)
+static uint32_t last_index(struct fj_idlist * list)
 {
     return list->length - 1;
 }
 
 /// Modifies the capacity, but leaves length as is
-static fj_result_t idlist_resize(fj_idlist_t * list, uint32_t capacity)
+static fj_result_t idlist_resize(struct fj_idlist * list, uint32_t capacity)
 {
     list->elements = realloc(list->elements, capacity * ELEMENT_SIZE);
     
@@ -36,19 +37,19 @@ static fj_result_t idlist_resize(fj_idlist_t * list, uint32_t capacity)
 }
 
 
-static fj_result_t idlist_grow(fj_idlist_t * list)
+static fj_result_t idlist_grow(struct fj_idlist * list)
 {
     if (list->length + 1 <= list->capacity) {
         return FJ_OK;
     }
 
-    uint32_t new_capacity = fj_max_u32(1, list->capacity * 2);
+    uint32_t new_capacity = fj_max(1, list->capacity * 2);
 
     return idlist_resize(list, new_capacity);
 }
 
 
-static fj_result_t idlist_shrink(fj_idlist_t * list)
+static fj_result_t idlist_shrink(struct fj_idlist * list)
 {
     if (list->length >= list->capacity / 2) {
         return FJ_OK;
@@ -58,7 +59,7 @@ static fj_result_t idlist_shrink(fj_idlist_t * list)
 }
 
 
-static void shift_elements_right(fj_idlist_t * list, uint32_t index)
+static void shift_elements_right(struct fj_idlist * list, uint32_t index)
 {
     fj_id_t * start = list->elements + index;
     uint32_t move_count = list->length - index;
@@ -66,7 +67,7 @@ static void shift_elements_right(fj_idlist_t * list, uint32_t index)
 }
 
 
-static void shift_elements_left(fj_idlist_t * list, uint32_t index)
+static void shift_elements_left(struct fj_idlist * list, uint32_t index)
 {
     fj_id_t * start = list->elements + index + 1;
     uint32_t move_count = list->length - index - 1;
@@ -74,15 +75,15 @@ static void shift_elements_left(fj_idlist_t * list, uint32_t index)
 }
 
 
-fj_idlist_t * fj_idlist_new(void)
+struct fj_idlist * fj_idlist_new(void)
 {
-    fj_idlist_t * list = calloc(1, sizeof(fj_idlist_t));
+    struct fj_idlist * list = calloc(1, sizeof(struct fj_idlist));
 
     return list;
 }
 
 
-void fj_idlist_del(fj_idlist_t * list)
+void fj_idlist_del(struct fj_idlist * list)
 {
     if (list->elements != NULL) {
         free(list->elements);
@@ -92,7 +93,11 @@ void fj_idlist_del(fj_idlist_t * list)
 }
 
 
-fj_result_t fj_idlist_insert(fj_idlist_t * list, uint32_t index, fj_id_t elem)
+fj_result_t fj_idlist_insert(
+    struct fj_idlist * list,
+    uint32_t index,
+    fj_id_t elem
+)
 {
     if (index > last_index(list)+1) {
         return FJ_INTERNAL_FAIL;
@@ -115,7 +120,7 @@ fj_result_t fj_idlist_insert(fj_idlist_t * list, uint32_t index, fj_id_t elem)
 }
 
 
-fj_result_t fj_idlist_remove(fj_idlist_t * list, uint32_t index)
+fj_result_t fj_idlist_remove(struct fj_idlist * list, uint32_t index)
 {
     if (is_empty(list) || index > last_index(list)) {
         return FJ_INTERNAL_FAIL;
@@ -131,13 +136,25 @@ fj_result_t fj_idlist_remove(fj_idlist_t * list, uint32_t index)
 }
 
 
-fj_result_t fj_idlist_push(fj_idlist_t * list, fj_id_t element)
+fj_result_t fj_idlist_remove_item(struct fj_idlist * list, fj_id_t item)
+{
+    for (uint32_t i = 0; i < list->length; i++) {
+        if (list->elements[i] == item) {
+            return fj_idlist_remove(list, i);
+        }
+    }
+
+    return FJ_INTERNAL_FAIL;
+}
+
+
+fj_result_t fj_idlist_push(struct fj_idlist * list, fj_id_t element)
 {
     return fj_idlist_insert(list, last_index(list)+1, element);
 }
 
 
-fj_result_t fj_idlist_pop(fj_idlist_t * list)
+fj_result_t fj_idlist_pop(struct fj_idlist * list)
 {
     return fj_idlist_remove(list, last_index(list));
 }

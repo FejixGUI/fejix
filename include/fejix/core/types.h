@@ -7,7 +7,6 @@
 
 typedef uint32_t fj_result_t;
 typedef uint32_t fj_id_t;
-typedef uint32_t fj_bool_t;
 typedef void * fj_ptr_t;
 
 /// UTF-8 string
@@ -19,6 +18,7 @@ enum fj_result_values {
     FJ_MALLOC_FAIL = 1,
     FJ_INTERNAL_FAIL = 2,
     FJ_SYSTEM_FAIL = 3,
+    FJ_INVALID_ID = 4,
 };
 
 enum fj_bool_values {
