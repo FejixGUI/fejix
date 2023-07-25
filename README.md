@@ -1,5 +1,9 @@
 # Fejix window management library
 
+Fejix is a low-level window management library in early development.
+
+For now, there is just an emoji: 🌸
+
 ## Build
 
 ```sh
