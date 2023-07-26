@@ -99,16 +99,16 @@ fj_ptr_t fj_sys_get_resource(
 
 fj_err_t fj_sys_bind_event(
     struct fj_sys * sys,
+    fj_id_t handler_module_id,
     fj_id_t entity_id,
-    fj_id_t event_id,
-    fj_id_t handler_module_id
+    fj_id_t event_id
 );
 
 fj_err_t fj_sys_unbind_event(
     struct fj_sys * sys,
+    fj_id_t handler_module_id,
     fj_id_t entity_id,
-    fj_id_t event_id,
-    fj_id_t handler_module_id
+    fj_id_t event_id
 );
 
 /// It is safe to modify `sys` in the event handlers.

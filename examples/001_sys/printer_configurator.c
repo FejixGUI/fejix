@@ -24,5 +24,5 @@ void printer_configurator_module_init(struct fj_sys * sys)
 {
     fj_sys_set_interface(sys, MODID, PRINT_EVENT_ID, &printer_configurator);
 
-    fj_sys_bind_event(sys, FJ_GLOBAL_ENTITY, PRINT_EVENT_ID, MODID);
+    fj_sys_bind_event(sys, MODID, FJ_GLOBAL_ENTITY, PRINT_EVENT_ID);
 }
