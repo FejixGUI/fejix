@@ -83,6 +83,25 @@ struct fj_list * fj_list_new(void)
 }
 
 
+struct fj_list * fj_list_clone(struct fj_list * source)
+{
+    struct fj_list * list = fj_list_new();
+
+    if (list == NULL) {
+        return NULL;
+    }
+
+    if (list_resize(list, source->capacity) != FJ_OK) {
+        fj_list_del(list);
+        return NULL;
+    }
+
+    memcpy(list->elements, source->elements, source->length * ELEMENT_SIZE);
+
+    return list;
+}
+
+
 void fj_list_del(struct fj_list * list)
 {
     if (list->elements != NULL) {
@@ -93,19 +112,14 @@ void fj_list_del(struct fj_list * list)
 }
 
 
-fj_result_t fj_list_insert(
-    struct fj_list * list,
-    uint32_t index,
-    fj_id_t elem
-)
+fj_result_t fj_list_insert(struct fj_list * list, uint32_t index, fj_id_t elem)
 {
     if (index > last_index(list)+1) {
         return FJ_INTERNAL_FAIL;
     }
 
-    fj_result_t result = list_grow(list);
-    if (result != FJ_OK) {
-        return result;
+    if (list_grow(list) != FJ_OK) {
+        return FJ_MALLOC_FAIL;
     }
 
     list->length++;

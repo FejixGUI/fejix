@@ -17,6 +17,8 @@ struct fj_list {
 
 struct fj_list * fj_list_new(void);
 
+struct fj_list * fj_list_clone(struct fj_list * source);
+
 void fj_list_del(struct fj_list * list);
 
 /// Returns `FJ_INTERNAL_FAIL` if the index is out of `[0; length]`.

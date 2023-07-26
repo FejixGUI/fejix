@@ -11,10 +11,12 @@ void my_hello_world(void) {
 
 #define MY_INTERFACE_ID 123
 
-struct my_interface {
-    void (*hello_world)(void);
-} my_instance = {
-    .hello_world = my_hello_world
+FJ_DEFINE_INTERFACE(my_interface) {
+    FJ_DEFINE_METHOD(hello_world, void, (void))
+};
+
+FJ_IMPLEMENT_INTERFACE(my_interface, my_instance) {
+    FJ_IMPLEMENT_METHOD(hello_world, my_hello_world)
 };
 
 #define MY_MODULE_ID 321

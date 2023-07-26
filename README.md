@@ -20,3 +20,12 @@ cmake -B build -D FEJIX_BUILD_TESTS=ON
 cmake --build build
 ctest --test-dir build 
 ```
+
+## Build and run examples
+
+```sh
+cd examples/EXAMPLE_NAME
+cmake -B build
+cmake --build build
+./build/example
+```

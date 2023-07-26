@@ -3,6 +3,7 @@
 
 
 #include <stdint.h>
+#include <stddef.h>
 
 
 typedef uint32_t fj_result_t;

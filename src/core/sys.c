@@ -269,6 +269,28 @@ fj_ptr_t fj_sys_find_interface(
 }
 
 
+fj_result_t fj_sys_load_module_description(
+    struct fj_sys * sys,
+    fj_id_t module_id,
+    struct fj_interface_description * interface_descriptions
+)
+{
+    fj_result_t result = FJ_OK;
+    struct fj_interface_description * desc = interface_descriptions;
+
+    for ( ; desc->interface != NULL && result == FJ_OK; desc++) {
+        result = fj_sys_set_interface(
+            sys,
+            module_id,
+            desc->interface_id,
+            desc->interface
+        );
+    }
+
+    return result;
+}
+
+
 fj_result_t fj_sys_set_resource(
     struct fj_sys * sys,
     fj_id_t module_id,
@@ -395,5 +417,15 @@ fj_result_t fj_sys_emit_event(
         return FJ_OK;
     }
 
-    return handle_event(sys, handlers, &event_data);
+    struct fj_list * handlers_clone = fj_list_clone(handlers);
+
+    if (handlers_clone == NULL) {
+        return FJ_MALLOC_FAIL;
+    }
+
+    fj_result_t result = handle_event(sys, handlers_clone, &event_data);
+
+    fj_list_del(handlers_clone);
+
+    return result;
 }
