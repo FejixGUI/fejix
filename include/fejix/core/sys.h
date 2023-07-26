@@ -86,7 +86,7 @@ fj_result_t fj_sys_unbind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
-    fj_id_t module_id
+    fj_id_t handler_module_id
 );
 
 fj_result_t fj_sys_emit_event(

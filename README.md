@@ -15,14 +15,8 @@ cmake --build build
 
 ## Test
 
-First, build the project with `FEJIX_BUILD_TESTS=ON`.
-
 ```sh
-ctest --test-dir build
-```
-
-Altogether:
-
-```sh
-cmake --build build && ctest --test-dir build 
+cmake -B build -D FEJIX_BUILD_TESTS=ON
+cmake --build build
+ctest --test-dir build 
 ```

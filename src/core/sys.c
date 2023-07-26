@@ -327,7 +327,7 @@ fj_result_t fj_sys_unbind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
-    fj_id_t module_id
+    fj_id_t handler_module_id
 )
 {
     struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
@@ -336,7 +336,7 @@ fj_result_t fj_sys_unbind_event(
         return FJ_OK;
     }
 
-    return fj_list_exclude(handlers, module_id);
+    return fj_list_exclude(handlers, handler_module_id);
 }
 
 
