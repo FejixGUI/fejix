@@ -1,4 +1,6 @@
 #include <fejix/core/sys.h>
+#include <fejix/core/list.h>
+#include <fejix/core/map.h>
 
 #include <malloc.h>
 
@@ -21,7 +23,7 @@ struct find_interface_data {
 };
 
 
-static fj_result_t sys_init(struct fj_sys * sys)
+static fj_err_t sys_init(struct fj_sys * sys)
 {
     sys->module_interfaces = fj_map_new();
     sys->module_resources = fj_map_new();
@@ -195,7 +197,7 @@ void fj_sys_del(struct fj_sys * sys)
 }
 
 
-fj_result_t fj_sys_set_interface(
+fj_err_t fj_sys_set_interface(
     struct fj_sys * sys,
     fj_id_t module_id,
     fj_id_t interface_id,
@@ -262,29 +264,7 @@ fj_ptr_t fj_sys_find_interface(
 }
 
 
-fj_result_t fj_sys_load_module_description(
-    struct fj_sys * sys,
-    fj_id_t module_id,
-    struct fj_interface_description * interface_descriptions
-)
-{
-    fj_result_t result = FJ_OK;
-    struct fj_interface_description * desc = interface_descriptions;
-
-    for ( ; desc->interface != NULL && result == FJ_OK; desc++) {
-        result = fj_sys_set_interface(
-            sys,
-            module_id,
-            desc->interface_id,
-            desc->interface
-        );
-    }
-
-    return result;
-}
-
-
-fj_result_t fj_sys_set_resource(
+fj_err_t fj_sys_set_resource(
     struct fj_sys * sys,
     fj_id_t module_id,
     fj_id_t entity_id,
@@ -319,7 +299,7 @@ fj_ptr_t fj_sys_get_resource(
 }
 
 
-fj_result_t fj_sys_bind_event(
+fj_err_t fj_sys_bind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
@@ -338,7 +318,7 @@ fj_result_t fj_sys_bind_event(
 }
 
 
-fj_result_t fj_sys_unbind_event(
+fj_err_t fj_sys_unbind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
@@ -355,7 +335,7 @@ fj_result_t fj_sys_unbind_event(
 }
 
 
-static fj_result_t invoke_handler(
+static fj_err_t invoke_handler(
     struct fj_sys * sys,
     fj_id_t handler_id,
     struct fj_event_data * event_data
@@ -372,25 +352,23 @@ static fj_result_t invoke_handler(
 }
 
 
-static fj_result_t handle_event(
+static fj_err_t handle_event(
     struct fj_sys * sys,
     struct fj_list * handlers,
     struct fj_event_data * event_data
 )
 {
-    fj_result_t result = FJ_OK;
+    fj_err_t e = FJ_OK;
 
-    for (uint32_t i = 0; i < handlers->length && result == FJ_OK; i++) {
-        fj_result_t result = invoke_handler(
-            sys, handlers->elements[i], event_data
-        );
+    for (uint32_t i = 0; i < handlers->length && e == FJ_OK; i++) {
+        e = invoke_handler(sys, handlers->elements[i], event_data);
     }
 
-    return result;
+    return e;
 }
 
 
-fj_result_t fj_sys_emit_event(
+fj_err_t fj_sys_emit_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
@@ -414,9 +392,9 @@ fj_result_t fj_sys_emit_event(
         return FJ_MALLOC_FAIL;
     }
 
-    fj_result_t result = handle_event(sys, handlers_clone, &event_data);
+    fj_err_t e = handle_event(sys, handlers_clone, &event_data);
 
     fj_list_del(handlers_clone);
 
-    return result;
+    return e;
 }

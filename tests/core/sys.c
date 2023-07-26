@@ -21,7 +21,7 @@ FJ_IMPLEMENT_INTERFACE(my_interface, my_instance) {
 
 #define MY_MODULE_ID 321
 
-fj_result_t my_module_init(struct fj_sys * sys)
+fj_err_t my_module_init(struct fj_sys * sys)
 {
     return fj_sys_set_interface(
         sys, MY_MODULE_ID, MY_INTERFACE_ID, &my_instance

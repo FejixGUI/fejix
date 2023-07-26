@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 
-typedef uint32_t fj_result_t;
+typedef uint32_t fj_err_t;
 typedef uint32_t fj_id_t;
 typedef void * fj_ptr_t;
 

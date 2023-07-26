@@ -2,8 +2,7 @@
 #define FEJIX_SYS_H_
 
 
-#include <fejix/core/list.h>
-#include <fejix/core/map.h>
+#include <fejix/core/types.h>
 
 
 #define FJ_DEFINE_INTERFACE(INTERFACE_NAME) \
@@ -12,20 +11,16 @@
 #define FJ_DEFINE_METHOD(METHOD_NAME, RETURN_TYPE, ARGS) \
     RETURN_TYPE (*METHOD_NAME) ARGS;
 
-#define FJ_IMPLEMENT_INTERFACE(INTERFACE_NAME, IMPL_NAME) \
-    static struct INTERFACE_NAME IMPL_NAME =
+#define FJ_IMPLEMENT_INTERFACE(INTERFACE_NAME, INSTANCE_NAME) \
+    static struct INTERFACE_NAME INSTANCE_NAME =
 
-#define FJ_IMPLEMENT_METHOD(METHOD_NAME, IMPL_NAME) \
-    .METHOD_NAME = IMPL_NAME,
+#define FJ_IMPLEMENT_METHOD(METHOD_NAME, IMPLEMENTATION_NAME) \
+    .METHOD_NAME = IMPLEMENTATION_NAME,
 
-#define FJ_DESCRIBE_MODULE(MODULE_NAME) \
-    static struct fj_interface_description MODULE_NAME[] =
-
-#define FJ_DESCRIBE_INTERFACE(INTERFACE_ID, IMPL_NAME) \
-    { .interface_id = INTERFACE_ID, .interface = &IMPL_NAME },
-
-#define FJ_DESCRIBE_END \
-    { .interface_id = 0, .interface = NULL }
+#define FJ_IMPLEMENT_EVENT_INTERFACE(INSTANCE_NAME, CALLBACK_NAME) \
+    FJ_IMPLEMENT_INTERFACE(fj_event_handler_interface, INSTANCE_NAME) { \
+        FJ_IMPLEMENT_METHOD(handle_event, CALLBACK_NAME) \
+    };
 
 
 enum fj_sys_standard_entities {
@@ -56,7 +51,7 @@ struct fj_interface_description {
 };
 
 FJ_DEFINE_INTERFACE(fj_event_handler_interface) {
-    FJ_DEFINE_METHOD(handle_event, fj_result_t, (
+    FJ_DEFINE_METHOD(handle_event, fj_err_t, (
         struct fj_sys * sys,
         struct fj_event_data * event_data
     ))
@@ -70,7 +65,7 @@ void fj_sys_del(struct fj_sys * sys);
 /// Remove the interface by setting it to NULL.
 /// However, removing interfaces is potentially dengerous.
 /// See `fj_sys_emit_event()`.
-fj_result_t fj_sys_set_interface(
+fj_err_t fj_sys_set_interface(
     struct fj_sys * sys,
     fj_id_t module_id,
     fj_id_t interface_id,
@@ -88,14 +83,8 @@ fj_ptr_t fj_sys_find_interface(
     fj_id_t interface_id
 );
 
-fj_result_t fj_sys_load_module_description(
-    struct fj_sys * sys,
-    fj_id_t module_id,
-    struct fj_interface_description * interface_descriptions
-);
-
 /// Remove the resource by setting it to NULL
-fj_result_t fj_sys_set_resource(
+fj_err_t fj_sys_set_resource(
     struct fj_sys * sys,
     fj_id_t module_id,
     fj_id_t entity_id,
@@ -108,14 +97,14 @@ fj_ptr_t fj_sys_get_resource(
     fj_id_t entity_id
 );
 
-fj_result_t fj_sys_bind_event(
+fj_err_t fj_sys_bind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
     fj_id_t handler_module_id
 );
 
-fj_result_t fj_sys_unbind_event(
+fj_err_t fj_sys_unbind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,
@@ -127,7 +116,7 @@ fj_result_t fj_sys_unbind_event(
 /// If a handler module does not have the appropriate event handling interface
 /// (such interface should be of type `struct fj_event_handler_interface` and
 /// have the same ID as the event), then `FJ_INTERNAL_FAIL` is returned.
-fj_result_t fj_sys_emit_event(
+fj_err_t fj_sys_emit_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id,

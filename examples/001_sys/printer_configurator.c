@@ -2,7 +2,10 @@
 #include "printer_configurator.h"
 
 
-static fj_result_t configure_printing(
+#define MODID PRINTER_CONFIGURATOR_MODULE_ID
+
+
+static fj_err_t configure_printing(
     struct fj_sys * sys,
     struct fj_event_data * event_data
 )
@@ -15,24 +18,11 @@ static fj_result_t configure_printing(
 }
 
 
-FJ_IMPLEMENT_INTERFACE(fj_event_handler_interface, printer_configurator) {
-    FJ_IMPLEMENT_METHOD(handle_event, configure_printing)
-};
-
-FJ_DESCRIBE_MODULE(module_description) {
-    FJ_DESCRIBE_INTERFACE(PRINT_EVENT_ID, printer_configurator)
-    FJ_DESCRIBE_END
-};
-
+FJ_IMPLEMENT_EVENT_INTERFACE(printer_configurator, configure_printing);
 
 void printer_configurator_module_init(struct fj_sys * sys)
 {
-    fj_sys_load_module_description(
-        sys, PRINTER_CONFIGURATOR_MODULE_ID, module_description
-    );
+    fj_sys_set_interface(sys, MODID, PRINT_EVENT_ID, &printer_configurator);
 
-    fj_sys_bind_event(
-        sys, FJ_SYS_GLOBAL_ENTITY, PRINT_EVENT_ID,
-        PRINTER_CONFIGURATOR_MODULE_ID
-    );
+    fj_sys_bind_event(sys, FJ_SYS_GLOBAL_ENTITY, PRINT_EVENT_ID, MODID);
 }
