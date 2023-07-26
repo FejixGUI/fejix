@@ -14,17 +14,12 @@ typedef void * fj_ptr_t;
 typedef char * fj_string_t;
 
 
-enum fj_result_values {
+enum fj_err_values {
     FJ_OK = 0,
     FJ_MALLOC_FAIL = 1,
     FJ_INTERNAL_FAIL = 2,
     FJ_SYSTEM_FAIL = 3,
     FJ_INVALID_ID = 4,
-};
-
-enum fj_bool_values {
-    FJ_FALSE = 0,
-    FJ_TRUE = 1,
 };
 
 

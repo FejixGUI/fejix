@@ -10,7 +10,7 @@ static void print_impl(struct fj_sys * sys)
 {
     struct print_event event;
     event.text = "default_text";
-    fj_sys_emit_event(sys, FJ_SYS_GLOBAL_ENTITY, PRINT_EVENT_ID, &event);
+    fj_sys_emit_event(sys, FJ_GLOBAL_ENTITY, PRINT_EVENT_ID, &event);
 
     puts(event.text);
 }

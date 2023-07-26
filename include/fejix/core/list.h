@@ -19,6 +19,8 @@ struct fj_list {
 /// If this returns NULL, it can be assumed to be an `FJ_MALLOC_FAIL` error.
 struct fj_list * fj_list_new(void);
 
+/// Returns NULL on failure.
+/// If this returns NULL, it can be assumed to be an `FJ_MALLOC_FAIL` error.
 struct fj_list * fj_list_clone(struct fj_list * source);
 
 void fj_list_del(struct fj_list * list);
@@ -35,17 +37,17 @@ fj_err_t fj_list_pop(struct fj_list * list);
 
 /// Returns the index of `item` if it is present.
 /// Returns `list->length` if the item was not found.
-/// `O(length)` complexity.
+/// This has `O(length)` complexity.
 uint32_t fj_list_find(struct fj_list * list, fj_id_t item);
 
 /// Ensures that `item` is uniquely present on the list.
 /// Returns `FJ_OK` if `item` already exists.
-/// `O(length)` complexity.
+/// This has `O(length)` complexity.
 fj_err_t fj_list_include(struct fj_list * list, fj_id_t item);
 
 /// Ensures that `item` is not present on the list.
 /// Returns `FJ_OK` if `item` was not found.
-/// `O(length)` complexity.
+/// This has `O(length)` complexity.
 fj_err_t fj_list_exclude(struct fj_list * list, fj_id_t item);
 
 

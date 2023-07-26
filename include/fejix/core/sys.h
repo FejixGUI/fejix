@@ -24,15 +24,15 @@
 
 
 enum fj_sys_standard_entities {
-    FJ_SYS_GLOBAL_ENTITY = 0,
-    FJ_SYS_DEFAULT_ENTITY = 1,
+    FJ_GLOBAL_ENTITY = 0,
+    FJ_DEFAULT_ENTITY = 1,
 };
 
 enum fj_sys_standard_events {
-    FJ_SYS_GLOBAL_SETUP = 0,
-    FJ_SYS_GLOBAL_SHUTDOWN = 1,
-    FJ_SYS_ENTITY_CREATE = 2,
-    FJ_SYS_ENTITY_DESTROY = 3,
+    FJ_GLOBAL_SETUP = 0,
+    FJ_GLOBAL_SHUTDOWN = 1,
+    FJ_ENTITY_CREATE = 2,
+    FJ_ENTITY_DESTROY = 3,
 };
 
 
