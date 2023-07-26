@@ -96,6 +96,8 @@ struct fj_list * fj_list_clone(struct fj_list * source)
         return NULL;
     }
 
+    list->length = source->length;
+
     memcpy(list->elements, source->elements, source->length * ELEMENT_SIZE);
 
     return list;

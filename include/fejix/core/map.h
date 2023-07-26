@@ -24,7 +24,7 @@ typedef fj_map_foreach_result_t (*fj_map_foreach_callback_t)(
 
 enum fj_map_foreach_result_values {
     FJ_MAP_FOREACH_CONTINUE = 0,
-    FJ_MAP_FOREACH_STOP = 0,
+    FJ_MAP_FOREACH_STOP = 1,
 };
 
 

@@ -123,10 +123,7 @@ static struct fj_list * insert_new_list(struct fj_map * map, fj_id_t key)
 }
 
 
-static struct fj_list * get_or_insert_new_list(
-    struct fj_map * map,
-    fj_id_t key
-)
+static struct fj_list * get_or_insert_new_list(struct fj_map * map, fj_id_t key)
 {
     struct fj_list * list = fj_map_get(map, key);
 
@@ -145,18 +142,14 @@ static struct fj_list * get_or_create_handlers(
 )
 {
     struct fj_map * bindings = get_or_insert_new_map(
-        sys->event_bindings,
-        entity_id
+        sys->event_bindings, entity_id
     );
 
     if (bindings == NULL) {
         return NULL;
     }
 
-    struct fj_list * handlers = get_or_insert_new_list(
-        bindings, 
-        entity_id
-    );
+    struct fj_list * handlers = get_or_insert_new_list(bindings, event_id);
 
     return handlers;
 }
@@ -260,7 +253,7 @@ fj_ptr_t fj_sys_find_interface(
     fj_id_t interface_id
 )
 {
-    struct find_interface_data find_data;
+    struct find_interface_data find_data = { 0 };
     find_data.interface_id = interface_id;
 
     fj_map_foreach(sys->module_interfaces, find_interface, &find_data);
@@ -385,17 +378,15 @@ static fj_result_t handle_event(
     struct fj_event_data * event_data
 )
 {
-    for (uint32_t i = 0; i < handlers->length; i++) {
+    fj_result_t result = FJ_OK;
+
+    for (uint32_t i = 0; i < handlers->length && result == FJ_OK; i++) {
         fj_result_t result = invoke_handler(
             sys, handlers->elements[i], event_data
         );
-
-        if (result != FJ_OK) {
-            return result;
-        }
     }
 
-    return FJ_OK;
+    return result;
 }
 
 
