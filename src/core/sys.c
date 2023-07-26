@@ -48,12 +48,12 @@ static fj_map_foreach_result_t destroy_map(
 }
 
 
-static fj_map_foreach_result_t destroy_idlist(
+static fj_map_foreach_result_t destroy_list(
     struct fj_map_element * element,
     fj_ptr_t _data
 )
 {
-    fj_idlist_del(element->value);
+    fj_list_del(element->value);
     return FJ_MAP_FOREACH_CONTINUE;
 }
 
@@ -71,7 +71,7 @@ static void sys_destroy(struct fj_sys * sys)
     }
 
     if (sys->event_bindings != NULL) {
-        fj_map_foreach(sys->event_bindings, destroy_idlist, NULL);
+        fj_map_foreach(sys->event_bindings, destroy_list, NULL);
         fj_map_del(sys->event_bindings);
     }
 }
@@ -106,16 +106,16 @@ static struct fj_map * get_or_insert_new_map(struct fj_map * map, fj_id_t key)
 }
 
 
-static struct fj_idlist * insert_new_list(struct fj_map * map, fj_id_t key)
+static struct fj_list * insert_new_list(struct fj_map * map, fj_id_t key)
 {
-    struct fj_idlist * new_list = fj_idlist_new();
+    struct fj_list * new_list = fj_list_new();
 
     if (new_list == NULL) {
         return NULL;
     }
 
     if (fj_map_set(map, key, new_list) != FJ_OK) {
-        fj_idlist_del(new_list);
+        fj_list_del(new_list);
         return NULL;
     }
 
@@ -123,12 +123,12 @@ static struct fj_idlist * insert_new_list(struct fj_map * map, fj_id_t key)
 }
 
 
-static struct fj_idlist * get_or_insert_new_list(
+static struct fj_list * get_or_insert_new_list(
     struct fj_map * map,
     fj_id_t key
 )
 {
-    struct fj_idlist * list = fj_map_get(map, key);
+    struct fj_list * list = fj_map_get(map, key);
 
     if (list == NULL) {
         list = insert_new_list(map, key);
@@ -138,7 +138,7 @@ static struct fj_idlist * get_or_insert_new_list(
 }
 
 
-static struct fj_idlist * get_or_create_handlers(
+static struct fj_list * get_or_create_handlers(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id
@@ -153,7 +153,7 @@ static struct fj_idlist * get_or_create_handlers(
         return NULL;
     }
 
-    struct fj_idlist * handlers = get_or_insert_new_list(
+    struct fj_list * handlers = get_or_insert_new_list(
         bindings, 
         entity_id
     );
@@ -162,7 +162,7 @@ static struct fj_idlist * get_or_create_handlers(
 }
 
 
-static struct fj_idlist * get_handlers(
+static struct fj_list * get_handlers(
     struct fj_sys * sys,
     fj_id_t entity_id,
     fj_id_t event_id
@@ -311,7 +311,7 @@ fj_result_t fj_sys_bind_event(
     fj_id_t handler_module_id
 )
 {
-    struct fj_idlist * handlers = get_or_create_handlers(
+    struct fj_list * handlers = get_or_create_handlers(
         sys, entity_id, event_id
     );
 
@@ -319,7 +319,7 @@ fj_result_t fj_sys_bind_event(
         return FJ_MALLOC_FAIL;
     }
 
-    return fj_idlist_push(handlers, handler_module_id);
+    return fj_list_include(handlers, handler_module_id);
 }
 
 
@@ -330,13 +330,13 @@ fj_result_t fj_sys_unbind_event(
     fj_id_t module_id
 )
 {
-    struct fj_idlist * handlers = get_handlers(sys, entity_id, event_id);
+    struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
         return FJ_OK;
     }
 
-    return fj_idlist_remove_item(handlers, module_id);
+    return fj_list_exclude(handlers, module_id);
 }
 
 
@@ -359,7 +359,7 @@ static fj_result_t invoke_handler(
 
 static fj_result_t handle_event(
     struct fj_sys * sys,
-    struct fj_idlist * handlers,
+    struct fj_list * handlers,
     struct fj_event_data * event_data
 )
 {
@@ -389,7 +389,7 @@ fj_result_t fj_sys_emit_event(
     event_data.event_id = event_id;
     event_data.event = event;
 
-    struct fj_idlist * handlers = get_handlers(sys, entity_id, event_id);
+    struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
         return FJ_OK;

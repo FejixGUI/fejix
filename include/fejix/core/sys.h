@@ -2,7 +2,7 @@
 #define FEJIX_SYS_H_
 
 
-#include <fejix/core/idlist.h>
+#include <fejix/core/list.h>
 #include <fejix/core/map.h>
 
 

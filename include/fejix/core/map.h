@@ -38,6 +38,7 @@ fj_result_t fj_map_set(struct fj_map * map, fj_id_t key, fj_ptr_t value);
 /// Returns NULL if the element was not found.
 fj_ptr_t fj_map_get(struct fj_map * map, fj_id_t key);
 
+/// Modifying the map while iterating over it is undefined behavior.
 void fj_map_foreach(
     struct fj_map * map,
     fj_map_foreach_callback_t callback,
