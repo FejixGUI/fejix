@@ -2,7 +2,7 @@
 #define FEJIX_LIST_H_
 
 
-#include <fejix/core/types.h>
+#include <fejix/core/base.h>
 
 
 /// Linear dynamic array of identifiers (`fj_id_t`).
@@ -15,12 +15,10 @@ struct fj_list {
 };
 
 
-/// Returns NULL on failure.
-/// If this returns NULL, it can be assumed to be an `FJ_MALLOC_FAIL` error.
+/// Returns NULL if `fj_err_malloc` occurs.
 struct fj_list * fj_list_new(void);
 
-/// Returns NULL on failure.
-/// If this returns NULL, it can be assumed to be an `FJ_MALLOC_FAIL` error.
+/// Returns NULL if `fj_err_malloc` occurs.
 struct fj_list * fj_list_clone(struct fj_list * source);
 
 void fj_list_del(struct fj_list * list);
@@ -46,7 +44,7 @@ uint32_t fj_list_find(struct fj_list * list, fj_id_t item);
 fj_err_t fj_list_include(struct fj_list * list, fj_id_t item);
 
 /// Ensures that `item` is not present on the list.
-/// Returns `FJ_OK` if `item` was not found.
+/// Returns `fj_ok` if `item` was not found.
 /// This has `O(length)` complexity.
 fj_err_t fj_list_exclude(struct fj_list * list, fj_id_t item);
 

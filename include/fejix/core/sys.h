@@ -2,7 +2,7 @@
 #define FEJIX_SYS_H_
 
 
-#include <fejix/core/types.h>
+#include <fejix/core/base.h>
 
 
 #define FJ_DEFINE_INTERFACE(INTERFACE_NAME) \
@@ -45,10 +45,6 @@ struct fj_event_data {
     fj_id_t entity_id;
 };
 
-struct fj_interface_description {
-    fj_ptr_t interface;
-    fj_id_t interface_id;
-};
 
 FJ_DEFINE_INTERFACE(fj_event_handler_interface) {
     FJ_DEFINE_METHOD(handle_event, fj_err_t, (
@@ -58,6 +54,7 @@ FJ_DEFINE_INTERFACE(fj_event_handler_interface) {
 };
 
 
+/// Returns NULL if `fj_err_malloc` occurs.
 struct fj_sys * fj_sys_new(void);
 
 void fj_sys_del(struct fj_sys * sys);

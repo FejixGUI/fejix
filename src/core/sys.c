@@ -1,6 +1,7 @@
 #include <fejix/core/sys.h>
 #include <fejix/core/list.h>
 #include <fejix/core/map.h>
+#include <fejix/core/utils.h>
 
 #include <malloc.h>
 
@@ -33,10 +34,10 @@ static fj_err_t sys_init(struct fj_sys * sys)
         || sys->module_resources == NULL
         || sys->event_bindings == NULL
     ) {
-        return FJ_MALLOC_FAIL;
+        return fj_err_malloc;
     }
 
-    return FJ_OK;
+    return fj_ok;
 }
 
 
@@ -87,7 +88,7 @@ static struct fj_map * insert_new_map(struct fj_map * map, fj_id_t key)
         return NULL;
     }
 
-    if (fj_map_set(map, key, new_map) != FJ_OK) {
+    if (fj_map_set(map, key, new_map) != fj_ok) {
         fj_map_del(new_map);
         return NULL;
     }
@@ -116,7 +117,7 @@ static struct fj_list * insert_new_list(struct fj_map * map, fj_id_t key)
         return NULL;
     }
 
-    if (fj_map_set(map, key, new_list) != FJ_OK) {
+    if (fj_map_set(map, key, new_list) != fj_ok) {
         fj_list_del(new_list);
         return NULL;
     }
@@ -181,7 +182,7 @@ struct fj_sys * fj_sys_new(void)
         return NULL;
     }
 
-    if (sys_init(sys) != FJ_OK) {
+    if (sys_init(sys) != fj_ok) {
         fj_sys_del(sys);
         return NULL;
     }
@@ -209,7 +210,7 @@ fj_err_t fj_sys_set_interface(
     );
 
     if (interfaces == NULL) {
-        return FJ_MALLOC_FAIL;
+        return fj_err_malloc;
     }
 
     return fj_map_set(interfaces, interface_id, interface);
@@ -276,7 +277,7 @@ fj_err_t fj_sys_set_resource(
     );
 
     if (resources == NULL) {
-        return FJ_MALLOC_FAIL;
+        return fj_err_malloc;
     }
 
     return fj_map_set(resources, entity_id, resources);
@@ -311,7 +312,7 @@ fj_err_t fj_sys_bind_event(
     );
 
     if (handlers == NULL) {
-        return FJ_MALLOC_FAIL;
+        return fj_err_malloc;
     }
 
     return fj_list_include(handlers, handler_module_id);
@@ -328,7 +329,7 @@ fj_err_t fj_sys_unbind_event(
     struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
-        return FJ_OK;
+        return fj_ok;
     }
 
     return fj_list_exclude(handlers, handler_module_id);
@@ -345,7 +346,7 @@ static fj_err_t invoke_handler(
     interface = fj_sys_get_interface(sys, handler_id, event_data->event_id);
 
     if (interface == NULL) {
-        return FJ_INTERNAL_FAIL;
+        return FJ_ERR("cannot call event handler (event interface not found)");
     }
 
     return interface->handle_event(sys, event_data);
@@ -358,9 +359,9 @@ static fj_err_t handle_event(
     struct fj_event_data * event_data
 )
 {
-    fj_err_t e = FJ_OK;
+    fj_err_t e = fj_ok;
 
-    for (uint32_t i = 0; i < handlers->length && e == FJ_OK; i++) {
+    for (uint32_t i = 0; i < handlers->length && e == fj_ok; i++) {
         e = invoke_handler(sys, handlers->elements[i], event_data);
     }
 
@@ -383,13 +384,13 @@ fj_err_t fj_sys_emit_event(
     struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
-        return FJ_OK;
+        return fj_ok;
     }
 
     struct fj_list * handlers_clone = fj_list_clone(handlers);
 
     if (handlers_clone == NULL) {
-        return FJ_MALLOC_FAIL;
+        return fj_err_malloc;
     }
 
     fj_err_t e = handle_event(sys, handlers_clone, &event_data);

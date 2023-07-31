@@ -28,19 +28,19 @@ static fj_err_t list_resize(struct fj_list * list, uint32_t capacity)
         list->capacity = 0;
         list->length = 0;
 
-        return FJ_MALLOC_FAIL;
+        return fj_err_malloc;
     }
 
     list->capacity = capacity;
 
-    return FJ_OK;
+    return fj_ok;
 }
 
 
 static fj_err_t list_grow(struct fj_list * list)
 {
     if (list->length + 1 <= list->capacity) {
-        return FJ_OK;
+        return fj_ok;
     }
 
     uint32_t new_capacity = fj_max(1, list->capacity * 2);
@@ -52,7 +52,7 @@ static fj_err_t list_grow(struct fj_list * list)
 static fj_err_t list_shrink(struct fj_list * list)
 {
     if (list->length >= list->capacity / 2) {
-        return FJ_OK;
+        return fj_ok;
     }
 
     return list_resize(list, list->capacity / 2);
@@ -86,12 +86,11 @@ struct fj_list * fj_list_new(void)
 struct fj_list * fj_list_clone(struct fj_list * source)
 {
     struct fj_list * list = fj_list_new();
-
     if (list == NULL) {
         return NULL;
     }
 
-    if (list_resize(list, source->capacity) != FJ_OK) {
+    if (list_resize(list, source->capacity) != fj_ok) {
         fj_list_del(list);
         return NULL;
     }
@@ -117,11 +116,11 @@ void fj_list_del(struct fj_list * list)
 fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, fj_id_t elem)
 {
     if (index > last_index(list)+1) {
-        return FJ_INTERNAL_FAIL;
+        return FJ_ERR("cannot insert to list (index out of range)");
     }
 
-    if (list_grow(list) != FJ_OK) {
-        return FJ_MALLOC_FAIL;
+    if (list_grow(list) != fj_ok) {
+        return fj_err_malloc;
     }
 
     list->length++;
@@ -132,14 +131,14 @@ fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, fj_id_t elem)
 
     list->elements[index] = elem;
 
-    return FJ_OK;
+    return fj_ok;
 }
 
 
 fj_err_t fj_list_remove(struct fj_list * list, uint32_t index)
 {
     if (is_empty(list) || index > last_index(list)) {
-        return FJ_INTERNAL_FAIL;
+        return FJ_ERR("cannot remove from list (index out of range)");
     }
 
     if (index != last_index(list)) {
@@ -180,7 +179,7 @@ uint32_t fj_list_find(struct fj_list * list, fj_id_t item)
 fj_err_t fj_list_include(struct fj_list * list, fj_id_t item)
 {
     if (fj_list_find(list, item) != list->length) {
-        return FJ_OK;
+        return fj_ok;
     }
 
     return fj_list_push(list, item);
@@ -192,7 +191,7 @@ fj_err_t fj_list_exclude(struct fj_list * list, fj_id_t item)
     uint32_t index = fj_list_find(list, item);
 
     if (index == list->length) {
-        return FJ_OK;
+        return fj_ok;
     }
 
     return fj_list_remove(list, index);

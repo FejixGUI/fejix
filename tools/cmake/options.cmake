@@ -32,3 +32,5 @@ fejix_define_interface(CLIPBOARD)
 
 fejix_define_interface(PIXMAP)
 fejix_define_interface(OPENGL)
+
+option(FEJIX_BUILD_TESTS OFF)

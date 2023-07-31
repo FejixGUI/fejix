@@ -7,25 +7,28 @@ For now, there is just an emoji: 🌸
 ## Build
 
 ```sh
-# Configure
-cmake -B build -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
-# Build
-cmake --build build
+mkdir build
+cd build
+cmake .. -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
+ninja # Or 'make' or whatever cmake uses
 ```
 
 ## Test
 
 ```sh
-cmake -B build -D FEJIX_BUILD_TESTS=ON
-cmake --build build
-ctest --test-dir build 
+cd build
+cmake .. -D FEJIX_BUILD_TESTS=ON
+ninja
+ctest 
 ```
 
 ## Build and run examples
 
 ```sh
 cd examples/EXAMPLE_NAME
-cmake -B build
-cmake --build build
-./build/example
+mkdir build
+cd build
+cmake ..
+ninja
+./example
 ```

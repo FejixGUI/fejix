@@ -2,7 +2,7 @@
 #define FEJIX_H_
 
 
-#include <fejix/core/types.h>
+#include <fejix/core/base.h>
 #include <fejix/core/sys.h>
 
 

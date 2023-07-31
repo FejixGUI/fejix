@@ -35,7 +35,7 @@ int main() {
 
     assert(sys != NULL);
 
-    assert(my_module_init(sys) == FJ_OK);
+    assert(my_module_init(sys) == fj_ok);
 
     struct my_interface * interface;
     interface = fj_sys_find_interface(sys, MY_INTERFACE_ID);
@@ -44,7 +44,7 @@ int main() {
 
     interface->hello_world();
 
-    assert(fj_sys_set_interface(sys, MY_MODULE_ID, MY_INTERFACE_ID, NULL) == FJ_OK);
+    assert(fj_sys_set_interface(sys, MY_MODULE_ID, MY_INTERFACE_ID, NULL) == fj_ok);
 
     assert(fj_sys_find_interface(sys, MY_INTERFACE_ID) == NULL);
 

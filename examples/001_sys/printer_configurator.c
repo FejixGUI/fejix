@@ -14,7 +14,7 @@ static fj_err_t configure_printing(
 
     event->text = "Hello world! (configured by printer configurator)";
 
-    return FJ_OK;
+    return fj_ok;
 }
 
 
