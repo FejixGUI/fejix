@@ -25,7 +25,6 @@
 
 enum fj_sys_standard_entities {
     FJ_GLOBAL_ENTITY = 0,
-    FJ_DEFAULT_USER_ENTITY = 1,
 };
 
 enum fj_sys_standard_events {

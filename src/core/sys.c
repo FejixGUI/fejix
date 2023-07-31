@@ -59,7 +59,7 @@ static fj_map_foreach_result_t destroy_list(
 )
 {
     (void) data;
-    
+
     fj_list_del(element->value);
     return FJ_MAP_FOREACH_CONTINUE;
 }
@@ -365,8 +365,12 @@ static fj_err_t handle_event(
 {
     fj_err_t e = fj_ok;
 
-    for (uint32_t i = 0; i < handlers->length && e == fj_ok; i++) {
+    for (uint32_t i = 0; i < handlers->length; i++) {
         e = invoke_handler(sys, handlers->elements[i], event_data);
+
+        if (e != fj_ok) {
+            break;
+        }
     }
 
     return e;
