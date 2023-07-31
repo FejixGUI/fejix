@@ -43,9 +43,11 @@ static fj_err_t sys_init(struct fj_sys * sys)
 
 static fj_map_foreach_result_t destroy_map(
     struct fj_map_element * element,
-    fj_ptr_t _data
+    fj_ptr_t data
 )
 {
+    (void) data;
+
     fj_map_del(element->value);
     return FJ_MAP_FOREACH_CONTINUE;
 }
@@ -53,9 +55,11 @@ static fj_map_foreach_result_t destroy_map(
 
 static fj_map_foreach_result_t destroy_list(
     struct fj_map_element * element,
-    fj_ptr_t _data
+    fj_ptr_t data
 )
 {
+    (void) data;
+    
     fj_list_del(element->value);
     return FJ_MAP_FOREACH_CONTINUE;
 }
@@ -280,7 +284,7 @@ fj_err_t fj_sys_set_resource(
         return fj_err_malloc;
     }
 
-    return fj_map_set(resources, entity_id, resources);
+    return fj_map_set(resources, entity_id, resource);
 }
 
 

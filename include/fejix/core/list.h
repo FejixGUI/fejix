@@ -23,10 +23,10 @@ struct fj_list * fj_list_clone(struct fj_list * source);
 
 void fj_list_del(struct fj_list * list);
 
-/// Returns `FJ_INTERNAL_FAIL` if the index is out of `[0; length]`.
+/// Returns an error if the index is out of `[0; length]`.
 fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, fj_id_t item);
 
-/// Returns `FJ_INTERNAL_FAIL` if the index is out of `[0; length-1]`.
+/// Returns an error if the index is out of `[0; length-1]`.
 fj_err_t fj_list_remove(struct fj_list * list, uint32_t index);
 
 fj_err_t fj_list_push(struct fj_list * list, fj_id_t item);
@@ -39,7 +39,7 @@ fj_err_t fj_list_pop(struct fj_list * list);
 uint32_t fj_list_find(struct fj_list * list, fj_id_t item);
 
 /// Ensures that `item` is uniquely present on the list.
-/// Returns `FJ_OK` if `item` already exists.
+/// Returns `fj_ok` if `item` already exists.
 /// This has `O(length)` complexity.
 fj_err_t fj_list_include(struct fj_list * list, fj_id_t item);
 

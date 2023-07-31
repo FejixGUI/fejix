@@ -25,7 +25,7 @@
 
 enum fj_sys_standard_entities {
     FJ_GLOBAL_ENTITY = 0,
-    FJ_DEFAULT_ENTITY = 1,
+    FJ_DEFAULT_USER_ENTITY = 1,
 };
 
 enum fj_sys_standard_events {
@@ -75,6 +75,9 @@ fj_ptr_t fj_sys_get_interface(
     fj_id_t interface_id
 );
 
+/// Finds the module that provides an interface with the given ID and returns
+///the interface. This is supposed to work for globally unique interfaces.
+/// Returns NULL if the interface cannot be found.
 fj_ptr_t fj_sys_find_interface(
     struct fj_sys * sys,
     fj_id_t interface_id
@@ -112,7 +115,7 @@ fj_err_t fj_sys_unbind_event(
 ///
 /// If a handler module does not have the appropriate event handling interface
 /// (such interface should be of type `struct fj_event_handler_interface` and
-/// have the same ID as the event), then `FJ_INTERNAL_FAIL` is returned.
+/// have the same ID as the event), then an error is returned.
 fj_err_t fj_sys_emit_event(
     struct fj_sys * sys,
     fj_id_t entity_id,

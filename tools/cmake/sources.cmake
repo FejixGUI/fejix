@@ -1,6 +1,5 @@
 target_include_directories(fejix PUBLIC "${FEJIX_INCLUDE}")
 
-set_target_properties(fejix PROPERTIES C_STANDARD 99)
 
 target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/base.c"

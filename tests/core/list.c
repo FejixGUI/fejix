@@ -10,8 +10,6 @@ int main() {
 
     struct fj_list * list = fj_list_new();
 
-    int x = ((uint32_t) 2) < ((int32_t) 3);
-
     assert(fj_list_include(list, 123) == fj_ok);
     assert(list->length == 1);
     assert(fj_list_find(list, 123) == 0);
@@ -43,7 +41,7 @@ int main() {
 
     assert(list->length == 10);
 
-    for (int i=0; i<list->length; i++) {
+    for (uint32_t i=0; i<list->length; i++) {
         assert(list->elements[i] == i);
     }
 

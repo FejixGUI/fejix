@@ -15,10 +15,7 @@ set(FEJIX_TOOLS "${FEJIX_ROOT}/tools")
 set(FEJIX_CMAKE "${FEJIX_TOOLS}/cmake")
 set(FEJIX_TESTS "${FEJIX_ROOT}/tests")
 
-# Output paths
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+include("${FEJIX_CMAKE}/config.cmake")
 
 # Main target
 add_library(fejix STATIC)
