@@ -19,9 +19,7 @@ struct print_event {
 };
 
 
-#define PRINTER_MODULE_ID 12345
-
-void printer_module_init(struct fj_sys * sys);
+void printer_init(struct fj_sys * sys);
 
 
 #endif

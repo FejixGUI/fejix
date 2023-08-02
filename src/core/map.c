@@ -235,12 +235,12 @@ static fj_err_t resize_buckets(struct fj_map * map, uint32_t buckets_count)
     if (map->buckets == NULL) {
         map->buckets_count = 0;
         map->elements_count = 0;
-        return fj_err_malloc;
+        return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
     map->buckets_count = buckets_count;
 
-    return fj_ok;
+    return FJ_OK;
 }
 
 
@@ -259,7 +259,7 @@ static fj_err_t rehash(struct fj_map * map, bool grow)
     struct fj_map_node * list_head = extract_nodes(map);
 
     fj_err_t e = resize_map(map, grow);
-    if (e != fj_ok) {
+    if (e != FJ_OK) {
         free_nodes(list_head);
         return e;
     }
@@ -268,7 +268,7 @@ static fj_err_t rehash(struct fj_map * map, bool grow)
         reinsert_nodes(map, list_head);
     }
 
-    return fj_ok;
+    return FJ_OK;
 }
 
 
@@ -280,7 +280,7 @@ static fj_err_t validate_map(struct fj_map * map)
         return rehash(map, map_needs_to_grow(load_factor));
     }
 
-    return fj_ok;
+    return FJ_OK;
 }
 
 
@@ -289,7 +289,7 @@ static fj_err_t map_remove(struct fj_map * map, fj_id_t key)
     struct fj_map_node * node = raw_remove(map, key);
 
     if (node == NULL) {
-        return fj_ok;
+        return FJ_OK;
     }
 
     free(node);
@@ -335,7 +335,7 @@ static fj_err_t map_insert(struct fj_map * map, fj_id_t key, fj_ptr_t value)
     struct fj_map_node * node = calloc(1, sizeof(struct fj_map_node));
 
     if (node == NULL) {
-        return fj_err_malloc;
+        return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
     node->element.key = key;
@@ -385,7 +385,7 @@ fj_err_t fj_map_set(struct fj_map * map, fj_id_t key, fj_ptr_t value)
     }
 
     if (map_update(map, key, value)) {
-        return fj_ok;
+        return FJ_OK;
     }
 
     return map_insert(map, key, value);

@@ -13,8 +13,12 @@
 
 /// Formats the given error message.
 /// `MESSAGE` must be a string literal.
-#define FJ_ERR(MESSAGE) \
-    "Error [" __FILE__ "@" FJ_STRINGIFY(__LINE__) "]: " MESSAGE
+#ifdef FJ_DEBUG
+#   define FJ_ERR(MESSAGE) \
+        "error [" __FILE__ ":" FJ_STRINGIFY(__LINE__) "]: " MESSAGE
+#else
+#   define FJ_ERR(MESSAGE) "error: " MESSAGE
+#endif
 
 
 uint32_t fj_max(uint32_t a, uint32_t b);

@@ -6,6 +6,7 @@ Here are some consistency guidelines.
 
 * Lines should be maximum 80 characters and end with LF.
 * Indents should be 4 spaces.
+* All files should end with a final newline.
 * Use C99.
 
 ## Order
@@ -55,9 +56,9 @@ FJ_DEFINE_INTERFACE(my_interface) {
 ### Function arguments
 
 1. System
-2. Module ID
-3. Entity ID
-4. Event/interface ID
+2. Entity ID
+3. Event ID
+4. Interface ID
 5. Data pointers
 
 Illustration:
@@ -78,7 +79,7 @@ void func(
 3. Public functions
 
 If a static function is used in exactly one function and is not intended to be used anywhere else, it may come right before the function that uses it.
-An example of such static functions are callbacks.
+An example of such static functions is callbacks.
 
 Illustration:
 ```c
@@ -89,25 +90,27 @@ Illustration:
 
 #include <malloc.h>
 #include <stdlib.h>
-#include <stdwhatever.h>
+#include <stdbool.h>
 
 
 static .. foo(..)
-..
+    ..
+
 
 static .. bar(..)
-..
+    ..
+
 
 .. fj_some_function(..)
-..
+    ..
 
 
 static .. some_callback(..)
-..
+    ..
 
 
-.. fj_do_something(..)
-.. use some_callback(..) ..
-..
+.. fj_another_function(..)
+    .. use some_callback(..) ..
+    ..
 
 ```

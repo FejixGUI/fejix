@@ -6,6 +6,10 @@
 #include <stddef.h>
 
 
+#define FJ_OK NULL
+#define FJ_MALLOC_FAILED "memory allocation failed"
+
+
 /// Identifier.
 typedef uint32_t fj_id_t;
 /// Void pointer.
@@ -14,14 +18,6 @@ typedef void * fj_ptr_t;
 typedef char * fj_string_t;
 /// Constant ASCII string for error messages.
 typedef const char * fj_err_t;
-
-
-// Predefined errors for avoiding duplication:
-
-/// Success, equal to NULL.
-extern fj_err_t fj_ok;
-/// Memory allocation error.
-extern fj_err_t fj_err_malloc;
 
 
 #endif

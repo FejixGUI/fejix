@@ -5,9 +5,7 @@
 #include <fejix/fejix.h>
 
 
-#define PRINTER_CONFIGURATOR_MODULE_ID 321
-
-void printer_configurator_module_init(struct fj_sys * sys);
+void printer_configurator_init(struct fj_sys * sys);
 
 
 #endif

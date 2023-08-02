@@ -15,3 +15,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
 elseif(CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_compile_options("/W4")
 endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    set(FEJIX_DEBUG ON)
+endif()

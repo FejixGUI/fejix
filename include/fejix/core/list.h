@@ -15,10 +15,10 @@ struct fj_list {
 };
 
 
-/// Returns NULL if `fj_err_malloc` occurs.
+/// Returns NULL if an allocation error occurs.
 struct fj_list * fj_list_new(void);
 
-/// Returns NULL if `fj_err_malloc` occurs.
+/// Returns NULL if an allocation error occurs.
 struct fj_list * fj_list_clone(struct fj_list * source);
 
 void fj_list_del(struct fj_list * list);
@@ -39,12 +39,12 @@ fj_err_t fj_list_pop(struct fj_list * list);
 uint32_t fj_list_find(struct fj_list * list, fj_id_t item);
 
 /// Ensures that `item` is uniquely present on the list.
-/// Returns `fj_ok` if `item` already exists.
+/// Returns `FJ_OK` if `item` already exists.
 /// This has `O(length)` complexity.
 fj_err_t fj_list_include(struct fj_list * list, fj_id_t item);
 
 /// Ensures that `item` is not present on the list.
-/// Returns `fj_ok` if `item` was not found.
+/// Returns `FJ_OK` if `item` was not found.
 /// This has `O(length)` complexity.
 fj_err_t fj_list_exclude(struct fj_list * list, fj_id_t item);
 

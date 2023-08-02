@@ -7,11 +7,11 @@
 
 
 struct fj_sys {
-    /// module_id -> interface_id -> *interface
-    struct fj_map * module_interfaces;
+    /// interface_id -> *interface
+    struct fj_map * interfaces;
 
-    /// module_id -> entity_id -> *resource
-    struct fj_map * module_resources;
+    /// entity_id -> interface_id -> *resource
+    struct fj_map * resources;
 
     /// entity_id -> event_id -> modules_that_handle_the_event[]
     struct fj_map * event_bindings;
@@ -26,18 +26,18 @@ struct find_interface_data {
 
 static fj_err_t sys_init(struct fj_sys * sys)
 {
-    sys->module_interfaces = fj_map_new();
-    sys->module_resources = fj_map_new();
+    sys->interfaces = fj_map_new();
+    sys->resources = fj_map_new();
     sys->event_bindings = fj_map_new();
 
-    if (sys->module_interfaces == NULL
-        || sys->module_resources == NULL
+    if (sys->interfaces == NULL
+        || sys->resources == NULL
         || sys->event_bindings == NULL
     ) {
-        return fj_err_malloc;
+        return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
-    return fj_ok;
+    return FJ_OK;
 }
 
 
@@ -67,14 +67,13 @@ static fj_map_foreach_result_t destroy_list(
 
 static void sys_destroy(struct fj_sys * sys)
 {
-    if (sys->module_interfaces != NULL) {
-        fj_map_foreach(sys->module_interfaces, destroy_map, NULL);
-        fj_map_del(sys->module_interfaces);
+    if (sys->interfaces != NULL) {
+        fj_map_del(sys->interfaces);
     }
 
-    if (sys->module_resources != NULL) {
-        fj_map_foreach(sys->module_resources, destroy_map, NULL);
-        fj_map_del(sys->module_resources);
+    if (sys->resources != NULL) {
+        fj_map_foreach(sys->resources, destroy_map, NULL);
+        fj_map_del(sys->resources);
     }
 
     if (sys->event_bindings != NULL) {
@@ -92,7 +91,7 @@ static struct fj_map * insert_new_map(struct fj_map * map, fj_id_t key)
         return NULL;
     }
 
-    if (fj_map_set(map, key, new_map) != fj_ok) {
+    if (fj_map_set(map, key, new_map) != FJ_OK) {
         fj_map_del(new_map);
         return NULL;
     }
@@ -121,7 +120,7 @@ static struct fj_list * insert_new_list(struct fj_map * map, fj_id_t key)
         return NULL;
     }
 
-    if (fj_map_set(map, key, new_list) != fj_ok) {
+    if (fj_map_set(map, key, new_list) != FJ_OK) {
         fj_list_del(new_list);
         return NULL;
     }
@@ -186,7 +185,7 @@ struct fj_sys * fj_sys_new(void)
         return NULL;
     }
 
-    if (sys_init(sys) != fj_ok) {
+    if (sys_init(sys) != FJ_OK) {
         fj_sys_del(sys);
         return NULL;
     }
@@ -204,111 +203,65 @@ void fj_sys_del(struct fj_sys * sys)
 
 fj_err_t fj_sys_set_interface(
     struct fj_sys * sys,
-    fj_id_t module_id,
     fj_id_t interface_id,
     fj_ptr_t interface
 )
 {
-    struct fj_map * interfaces = get_or_insert_new_map(
-        sys->module_interfaces, module_id
-    );
-
-    if (interfaces == NULL) {
-        return fj_err_malloc;
-    }
-
-    return fj_map_set(interfaces, interface_id, interface);
+    return fj_map_set(sys->interfaces, interface_id, interface);
 }
 
 
 fj_ptr_t fj_sys_get_interface(
     struct fj_sys * sys,
-    fj_id_t module_id,
     fj_id_t interface_id
 )
 {
-    struct fj_map * interfaces = fj_map_get(sys->module_interfaces, module_id);
-
-    if (interfaces == NULL) {
-        return NULL;
-    }
-
-    return fj_map_get(interfaces, interface_id);
+    return fj_map_get(sys->interfaces, interface_id);
 }
 
 
-static fj_map_foreach_result_t find_interface(
-    struct fj_map_element * element,
-    fj_ptr_t data
-)
-{
-    struct fj_map * interfaces = element->value;
-    struct find_interface_data * find_data = data;
-
-    find_data->interface = fj_map_get(interfaces, find_data->interface_id);
-
-    if (find_data->interface == NULL) {
-        return FJ_MAP_FOREACH_CONTINUE;
-    }
-
-    return FJ_MAP_FOREACH_STOP;
-}
-
-
-fj_ptr_t fj_sys_find_interface(
-    struct fj_sys * sys,
-    fj_id_t interface_id
-)
-{
-    struct find_interface_data find_data = { 0 };
-    find_data.interface_id = interface_id;
-
-    fj_map_foreach(sys->module_interfaces, find_interface, &find_data);
-
-    return find_data.interface;
-}
-
-
+// TODO If all resources of an entity get deleted, the map for storing those
+// resources is not freed. Do we need to fix this?
 fj_err_t fj_sys_set_resource(
     struct fj_sys * sys,
-    fj_id_t module_id,
     fj_id_t entity_id,
+    fj_id_t interface_id,
     fj_ptr_t resource
 )
 {
     struct fj_map * resources = get_or_insert_new_map(
-        sys->module_resources, module_id
+        sys->resources, entity_id
     );
 
     if (resources == NULL) {
-        return fj_err_malloc;
+        return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
-    return fj_map_set(resources, entity_id, resource);
+    return fj_map_set(resources, interface_id, resource);
 }
 
 
 fj_ptr_t fj_sys_get_resource(
     struct fj_sys * sys,
-    fj_id_t module_id,
-    fj_id_t entity_id
+    fj_id_t entity_id,
+    fj_id_t interface_id
 )
 {
-    struct fj_map * resources = fj_map_get(sys->module_resources, module_id);
+    struct fj_map * resources = fj_map_get(sys->resources, entity_id);
 
     if (resources == NULL) {
         return NULL;
     }
 
-    return fj_map_get(resources, entity_id);
+    return fj_map_get(resources, interface_id);
 }
 
 
 fj_err_t fj_sys_bind_event(
     struct fj_sys * sys,
-    fj_id_t handler_module_id,
     fj_id_t entity_id,
-    fj_id_t event_id
+    fj_id_t event_id,
+    fj_id_t handler_interface_id
 )
 {
     struct fj_list * handlers = get_or_create_handlers(
@@ -316,41 +269,42 @@ fj_err_t fj_sys_bind_event(
     );
 
     if (handlers == NULL) {
-        return fj_err_malloc;
+        return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
-    return fj_list_include(handlers, handler_module_id);
+    return fj_list_include(handlers, handler_interface_id);
 }
 
 
+// TODO If the last handler gets unbound from an entity, the list for storing
+// its bindings is not freed. Do we need to fix this?
 fj_err_t fj_sys_unbind_event(
     struct fj_sys * sys,
-    fj_id_t handler_module_id,
     fj_id_t entity_id,
-    fj_id_t event_id
+    fj_id_t event_id,
+    fj_id_t handler_interface_id
 )
 {
     struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
-        return fj_ok;
+        return FJ_OK;
     }
 
-    return fj_list_exclude(handlers, handler_module_id);
+    return fj_list_exclude(handlers, handler_interface_id);
 }
 
 
 static fj_err_t invoke_handler(
     struct fj_sys * sys,
-    fj_id_t handler_id,
+    fj_id_t handler,
     struct fj_event_data * event_data
 )
 {
-    struct fj_event_handler_interface * interface;
-    interface = fj_sys_get_interface(sys, handler_id, event_data->event_id);
+    struct fj_event_handler * interface = fj_sys_get_interface(sys, handler);
 
     if (interface == NULL) {
-        return FJ_ERR("cannot call event handler (event interface not found)");
+        return FJ_ERR("cannot call event handler (interface not found)");
     }
 
     return interface->handle_event(sys, event_data);
@@ -363,12 +317,12 @@ static fj_err_t handle_event(
     struct fj_event_data * event_data
 )
 {
-    fj_err_t e = fj_ok;
+    fj_err_t e = FJ_OK;
 
     for (uint32_t i = 0; i < handlers->length; i++) {
         e = invoke_handler(sys, handlers->elements[i], event_data);
 
-        if (e != fj_ok) {
+        if (e != FJ_OK) {
             break;
         }
     }
@@ -392,13 +346,13 @@ fj_err_t fj_sys_emit_event(
     struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
-        return fj_ok;
+        return FJ_OK;
     }
 
     struct fj_list * handlers_clone = fj_list_clone(handlers);
 
     if (handlers_clone == NULL) {
-        return fj_err_malloc;
+        return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
     fj_err_t e = handle_event(sys, handlers_clone, &event_data);

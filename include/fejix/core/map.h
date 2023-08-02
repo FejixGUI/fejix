@@ -31,7 +31,7 @@ struct fj_map_element {
 };
 
 
-/// Returns NULL if `fj_err_malloc` occurs.
+/// Returns NULL if an allocation error occurs.
 struct fj_map * fj_map_new(void);
 
 void fj_map_del(struct fj_map * map);
