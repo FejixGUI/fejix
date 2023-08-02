@@ -4,6 +4,7 @@
 
 #include <fejix/core/base.h>
 #include <fejix/core/sys.h>
+#include <fejix/interfaces/interfaces.h>
 
 
 #endif
