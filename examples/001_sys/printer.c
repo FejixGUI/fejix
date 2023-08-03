@@ -13,9 +13,9 @@ static void print_impl(struct fj_sys * sys)
 }
 
 
-FJ_IMPLEMENT_INTERFACE(printer, printer_impl) {
-    FJ_IMPLEMENT_METHOD(print, print_impl)
-};
+FJ_IMPL_BEGIN(printer, printer_impl)
+    FJ_IMPL(print, print_impl)
+FJ_IMPL_END()
 
 void printer_init(struct fj_sys * sys)
 {

@@ -6,16 +6,16 @@
 
 
 // TODO
-FJ_DEFINE_INTERFACE(fj_unixloop) {
-    FJ_DEFINE_METHOD(add_watch, fj_err_t, (
+struct FJ_INTERFACE(fj_unixloop) {
+    fj_err_t FJ_METHOD(add_watch)(
         struct fj_sys * sys,
         int32_t file_descriptor
-    ))
+    );
 
-    FJ_DEFINE_METHOD(remove_watch, fj_err_t, (
+    fj_err_t FJ_METHOD(remove_watch)(
         struct fj_sys * sys,
         int32_t file_descriptor
-    ))
+    );
 };
 
 

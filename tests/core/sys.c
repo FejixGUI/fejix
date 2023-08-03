@@ -11,13 +11,13 @@ void my_hello_world(void) {
 
 #define MY_INTERFACE_ID 123
 
-FJ_DEFINE_INTERFACE(my_interface) {
-    FJ_DEFINE_METHOD(hello_world, void, (void))
+struct FJ_INTERFACE(my_interface) {
+    void FJ_METHOD(hello_world)(void);
 };
 
-FJ_IMPLEMENT_INTERFACE(my_interface, my_instance) {
-    FJ_IMPLEMENT_METHOD(hello_world, my_hello_world)
-};
+FJ_IMPL_BEGIN(my_interface, my_instance)
+    FJ_IMPL(hello_world, my_hello_world)
+FJ_IMPL_END()
 
 fj_err_t my_module_init(struct fj_sys * sys)
 {

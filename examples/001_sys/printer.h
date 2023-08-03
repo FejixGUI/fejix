@@ -6,15 +6,14 @@
 
 
 #define PRINTER_INTERFACE_ID 123
-
-FJ_DEFINE_INTERFACE(printer) {
-    FJ_DEFINE_METHOD(print, void, (struct fj_sys *))
-};
-
-
 #define PRINT_EVENT_ID 1234
 
-struct print_event {
+
+struct FJ_INTERFACE(printer) {
+    void FJ_METHOD(print)(struct fj_sys *);
+};
+
+struct FJ_EVENT(print_event) {
     fj_string_t text;
 };
 

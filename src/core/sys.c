@@ -10,7 +10,7 @@ struct fj_sys {
     /// interface_id -> *interface
     struct fj_map * interfaces;
 
-    /// entity_id -> interface_id -> *resource
+    /// interface_id -> entity_id -> *resource
     struct fj_map * resources;
 
     /// entity_id -> event_id -> modules_that_handle_the_event[]
@@ -220,8 +220,6 @@ fj_ptr_t fj_sys_get_interface(
 }
 
 
-// TODO If all resources of an entity get deleted, the map for storing those
-// resources is not freed. Do we need to fix this?
 fj_err_t fj_sys_set_resource(
     struct fj_sys * sys,
     fj_id_t entity_id,
@@ -230,14 +228,14 @@ fj_err_t fj_sys_set_resource(
 )
 {
     struct fj_map * resources = get_or_insert_new_map(
-        sys->resources, entity_id
+        sys->resources, interface_id
     );
 
     if (resources == NULL) {
         return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
-    return fj_map_set(resources, interface_id, resource);
+    return fj_map_set(resources, entity_id, resource);
 }
 
 
@@ -247,13 +245,13 @@ fj_ptr_t fj_sys_get_resource(
     fj_id_t interface_id
 )
 {
-    struct fj_map * resources = fj_map_get(sys->resources, entity_id);
+    struct fj_map * resources = fj_map_get(sys->resources, interface_id);
 
     if (resources == NULL) {
         return NULL;
     }
 
-    return fj_map_get(resources, interface_id);
+    return fj_map_get(resources, entity_id);
 }
 
 

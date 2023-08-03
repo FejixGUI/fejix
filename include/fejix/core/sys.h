@@ -5,22 +5,24 @@
 #include <fejix/core/base.h>
 
 
-#define FJ_DEFINE_INTERFACE(INTERFACE_NAME) \
-    struct INTERFACE_NAME
+#define FJ_INTERFACE(INTERFACE) INTERFACE
 
-#define FJ_DEFINE_METHOD(METHOD_NAME, RETURN_TYPE, ARGS) \
-    RETURN_TYPE (*METHOD_NAME) ARGS;
+#define FJ_METHOD(METHOD) (*METHOD)
 
-#define FJ_IMPLEMENT_INTERFACE(INTERFACE_NAME, INSTANCE_NAME) \
-    static struct INTERFACE_NAME INSTANCE_NAME =
+#define FJ_EVENT(EVENT) EVENT
 
-#define FJ_IMPLEMENT_METHOD(METHOD_NAME, IMPLEMENTATION_NAME) \
-    .METHOD_NAME = IMPLEMENTATION_NAME,
+#define FJ_IMPL_BEGIN(INTERFACE, INSTANCE) \
+    static struct INTERFACE INSTANCE = {
 
-#define FJ_IMPLEMENT_EVENT_INTERFACE(INSTANCE_NAME, CALLBACK_NAME) \
-    FJ_IMPLEMENT_INTERFACE(fj_event_handler, INSTANCE_NAME) { \
-        FJ_IMPLEMENT_METHOD(handle_event, CALLBACK_NAME) \
-    };
+#define FJ_IMPL_END() };
+
+#define FJ_IMPL(METHOD, IMPLEMENTATION) \
+    .METHOD = IMPLEMENTATION,
+
+#define FJ_IMPL_EVENT_HANDLER(INSTANCE, CALLBACK) \
+    FJ_IMPL_BEGIN(fj_event_handler, INSTANCE) \
+        FJ_IMPL(handle_event, CALLBACK) \
+    FJ_IMPL_END()
 
 
 enum fj_sys_standard_entities {
@@ -45,11 +47,11 @@ struct fj_event_data {
 };
 
 
-FJ_DEFINE_INTERFACE(fj_event_handler) {
-    FJ_DEFINE_METHOD(handle_event, fj_err_t, (
+struct FJ_INTERFACE(fj_event_handler) {
+    fj_err_t FJ_METHOD(handle_event)(
         struct fj_sys * sys,
         struct fj_event_data * event_data
-    ))
+    );
 };
 
 
