@@ -3,6 +3,7 @@
 
 
 #include <fejix/core/base.h>
+#include <fejix/core/malloc.h>
 
 
 /// Get length of a static array

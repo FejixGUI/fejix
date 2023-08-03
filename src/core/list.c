@@ -1,15 +1,10 @@
 #include <fejix/core/list.h>
 #include <fejix/core/utils.h>
 
-#include <malloc.h>
 #include <string.h>
-#include <stdbool.h>
 
 
-#define ELEMENT_SIZE sizeof(fj_id_t)
-
-
-static bool is_empty(struct fj_list * list)
+static fj_bool_t is_empty(struct fj_list * list)
 {
     return list->length == 0;
 }
@@ -23,7 +18,7 @@ static uint32_t last_index(struct fj_list * list)
 /// Modifies the capacity, but leaves length as is
 static fj_err_t list_resize(struct fj_list * list, uint32_t capacity)
 {
-    list->elements = realloc(list->elements, capacity * ELEMENT_SIZE);
+    list->elements = fj_realloc(list->elements, capacity, list->element_size);
     
     if (list->elements == NULL) {
         list->capacity = 0;
@@ -60,25 +55,28 @@ static fj_err_t list_shrink(struct fj_list * list)
 }
 
 
-static void shift_elements_right(struct fj_list * list, uint32_t index)
+static void shift_elements_right(struct fj_list * list, uint32_t src_index)
 {
-    fj_id_t * start = list->elements + index;
-    uint32_t move_count = list->length - index;
-    memmove(start + 1, start, move_count * ELEMENT_SIZE);
+    uint8_t * src = fj_list_get(list, src_index);
+    uint8_t * dst = src + list->element_size;
+    uint32_t move_count = list->length - src_index;
+    memmove(dst, src, move_count * list->element_size);
 }
 
 
-static void shift_elements_left(struct fj_list * list, uint32_t index)
+static void shift_elements_left(struct fj_list * list, uint32_t dst_index)
 {
-    fj_id_t * start = list->elements + index + 1;
-    uint32_t move_count = list->length - index - 1;
-    memmove(start - 1, start, move_count * ELEMENT_SIZE);
+    uint8_t * dst = fj_list_get(list, dst_index);
+    uint8_t * src = dst + list->element_size;
+    uint32_t move_count = list->length - dst_index - 1;
+    memmove(dst, src, move_count * list->element_size);
 }
 
 
-struct fj_list * fj_list_new(void)
+struct fj_list * fj_list_new(size_t element_size)
 {
-    struct fj_list * list = calloc(1, sizeof(struct fj_list));
+    struct fj_list * list = fj_alloc_zeroed(sizeof(struct fj_list));
+    list->element_size = element_size;
 
     return list;
 }
@@ -86,7 +84,7 @@ struct fj_list * fj_list_new(void)
 
 struct fj_list * fj_list_clone(struct fj_list * source)
 {
-    struct fj_list * list = fj_list_new();
+    struct fj_list * list = fj_list_new(source->element_size);
     if (list == NULL) {
         return NULL;
     }
@@ -98,7 +96,8 @@ struct fj_list * fj_list_clone(struct fj_list * source)
 
     list->length = source->length;
 
-    memcpy(list->elements, source->elements, source->length * ELEMENT_SIZE);
+    size_t copy_size = source->length * source->element_size;
+    memcpy(list->elements, source->elements, copy_size);
 
     return list;
 }
@@ -107,14 +106,14 @@ struct fj_list * fj_list_clone(struct fj_list * source)
 void fj_list_del(struct fj_list * list)
 {
     if (list->elements != NULL) {
-        free(list->elements);
+        fj_free(list->elements);
     }
 
-    free(list);
+    fj_free(list);
 }
 
 
-fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, fj_id_t elem)
+fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, fj_ptr_t item)
 {
     if (index > last_index(list)+1) {
         return FJ_ERR("cannot insert to list (index out of range)");
@@ -130,7 +129,8 @@ fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, fj_id_t elem)
         shift_elements_right(list, index);
     }
 
-    list->elements[index] = elem;
+    fj_ptr_t dst = fj_list_get(list, index);
+    memcpy(dst, item, list->element_size);
 
     return FJ_OK;
 }
@@ -152,9 +152,9 @@ fj_err_t fj_list_remove(struct fj_list * list, uint32_t index)
 }
 
 
-fj_err_t fj_list_push(struct fj_list * list, fj_id_t element)
+fj_err_t fj_list_push(struct fj_list * list, fj_ptr_t item)
 {
-    return fj_list_insert(list, last_index(list) + 1, element);
+    return fj_list_insert(list, last_index(list) + 1, item);
 }
 
 
@@ -164,11 +164,24 @@ fj_err_t fj_list_pop(struct fj_list * list)
 }
 
 
-uint32_t fj_list_find(struct fj_list * list, fj_id_t item)
+fj_ptr_t fj_list_get(struct fj_list * list, uint32_t index)
+{
+    if (index >= list->length) {
+        return NULL;
+    }
+
+    uint8_t * elements = (uint8_t *) list->elements;
+    return elements + index * list->element_size;
+}
+
+
+uint32_t fj_list_find(struct fj_list * list, fj_ptr_t item)
 {
     uint32_t i;
     for (i = 0; i < list->length; i++) {
-        if (list->elements[i] == item) {
+        fj_ptr_t list_item = fj_list_get(list, i);
+
+        if (memcmp(list_item, item, list->element_size) == 0) {
             break;
         }
     }
@@ -177,17 +190,7 @@ uint32_t fj_list_find(struct fj_list * list, fj_id_t item)
 }
 
 
-fj_err_t fj_list_include(struct fj_list * list, fj_id_t item)
-{
-    if (fj_list_find(list, item) != list->length) {
-        return FJ_OK;
-    }
-
-    return fj_list_push(list, item);
-}
-
-
-fj_err_t fj_list_exclude(struct fj_list * list, fj_id_t item)
+fj_err_t fj_list_exclude(struct fj_list * list, fj_ptr_t item)
 {
     uint32_t index = fj_list_find(list, item);
 

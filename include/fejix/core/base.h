@@ -4,12 +4,16 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 
 #define FJ_OK NULL
 #define FJ_MALLOC_FAILED "memory allocation failed"
 
 
+/// This type has a fixed size, 32 bits, unlike `_Bool`.
+/// However, use the standard `true` or `false` for this.
+typedef uint32_t fj_bool_t;
 /// Identifier.
 typedef uint32_t fj_id_t;
 /// Void pointer.

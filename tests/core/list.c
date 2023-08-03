@@ -6,53 +6,74 @@
 #include <assert.h>
 
 
+typedef uint32_t u32;
+
+
 int main() {
 
-    struct fj_list * list = fj_list_new();
+    struct fj_list * list = fj_list_new(sizeof(uint32_t));
 
-    assert(fj_list_include(list, 123) == FJ_OK);
-    assert(list->length == 1);
-    assert(fj_list_find(list, 123) == 0);
-    assert(fj_list_include(list, 123) == FJ_OK);
-    assert(list->length == 1);
-    assert(fj_list_find(list, 123) == 0);
+    // TODO Better tests...
 
-    assert(fj_list_include(list, 321) == FJ_OK);
+    u32 a = 123;
+    u32 b = 321;
+
+    assert(fj_list_push(list, &a) == FJ_OK);
+    assert(list->length == 1);
+    assert(fj_list_find(list, &a) == 0);
+
+    assert(fj_list_push(list, &a) == FJ_OK);
     assert(list->length == 2);
-    assert(fj_list_find(list, 321) == 1);
-    assert(fj_list_include(list, 321) == FJ_OK);
+    assert(fj_list_find(list, &a) == 0);
+
+    assert(*(u32*)fj_list_get(list, 0) == a);
+    assert(*(u32*)fj_list_get(list, 1) == a);
+
+    assert(fj_list_insert(list, 1, &b) == FJ_OK);
+    assert(list->length == 3);
+    assert(fj_list_find(list, &b) == 1);
+
+    assert(fj_list_push(list, &b) == FJ_OK);
+    assert(list->length == 4);
+    assert(fj_list_find(list, &b) == 1);
+
+    assert(*(u32*)fj_list_get(list, 1) == b);
+    assert(*(u32*)fj_list_get(list, 3) == b);
+
+    assert(fj_list_exclude(list, &a) == FJ_OK);
+    assert(list->length == 3);
+    assert(fj_list_find(list, &a) == 1);
+
+    assert(fj_list_exclude(list, &b) == FJ_OK);
     assert(list->length == 2);
-    assert(fj_list_find(list, 321) == 1);
+    assert(fj_list_find(list, &b) == 1);
 
-    assert(fj_list_find(list, 123) == 0);
-    assert(fj_list_exclude(list, 123) == FJ_OK);
+    assert(fj_list_remove(list, 1) == FJ_OK);
     assert(list->length == 1);
-    assert(fj_list_find(list, 123) == list->length);
-    assert(fj_list_find(list, 321) == 0);
+    assert(*(u32*)fj_list_get(list, 0) == a);
 
-    assert(fj_list_exclude(list, 321) == FJ_OK);
+    assert(fj_list_remove(list, 0) == FJ_OK);
     assert(list->length == 0);
-    assert(fj_list_find(list, 321) == list->length);
 
-
-    for (int i=0; i<10; i++) {
-        assert(fj_list_insert(list, 0, 9 - i) == FJ_OK);
+    for (u32 i=0; i<10; i++) {
+        u32 item = 9 - i;
+        assert(fj_list_insert(list, 0, &item) == FJ_OK);
     }
 
     assert(list->length == 10);
 
-    for (uint32_t i=0; i<list->length; i++) {
-        assert(list->elements[i] == i);
+    for (u32 i=0; i<list->length; i++) {
+        assert(*(u32*) fj_list_get(list, i) == i);
     }
 
     assert(fj_list_pop(list) == FJ_OK);
     assert(list->length == 9);
-    assert(list->elements[8] == 8);
+    assert(*(u32*) fj_list_get(list, 8) == 8);
     assert(fj_list_remove(list, 4) == FJ_OK);
     assert(list->length == 8);
-    assert(list->elements[7] == 8);
-    assert(list->elements[4] == 5);
-    assert(list->elements[3] == 3);
+    assert(*(u32*)fj_list_get(list, 7) == 8);
+    assert(*(u32*)fj_list_get(list, 4) == 5);
+    assert(*(u32*)fj_list_get(list, 3) == 3);
 
 
     fj_list_del(list);

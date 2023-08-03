@@ -5,21 +5,14 @@
 #include <fejix/core/base.h>
 
 
-enum fj_map_foreach_result_values {
-    FJ_MAP_FOREACH_CONTINUE = 0,
-    FJ_MAP_FOREACH_STOP = 1,
-};
-
-
 /// Hash table of `fj_id_t` -> `fj_ptr_t`, whose elements are not NULL.
 struct fj_map;
 
 struct fj_map_element;
 
 
-typedef uint32_t fj_map_foreach_result_t;
-
-typedef fj_map_foreach_result_t (*fj_map_foreach_callback_t)(
+/// Returns `true` to continue the search or `false` to stop.
+typedef fj_bool_t (*fj_map_foreach_callback_t)(
     struct fj_map_element * element,
     fj_ptr_t data
 );

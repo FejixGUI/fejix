@@ -41,27 +41,23 @@ static fj_err_t sys_init(struct fj_sys * sys)
 }
 
 
-static fj_map_foreach_result_t destroy_map(
-    struct fj_map_element * element,
-    fj_ptr_t data
-)
+static fj_bool_t destroy_map(struct fj_map_element * element, fj_ptr_t data)
 {
     (void) data;
 
     fj_map_del(element->value);
-    return FJ_MAP_FOREACH_CONTINUE;
+    
+    return true;
 }
 
 
-static fj_map_foreach_result_t destroy_list(
-    struct fj_map_element * element,
-    fj_ptr_t data
-)
+static fj_bool_t destroy_list(struct fj_map_element * element, fj_ptr_t data)
 {
     (void) data;
 
     fj_list_del(element->value);
-    return FJ_MAP_FOREACH_CONTINUE;
+
+    return true;
 }
 
 
@@ -114,7 +110,7 @@ static struct fj_map * get_or_insert_new_map(struct fj_map * map, fj_id_t key)
 
 static struct fj_list * insert_new_list(struct fj_map * map, fj_id_t key)
 {
-    struct fj_list * new_list = fj_list_new();
+    struct fj_list * new_list = fj_list_new(sizeof(fj_id_t));
 
     if (new_list == NULL) {
         return NULL;
@@ -270,7 +266,7 @@ fj_err_t fj_sys_bind_event(
         return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
-    return fj_list_include(handlers, handler_interface_id);
+    return fj_list_push(handlers, &handler_interface_id);
 }
 
 
@@ -289,7 +285,7 @@ fj_err_t fj_sys_unbind_event(
         return FJ_OK;
     }
 
-    return fj_list_exclude(handlers, handler_interface_id);
+    return fj_list_exclude(handlers, &handler_interface_id);
 }
 
 
@@ -318,7 +314,8 @@ static fj_err_t handle_event(
     fj_err_t e = FJ_OK;
 
     for (uint32_t i = 0; i < handlers->length; i++) {
-        e = invoke_handler(sys, handlers->elements[i], event_data);
+        fj_id_t handler_id = * (fj_id_t *) fj_list_get(handlers, i);
+        e = invoke_handler(sys, handler_id, event_data);
 
         if (e != FJ_OK) {
             break;
