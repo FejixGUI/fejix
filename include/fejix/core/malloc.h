@@ -20,7 +20,7 @@ void fj_free(fj_ptr_t ptr);
 ///     - If `ptr` is not NULL:
 ///         + reallocates the block, returns a new block
 ///     - If `ptr` is NULL:
-///         + calls `fj_alloc_uninit`
+///         + calls `fj_alloc_zeroed`, returns a new block
 ///  * If either `element_count` or `element_size` is 0:
 ///     - If `ptr` is not NULL:
 ///         + calls `fj_free`, returns NULL

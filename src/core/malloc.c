@@ -34,17 +34,17 @@ fj_ptr_t fj_realloc(fj_ptr_t ptr, uint32_t element_count, size_t element_size)
 {
     size_t size = element_count * element_size;
 
-    if (element_count > 0 && element_size > 0) {
+    if (element_count == 0 || element_size == 0) {
         if (ptr != NULL) {
-            return realloc(ptr, size);
-        } else {
-            return fj_alloc_uninit(size);
+            free(ptr);
         }
+
+        return NULL;
     }
 
-    if (ptr != NULL) {
-        free(ptr);
+    if (ptr == NULL) {
+        return fj_alloc_zeroed(size);
     }
 
-    return NULL;
+    return realloc(ptr, size);
 }
