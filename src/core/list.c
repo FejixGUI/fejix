@@ -15,7 +15,7 @@ static uint32_t last_index(struct fj_list * list)
 }
 
 
-/// Modifies the capacity, but leaves length as is
+/* Modifies the capacity, but leaves length as is */
 static fj_err_t list_resize(struct fj_list * list, uint32_t capacity)
 {
     list->elements = fj_realloc(list->elements, capacity, list->element_size);
@@ -39,7 +39,7 @@ static fj_err_t list_grow(struct fj_list * list)
         return FJ_OK;
     }
 
-    uint32_t new_capacity = fj_max(1, list->capacity * 2);
+    uint32_t new_capacity = FJ_MAX(1, list->capacity * 2);
 
     return list_resize(list, new_capacity);
 }

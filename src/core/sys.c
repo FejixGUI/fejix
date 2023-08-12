@@ -7,13 +7,13 @@
 
 
 struct fj_sys {
-    /// interface_id -> *interface
+    /* interface_id -> *interface */
     struct fj_map * interfaces;
 
-    /// interface_id -> entity_id -> *resource
+    /* interface_id -> entity_id -> *resource */
     struct fj_map * resources;
 
-    /// entity_id -> event_id -> modules_that_handle_the_event[]
+    /* entity_id -> event_id -> modules_that_handle_the_event[] */
     struct fj_map * event_bindings;
 };
 
@@ -270,8 +270,6 @@ fj_err_t fj_sys_bind_event(
 }
 
 
-// TODO If the last handler gets unbound from an entity, the list for storing
-// its bindings is not freed. Do we need to fix this?
 fj_err_t fj_sys_unbind_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
@@ -279,12 +277,14 @@ fj_err_t fj_sys_unbind_event(
     fj_id_t handler_interface_id
 )
 {
+
     struct fj_list * handlers = get_handlers(sys, entity_id, event_id);
 
     if (handlers == NULL) {
         return FJ_OK;
     }
 
+    // TODO `handlers` is not freed when becomes empty. Do we need to fix this?
     return fj_list_exclude(handlers, &handler_interface_id);
 }
 

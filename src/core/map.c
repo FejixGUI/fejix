@@ -8,22 +8,15 @@
 #define MIN_LOAD_FACTOR (MAX_LOAD_FACTOR/4.0f)
 
 
-struct map_node;
-
-
-/// Bucket is a head node of a list of nodes
-typedef struct map_node * bucket_t;
-
-
-struct fj_map {
-    bucket_t * buckets;
-    uint32_t buckets_count;
-    uint32_t elements_count;
-};
-
 struct map_node {
     struct map_node * next;
     struct fj_map_element element;
+};
+
+struct fj_map {
+    struct map_node ** buckets;
+    uint32_t buckets_count;
+    uint32_t elements_count;
 };
 
 
@@ -49,7 +42,7 @@ static uint32_t get_bucket_index(fj_id_t key, uint32_t buckets_count)
 }
 
 
-static bucket_t * get_bucket(struct fj_map * map, fj_id_t key)
+static struct map_node ** get_bucket(struct fj_map * map, fj_id_t key)
 {
     uint32_t index = get_bucket_index(key, map->buckets_count);
     return &map->buckets[index];
@@ -69,7 +62,7 @@ static struct map_node * get_tail_node(struct map_node * list_head)
 
 
 static void insert_node_to_bucket(
-    bucket_t * bucket,
+    struct map_node ** bucket,
     struct map_node * node
 )
 {
@@ -80,7 +73,7 @@ static void insert_node_to_bucket(
 
 
 static void remove_node_from_bucket(
-    bucket_t * bucket,
+    struct map_node ** bucket,
     struct map_node * prev_node,
     struct map_node * node
 )
@@ -103,13 +96,13 @@ static void clear_buckets(struct fj_map * map)
 
 static void raw_insert(struct fj_map * map, struct map_node * node)
 {
-    bucket_t * bucket = get_bucket(map, get_key(node));
+    struct map_node ** bucket = get_bucket(map, get_key(node));
     insert_node_to_bucket(bucket, node);
 }
 
 
-static void raw_find(
-    struct map_node * list_head,
+static void find_node_in_bucket(
+    struct map_node ** bucket,
     fj_id_t key,
     struct map_node ** found_node,
     struct map_node ** found_previous_node
@@ -118,12 +111,12 @@ static void raw_find(
     *found_node = NULL;
     *found_previous_node = NULL;
 
-    if (list_head == NULL) {
+    if (bucket == NULL) {
         return;
     }
 
     struct map_node * previous_node = NULL;
-    struct map_node * current_node = list_head;
+    struct map_node * current_node = *bucket;
 
     while (current_node != NULL && get_key(current_node) != key) {
         previous_node = current_node;
@@ -139,12 +132,11 @@ static void raw_find(
 
 static struct map_node * raw_remove(struct fj_map * map, fj_id_t key)
 {
-    bucket_t * bucket = get_bucket(map, key);
+    struct map_node ** bucket = get_bucket(map, key);
 
-    struct map_node * list_head = *bucket;
-    struct map_node * prev_node;
     struct map_node * node;
-    raw_find(list_head, key, &node, &prev_node);
+    struct map_node * prev_node;
+    find_node_in_bucket(bucket, key, &node, &prev_node);
 
     if (node == NULL) {
         return NULL;
@@ -240,8 +232,9 @@ static fj_bool_t map_is_validated(float load_factor)
 
 static fj_err_t resize_buckets(struct fj_map * map, uint32_t buckets_count)
 {
-    size_t bucket_size = sizeof(struct map_node *);
-    bucket_t * buckets = fj_realloc(map->buckets, buckets_count, bucket_size);
+    struct map_node ** buckets = fj_realloc(
+        map->buckets, buckets_count, sizeof(struct map_node *)
+    );
 
     if (buckets == NULL) {
         return FJ_ERR(FJ_MALLOC_FAILED);
@@ -260,7 +253,7 @@ static fj_err_t resize_map(struct fj_map * map, fj_bool_t grow)
         return resize_buckets(map, map->buckets_count * 2);
     }
 
-    return resize_buckets(map, fj_max(1, map->buckets_count / 2));
+    return resize_buckets(map, FJ_MAX(1, map->buckets_count / 2));
 }
 
 
@@ -314,11 +307,11 @@ static fj_err_t map_remove(struct fj_map * map, fj_id_t key)
 
 static struct fj_map_element * map_find(struct fj_map * map, fj_id_t key)
 {
-    struct map_node * list_head = *get_bucket(map, key);
+    struct map_node ** bucket = get_bucket(map, key);
 
     struct map_node * prev_node;
     struct map_node * node;
-    raw_find(list_head, key, &node, &prev_node);
+    find_node_in_bucket(bucket, key, &node, &prev_node);
 
     if (node == NULL) {
         return NULL;
@@ -360,6 +353,26 @@ static fj_err_t map_insert(struct fj_map * map, fj_id_t key, fj_ptr_t value)
 }
 
 
+static void bucket_foreach_node(
+    struct map_node ** bucket,
+    fj_map_foreach_callback_t callback,
+    fj_ptr_t data
+)
+{
+    struct map_node * node = *bucket;
+
+    while (node != NULL) {
+        fj_bool_t should_continue = callback(&node->element, data);
+        
+        if (!should_continue) {
+            return;
+        }
+
+        node = node->next;
+    }
+}
+
+
 struct fj_map * fj_map_new(void)
 {
     struct fj_map * map = fj_alloc_zeroed(sizeof(struct fj_map));
@@ -368,7 +381,7 @@ struct fj_map * fj_map_new(void)
         return NULL;
     }
 
-    map->buckets = fj_alloc_zeroed(sizeof(bucket_t));
+    map->buckets = fj_alloc_zeroed(sizeof(struct map_node *));
     map->buckets_count = 1;
 
     if (map->buckets == NULL) {
@@ -434,16 +447,6 @@ void fj_map_foreach(
             continue;
         }
 
-        struct map_node * node = map->buckets[i];
-
-        while (node != NULL) {
-            fj_bool_t should_continue = callback(&node->element, data);
-            
-            if (!should_continue) {
-                return;
-            }
-
-            node = node->next;
-        }
+        bucket_foreach_node(&map->buckets[i], callback, data);
     }
 }

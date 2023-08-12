@@ -4,7 +4,6 @@
 
 #include <fejix/fejix.h>
 #include <fejix/core/utils.h>
-#include <fejix/registry/private.h>
 
 
 #endif

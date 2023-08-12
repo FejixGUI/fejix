@@ -1,5 +1,3 @@
-option(FEJIX_BUILD_TESTS OFF)
-
 fejix_add_optional_definition(DEBUG)
 
 fejix_add_optional_definition(PLATFORM_X11)

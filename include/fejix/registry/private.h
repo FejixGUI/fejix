@@ -1,5 +1,0 @@
-#ifndef FEJIX_REGISTRY_PRIVATE_H_
-#define FEJIX_REGISTRY_PRIVATE_H_
-
-
-#endif

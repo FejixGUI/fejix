@@ -16,10 +16,12 @@ set(FEJIX_CMAKE "${FEJIX_TOOLS}/cmake")
 set(FEJIX_TESTS "${FEJIX_ROOT}/tests")
 
 include("${FEJIX_CMAKE}/utils.cmake")
-# May enable some options
-include("${FEJIX_CMAKE}/config.cmake")
+
 # Declares options and adds compile definitions based on them
 include("${FEJIX_CMAKE}/options.cmake")
+
+# Configure CMake and the compiler 
+include("${FEJIX_CMAKE}/config.cmake")
 
 # Main target
 add_library(fejix STATIC)
@@ -28,6 +30,7 @@ add_library(fejix STATIC)
 include("${FEJIX_CMAKE}/sources.cmake")
 include("${FEJIX_CMAKE}/dependencies.cmake")
 
+option(FEJIX_BUILD_TESTS OFF)
 if(FEJIX_BUILD_TESTS)
     include("${FEJIX_CMAKE}/tests.cmake")
 endif()

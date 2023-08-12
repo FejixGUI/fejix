@@ -55,14 +55,14 @@ struct FJ_INTERFACE(fj_event_handler) {
 };
 
 
-/// Returns NULL if an allocation error occurs.
+/* Returns NULL if an allocation error occurs. */
 struct fj_sys * fj_sys_new(void);
 
 void fj_sys_del(struct fj_sys * sys);
 
-/// Remove the interface by setting it to NULL.
-/// However, removing interfaces is potentially dengerous.
-/// See `fj_sys_emit_event()`.
+/* Remove the interface by setting it to NULL.
+    However, removing interfaces is potentially dengerous.
+    See `fj_sys_emit_event()`. */
 fj_err_t fj_sys_set_interface(
     struct fj_sys * sys,
     fj_id_t interface_id,
@@ -74,8 +74,8 @@ fj_ptr_t fj_sys_get_interface(
     fj_id_t interface_id
 );
 
-/// Remove the resource by setting it to NULL.
-/// Resources are not deallocated by this function.
+/* Remove the resource by setting it to NULL.
+    Resources are not deallocated by this function. */
 fj_err_t fj_sys_set_resource(
     struct fj_sys * sys,
     fj_id_t entity_id,
@@ -103,9 +103,8 @@ fj_err_t fj_sys_unbind_event(
     fj_id_t handler_interface_id
 );
 
-/// It is safe to modify `sys` in the event handlers.
-///
-/// If a handler interface does not exist, then an error is returned.
+/* It is safe to modify `sys` in the event handlers.
+    If a handler interface does not exist, then an error is returned. */
 fj_err_t fj_sys_emit_event(
     struct fj_sys * sys,
     fj_id_t entity_id,
