@@ -4,10 +4,80 @@ Here are some consistency guidelines.
 
 ## General
 
+* Use C99.
 * Lines should be maximum 80 characters and end with LF.
 * Indents should be 4 spaces.
 * All files should end with a final newline.
-* Use C99.
+
+## Formatting
+
+* Use `/*...*/` comments, without any additional "cosmetical" characters.
+    ```c
+    /* This is a good comment.
+        It contains no garbage.
+        It is properly indented. */
+    void a(void);
+
+    /* This is a bad comment.
+     * It is hard to type and edit.
+     */
+    void a(void);
+
+    /**************************************
+     * This is an especially bad comment. *
+     **************************************/
+    void a(void);
+
+    ```
+
+* Put spaces around `*`:
+    ```c
+    uint32_t * var;
+    uint32_t ** var2;
+    uint32_t *** var3;
+    uint32_t * function();
+    void function(uint32_t * arg);
+    ```
+
+* Put `{` on the same line as the signature, except for functions.
+
+    ```c
+    enum|struct|union x {
+        ...
+    };
+
+    uint32_t var[] = {
+        ...
+    };
+
+    void function()
+    {
+        ...
+    }
+
+    struct some_struct_type long_function(
+        struct argument_type ***** some_long_argument,
+        const struct argument_type *** another_argument
+    )
+    {
+
+    }
+    ```
+
+## Types
+
+* Use `fj_ptr_t` instead of `void *`.
+
+    If there is `void` somewhere in the function return type,
+    it must mean that function returns nothing.
+    The little star `*` is easy to miss.
+
+* Use `fj_bool_t` instead of `bool`. Use `true`/`false` instead of `1`/`0`.
+
+    `fj_bool_t` has a fixed size, so it is more preferable in public
+    declarations.
+
+    We use C99, so `<stdbool.h>` and `true`/`false` are available.
 
 ## Order
 
@@ -19,8 +89,8 @@ Here are some consistency guidelines.
 4. Enum constants
 5. Structure forward declarations
 6. Typedefs
-7. Structure definitions
-8. Interface definitions
+7. Structure declarations
+8. Interface declarations
 9. Function declarations
 
 Illustration:
@@ -51,66 +121,4 @@ FJ_DEFINE_INTERFACE(my_interface) {
 .. my_function(..);
 
 #endif
-```
-
-### Function arguments
-
-1. System
-2. Entity ID
-3. Event ID
-4. Interface ID
-5. Data pointers
-
-Illustration:
-```c
-void func(
-    struct fj_sys * sys,
-    fj_id_t module_id,
-    fj_id_t entity_id,
-    fj_id_t event_id,
-    fj_ptr_t data
-);
-```
-
-### Source files
-
-1. Header includes (header being implemented, Fejix headers, dependency headers, standard headers).
-2. Static functions
-3. Public functions
-
-If a static function is used in exactly one function and is not intended to be used anywhere else, it may come right before the function that uses it.
-An example of such static functions is callbacks.
-
-Illustration:
-```c
-#include <fejix/the_header_that_is_being_implemented.h>
-#include <fejix/other.h>
-
-#include <some_lib/some_header.h>
-
-#include <malloc.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
-
-static .. foo(..)
-    ..
-
-
-static .. bar(..)
-    ..
-
-
-.. fj_some_function(..)
-    ..
-
-
-static .. some_callback(..)
-    ..
-
-
-.. fj_another_function(..)
-    .. use some_callback(..) ..
-    ..
-
 ```
