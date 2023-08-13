@@ -2,12 +2,9 @@
 
 Here are some consistency guidelines.
 
-## General
+## Standards
 
 * Use C99.
-* Lines should be maximum 80 characters and end with LF.
-* Indents should be 4 spaces.
-* All files should end with a final newline.
 
 ## Formatting
 
@@ -64,7 +61,7 @@ Here are some consistency guidelines.
     }
     ```
 
-## Types
+## General
 
 * Use `fj_ptr_t` instead of `void *`.
 
