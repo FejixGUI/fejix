@@ -15,16 +15,32 @@
     However, use the standard `true` or `false` for this. */
 typedef uint32_t fj_bool_t;
 
-/* Identifier. */
+/* Unique identifier. */
 typedef uint32_t fj_id_t;
 
-/* Void pointer. */
+/* Untyped pointer. */
 typedef void * fj_ptr_t;
 
 /* UTF-8 string for most use cases. */
-typedef char * fj_string_t;
+typedef const char * fj_string_t;
 
-/* Constant ASCII string for error messages. */
+/* ASCII string for internal unique string identifiers.
+
+    String identifiers are inspired by Java package names, for example
+    `com.example.SomeProject.some_subproject._1.x` is a valid identifier.
+
+    # Format
+
+    Identifiers must contain only `a-z`, `A-Z`, `_`, `0-9`, `.`
+    and must be no longer than 254 characters (including the NULL terminator).
+
+    The parts separated by `.` are called identifier segments.
+    Identifier segments must not be empty and must not start with `0-9`.
+    There must be at least two segments and thus at least one `.` between
+    them. */
+typedef const char * fj_string_id_t;
+
+/* ASCII string for error messages. */
 typedef const char * fj_err_t;
 
 

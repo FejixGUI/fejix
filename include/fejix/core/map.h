@@ -8,7 +8,10 @@
 /* Hash table of `fj_id_t` -> `fj_ptr_t`, whose elements are not NULL. */
 struct fj_map;
 
-struct fj_map_element;
+struct fj_map_element {
+    fj_ptr_t value;
+    fj_id_t key;
+};
 
 
 /* Returns `true` to continue the search or `false` to stop. */
@@ -16,12 +19,6 @@ typedef fj_bool_t (*fj_map_foreach_callback_t)(
     struct fj_map_element * element,
     fj_ptr_t data
 );
-
-
-struct fj_map_element {
-    fj_ptr_t value;
-    fj_id_t key;
-};
 
 
 /* Returns NULL if an allocation error occurs. */

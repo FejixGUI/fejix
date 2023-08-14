@@ -3,14 +3,13 @@
 
 
 #include <fejix/core/base.h>
-#include <fejix/core/malloc.h>
 
 
 /* Get length of a static array */
 #define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY))) 
 
-#define FJ_STRINGIFY(ARG) FJ_STRINGIFY2(ARG)
-#define FJ_STRINGIFY2(ARG) #ARG
+#define FJ_STRINGIFY(ARG) FJ_STRINGIFY_IMPL(ARG)
+#define FJ_STRINGIFY_IMPL(ARG) #ARG
 
 /* `FJ_UTIL_FILENAME` is a short relative path to the current file.
     Ideally, CMake defines `FJ_FILENAME` for each Fejix source file.

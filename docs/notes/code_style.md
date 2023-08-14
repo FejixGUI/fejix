@@ -2,7 +2,7 @@
 
 Here are some consistency guidelines.
 
-## Standards
+## Standard
 
 * Use C99.
 
@@ -52,13 +52,23 @@ Here are some consistency guidelines.
         ...
     }
 
-    struct some_struct_type long_function(
-        struct argument_type ***** some_long_argument,
-        const struct argument_type *** another_argument
+    struct some_struct_type long_function_definition(
+        struct argument_type const ** const *** some_long_argument,
+        const struct argument_type ** const * another_argument
     )
     {
 
     }
+    ```
+
+* Put each variable declaration on its own line.
+
+    ```c
+    struct somestruct * a;
+    struct somestruct * b;
+    uint32_t i;
+    uint32_t j;
+    uint32_t k;
     ```
 
 ## General
@@ -75,47 +85,3 @@ Here are some consistency guidelines.
     declarations.
 
     We use C99, so `<stdbool.h>` and `true`/`false` are available.
-
-## Order
-
-### Header files
-
-1. Header guard
-2. Header includes
-3. Macros
-4. Enum constants
-5. Structure forward declarations
-6. Typedefs
-7. Structure declarations
-8. Interface declarations
-9. Function declarations
-
-Illustration:
-```c
-#ifndef MY_HEADER_FILE_H_
-#define MY_HEADER_FILE_H_
-
-#include <my_include_file.h>
-
-#define MY_MACRO
-
-enum my_enum {
-    MY_CONSTANT = 0,
-};
-
-struct my_struct_declaration;
-
-typedef .. my_typedef;
-
-struct my_struct {
-    ..
-};
-
-FJ_DEFINE_INTERFACE(my_interface) {
-    ..
-};
-
-.. my_function(..);
-
-#endif
-```

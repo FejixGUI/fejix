@@ -37,13 +37,14 @@ fj_err_t fj_list_pop(struct fj_list * list);
 /* Returns NULL if `index` is out of bounds. */
 fj_ptr_t fj_list_get(struct fj_list * list, uint32_t index);
 
-/* Searches the item by byte-wise comparison.
-    Returns the index of `item` if it is present.
-    Returns `list->length` if the item was not found.
-    This has `O(length)` complexity. */
+/* Linearly searches the item by byte-wise comparison.
+    # Returns
+    * The index of `item` if it is present.
+    *`list->length` if the item was not found.*/
 uint32_t fj_list_find(struct fj_list * list, fj_ptr_t item);
 
-/* If the item is present on the list, removes it. */
+/* If the item is present on the list, removes it.
+    This uses `fj_list_find` and `fj_list_remove`. */
 fj_err_t fj_list_exclude(struct fj_list * list, fj_ptr_t item);
 
 

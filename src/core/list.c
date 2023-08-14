@@ -1,4 +1,5 @@
 #include <fejix/core/list.h>
+#include <fejix/core/malloc.h>
 #include <fejix/core/utils.h>
 
 #include <string.h>
