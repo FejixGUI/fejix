@@ -1,4 +1,4 @@
-#include <fejix/fejix.h>
+#include <fejix/prelude.h>
 #include <fejix/core/map.h>
 
 #include <stdlib.h>
@@ -34,8 +34,8 @@ int main() {
     assert(fj_map_get(map, 2) == NULL);
     assert(fj_map_get(map, 3) != NULL);
 
-    fj_string_t s1 = "s1";
-    fj_string_t s2 = "s2";
+    fj_ptr_t s1 = (fj_ptr_t) "s1";
+    fj_ptr_t s2 = (fj_ptr_t) "s2";
     assert(fj_map_set(map, 3, s1) == FJ_OK);
     assert(fj_map_get(map, 3) == s1);
     assert(fj_map_set(map, 3, s2) == FJ_OK);

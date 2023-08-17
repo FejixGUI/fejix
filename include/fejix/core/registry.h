@@ -1,9 +1,5 @@
-#ifndef FEJIX_GLOBAL_H_
-#define FEJIX_GLOBAL_H_
-
-
-#include <fejix/core/base.h>
-#include <fejix/core/map.h>
+#ifndef FEJIX_REGISTRY_H_
+#define FEJIX_REGISTRY_H_
 
 
 enum fj_registry {
@@ -11,7 +7,6 @@ enum fj_registry {
 
     FJ_CLIENT_LISTENER,
     FJ_WINDOW_MANAGER_LISTENER,
-
     FJ_WINDOW_LISTENER,
     FJ_WINDOW_CONFIG_LISTENER,
 
@@ -23,9 +18,6 @@ enum fj_registry {
 
     FJ_USER_ID_SPACE_BEGIN = 10000,
 };
-
-
-fj_err_t fj_global_run(struct fj_map * global_object);
 
 
 #endif

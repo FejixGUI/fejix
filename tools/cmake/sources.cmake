@@ -4,6 +4,7 @@ target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/list.c"
     "${FEJIX_SRC}/core/map.c"
+    "${FEJIX_SRC}/core/object.c"
 )
 
 

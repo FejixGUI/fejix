@@ -3,9 +3,10 @@
 
 
 #include <fejix/core/base.h>
-#include <fejix/core/map.h>
+#include <fejix/core/object.h>
+#include <fejix/core/registry.h>
 
-#include <fejix/interface/global.h>
+#include <fejix/interface/client.h>
 
 
 #endif

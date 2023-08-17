@@ -1,10 +1,14 @@
 # Fejix window management library
 
-Fejix is a low-level window management library in early development.
+Fejix is a cross-platform window management library.
+Written in C99.
 
-For now, there is just an emoji: 🌸
+> This library is in early development.
+> For now, there is just an emoji: 🌸
 
 ## Build
+
+### Fejix
 
 ```sh
 mkdir build
@@ -13,7 +17,7 @@ cmake .. -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
 ninja # Or 'make' or whatever cmake uses
 ```
 
-## Test
+### Tests
 
 ```sh
 cd build
@@ -22,7 +26,7 @@ ninja
 ctest 
 ```
 
-## Build and run examples
+### Examples
 
 ```sh
 cd examples/EXAMPLE_NAME

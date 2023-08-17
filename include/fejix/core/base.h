@@ -11,9 +11,9 @@
 #define FJ_MALLOC_FAILED "memory allocation failed"
 
 
-/* This type has a fixed size, 32 bits, unlike `_Bool`.
+/* This type has a fixed size, unlike `_Bool`.
     However, use the standard `true` or `false` for this. */
-typedef uint32_t fj_bool_t;
+typedef uint8_t fj_bool_t;
 
 /* Unique identifier. */
 typedef uint32_t fj_id_t;

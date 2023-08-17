@@ -1,4 +1,4 @@
-#include <fejix/fejix.h>
+#include <fejix/prelude.h>
 #include <fejix/core/list.h>
 
 #include <stdio.h>
