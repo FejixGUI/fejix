@@ -4,6 +4,8 @@
 
 #include <fejix/core/base.h>
 
+#include <string.h>
+
 
 /* Get length of a static array */
 #define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY))) 
@@ -30,11 +32,16 @@
 /* Formats the given error message. `TEXT` must be a string literal. */
 #define FJ_ERR(TEXT) "error [" FJ_UTIL_FILENAME ":" FJ_UTIL_LINE "]: " TEXT
 
+/* Example: FJ_ERR(FJ_MALLOC_FAILED) */
+#define FJ_MALLOC_FAILED "memory allocation failed"
+
 /* Double-evaluates the arguments */
 #define FJ_MAX(A, B) (((A) > (B)) ? (A) : (B))
 
 /* Double-evaluates the arguments */
 #define FJ_MIN(A, B) (((A) < (B)) ? (A) : (B))
+
+#define FJ_STREQ(A, B) (strcmp((A), (B)) == 0)
 
 
 #endif

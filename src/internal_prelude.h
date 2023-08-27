@@ -7,6 +7,7 @@
 #include <fejix/core/utils.h>
 #include <fejix/core/malloc.h>
 
+#include "src/modules/client/client.h"
 
 
 #endif

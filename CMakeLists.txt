@@ -15,8 +15,6 @@ set(FEJIX_TOOLS "${FEJIX_ROOT}/tools")
 set(FEJIX_CMAKE "${FEJIX_TOOLS}/cmake")
 set(FEJIX_TESTS "${FEJIX_ROOT}/tests")
 
-include("${FEJIX_CMAKE}/utils.cmake")
-
 # Declares options and adds compile definitions based on them
 include("${FEJIX_CMAKE}/options.cmake")
 
