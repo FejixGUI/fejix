@@ -1,4 +1,4 @@
-if(NOT FEJIX_DEBUG)
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     message(FATAL_ERROR "Building tests requires CMAKE_BUILD_TYPE=\"Debug\"")
 endif()
 
@@ -12,3 +12,4 @@ endmacro()
 
 fejix_add_test(fejix_test_core_map "${FEJIX_TESTS}/core/map.c")
 fejix_add_test(fejix_test_core_list "${FEJIX_TESTS}/core/list.c")
+fejix_add_test(fejix_test_client_tmp "${FEJIX_TESTS}/client/tmp.c")

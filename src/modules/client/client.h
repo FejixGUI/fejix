@@ -12,13 +12,20 @@ struct fj_client {
     const struct fj_client_listener * client_listener;
     
     union {
-        struct fj_x11_client * x11;
-    } client_data;
-
+#ifdef FJ_PLATFORM_X11
+        struct fj_x11_data * x11_data;
+#endif
+    } platform_data;
 
 #ifdef FJ_FEATURE_UNIXPOLLER
     const struct fj_unixpoller_listener * unixpoller_listener;
-    fj_ptr_t unixpoller_data;
+    const struct fj_unixpoller * unixpoller_interface;    
+    struct fj_unixpoller_data * unixpoller_data;
+#endif
+
+#ifdef FJ_FEATURE_SHELL
+    const struct fj_shell_listener * shell_listener;
+    const struct fj_shell * shell_interface;
 #endif
 
 };

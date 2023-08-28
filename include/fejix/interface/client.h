@@ -42,6 +42,21 @@ const struct fj_client_listener ** fj_client_get_listener(
     struct fj_client * client
 );
 
+const struct fj_unixpoller_listener ** fj_client_get_unixpoller_listener(
+    struct fj_client * client
+);
+
+const struct fj_unixpoller * fj_client_get_unixpoller(
+    struct fj_client * client
+);
+
+const struct fj_shell_listener ** fj_client_get_shell_listener(
+    struct fj_client * client
+);
+
+const struct fj_shell * fj_client_get_shell(
+    struct fj_client * client
+);
 
 
 #endif

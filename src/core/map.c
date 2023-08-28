@@ -254,7 +254,7 @@ static fj_err_t resize_map(struct fj_map * map, fj_bool_t grow)
         return resize_buckets(map, map->buckets_count * 2);
     }
 
-    return resize_buckets(map, FJ_MAX(1, map->buckets_count / 2));
+    return resize_buckets(map, fj_max_u32(1, map->buckets_count / 2));
 }
 
 

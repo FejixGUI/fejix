@@ -3,6 +3,7 @@ target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 
 target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
+    "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/list.c"
     "${FEJIX_SRC}/core/map.c"
     "${FEJIX_SRC}/modules/client/client.c"

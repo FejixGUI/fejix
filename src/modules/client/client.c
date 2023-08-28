@@ -3,17 +3,13 @@
 #include <stdlib.h>
 
 
-#define NO_PLATFORM_ERROR "No platform selected. " \
-    "Define FEJIX_PLATFORM or XDG_SESSION_TYPE or DISPLAY or WAYLAND_DISPLAY"
-
-
-struct platform {
+struct platform_runner {
     fj_utf8string_t name;
     fj_err_t (*run)(struct fj_client *);
 };
 
 
-static const struct platform platforms[] = {
+static const struct platform_runner platform_runners[] = {
 #ifdef FJ_PLATFORM_X11
     { "x11", fj_x11_run },
 #endif
@@ -53,7 +49,7 @@ static fj_utf8string_t guess_platform(void)
 }
 
 
-static fj_utf8string_t get_platform(void)
+static fj_utf8string_t get_platform_name(void)
 {
     fj_utf8string_t env = NULL;
 
@@ -67,7 +63,7 @@ static fj_utf8string_t get_platform(void)
     
     /* XDG_SESSION_TYPE is not documented, so we cannot be sure about what it
         contains */
-    if (FJ_STREQ(env, "x11") || FJ_STREQ(env, "wayland")) {
+    if (fj_streq(env, "x11") || fj_streq(env, "wayland")) {
         return env;
     }
 
@@ -75,19 +71,17 @@ static fj_utf8string_t get_platform(void)
 }
 
 
-/* Run the platform which matches the name. */
-static fj_err_t run_platform(
-    struct fj_client * client,
+static const struct platform_runner * get_platform_runner(
     fj_utf8string_t platform_name
 )
 {
-    for (uint32_t i = 0; i < FJ_ARRLEN(platforms); i++) {
-        if (FJ_STREQ(platforms[i].name, platform_name)) {
-            return platforms[i].run(client);
+    for (uint32_t i = 0; i < FJ_ARRLEN(platform_runners); i++) {
+        if (fj_streq(platform_runners[i].name, platform_name)) {
+            return &platform_runners[i];
         }
     }
 
-    return FJ_ERR("selected platform does not exist");
+    return NULL;
 }
 
 
@@ -119,12 +113,77 @@ const struct fj_client_listener ** fj_client_get_listener(
 
 fj_err_t fj_client_run(struct fj_client * client)
 {
-
-    fj_utf8string_t platform_name = get_platform();
-
-    if (platform_name == NULL) {
-        return FJ_ERR(NO_PLATFORM_ERROR);
+    if (client->client_listener == NULL) {
+        return FJ_ERR("client listener is not set");
     }
 
-    return run_platform(client, platform_name);
+    fj_utf8string_t platform_name = get_platform_name();
+
+    if (platform_name == NULL) {
+        return FJ_ERR("No platform selected. "
+            "Define any of the environment variables:"
+            "FEJIX_PLATFORM, XDG_SESSION_TYPE, DISPLAY, WAYLAND_DISPLAY"
+        );
+    }
+
+    const struct platform_runner * runner;
+    runner = get_platform_runner(platform_name);
+
+    if (runner == NULL) {
+        return FJ_ERR("selected platform is not supported");
+    }
+
+    return runner->run(client);
+}
+
+
+const struct fj_unixpoller_listener ** fj_client_get_unixpoller_listener(
+    struct fj_client * client
+)
+{
+#ifdef FJ_FEATURE_UNIXPOLLER
+    return &client->unixpoller_listener;
+#else
+    (void) client;
+    return NULL;
+#endif
+}
+
+
+const struct fj_unixpoller * fj_client_get_unixpoller(
+    struct fj_client * client
+)
+{
+#ifdef FJ_FEATURE_UNIXPOLLER
+    return client->unixpoller_interface;
+#else
+    (void) client;
+    return NULL;
+#endif
+}
+
+
+const struct fj_shell_listener ** fj_client_get_shell_listener(
+    struct fj_client * client
+)
+{
+#ifdef FJ_FEATURE_SHELL
+    return &client->shell_listener;
+#else
+    (void) client;
+    return NULL;
+#endif
+}
+
+
+const struct fj_shell * fj_client_get_shell(
+    struct fj_client * client
+)
+{
+#ifdef FJ_FEATURE_SHELL
+    return client->shell_interface;
+#else
+    (void) client;
+    return NULL;
+#endif
 }

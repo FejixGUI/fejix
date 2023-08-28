@@ -9,7 +9,7 @@
 #include <X11/Xlib-xcb.h>
 
 
-struct fj_x11_client {
+struct fj_x11_data {
     xcb_connection_t * connection;
     Display * xdisplay;
     

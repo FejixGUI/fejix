@@ -40,7 +40,7 @@ static fj_err_t list_grow(struct fj_list * list)
         return FJ_OK;
     }
 
-    uint32_t new_capacity = FJ_MAX(1, list->capacity * 2);
+    uint32_t new_capacity = fj_max_u32(1, list->capacity * 2);
 
     return list_resize(list, new_capacity);
 }
