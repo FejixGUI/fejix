@@ -2,7 +2,7 @@
 #include "src/modules/x11/client.h"
 
 
-static fj_err_t connect_x11(struct fj_x11_data * x11_data)
+static fj_err_t x11_connect(struct fj_x11_data * x11_data)
 {
     x11_data->xdisplay = XOpenDisplay(NULL);
 
@@ -20,13 +20,13 @@ static fj_err_t connect_x11(struct fj_x11_data * x11_data)
 }
 
 
-static void disconnect_x11(struct fj_x11_data * x11_data)
+static void x11_disconnect(struct fj_x11_data * x11_data)
 {
     XCloseDisplay(x11_data->xdisplay);
 }
 
 
-static fj_err_t init_x11(struct fj_client * client)
+static fj_err_t x11_setup(struct fj_client * client)
 {
     struct fj_x11_data * x11_data = fj_alloc_zeroed(sizeof(struct fj_x11_data));
 
@@ -34,37 +34,82 @@ static fj_err_t init_x11(struct fj_client * client)
         return FJ_ERR(FJ_MALLOC_FAILED);
     }
 
-    connect_x11(x11_data);
+    fj_err_t err = x11_connect(x11_data);
+    if (err != FJ_OK) {
+        fj_free(x11_data);
+        return err;
+    }
 
     client->platform_data.x11_data = x11_data;
+
+
     return FJ_OK;
 }
 
 
-static void destroy_x11(struct fj_client * client)
+static fj_err_t x11_shutdown(struct fj_client * client)
 {
-    disconnect_x11(client->platform_data.x11_data);
+    x11_disconnect(client->platform_data.x11_data);
     fj_free(client->platform_data.x11_data);
+    return FJ_OK;
 }
 
 
-static fj_err_t run_x11(struct fj_client * client)
+static fj_err_t x11_client_run(struct fj_client * client)
 {
     (void) client;
     return FJ_OK;
 }
 
 
-fj_err_t fj_x11_run(struct fj_client * client)
+static fj_err_t x11_client_setup(struct fj_client * client)
 {
     fj_err_t err = FJ_OK;
 
-    err = init_x11(client);
+    err = x11_setup(client);
     if (err != FJ_OK) {
         return err;
     }
 
-    err = run_x11(client);
-    destroy_x11(client);
-    return err;
+    err = client->client_listener->setup(client);
+    if (err != FJ_OK) {
+        x11_shutdown(client);
+        return err;
+    }
+
+    return FJ_OK;
+}
+
+
+static fj_err_t x11_client_shutdown(struct fj_client * client)
+{
+    fj_err_t err = FJ_OK;
+
+    err = client->client_listener->shutdown(client);
+    if (err != FJ_OK) {
+        x11_shutdown(client);
+        return err;
+    }
+
+    return x11_shutdown(client);
+}
+
+
+fj_err_t fj_x11_client_run(struct fj_client * client)
+{
+    fj_err_t err = FJ_OK;
+
+    err = x11_client_setup(client);
+    if (err != FJ_OK) {
+        return err;
+    }
+
+    err = x11_client_run(client);
+    if (err != FJ_OK) {
+        // TODO Is shutdown the best strategy on failure?
+        x11_client_shutdown(client);
+        return err;
+    }
+    
+    return x11_client_shutdown(client);
 }

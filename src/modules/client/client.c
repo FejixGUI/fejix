@@ -11,7 +11,7 @@ struct platform_runner {
 
 static const struct platform_runner platform_runners[] = {
 #ifdef FJ_PLATFORM_X11
-    { "x11", fj_x11_run },
+    { "x11", fj_x11_client_run },
 #endif
 };
 

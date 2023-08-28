@@ -34,7 +34,7 @@ struct fj_client {
 /* The following functions are declared but may not be implemented.
     Check Fejix macros before calling them.  */
 
-fj_err_t fj_x11_run(struct fj_client * client);
+fj_err_t fj_x11_client_run(struct fj_client * client);
 
 
 
