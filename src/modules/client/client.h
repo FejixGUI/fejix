@@ -10,7 +10,6 @@ struct fj_client {
     fj_ptr_t user_data;
 
     const struct fj_client_listener * client_listener;
-    
     union {
 #ifdef FJ_PLATFORM_X11
         struct fj_x11_data * x11_data;
@@ -19,13 +18,11 @@ struct fj_client {
 
 #ifdef FJ_FEATURE_UNIXPOLLER
     const struct fj_unixpoller_listener * unixpoller_listener;
-    const struct fj_unixpoller * unixpoller_interface;    
     struct fj_unixpoller_data * unixpoller_data;
 #endif
 
 #ifdef FJ_FEATURE_SHELL
     const struct fj_shell_listener * shell_listener;
-    const struct fj_shell * shell_interface;
 #endif
 
 };
@@ -34,7 +31,7 @@ struct fj_client {
 /* The following functions are declared but may not be implemented.
     Check Fejix macros before calling them.  */
 
-fj_err_t fj_x11_client_run(struct fj_client * client);
+fj_err_t fj_x11_client_run(struct fj_client * client, fj_idstring_t id);
 
 
 

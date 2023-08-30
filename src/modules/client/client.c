@@ -5,7 +5,7 @@
 
 struct platform_runner {
     fj_utf8string_t name;
-    fj_err_t (*run)(struct fj_client *);
+    fj_err_t (*run)(struct fj_client *, fj_idstring_t client_name);
 };
 
 
@@ -111,7 +111,10 @@ const struct fj_client_listener ** fj_client_get_listener(
 }
 
 
-fj_err_t fj_client_run(struct fj_client * client)
+fj_err_t fj_client_run(
+    struct fj_client * client,
+    fj_idstring_t client_name
+)
 {
     if (client->client_listener == NULL) {
         return FJ_ERR("client listener is not set");
@@ -133,7 +136,7 @@ fj_err_t fj_client_run(struct fj_client * client)
         return FJ_ERR("selected platform is not supported");
     }
 
-    return runner->run(client);
+    return runner->run(client, client_name);
 }
 
 
@@ -150,38 +153,12 @@ const struct fj_unixpoller_listener ** fj_client_get_unixpoller_listener(
 }
 
 
-const struct fj_unixpoller * fj_client_get_unixpoller(
-    struct fj_client * client
-)
-{
-#ifdef FJ_FEATURE_UNIXPOLLER
-    return client->unixpoller_interface;
-#else
-    (void) client;
-    return NULL;
-#endif
-}
-
-
 const struct fj_shell_listener ** fj_client_get_shell_listener(
     struct fj_client * client
 )
 {
 #ifdef FJ_FEATURE_SHELL
     return &client->shell_listener;
-#else
-    (void) client;
-    return NULL;
-#endif
-}
-
-
-const struct fj_shell * fj_client_get_shell(
-    struct fj_client * client
-)
-{
-#ifdef FJ_FEATURE_SHELL
-    return client->shell_interface;
 #else
     (void) client;
     return NULL;

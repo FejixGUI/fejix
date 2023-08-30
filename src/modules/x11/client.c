@@ -71,7 +71,7 @@ static fj_err_t x11_client_setup(struct fj_client * client)
         return err;
     }
 
-    err = client->client_listener->setup(client);
+    err = client->client_listener->init(client);
     if (err != FJ_OK) {
         x11_shutdown(client);
         return err;
@@ -85,7 +85,7 @@ static fj_err_t x11_client_shutdown(struct fj_client * client)
 {
     fj_err_t err = FJ_OK;
 
-    err = client->client_listener->shutdown(client);
+    err = client->client_listener->release(client);
     if (err != FJ_OK) {
         x11_shutdown(client);
         return err;
@@ -95,7 +95,7 @@ static fj_err_t x11_client_shutdown(struct fj_client * client)
 }
 
 
-fj_err_t fj_x11_client_run(struct fj_client * client)
+fj_err_t fj_x11_client_run(struct fj_client * client, fj_idstring_t id)
 {
     fj_err_t err = FJ_OK;
 
