@@ -14,6 +14,49 @@ struct fj_unixpoller {
 };
 
 
+static fj_err_t unixpoller_process_events(
+    struct fj_client * client,
+    struct fj_unixpoller * poller
+)
+{
+    for (uint32_t i=0; i<poller->pollfds->length; i++) {
+        struct pollfd * pollfd = fj_list_get(poller->pollfds, i);
+
+        fj_unixpoller_callback_t callback;
+        callback = (fj_unixpoller_callback_t) fj_list_get(poller->callbacks, i);
+
+        if (pollfd->revents != 0) {
+            // TODO does callback need to handle POLLNVAL (invalid FD error)?
+            fj_err_t err = callback(client, pollfd->fd, pollfd->revents);
+            if (err != FJ_OK) return err;
+
+            pollfd->revents = 0;
+        }
+    }
+
+    return FJ_OK;
+}
+
+
+static fj_err_t unixpoller_process_interruption(
+    struct fj_client * client,
+    fj_unixpoller_fd_t fd,
+    fj_unixpoller_event_mask_t events
+)
+{
+    (void) client;
+
+    if (events & (POLLERR|POLLHUP|POLLNVAL)) {
+        return FJ_ERR("error on interruptor FD");
+    }
+
+    uint8_t buffer[1];
+    read(fd, buffer, 1);
+
+    return FJ_OK;
+}
+
+
 static fj_err_t unixpoller_init(struct fj_unixpoller * poller)
 {
     poller->pollfds = fj_list_new(sizeof(struct pollfd));
@@ -24,11 +67,17 @@ static fj_err_t unixpoller_init(struct fj_unixpoller * poller)
     }
 
     int pipe_result = pipe((int32_t *) poller->interrupt_pipe);
+
     if (pipe_result < 0) {
         return FJ_ERR("pipe failed");
     }
 
-    return FJ_OK;
+    return fj_unixpoller_add_watch(
+        poller,
+        fj_unixpoller_get_interruptor(poller),
+        POLLIN,
+        unixpoller_process_interruption
+    );
 }
 
 
@@ -40,7 +89,9 @@ struct fj_unixpoller * fj_unixpoller_new(void)
         return NULL;
     }
 
-    if (unixpoller_init(poller) != FJ_OK) {
+    fj_err_t err = unixpoller_init(poller);
+    
+    if (err != FJ_OK) {
         fj_unixpoller_del(poller);
         return NULL;
     }
@@ -51,6 +102,11 @@ struct fj_unixpoller * fj_unixpoller_new(void)
 
 void fj_unixpoller_del(struct fj_unixpoller * poller)
 {
+    if (poller->interrupt_pipe[0] != 0) {
+        close(poller->interrupt_pipe[0]);
+        close(poller->interrupt_pipe[1]);
+    }
+
     if (poller->callbacks != NULL) {
         fj_free(poller->callbacks);
     }
@@ -129,18 +185,11 @@ fj_err_t fj_unixpoller_poll(
         return FJ_ERR("poll failed");
     }
 
-    for (uint32_t i=0; i<poller->pollfds->length; i++) {
-        struct pollfd * pollfd = fj_list_get(poller->pollfds, i);
-
-        fj_unixpoller_callback_t callback;
-        callback = (fj_unixpoller_callback_t) fj_list_get(poller->callbacks, i);
-
-        if (pollfd->revents != 0) {
-            callback(client, pollfd->fd, pollfd->revents);
-        }
+    if (result == 0) {
+        return FJ_OK;
     }
 
-    return FJ_OK;
+    return unixpoller_process_events(client, poller);
 }
 
 
@@ -156,7 +205,8 @@ fj_err_t fj_unixpoller_interrupt(
     fj_unixpoller_fd_t interruptor
 )
 {
-    ssize_t written_count = write(interruptor, "\0", 1);
+    uint8_t buffer[1];
+    ssize_t written_count = write(interruptor, buffer, 1);
 
     if (written_count < 0) {
         return FJ_ERR("failed to write to interruptor FD");
