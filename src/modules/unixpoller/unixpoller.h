@@ -2,7 +2,23 @@
 #define FEJIX_INTERNAL_UNIXPOLLER_H_
 
 
-#include <fejix/interface/unixpoller.h>
+#include <fejix/core/base.h>
+#include <fejix/interface/client.h>
+
+#include <sys/poll.h>
+
+
+/* Unix file descriptor */
+typedef uint32_t fj_unixpoller_fd_t;
+
+/* Example: `POLLIN|POLLOUT` */
+typedef uint16_t fj_unixpoller_event_mask_t;
+
+typedef fj_err_t (*fj_unixpoller_callback_t)(
+    struct fj_client * client,
+    fj_unixpoller_fd_t file_descriptor,
+    fj_unixpoller_event_mask_t event_mask
+);
 
 
 struct fj_unixpoller;
@@ -19,6 +35,9 @@ fj_err_t fj_unixpoller_add_watch(
     fj_unixpoller_callback_t callback
 );
 
+/* Ensures that the file descriptor is not being watched.
+    If the file descriptor has not beed added to the watching list, this
+    returns `FJ_OK`. */
 fj_err_t fj_unixpoller_remove_watch(
     struct fj_unixpoller * poller,
     fj_unixpoller_fd_t file_descriptor
@@ -26,13 +45,12 @@ fj_err_t fj_unixpoller_remove_watch(
 
 /* # Parameters
     * `client` - unused by `poll` itself, but passed to the callbacks.
-    * `poll_forever` - if `true`, ignores the timeout and polls until any event
-        is received. */
+    * `timeout` - if negative, this will poll forever,
+        if zero, this will return immediately. */
 fj_err_t fj_unixpoller_poll(
     struct fj_unixpoller * poller,
     struct fj_client * client,
-    uint32_t timeout_ms,
-    fj_bool_t poll_forever
+    int32_t timeout_ms
 );
 
 fj_unixpoller_fd_t fj_unixpoller_get_interruptor(

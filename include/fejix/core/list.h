@@ -5,11 +5,16 @@
 #include <fejix/core/base.h>
 
 
+typedef fj_bool_t (*fj_comparator_t)(fj_ptr_t a, fj_ptr_t b);
+
+
 /* Dynamically-allocated linear array. */
 struct fj_list {
     fj_ptr_t elements;
     size_t element_size;
+    /* Number of currently stored elements */
     uint32_t length;
+    /* Size of `elements` in element sizes */
     uint32_t capacity;
 };
 
@@ -37,15 +42,30 @@ fj_err_t fj_list_pop(struct fj_list * list);
 /* Returns NULL if `index` is out of bounds. */
 fj_ptr_t fj_list_get(struct fj_list * list, uint32_t index);
 
-/* Linearly searches the item by byte-wise comparison.
+/* Linearly searches for the item using the predicate function.
+    This is analogous to `fj_list_search(list, item, predicate, 0, true)`.
     # Returns
     * The index of `item` if it is present.
     *`list->length` if the item was not found.*/
-uint32_t fj_list_find(struct fj_list * list, fj_ptr_t item);
+uint32_t fj_list_find(
+    struct fj_list * list,
+    fj_ptr_t item,
+    fj_comparator_t predicate
+);
 
-/* If the item is present on the list, removes it.
-    This uses `fj_list_find` and `fj_list_remove`. */
-fj_err_t fj_list_exclude(struct fj_list * list, fj_ptr_t item);
+/* Linearly searches for the item using the predicate function.
+    The search starts from the given start index and goes forward if `forward`
+    is true or backward otherwise.
+    # Returns
+    * The index of `item` if it is present.
+    *`list->length` if the item was not found.*/
+uint32_t fj_list_search(
+    struct fj_list * list,
+    fj_ptr_t item,
+    fj_comparator_t predicate,
+    uint32_t start_index,
+    fj_bool_t forward
+);
 
 
 #endif

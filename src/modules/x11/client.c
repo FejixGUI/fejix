@@ -85,7 +85,7 @@ static fj_err_t x11_client_shutdown(struct fj_client * client)
 {
     fj_err_t err = FJ_OK;
 
-    err = client->client_listener->release(client);
+    err = client->client_listener->deinit(client);
     if (err != FJ_OK) {
         x11_shutdown(client);
         return err;

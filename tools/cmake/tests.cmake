@@ -10,6 +10,5 @@ macro(fejix_add_test test_name source_file)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endmacro()
 
-fejix_add_test(fejix_test_core_map "${FEJIX_TESTS}/core/map.c")
 fejix_add_test(fejix_test_core_list "${FEJIX_TESTS}/core/list.c")
 fejix_add_test(fejix_test_client_tmp "${FEJIX_TESTS}/client/tmp.c")

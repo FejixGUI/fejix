@@ -17,7 +17,7 @@ struct fj_client_listener {
         struct fj_client * client
     );
 
-    fj_err_t (*release)(
+    fj_err_t (*deinit)(
         struct fj_client * client
     );
 
@@ -39,10 +39,6 @@ fj_ptr_t * fj_client_get_user_data(struct fj_client * client);
 
 /* Always returns a valid pointer. */
 const struct fj_client_listener ** fj_client_get_listener(
-    struct fj_client * client
-);
-
-const struct fj_unixpoller_listener ** fj_client_get_unixpoller_listener(
     struct fj_client * client
 );
 

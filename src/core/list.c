@@ -76,7 +76,7 @@ static void shift_elements_left(struct fj_list * list, uint32_t dst_index)
 
 struct fj_list * fj_list_new(size_t element_size)
 {
-    struct fj_list * list = fj_alloc_zeroed(sizeof(struct fj_list));
+    struct fj_list * list = fj_alloc_zeroed(sizeof *list);
     list->element_size = element_size;
 
     return list;
@@ -176,28 +176,34 @@ fj_ptr_t fj_list_get(struct fj_list * list, uint32_t index)
 }
 
 
-uint32_t fj_list_find(struct fj_list * list, fj_ptr_t item)
+uint32_t fj_list_find(
+    struct fj_list * list,
+    fj_ptr_t item,
+    fj_comparator_t predicate
+)
 {
-    uint32_t i;
-    for (i = 0; i < list->length; i++) {
-        fj_ptr_t list_item = fj_list_get(list, i);
+    return fj_list_search(list, item, predicate, 0, true);
+}
 
-        if (memcmp(list_item, item, list->element_size) == 0) {
+
+uint32_t fj_list_search(
+    struct fj_list * list,
+    fj_ptr_t item,
+    fj_comparator_t predicate,
+    uint32_t start_index,
+    fj_bool_t forward
+)
+{
+    uint32_t index = start_index;
+    int32_t step = forward ? 1 : -1;
+
+    for ( ; index < list->length; index += step) {
+        fj_ptr_t list_item = fj_list_get(list, index);
+
+        if (predicate(list_item, item) == true) {
             break;
         }
     }
 
-    return i;
-}
-
-
-fj_err_t fj_list_exclude(struct fj_list * list, fj_ptr_t item)
-{
-    uint32_t index = fj_list_find(list, item);
-
-    if (index == list->length) {
-        return FJ_OK;
-    }
-
-    return fj_list_remove(list, index);
+    return index;
 }
