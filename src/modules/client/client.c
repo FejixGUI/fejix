@@ -5,7 +5,7 @@
 
 struct platform_runner {
     fj_utf8string_t name;
-    fj_err_t (*run)(struct fj_client *, fj_idstring_t client_name);
+    fj_err_t (*run)(struct fj_client *);
 };
 
 
@@ -111,10 +111,7 @@ const struct fj_client_listener ** fj_client_get_listener(
 }
 
 
-fj_err_t fj_client_run(
-    struct fj_client * client,
-    fj_idstring_t client_name
-)
+fj_err_t fj_client_run(struct fj_client * client, fj_idstring_t client_id)
 {
     if (client->client_listener == NULL) {
         return FJ_ERR("client listener is not set");
@@ -136,20 +133,9 @@ fj_err_t fj_client_run(
         return FJ_ERR("selected platform is not supported");
     }
 
-    return runner->run(client, client_name);
-}
+    client->client_id = client_id;
 
-
-const struct fj_unixpoller_listener ** fj_client_get_unixpoller_listener(
-    struct fj_client * client
-)
-{
-#ifdef FJ_FEATURE_UNIXPOLLER
-    return &client->unixpoller_listener;
-#else
-    (void) client;
-    return NULL;
-#endif
+    return runner->run(client);
 }
 
 

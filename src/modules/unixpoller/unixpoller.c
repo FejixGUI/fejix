@@ -72,7 +72,7 @@ static fj_err_t unixpoller_init(struct fj_unixpoller * poller)
         return FJ_ERR("pipe failed");
     }
 
-    return fj_unixpoller_add_watch(
+    return fj_unixpoller_watch(
         poller,
         fj_unixpoller_get_interruptor(poller),
         POLLIN,
@@ -119,7 +119,7 @@ void fj_unixpoller_del(struct fj_unixpoller * poller)
 }
 
 
-fj_err_t fj_unixpoller_add_watch(
+fj_err_t fj_unixpoller_watch(
     struct fj_unixpoller * poller,
     fj_unixpoller_fd_t file_descriptor,
     fj_unixpoller_event_mask_t events_to_watch,
@@ -147,7 +147,7 @@ static fj_bool_t compare_pollfds(fj_ptr_t a, fj_ptr_t b)
     return ((struct pollfd *)a)->fd == ((struct pollfd *)b)->fd;
 }
 
-fj_err_t fj_unixpoller_remove_watch(
+fj_err_t fj_unixpoller_unwatch(
     struct fj_unixpoller * poller,
     fj_unixpoller_fd_t file_descriptor
 )

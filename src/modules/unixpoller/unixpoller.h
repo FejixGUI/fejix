@@ -28,7 +28,7 @@ struct fj_unixpoller * fj_unixpoller_new(void);
 
 void fj_unixpoller_del(struct fj_unixpoller * poller);
 
-fj_err_t fj_unixpoller_add_watch(
+fj_err_t fj_unixpoller_watch(
     struct fj_unixpoller * poller,
     fj_unixpoller_fd_t file_descriptor,
     fj_unixpoller_event_mask_t events_to_watch,
@@ -38,7 +38,7 @@ fj_err_t fj_unixpoller_add_watch(
 /* Ensures that the file descriptor is not being watched.
     If the file descriptor has not beed added to the watching list, this
     returns `FJ_OK`. */
-fj_err_t fj_unixpoller_remove_watch(
+fj_err_t fj_unixpoller_unwatch(
     struct fj_unixpoller * poller,
     fj_unixpoller_fd_t file_descriptor
 );
