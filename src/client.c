@@ -1,19 +1,10 @@
-#include "src/internal_prelude.h"
+#define DEFINE_PLATFORM_RUNNERS
+#include "src/client.h"
+
+#include <fejix/core/utils.h>
+#include <fejix/core/malloc.h>
 
 #include <stdlib.h>
-
-
-struct platform_runner {
-    fj_utf8string_t name;
-    fj_err_t (*run)(struct fj_client *);
-};
-
-
-static const struct platform_runner platform_runners[] = {
-#ifdef FJ_PLATFORM_X11
-    { "x11", fj_x11_client_run },
-#endif
-};
 
 
 static fj_utf8string_t guess_default_platform(void)
@@ -71,7 +62,7 @@ static fj_utf8string_t get_platform_name(void)
 }
 
 
-static const struct platform_runner * get_platform_runner(
+static const struct fj_platform_runner * get_platform_runner(
     fj_utf8string_t platform_name
 )
 {
@@ -85,15 +76,49 @@ static const struct platform_runner * get_platform_runner(
 }
 
 
-struct fj_client * fj_client_new(void)
+struct fj_client * fj_client_new(fj_idstring_t client_id)
 {
-    return fj_alloc_zeroed(sizeof(struct fj_client));
+    struct fj_client * client = fj_alloc_zeroed(sizeof *client);
+
+    if (client == NULL) {
+        return NULL;
+    }
+
+    client->client_id = client_id;
+
+    return client;
 }
 
 
 void fj_client_del(struct fj_client * client)
 {
     fj_free(client);
+}
+
+
+fj_err_t fj_client_run(struct fj_client * client)
+{
+    if (client->client_listener == NULL) {
+        return FJ_ERR("client listener is not set");
+    }
+
+    fj_utf8string_t platform_name = get_platform_name();
+
+    if (platform_name == NULL) {
+        return FJ_ERR("No platform selected. "
+            "Define any of the environment variables:"
+            "FEJIX_PLATFORM, XDG_SESSION_TYPE, DISPLAY, WAYLAND_DISPLAY"
+        );
+    }
+
+    const struct fj_platform_runner * platform_runner;
+    platform_runner = get_platform_runner(platform_name);
+
+    if (platform_runner == NULL) {
+        return FJ_ERR("selected platform is not supported");
+    }
+
+    return platform_runner->run(client);
 }
 
 
@@ -111,42 +136,41 @@ const struct fj_client_listener ** fj_client_get_listener(
 }
 
 
-fj_err_t fj_client_run(struct fj_client * client, fj_idstring_t client_id)
-{
-    if (client->client_listener == NULL) {
-        return FJ_ERR("client listener is not set");
-    }
-
-    fj_utf8string_t platform_name = get_platform_name();
-
-    if (platform_name == NULL) {
-        return FJ_ERR("No platform selected. "
-            "Define any of the environment variables:"
-            "FEJIX_PLATFORM, XDG_SESSION_TYPE, DISPLAY, WAYLAND_DISPLAY"
-        );
-    }
-
-    const struct platform_runner * runner;
-    runner = get_platform_runner(platform_name);
-
-    if (runner == NULL) {
-        return FJ_ERR("selected platform is not supported");
-    }
-
-    client->client_id = client_id;
-
-    return runner->run(client);
-}
-
-
 const struct fj_shell_listener ** fj_client_get_shell_listener(
     struct fj_client * client
 )
 {
-#ifdef FJ_FEATURE_SHELL
-    return &client->shell_listener;
-#else
-    (void) client;
-    return NULL;
-#endif
+#   ifdef FJ_FEATURE_SHELL
+        return &client->shell_listener;
+#   else
+        (void) client;
+        return NULL;
+#   endif
+}
+
+
+void fj_client_schedule_none(struct fj_client * client)
+{
+    client->schedule = FJ_SCHEDULE_NONE;
+}
+
+
+void fj_client_schedule_timeout(
+    struct fj_client * client,
+    uint32_t milliseconds
+)
+{
+    client->schedule = milliseconds;
+}
+
+
+void fj_client_schedule_idle(struct fj_client * client)
+{
+    client->schedule = FJ_SCHEDULE_IDLE;
+}
+
+
+void fj_client_schedule_exit(struct fj_client * client)
+{
+    client->schedule = FJ_SCHEDULE_EXIT;
 }

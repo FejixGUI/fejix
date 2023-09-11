@@ -1,5 +1,7 @@
-#include "src/internal_prelude.h"
 #include "src/modules/x11/client.h"
+
+#include <fejix/core/utils.h>
+#include <fejix/core/malloc.h>
 
 
 static fj_err_t x11_connect(struct fj_x11_data * x11_data)
@@ -41,7 +43,7 @@ static fj_err_t x11_setup(struct fj_client * client)
         return err;
     }
 
-    client->platform_data.x11_data = x11_data;
+    client->platform_data.x11 = x11_data;
 
     return FJ_OK;
 }
@@ -49,8 +51,8 @@ static fj_err_t x11_setup(struct fj_client * client)
 
 static fj_err_t x11_shutdown(struct fj_client * client)
 {
-    x11_disconnect(client->platform_data.x11_data);
-    fj_free(client->platform_data.x11_data);
+    x11_disconnect(client->platform_data.x11);
+    fj_free(client->platform_data.x11);
     return FJ_OK;
 }
 
@@ -64,7 +66,7 @@ static fj_err_t x11_client_run(struct fj_client * client)
 
 static fj_err_t x11_client_load_modules(struct fj_client * client)
 {
-    struct fj_x11_data * x11_data = client->platform_data.x11_data;
+    struct fj_x11_data * x11_data = client->platform_data.x11;
 
     x11_data->unixpoller = fj_unixpoller_new();
 

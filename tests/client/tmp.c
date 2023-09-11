@@ -1,4 +1,4 @@
-#include <fejix/prelude.h>
+#include <fejix/client.h>
 
 #include <stdio.h>
 
@@ -6,7 +6,7 @@
 int main() {
     fj_err_t err = FJ_OK;
 
-    struct fj_client * client = fj_client_new();
+    struct fj_client * client = fj_client_new("com.example.test");
 
     if (client == NULL) {
         return 1;

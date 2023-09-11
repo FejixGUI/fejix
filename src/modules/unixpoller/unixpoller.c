@@ -1,8 +1,8 @@
-#include "src/internal_prelude.h"
 #include "src/modules/unixpoller/unixpoller.h"
 
 #include <fejix/core/list.h>
 #include <fejix/core/malloc.h>
+#include <fejix/core/utils.h>
 
 #include <unistd.h>
 
@@ -22,8 +22,8 @@ static fj_err_t unixpoller_process_events(
     for (uint32_t i=0; i<poller->pollfds->length; i++) {
         struct pollfd * pollfd = fj_list_get(poller->pollfds, i);
 
-        fj_unixpoller_callback_t callback;
-        callback = (fj_unixpoller_callback_t) fj_list_get(poller->callbacks, i);
+        fj_unixpoller_callback_t callback
+            = * (fj_unixpoller_callback_t *) fj_list_get(poller->callbacks, i);
 
         if (pollfd->revents != 0) {
             // TODO does callback need to handle POLLNVAL (invalid FD error)?
@@ -175,7 +175,7 @@ fj_err_t fj_unixpoller_poll(
     int32_t timeout_ms
 )
 {
-    uint32_t result = poll(
+    int32_t result = poll(
         poller->pollfds->elements,
         poller->pollfds->length,
         timeout_ms
@@ -205,7 +205,7 @@ fj_err_t fj_unixpoller_interrupt(
     fj_unixpoller_fd_t interruptor
 )
 {
-    uint8_t buffer[1];
+    uint8_t buffer[1] = { 42 };
     ssize_t written_count = write(interruptor, buffer, 1);
 
     if (written_count < 0) {

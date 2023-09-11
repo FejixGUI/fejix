@@ -17,13 +17,10 @@ typedef uint8_t fj_bool_t;
 /* Untyped pointer. */
 typedef void * fj_ptr_t;
 
-// TODO Delete this eventually. The concept of IDs was deprecated with the new API
-typedef uint32_t fj_id_t;
-
 /* UTF-8 string for most use cases. */
 typedef const char * fj_utf8string_t;
 
-/* ASCII string for rare use cases. */
+/* ASCII string for specific use cases. */
 typedef const char * fj_asciistring_t;
 
 /* ASCII unique string identifiers.

@@ -5,12 +5,18 @@ target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/list.c"
-    "${FEJIX_SRC}/modules/client/client.c"
+    "${FEJIX_SRC}/client.c"
 )
 
 if(FEJIX_PLATFORM_X11)
     target_sources(fejix PRIVATE
         "${FEJIX_SRC}/modules/x11/client.c"
+    )
+endif()
+
+if(FEJIX_FEATURE_UNIXPOLLER)
+    target_sources(fejix PRIVATE
+        "${FEJIX_SRC}/modules/unixpoller/unixpoller.c"
     )
 endif()
 

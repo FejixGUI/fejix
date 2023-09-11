@@ -2,8 +2,7 @@
 #define FEJIX_INTERNAL_UNIXPOLLER_H_
 
 
-#include <fejix/core/base.h>
-#include <fejix/interface/client.h>
+#include <fejix/client.h>
 
 #include <sys/poll.h>
 

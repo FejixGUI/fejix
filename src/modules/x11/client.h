@@ -2,8 +2,7 @@
 #define FEJIX_INTERNAL_X11_CLIENT_H_
 
 
-#include <fejix/core/base.h>
-
+#include "src/client.h"
 #include "src/modules/unixpoller/unixpoller.h"
 
 #include <xcb/xcb.h>
