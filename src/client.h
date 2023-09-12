@@ -12,6 +12,10 @@
 #define FJ_SCHEDULE_IDLE (-1)
 #define FJ_SCHEDULE_EXIT (-2)
 
+#define FJ_SCHEDULE_IS_TIMEOUT(SCHEDULE) \
+    ((SCHEDULE) >= FJ_SCHEDULE_TIMEOUT_MIN \
+    && (SCHEDULE) <= FJ_SCHEDULE_TIMEOUT_MAX)
+
 
 struct fj_client {
 
@@ -22,8 +26,8 @@ struct fj_client {
     
     fj_ptr_t user_data;
 
-/* The following structure types may not be implemented.
-    Check Fejix macros and include the respective headers before using them. */
+    /* The following structure types may not be implemented. Check Fejix macros
+        and include the respective headers before using them. */
     union {
         struct fj_x11_data * x11;
         struct fj_wayland_data * wayland;
@@ -51,7 +55,7 @@ fj_err_t fj_winapi_client_run(struct fj_client * client);
 
 
 /* This macro should be manually defined before including this header. */
-#ifdef DEFINE_PLATFORM_RUNNERS
+#ifdef FJ_INTERNAL_DEFINE_PLATFORM_RUNNERS
 
     static const struct fj_platform_runner {
         fj_utf8string_t name;

@@ -1,4 +1,4 @@
-#define DEFINE_PLATFORM_RUNNERS
+#define FJ_INTERNAL_DEFINE_PLATFORM_RUNNERS
 #include "src/client.h"
 
 #include <fejix/core/utils.h>
@@ -160,7 +160,7 @@ void fj_client_schedule_timeout(
     uint32_t milliseconds
 )
 {
-    client->schedule = milliseconds;
+    client->schedule = FJ_SCHEDULE_TIMEOUT(milliseconds);
 }
 
 
