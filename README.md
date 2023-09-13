@@ -14,7 +14,7 @@ Written in C99.
 mkdir build
 cd build
 cmake .. -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
-ninja # Or 'make' or whatever cmake uses
+cmake --build .
 ```
 
 ### Tests
@@ -22,7 +22,7 @@ ninja # Or 'make' or whatever cmake uses
 ```sh
 cd build
 cmake .. -D FEJIX_BUILD_TESTS=ON
-ninja
+cmake --build .
 ctest 
 ```
 
@@ -33,6 +33,6 @@ cd examples/EXAMPLE_NAME
 mkdir build
 cd build
 cmake ..
-ninja
+cmake --build .
 ./example
 ```
