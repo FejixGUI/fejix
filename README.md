@@ -8,28 +8,42 @@ Written in C99.
 
 ## Build
 
-### Fejix
+## How to build a CMake project?
+
+```sh
+# Make the project directory current
+cd {PROJECT_DIRECTORY}
+
+# Folder where to build the project
+mkdir build
+
+# Configure the build
+cmake -S . -B build
+# Or if you need to specify any options:
+cmake -S . -B build -D {OPTION1}={VALUE1} -D {OPTION2}={VALUE2}
+
+# Perform the build
+cmake --build build
+```
+
+## How to build Fejix components?
+
+### Fejix library
+
+Build Fejix library as a CMake project:
 
 ```sh
 mkdir build
-cmake -B build -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
+cmake -S . -B build {options...}
 cmake --build build
 ```
 
 ### Tests
 
-```sh
-cmake -B build -D FEJIX_BUILD_TESTS=ON
-cmake --build build
-ctest 
-```
+Build Fejix library with the option: `FEJIX_BUILD_TESTS=ON`.
 
 ### Examples
 
-```sh
-cd examples/EXAMPLE_NAME
-mkdir build
-cmake -B build
-cmake --build build
-./example
-```
+1. Change directory to `examples/{EXAMPLE_DIRECTORY}`.
+2. Build the chosen example project.
+3. Run `./build/example`.
