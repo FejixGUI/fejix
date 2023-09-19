@@ -38,6 +38,7 @@ endfunction()
 
 
 declare_option(PLATFORM_X11)
+declare_option(PLATFORM_WINAPI)
 declare_option(FEATURE_UNIXPOLLER)
 
 if(FEJIX_PLATFORM_X11)

@@ -1,7 +1,7 @@
 target_include_directories(fejix PUBLIC "${FEJIX_INCLUDE}")
 target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 
-# Suppress pointless warnings from MSVC 
+# Suppress pointless warnings from MSVC
 add_compile_definitions("_CRT_SECURE_NO_WARNINGS")
 
 target_sources(fejix PRIVATE
@@ -17,6 +17,11 @@ if(FEJIX_PLATFORM_X11)
     )
 endif()
 
+if(FEJIX_PLATFORM_WINAPI)
+    target_sources(fejix PRIVATE
+        "${FEJIX_SRC}/modules/winapi/client.c")
+endif()
+
 if(FEJIX_FEATURE_UNIXPOLLER)
     target_sources(fejix PRIVATE
         "${FEJIX_SRC}/modules/unixpoller/unixpoller.c"
@@ -28,7 +33,7 @@ endif()
 get_target_property(fejix_source_files fejix SOURCES)
 foreach(file ${fejix_source_files})
     file(RELATIVE_PATH filename "${FEJIX_SRC}" "${file}")
-    
+
     set_property(
         SOURCE "${file}"
         APPEND PROPERTY COMPILE_DEFINITIONS
