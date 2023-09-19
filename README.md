@@ -12,17 +12,15 @@ Written in C99.
 
 ```sh
 mkdir build
-cd build
-cmake .. -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
-cmake --build .
+cmake -B build -D OPTION1=VALUE1 -D OPTION2=VALUE2 ...
+cmake --build build
 ```
 
 ### Tests
 
 ```sh
-cd build
-cmake .. -D FEJIX_BUILD_TESTS=ON
-cmake --build .
+cmake -B build -D FEJIX_BUILD_TESTS=ON
+cmake --build build
 ctest 
 ```
 
@@ -31,8 +29,7 @@ ctest
 ```sh
 cd examples/EXAMPLE_NAME
 mkdir build
-cd build
-cmake ..
-cmake --build .
+cmake -B build
+cmake --build build
 ./example
 ```

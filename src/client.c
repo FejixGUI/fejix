@@ -16,8 +16,10 @@ static fj_utf8string_t guess_default_platform(void)
 #elif defined(FJ_PLATFORM_X11)
     return "x11";
 #else
-#   error Cannot select default platform. Did you specify/implement it? \
-(note: specify the platform with FEJIX_PLATFORM_XXX=ON)
+#   error \
+!!!!! FEJIX ERROR !!!!! \
+Cannot select default platform. Did you specify/implement it? \
+(note: specify the platform with FEJIX_PLATFORM_{PLATFORM_NAME}=ON)
 #endif
 }
 

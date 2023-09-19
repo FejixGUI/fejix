@@ -1,6 +1,9 @@
 target_include_directories(fejix PUBLIC "${FEJIX_INCLUDE}")
 target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 
+# Suppress pointless warnings from MSVC 
+add_compile_definitions("_CRT_SECURE_NO_WARNINGS")
+
 target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
