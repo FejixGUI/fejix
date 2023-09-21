@@ -5,25 +5,13 @@
 #include <fejix/client.h>
 
 
-#define FJ_SCHEDULE_NONE (0)
-#define FJ_SCHEDULE_TIMEOUT(MILLISECONDS) (MILLISECONDS)
-#define FJ_SCHEDULE_TIMEOUT_MIN (1)
-#define FJ_SCHEDULE_TIMEOUT_MAX (0x7FFFFFFF)
-#define FJ_SCHEDULE_IDLE (-1)
-#define FJ_SCHEDULE_EXIT (-2)
-
-#define FJ_SCHEDULE_IS_TIMEOUT(SCHEDULE) \
-    ((SCHEDULE) >= FJ_SCHEDULE_TIMEOUT_MIN \
-    && (SCHEDULE) <= FJ_SCHEDULE_TIMEOUT_MAX)
-
-
 struct fj_client {
 
     fj_idstring_t client_id;
 
     /* Timeout in milliseconds or magic values. */
     int32_t schedule;
-    
+
     fj_ptr_t user_data;
 
     /* The following structure types may not be implemented. Check Fejix macros
@@ -32,16 +20,16 @@ struct fj_client {
         struct fj_x11_data * x11;
         struct fj_wayland_data * wayland;
         struct fj_winapi_data * winapi;
-    } platform_data;
+    } data;
 
     const struct fj_client_listener * client_listener;
 
-#   ifdef FJ_FEATURE_SHELL
+#ifdef FJ_FEATURE_SHELL
         const struct fj_shell_listener * shell_listener;
-#   endif
-#   ifdef FJ_FEATURE_WM
+#endif
+#ifdef FJ_FEATURE_WM
         const struct fj_wm_listener * wm_listener;
-#   endif
+#endif
 
 };
 
@@ -62,15 +50,15 @@ fj_err_t fj_winapi_client_run(struct fj_client * client);
         fj_err_t (*run)(struct fj_client *);
     } platform_runners[] = {
 
-#       ifdef FJ_PLATFORM_X11
-            { "x11", fj_x11_client_run },
-#       endif
-#       ifdef FJ_PLATFORM_WAYLAND
-            { "wayland", fj_wayland_client_run },
-#       endif
-#       ifdef FJ_PLATFORM_WINAPI
-            { "winapi", fj_winapi_client_run },
-#       endif
+#ifdef FJ_PLATFORM_X11
+        { "x11", fj_x11_client_run },
+#endif
+#ifdef FJ_PLATFORM_WAYLAND
+        { "wayland", fj_wayland_client_run },
+#endif
+#ifdef FJ_PLATFORM_WINAPI
+        { "winapi", fj_winapi_client_run },
+#endif
 
     };
 

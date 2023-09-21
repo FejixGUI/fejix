@@ -8,7 +8,8 @@
 
 
 struct fj_winapi_data {
-    HINSTANCE program_instance;
+    HINSTANCE app_instance;
+    LPWSTR window_class_name;
 };
 
 

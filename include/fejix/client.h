@@ -5,6 +5,40 @@
 #include <fejix/core/base.h>
 
 
+/* On each event loop iteration the client processes available shell
+    messages and then calls the user callback.
+    The callback gets called even if no messages were processed.
+    This is the default behavior. */
+#define FJ_SCHEDULE_NONE (0)
+
+/* On each event looop iteration the client waits indefinitely until new
+    messages arrive and then calls the user callback.
+    The callback gets called only when new messages arrive. */
+#define FJ_SCHEDULE_IDLE (-1)
+
+/* Event loop ends as soon as the current iteration ends. */
+#define FJ_SCHEDULE_EXIT (-2)
+
+/* On each event looop iteration the client waits until either the timeout
+    expires or new messages arrive and then calls the user callback.
+    The callback gets called only when new messages arrive. */
+#define FJ_SCHEDULE_TIMEOUT(MILLISECONDS) (MILLISECONDS)
+
+/* Minimal timeout is 1 millisecond. */
+#define FJ_SCHEDULE_TIMEOUT_MIN (1)
+
+/* Maximal timeout is 2147483647 milliseconds or approximately 25 days. */
+#define FJ_SCHEDULE_TIMEOUT_MAX (0x7FFFFFFF)
+
+#define FJ_SCHEDULE_IS_TIMEOUT(SCHEDULE) \
+    ((SCHEDULE) >= FJ_SCHEUDLE_TIMEOUT_MIN \
+    && (SCHEDULE) <= FJ_SCHEDULE_TIMEOUT_MAX)
+
+
+/* Contains timeout in milliseconds or magic values. */
+typedef int32_t fj_schedule_t;
+
+
 struct fj_client;
 
 struct fj_client_listener {
@@ -23,21 +57,9 @@ void fj_client_del(struct fj_client * client);
 
 fj_err_t fj_client_run(struct fj_client * client);
 
-/* Default behavior. The client only processes available shell messages and
-    calls `run` repeatedly. */
-void fj_client_schedule_none(struct fj_client * client);
+void fj_client_set_schedule(struct fj_client * client, fj_schedule_t schedule);
 
-/* The client waits until either the timeout expires or new messages arrive. */
-void fj_client_schedule_timeout(
-    struct fj_client * client,
-    uint32_t milliseconds
-);
-
-/* The client waits indefinitely until new messages arrive. */
-void fj_client_schedule_idle(struct fj_client * client);
-
-/* The `fj_client_run` function exits. */
-void fj_client_schedule_exit(struct fj_client * client);
+fj_schedule_t fj_client_get_schedule(struct fj_client * client);
 
 /* Always returns a valid pointer. */
 fj_ptr_t * fj_client_get_user_data(struct fj_client * client);

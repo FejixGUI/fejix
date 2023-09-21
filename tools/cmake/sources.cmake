@@ -1,8 +1,6 @@
 target_include_directories(fejix PUBLIC "${FEJIX_INCLUDE}")
 target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 
-# Suppress pointless warnings from MSVC
-add_compile_definitions("_CRT_SECURE_NO_WARNINGS")
 
 target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
@@ -19,7 +17,9 @@ endif()
 
 if(FEJIX_PLATFORM_WINAPI)
     target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/modules/winapi/client.c")
+        "${FEJIX_SRC}/modules/winapi/client.c"
+        "${FEJIX_SRC}/modules/winapi/utils.c"
+    )
 endif()
 
 if(FEJIX_FEATURE_UNIXPOLLER)

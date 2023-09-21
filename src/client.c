@@ -47,13 +47,13 @@ static fj_utf8string_t get_platform_name(void)
     fj_utf8string_t env = NULL;
 
     env = getenv("FEJIX_PLATFORM");
-    
+
     if (env != NULL) {
         return env;
     }
 
     env = getenv("XDG_SESSION_TYPE");
-    
+
     /* XDG_SESSION_TYPE is not documented, so we cannot be sure about what it
         contains */
     if (fj_streq(env, "x11") || fj_streq(env, "wayland")) {
@@ -142,37 +142,22 @@ const struct fj_shell_listener ** fj_client_get_shell_listener(
     struct fj_client * client
 )
 {
-#   ifdef FJ_FEATURE_SHELL
-        return &client->shell_listener;
-#   else
-        (void) client;
-        return NULL;
-#   endif
+#ifdef FJ_FEATURE_SHELL
+    return &client->shell_listener;
+#else
+    (void) client;
+    return NULL;
+#endif
 }
 
 
-void fj_client_schedule_none(struct fj_client * client)
+void fj_client_set_schedule(struct fj_client * client, fj_schedule_t schedule)
 {
-    client->schedule = FJ_SCHEDULE_NONE;
+    client->schedule = schedule;
 }
 
 
-void fj_client_schedule_timeout(
-    struct fj_client * client,
-    uint32_t milliseconds
-)
+fj_schedule_t fj_client_get_schedule(struct fj_client * client)
 {
-    client->schedule = FJ_SCHEDULE_TIMEOUT(milliseconds);
-}
-
-
-void fj_client_schedule_idle(struct fj_client * client)
-{
-    client->schedule = FJ_SCHEDULE_IDLE;
-}
-
-
-void fj_client_schedule_exit(struct fj_client * client)
-{
-    client->schedule = FJ_SCHEDULE_EXIT;
+    return client->schedule;
 }
