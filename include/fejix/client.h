@@ -41,11 +41,13 @@ typedef int32_t fj_schedule_t;
 
 struct fj_client;
 
-FJ_DEFINE_VERSION(fj_client_listener, v_0_1)
+FJ_DEFINE_VERSION(fj_client_listener, v_0_2)
 struct fj_client_listener {
     fj_err_t (*init)(struct fj_client * client);
 
-    fj_err_t (*deinit)(struct fj_client * client);
+    /* `run_result` is the result returned from the last `run` iteration,
+        either from the client listener or from the internal library code. */
+    fj_err_t (*deinit)(struct fj_client * client, fj_err_t run_result);
 
     /* Called on every event loop iteration. */
     fj_err_t (*run)(struct fj_client * client);

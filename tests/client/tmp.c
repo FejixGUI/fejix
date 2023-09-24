@@ -9,10 +9,10 @@ fj_err_t client_init(struct fj_client * client)
     return FJ_OK;
 }
 
-fj_err_t client_deinit(struct fj_client * client)
+fj_err_t client_deinit(struct fj_client * client, fj_err_t err)
 {
     (void) client;
-    return FJ_OK;
+    return err;
 }
 
 fj_err_t client_run(struct fj_client * client)
@@ -21,7 +21,7 @@ fj_err_t client_run(struct fj_client * client)
     return FJ_OK;
 }
 
-FJ_REQUIRE_VERSION(fj_client_listener, v_0_1)
+FJ_REQUIRE_VERSION(fj_client_listener, v_0_2)
 struct fj_client_listener listener = {
     .init = client_init,
     .deinit = client_deinit,

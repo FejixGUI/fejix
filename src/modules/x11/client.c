@@ -4,6 +4,9 @@
 #include <fejix/core/malloc.h>
 
 
+FJ_REQUIRE_VERSION(fj_client_listener, v_0_1)
+
+
 static fj_err_t x11_connect(struct fj_x11_data * x11_data)
 {
     x11_data->xdisplay = XOpenDisplay(NULL);
@@ -138,6 +141,6 @@ fj_err_t fj_x11_client_run(struct fj_client * client)
         x11_client_shutdown(client);
         return err;
     }
-    
+
     return x11_client_shutdown(client);
 }
