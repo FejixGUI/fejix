@@ -1,9 +1,12 @@
 #include <fejix/core/malloc.h>
 #include <fejix/core/utils.h>
 
+#include "src/client.h"
 #include "src/modules/winapi/client.h"
 #include "src/modules/winapi/utils.h"
-#include "src/client.h"
+
+
+FJ_REQUIRE_VERSION(fj_client_listener, v_0_1)
 
 
 static void client_init_app_instance(struct fj_client * client)
@@ -83,6 +86,7 @@ static fj_err_t client_data_deinit(struct fj_client * client)
 static fj_err_t client_eventloop_run(struct fj_client * client)
 {
     // TODO event loop
+    (void) client;
     return FJ_OK;
 }
 

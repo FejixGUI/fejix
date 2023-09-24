@@ -9,8 +9,7 @@ struct fj_client {
 
     fj_idstring_t client_id;
 
-    /* Timeout in milliseconds or magic values. */
-    int32_t schedule;
+    fj_schedule_t schedule;
 
     fj_ptr_t user_data;
 
@@ -43,21 +42,39 @@ fj_err_t fj_winapi_client_run(struct fj_client * client);
 
 
 /* This macro should be manually defined before including this header. */
-#ifdef FJ_INTERNAL_DEFINE_PLATFORM_RUNNERS
+#ifdef FJ_INTERNAL_CLIENT_IMPLEMENTATION
 
+    /* Order of the platforms is NOT important here. */
     static const struct fj_platform_runner {
         fj_utf8string_t name;
         fj_err_t (*run)(struct fj_client *);
     } platform_runners[] = {
 
-#ifdef FJ_PLATFORM_X11
-        { "x11", fj_x11_client_run },
+#ifdef FJ_PLATFORM_WINAPI
+        { "winapi", fj_winapi_client_run },
 #endif
 #ifdef FJ_PLATFORM_WAYLAND
         { "wayland", fj_wayland_client_run },
 #endif
+#ifdef FJ_PLATFORM_X11
+        { "x11", fj_x11_client_run },
+#endif
+
+    };
+
+    /* Order of the platforms IS important here.
+        The first available platform will be default.
+        The default platform is loaded when ENV gives no platform hints. */
+    static const fj_utf8string_t fj_platform_names[] = {
+
 #ifdef FJ_PLATFORM_WINAPI
-        { "winapi", fj_winapi_client_run },
+        "winapi",
+#endif
+#ifdef FJ_PLATFORM_WAYLAND
+        "wayland",
+#endif
+#ifdef FJ_PLATFORM_X11
+        "x11",
 #endif
 
     };

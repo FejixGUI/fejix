@@ -9,6 +9,16 @@
 
 #define FJ_OK NULL
 
+#ifndef NDEBUG
+#   define FJ_DEFINE_VERSION(INTERFACE, VERSION) \
+        typedef void FJ_VERSION_##INTERFACE##_##VERSION ;
+#   define FJ_REQUIRE_VERSION(INTERFACE, VERSION) \
+        FJ_VERSION_##INTERFACE##_##VERSION _fj_version_guard(void);
+#else
+#   define FJ_DEFINE_VERSION(INTERFACE, VERSION)
+#   define FJ_REQUIRE_VERSION(INTERFACE, VERSION)
+#endif
+
 
 /* This type has a fixed size, unlike `_Bool`.
     However, use the standard `true` or `false` for this. */

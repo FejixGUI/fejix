@@ -32,7 +32,7 @@ endif()
 # Define "FJ_FILENAME" for every source file
 get_target_property(fejix_source_files fejix SOURCES)
 foreach(file ${fejix_source_files})
-    file(RELATIVE_PATH filename "${FEJIX_SRC}" "${file}")
+    file(RELATIVE_PATH filename "${FEJIX_ROOT}" "${file}")
 
     set_property(
         SOURCE "${file}"

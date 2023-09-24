@@ -6,7 +6,7 @@
 
 
 /* Get length of a static array. */
-#define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY))) 
+#define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
 
 #define FJ_STRINGIFY(ARG) FJ_STRINGIFY_IMPL(ARG)
 #define FJ_STRINGIFY_IMPL(ARG) #ARG

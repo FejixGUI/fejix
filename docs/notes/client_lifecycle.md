@@ -1,5 +1,7 @@
 # Client lifecycle
 
+<!-- TODO: update client run logic doc -->
+
 What is inside `fj_client_run()`?
 
 1. Allocate client core data

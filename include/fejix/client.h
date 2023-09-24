@@ -41,6 +41,7 @@ typedef int32_t fj_schedule_t;
 
 struct fj_client;
 
+FJ_DEFINE_VERSION(fj_client_listener, v_0_1)
 struct fj_client_listener {
     fj_err_t (*init)(struct fj_client * client);
 
@@ -55,6 +56,14 @@ struct fj_client * fj_client_new(fj_idstring_t client_id);
 
 void fj_client_del(struct fj_client * client);
 
+/* Returns the name of the platform derived from the defined env variables. */
+fj_utf8string_t fj_get_selected_platform(void);
+
+/* Get a list of all built-in platforms. */
+void fj_client_get_platforms(uint32_t * count, fj_utf8string_t const ** names);
+
+/* Runs the platform selected by the `fj_client_get_selected_platform`.
+    If client does not have the client listener set, returns an error. */
 fj_err_t fj_client_run(struct fj_client * client);
 
 void fj_client_set_schedule(struct fj_client * client, fj_schedule_t schedule);
