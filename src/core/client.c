@@ -99,15 +99,9 @@ fj_ptr_t * fj_client_get_user_data(struct fj_client * client)
 }
 
 
-void fj_client_set_schedule(struct fj_client * client, fj_schedule_t schedule)
+fj_schedule_t * fj_client_get_schedule(struct fj_client * client)
 {
-    client->schedule = schedule;
-}
-
-
-fj_schedule_t fj_client_get_schedule(struct fj_client * client)
-{
-    return client->schedule;
+    return &client->schedule;
 }
 
 

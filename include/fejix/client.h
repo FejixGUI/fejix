@@ -79,9 +79,7 @@ void fj_client_get_platforms(uint32_t * count, fj_utf8string_t const ** names);
     If the client does not have the client listener set, returns an error. */
 fj_err_t fj_client_run(struct fj_client * client);
 
-void fj_client_set_schedule(struct fj_client * client, fj_schedule_t schedule);
-
-fj_schedule_t fj_client_get_schedule(struct fj_client * client);
+fj_schedule_t * fj_client_get_schedule(struct fj_client * client);
 
 /* Always returns a valid pointer. */
 fj_ptr_t * fj_client_get_user_data(struct fj_client * client);
