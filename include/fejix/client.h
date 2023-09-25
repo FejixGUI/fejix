@@ -2,7 +2,7 @@
 #define FEJIX_CLIENT_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/base.h>
 
 
 /* On each event loop iteration the client processes available shell
@@ -58,14 +58,25 @@ struct fj_client * fj_client_new(fj_idstring_t client_id);
 
 void fj_client_del(struct fj_client * client);
 
-/* Returns the name of the platform derived from the defined env variables. */
-fj_utf8string_t fj_get_selected_platform(void);
+/* Returns the name of the platform selected by the library.
+
+    The algorithm is the following:
+    - check `FEJIX_PLATFORM` environment variable (if exists, the value is
+        returned);
+    - check `XDG_SESSION_TYPE` environment variable (if exists and equal to
+        "x11" or "wayland", the value is returned);
+    - return the first name on the list of platform names or NULL if it is
+        empty.
+
+    Use `fj_client_get_platforms` to get the list of the available platform
+    names. */
+fj_utf8string_t fj_select_platform(void);
 
 /* Get a list of all built-in platforms. */
 void fj_client_get_platforms(uint32_t * count, fj_utf8string_t const ** names);
 
-/* Runs the platform selected by the `fj_client_get_selected_platform`.
-    If client does not have the client listener set, returns an error. */
+/* Runs the platform selected by the `fj_select_platform`.
+    If the client does not have the client listener set, returns an error. */
 fj_err_t fj_client_run(struct fj_client * client);
 
 void fj_client_set_schedule(struct fj_client * client, fj_schedule_t schedule);

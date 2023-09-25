@@ -1,9 +1,9 @@
-#include <fejix/core/malloc.h>
-#include <fejix/core/utils.h>
+#include <src/core/client.h>
+#include <src/winapi/client.h>
+#include <src/winapi/utils.h>
 
-#include "src/client.h"
-#include "src/modules/winapi/client.h"
-#include "src/modules/winapi/utils.h"
+#include <fejix/malloc.h>
+#include <fejix/utils.h>
 
 
 FJ_REQUIRE_VERSION(fj_client_listener, v_0_2)

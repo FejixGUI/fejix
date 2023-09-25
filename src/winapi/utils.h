@@ -2,7 +2,7 @@
 #define FEJIX_INTERNAL_WINAPI_UTILS_H_
 
 
-#include "fejix/core/base.h"
+#include "fejix/base.h"
 #include <windows.h>
 #include <winnt.h>
 

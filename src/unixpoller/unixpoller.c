@@ -1,8 +1,8 @@
-#include "src/modules/unixpoller/unixpoller.h"
+#include <src/unixpoller/unixpoller.h>
 
-#include <fejix/core/list.h>
-#include <fejix/core/malloc.h>
-#include <fejix/core/utils.h>
+#include <fejix/list.h>
+#include <fejix/malloc.h>
+#include <fejix/utils.h>
 
 #include <unistd.h>
 
@@ -90,7 +90,7 @@ struct fj_unixpoller * fj_unixpoller_new(void)
     }
 
     fj_err_t err = unixpoller_init(poller);
-    
+
     if (err != FJ_OK) {
         fj_unixpoller_del(poller);
         return NULL;
@@ -133,7 +133,7 @@ fj_err_t fj_unixpoller_watch(
     };
 
     fj_err_t err = FJ_OK;
-    
+
     err = fj_list_push(poller->pollfds, &pollfd);
     if (err != FJ_OK) return err;
 

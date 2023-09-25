@@ -1,6 +1,6 @@
-#include <fejix/core/list.h>
-#include <fejix/core/malloc.h>
-#include <fejix/core/utils.h>
+#include <fejix/list.h>
+#include <fejix/malloc.h>
+#include <fejix/utils.h>
 
 #include <string.h>
 
@@ -20,7 +20,7 @@ static uint32_t last_index(struct fj_list * list)
 static fj_err_t list_resize(struct fj_list * list, uint32_t capacity)
 {
     list->elements = fj_realloc(list->elements, capacity, list->element_size);
-    
+
     if (list->elements == NULL) {
         list->capacity = 0;
         list->length = 0;
@@ -40,7 +40,7 @@ static fj_err_t list_grow(struct fj_list * list)
         return FJ_OK;
     }
 
-    uint32_t new_capacity = fj_max_u32(1, list->capacity * 2);
+    uint32_t new_capacity = fj_u32_max(1, list->capacity * 2);
 
     return list_resize(list, new_capacity);
 }

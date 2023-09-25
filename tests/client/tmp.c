@@ -1,6 +1,7 @@
 #include <fejix/client.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 fj_err_t client_init(struct fj_client * client)
@@ -31,13 +32,7 @@ struct fj_client_listener listener = {
 int main(void) {
     fj_err_t err = FJ_OK;
 
-    struct fj_client * client = fj_client_new("com.example.test");
-
-    if (client == NULL) {
-        return 1;
-    }
-
-    fj_utf8string_t selected_platform = fj_get_selected_platform();
+    fj_utf8string_t selected_platform = fj_select_platform();
     uint32_t platform_count;
     const fj_utf8string_t * platform_names;
     fj_client_get_platforms(&platform_count, &platform_names);
@@ -49,8 +44,13 @@ int main(void) {
     }
     printf(".\n");
 
-    const struct fj_client_listener ** client_listener = fj_client_get_listener(client);
-    *client_listener = &listener;
+    struct fj_client * client = fj_client_new("com.example.test");
+
+    if (client == NULL) {
+        return 1;
+    }
+
+    *fj_client_get_listener(client) = &listener;
 
     err = fj_client_run(client);
     if (err != FJ_OK) {

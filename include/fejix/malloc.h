@@ -2,7 +2,7 @@
 #define FEJIX_MALLOC_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/base.h>
 
 
 /* Allocates an uninitialized block of memory.

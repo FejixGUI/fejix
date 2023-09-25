@@ -1,7 +1,7 @@
 #include "src/modules/x11/client.h"
 
-#include <fejix/core/utils.h>
-#include <fejix/core/malloc.h>
+#include <fejix/utils.h>
+#include <fejix/malloc.h>
 
 
 FJ_REQUIRE_VERSION(fj_client_listener, v_0_1)

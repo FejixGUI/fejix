@@ -6,25 +6,25 @@ target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/list.c"
-    "${FEJIX_SRC}/client.c"
+    "${FEJIX_SRC}/core/client.c"
 )
 
 if(FEJIX_PLATFORM_X11)
     target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/modules/x11/client.c"
+        "${FEJIX_SRC}/x11/client.c"
     )
 endif()
 
 if(FEJIX_PLATFORM_WINAPI)
     target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/modules/winapi/client.c"
-        "${FEJIX_SRC}/modules/winapi/utils.c"
+        "${FEJIX_SRC}/winapi/client.c"
+        "${FEJIX_SRC}/winapi/utils.c"
     )
 endif()
 
 if(FEJIX_FEATURE_UNIXPOLLER)
     target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/modules/unixpoller/unixpoller.c"
+        "${FEJIX_SRC}/unixpoller/unixpoller.c"
     )
 endif()
 

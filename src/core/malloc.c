@@ -1,5 +1,5 @@
-#include <fejix/core/malloc.h>
-#include <fejix/core/utils.h>
+#include <fejix/malloc.h>
+#include <fejix/utils.h>
 
 #include <malloc.h>
 

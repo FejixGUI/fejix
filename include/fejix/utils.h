@@ -2,7 +2,7 @@
 #define FEJIX_UTILS_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/base.h>
 
 
 /* Get length of a static array. */
@@ -28,10 +28,11 @@
 /* Example: `FJ_ERR(FJ_MALLOC_FAILED)` */
 #define FJ_MALLOC_FAILED "memory allocation failed"
 
-uint32_t fj_max_u32(uint32_t a, uint32_t b);
-uint32_t fj_min_u32(uint32_t a, uint32_t b);
+uint32_t fj_u32_max(uint32_t a, uint32_t b);
+
+uint32_t fj_u32_min(uint32_t a, uint32_t b);
 
 /* Accepts NULL as arguments. `NULL==NULL`, but `NULL!=""` */
-fj_bool_t fj_streq(fj_utf8string_t a, fj_utf8string_t b);
+fj_bool_t fj_str_eq(fj_utf8string_t a, fj_utf8string_t b);
 
 #endif

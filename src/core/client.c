@@ -1,16 +1,29 @@
 #define FJ_INTERNAL_CLIENT_IMPLEMENTATION
-#include "src/client.h"
+#include <src/core/client.h>
 
-#include <fejix/core/utils.h>
-#include <fejix/core/malloc.h>
+#include <fejix/utils.h>
+#include <fejix/malloc.h>
 
 #include <stdlib.h>
 
 
-static fj_utf8string_t get_direct_platform_choise(void) {
-    fj_utf8string_t env = NULL;
+static const struct fj_platform_runner * get_platform_runner(void)
+{
+    fj_utf8string_t platform_name = fj_select_platform();
 
-    env = getenv("FEJIX_PLATFORM");
+    for (uint32_t i = 0; i < FJ_ARRLEN(platform_runners); i++) {
+        if (fj_str_eq(platform_runners[i].name, platform_name)) {
+            return &platform_runners[i];
+        }
+    }
+
+    return NULL;
+}
+
+
+fj_utf8string_t fj_select_platform(void)
+{
+    fj_utf8string_t env = getenv("FEJIX_PLATFORM");
 
     if (env != NULL) {
         return env;
@@ -20,72 +33,15 @@ static fj_utf8string_t get_direct_platform_choise(void) {
 
     /* XDG_SESSION_TYPE is not documented, so we cannot be sure about what it
         contains */
-    if (fj_streq(env, "x11") || fj_streq(env, "wayland")) {
+    if (fj_str_eq(env, "x11") || fj_str_eq(env, "wayland")) {
         return env;
     }
 
-    return NULL;
-}
-
-
-static fj_utf8string_t get_indirect_platform_guess(void)
-{
-    if (getenv("WINDIR") != NULL) {
-        return "winapi";
-    }
-
-    if (getenv("WAYLAND_DISPLAY") != NULL) {
-        return "wayland";
-    }
-
-    if (getenv("DISPLAY") != NULL) {
-        return "x11";
-    }
-
-    return NULL;
-}
-
-
-static fj_utf8string_t get_default_platform(void) {
     if (FJ_ARRLEN(fj_platform_names) == 0) {
         return NULL;
     }
 
     return fj_platform_names[0];
-}
-
-
-static const struct fj_platform_runner * get_platform_runner(void)
-{
-    fj_utf8string_t platform_name = fj_get_selected_platform();
-
-    for (uint32_t i = 0; i < FJ_ARRLEN(platform_runners); i++) {
-        if (fj_streq(platform_runners[i].name, platform_name)) {
-            return &platform_runners[i];
-        }
-    }
-
-    return NULL;
-}
-
-
-fj_utf8string_t fj_get_selected_platform(void)
-{
-    fj_utf8string_t platform_name = NULL;
-
-    platform_name = get_direct_platform_choise();
-
-    if (platform_name != NULL) {
-        return platform_name;
-    }
-
-    platform_name = get_indirect_platform_guess();
-
-    if (platform_name != NULL) {
-        return platform_name;
-    }
-
-    return get_default_platform();
 }
 
 

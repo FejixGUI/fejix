@@ -2,7 +2,7 @@
 #define FEJIX_INTERFACE_SHELL_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/base.h>
 
 
 struct fj_client;

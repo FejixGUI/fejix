@@ -2,7 +2,7 @@
 #define FEJIX_LIST_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/base.h>
 
 
 typedef fj_bool_t (*fj_comparator_t)(fj_ptr_t a, fj_ptr_t b);

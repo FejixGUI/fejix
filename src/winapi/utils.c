@@ -1,8 +1,7 @@
-#include "src/modules/winapi/utils.h"
+#include <src/winapi/utils.h>
 
-#include <fejix/core/malloc.h>
-#include <fejix/core/utils.h>
-#include <stringapiset.h>
+#include <fejix/malloc.h>
+#include <fejix/utils.h>
 
 
 LPWSTR fj_winapi_utf8_to_wstr(fj_utf8string_t utf8_string)
