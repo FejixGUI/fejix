@@ -21,6 +21,12 @@ if(FEJIX_PLATFORM_WINAPI)
         "${FEJIX_SRC}/winapi/client.c"
         "${FEJIX_SRC}/winapi/utils.c"
     )
+
+    if(FEJIX_FEATURE_SHELL)
+        target_sources(fejix PRIVATE
+            "${FEJIX_SRC}/winapi/features/shell.c"
+        )
+    endif()
 endif()
 
 if(FEJIX_FEATURE_UNIXPOLLER)
