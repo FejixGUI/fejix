@@ -6,7 +6,8 @@ target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/list.c"
-    "${FEJIX_SRC}/core/client.c"
+    "${FEJIX_SRC}/generic/client.c"
+    "${FEJIX_SRC}/generic/shell.c"
 )
 
 if(FEJIX_PLATFORM_X11)

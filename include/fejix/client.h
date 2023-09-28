@@ -54,7 +54,10 @@ struct fj_client_listener {
 };
 
 
-struct fj_client * fj_client_new(fj_idstring_t client_id);
+struct fj_client * fj_client_new(
+    fj_idstring_t client_id,
+    const struct fj_client_listener * listener
+);
 
 void fj_client_del(struct fj_client * client);
 
@@ -83,15 +86,6 @@ fj_schedule_t * fj_client_get_schedule(struct fj_client * client);
 
 /* Always returns a valid pointer. */
 fj_ptr_t * fj_client_get_user_data(struct fj_client * client);
-
-/* Always returns a valid pointer. */
-const struct fj_client_listener ** fj_client_get_listener(
-    struct fj_client * client
-);
-
-const struct fj_shell_listener ** fj_client_get_shell_listener(
-    struct fj_client * client
-);
 
 
 #endif

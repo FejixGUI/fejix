@@ -1,5 +1,5 @@
-#ifndef FEJIX_INTERNAL_CLIENT_H_
-#define FEJIX_INTERNAL_CLIENT_H_
+#ifndef FEJIX_GENERIC_CLIENT_H_
+#define FEJIX_GENERIC_CLIENT_H_
 
 
 #include <fejix/client.h>
@@ -13,6 +13,8 @@ struct fj_client {
 
     fj_ptr_t user_data;
 
+    const struct fj_client_listener * client_listener;
+
     /* The following structure types may not be implemented. Check Fejix macros
         and include the respective headers before using them. */
     union {
@@ -20,8 +22,6 @@ struct fj_client {
         struct fj_wayland_data * wayland;
         struct fj_winapi_data * winapi;
     } data;
-
-    const struct fj_client_listener * client_listener;
 
 #ifdef FJ_FEATURE_SHELL
         const struct fj_shell_listener * shell_listener;

@@ -4,7 +4,6 @@
 
 #include "fejix/base.h"
 #include <windows.h>
-#include <winnt.h>
 
 
 /* Converts UTF-8 to Windows multibyte encoding.

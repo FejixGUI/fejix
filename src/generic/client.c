@@ -1,5 +1,5 @@
 #define FJ_INTERNAL_CLIENT_IMPLEMENTATION
-#include <src/core/client.h>
+#include <src/generic/client.h>
 
 #include <fejix/utils.h>
 #include <fejix/malloc.h>
@@ -57,8 +57,15 @@ void fj_client_get_platforms(uint32_t * count, fj_utf8string_t const ** names)
 }
 
 
-struct fj_client * fj_client_new(fj_idstring_t client_id)
+struct fj_client * fj_client_new(
+    fj_idstring_t client_id,
+    const struct fj_client_listener * listener
+)
 {
+    if (client_id == NULL || listener == NULL) {
+        return NULL;
+    }
+
     struct fj_client * client = fj_alloc_zeroed(sizeof *client);
 
     if (client == NULL) {
@@ -66,6 +73,7 @@ struct fj_client * fj_client_new(fj_idstring_t client_id)
     }
 
     client->client_id = client_id;
+    client->client_listener = listener;
 
     return client;
 }
@@ -102,26 +110,5 @@ fj_ptr_t * fj_client_get_user_data(struct fj_client * client)
 fj_schedule_t * fj_client_get_schedule(struct fj_client * client)
 {
     return &client->schedule;
-}
-
-
-const struct fj_client_listener ** fj_client_get_listener(
-    struct fj_client * client
-)
-{
-    return &client->client_listener;
-}
-
-
-const struct fj_shell_listener ** fj_client_get_shell_listener(
-    struct fj_client * client
-)
-{
-#ifdef FJ_FEATURE_SHELL
-    return &client->shell_listener;
-#else
-    (void) client;
-    return NULL;
-#endif
 }
 
