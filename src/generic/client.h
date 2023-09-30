@@ -24,21 +24,23 @@ struct fj_client {
     } data;
 
 #ifdef FJ_FEATURE_SHELL
-        const struct fj_shell_listener * shell_listener;
+    const struct fj_shell_listener * shell_listener;
 #endif
 #ifdef FJ_FEATURE_WM
-        const struct fj_wm_listener * wm_listener;
+    const struct fj_wm_listener * wm_listener;
 #endif
 
 };
 
-
-/* The following functions are declared but may not be implemented.
-    Check Fejix macros before calling them. */
-
-fj_err_t fj_x11_client_run(struct fj_client * client);
-fj_err_t fj_wayland_client_run(struct fj_client * client);
-fj_err_t fj_winapi_client_run(struct fj_client * client);
+#ifdef FJ_PLATFORM_X11
+    fj_err_t fj_x11_client_run(struct fj_client * client);
+#endif
+#ifdef FJ_PLATFORM_WAYLAND
+    fj_err_t fj_wayland_client_run(struct fj_client * client);
+#endif
+#ifdef FJ_PLATFORM_WINAPI
+    fj_err_t fj_winapi_client_run(struct fj_client * client);
+#endif
 
 
 /* This macro should be manually defined before including this header. */

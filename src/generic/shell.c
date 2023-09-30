@@ -20,26 +20,6 @@ const struct fj_shell_listener ** fj_client_get_shell_listener(
 }
 
 
-fj_err_t fj_shell_window_init(
-    struct fj_shell * shell,
-    struct fj_client * client,
-    struct fj_window * window
-)
-{
-    return shell->window_init(client, window);
-}
-
-
-fj_err_t fj_shell_window_deinit(
-    struct fj_shell * shell,
-    struct fj_client * client,
-    struct fj_window * window
-)
-{
-    return shell->window_deinit(client, window);
-}
-
-
 struct fj_window * fj_window_new(const struct fj_window_listener * listener)
 {
     if (listener == NULL) {

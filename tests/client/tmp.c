@@ -44,13 +44,11 @@ int main(void) {
     }
     printf(".\n");
 
-    struct fj_client * client = fj_client_new("com.example.test");
+    struct fj_client * client = fj_client_new("com.example.test", &listener);
 
     if (client == NULL) {
         return 1;
     }
-
-    *fj_client_get_listener(client) = &listener;
 
     err = fj_client_run(client);
     if (err != FJ_OK) {

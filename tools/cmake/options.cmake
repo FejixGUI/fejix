@@ -21,28 +21,30 @@
 # FEATURE_SYSINFO
 # FEATURE_SYSTRAY
 
-set(fejix_options "")
 
-macro(declare_option option)
-    option(FEJIX_${option} OFF)
-    list(APPEND fejix_options "${option}")
-endmacro()
+option(FEJIX_PLATFORM_X11 OFF)
+option(FEJIX_PLATFORM_WINAPI OFF)
+option(FEJIX_FEATURE_UNIXPOLLER OFF)
+option(FEJIX_FEATURE_SHELL OFF)
 
-function(define_macros_for_enabled_options)
-    foreach(option ${fejix_options})
-        if(FEJIX_${option})
-            add_compile_definitions("FJ_${option}")
-        endif()
-    endforeach()
-endfunction()
-
-
-declare_option(PLATFORM_X11)
-declare_option(PLATFORM_WINAPI)
-declare_option(FEATURE_UNIXPOLLER)
 
 if(FEJIX_PLATFORM_X11)
     set(FEJIX_FEATURE_UNIXPOLLER ON)
 endif()
 
-define_macros_for_enabled_options()
+
+if(FEJIX_PLATFORM_WINAPI)
+    add_compile_definitions("FJ_PLATFORM_WINAPI")
+endif()
+
+if(FEJIX_PLATFORM_X11)
+    add_compile_definitions("FJ_PLATFORM_X11")
+endif()
+
+if(FEJIX_FEATURE_SHELL)
+    add_compile_definitions("FJ_FEATURE_SHELL")
+endif()
+
+if(FEJIX_FEATURE_UNIXPOLLER)
+    add_compile_definitions("FJ_FEATURE_UNIXPOLLER")
+endif()

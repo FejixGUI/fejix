@@ -9,5 +9,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "(Clang)|(GNU)")
     add_compile_options("-Wall" "-Wextra" "-Wpedantic" "-Wunused")
 elseif(CMAKE_C_COMPILER_ID MATCHES "MSVC")
     add_compile_options("/W4")
-    add_compile_definitions("_CRT_SECURE_NO_WARNINGS")
 endif()
+
+# MSVC is not always correctly detected by the CMAKE_C_COMPILER_ID, so it is
+# better to define this globally
+add_compile_definitions("_CRT_SECURE_NO_WARNINGS")
