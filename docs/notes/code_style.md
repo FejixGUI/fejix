@@ -32,8 +32,9 @@ Here are some consistency guidelines.
     uint32_t * var;
     uint32_t ** var2;
     uint32_t *** var3;
-    uint32_t * function();
+    uint32_t * function(uint32_t * arg);
     void function(uint32_t * arg);
+    void (* function_pointer)(uint32_t * arg)
     ```
 
 * Put `{` on the same line as the signature, except for functions.
@@ -71,13 +72,7 @@ Here are some consistency guidelines.
     uint32_t k;
     ```
 
-## General
-
-* Use `fj_ptr_t` instead of `void *`.
-
-    If there is `void` somewhere in the function return type,
-    it must mean that function returns nothing.
-    The little star `*` is easy to miss.
+## Types
 
 * Use `fj_bool_t` instead of `bool`. Use `true`/`false` instead of `1`/`0`.
 
@@ -85,3 +80,13 @@ Here are some consistency guidelines.
     declarations.
 
     We use C99, so `<stdbool.h>` and `true`/`false` are available.
+
+* Use `fj_str_t` instead of `const char *`.
+
+## Error handling
+
+Use the Fejix macros for error handling.
+
+See [fejix/utils.h](../../include/fejix/utils.h).
+
+<!-- TODO Finish style notes -->

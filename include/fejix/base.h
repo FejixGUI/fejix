@@ -7,50 +7,40 @@
 #include <stdbool.h>
 
 
+/* Annotates a pointer that can be NULL */
+#define FJ_NULLABLE
+
+/* Annotates a pointer to an output variable */
+#define FJ_OUT
+
+/* Annotates a pointer to a variable that can be an output just as an input */
+#define FJ_INOUT
+
+/* Annotates a function that must be initialised by the user */
+#define FJ_CALLBACK
+
+/* A value of `fj_err_t` that means that there are no errors. */
 #define FJ_OK NULL
 
-#ifndef NDEBUG
-#   define FJ_DEFINE_VERSION(INTERFACE, VERSION) \
-        typedef void FJ_VERSION_##INTERFACE##_##VERSION ;
-#   define FJ_REQUIRE_VERSION(INTERFACE, VERSION) \
-        FJ_VERSION_##INTERFACE##_##VERSION _fj_version_guard(void);
-#else
-#   define FJ_DEFINE_VERSION(INTERFACE, VERSION)
-#   define FJ_REQUIRE_VERSION(INTERFACE, VERSION)
-#endif
+/* Does the type conversion required to use string literals as `fj_string_t` */
+#define FJ_STR(STRING_LITERAL) ((fj_string_t)(STRING_LITERAL))
 
 
 /* This type has a fixed size, unlike `_Bool`.
-    However, use the standard `true` or `false` for this. */
+    Use the standard `true` or `false` for this.
+
+    **Be careful:** this is an integral numeric type.
+    Therefore, `(fj_bool_t) 0.5 == false` while `(bool) 0.5 == true` */
 typedef uint8_t fj_bool_t;
 
-/* Untyped pointer. */
-typedef void * fj_ptr_t;
+/* UTF-8 string. */
+typedef const uint8_t * fj_string_t;
 
-/* UTF-8 string for most use cases. */
-typedef const char * fj_utf8string_t;
+/* Mutable UTF-8 string. */
+typedef uint8_t * fj_string_mut_t;
 
-/* ASCII string for specific use cases. */
-typedef const char * fj_asciistring_t;
-
-/* ASCII unique string identifiers.
-
-    String identifiers are inspired by Java package names, for example
-    `com.example.some_project.some_subproject._1.x` is a valid identifier.
-
-    # Format
-
-    Identifiers must contain only `a-z`, `_`, `0-9`, `.`
-    and must be no longer than 127 characters (including the NULL terminator).
-
-    The parts separated by `.` are called identifier segments.
-    Identifier segments must not be empty and must not start with `0-9`.
-    There must be at least two segments and thus at least one `.` between
-    them. */
-typedef fj_asciistring_t fj_idstring_t;
-
-/* ASCII string for error messages. */
-typedef fj_asciistring_t fj_err_t;
+/* Error message string. */
+typedef fj_string_t fj_err_t;
 
 
 #endif

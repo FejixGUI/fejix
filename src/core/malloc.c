@@ -4,47 +4,69 @@
 #include <malloc.h>
 
 
-fj_ptr_t fj_alloc_uninit(size_t size)
+fj_err_t fj_alloc_uninit(void FJ_OUT* * ptr, size_t size)
 {
     if (size == 0) {
-        return NULL;
+        ptr = NULL;
+        return FJ_ERR("cannot allocate 0 bytes");
     }
 
-    return malloc(size);
+    *ptr = malloc(size);
+
+    if (*ptr == NULL) {
+        return FJ_ERR(FJ_MALLOC_FAILED);
+    }
+
+    return FJ_OK;
 }
 
 
-fj_ptr_t fj_alloc_zeroed(size_t size)
+fj_err_t fj_alloc_zeroed(void FJ_OUT* * ptr, size_t size)
 {
     if (size == 0) {
-        return NULL;
+        *ptr = NULL;
+        return FJ_ERR("cannot allocate 0 bytes");
     }
 
-    return calloc(1, size);
+    *ptr = calloc(1, size);
+
+    if (*ptr == NULL) {
+        return FJ_ERR(FJ_MALLOC_FAILED);
+    }
+
+    return FJ_OK;
 }
 
 
-void fj_free(fj_ptr_t ptr)
+void fj_free(void * ptr)
 {
     free(ptr);
 }
 
 
-fj_ptr_t fj_realloc(fj_ptr_t ptr, uint32_t element_count, size_t element_size)
+fj_err_t fj_realloc(void FJ_INOUT* * ptr, uint32_t item_count, size_t item_size)
 {
-    size_t size = element_count * element_size;
+    size_t size = item_count * item_size;
 
-    if (element_count == 0 || element_size == 0) {
+    if (item_count == 0 || item_size == 0) {
         if (ptr != NULL) {
             free(ptr);
         }
 
-        return NULL;
+        *ptr = NULL;
+        return FJ_OK;
     }
 
-    if (ptr == NULL) {
-        return fj_alloc_zeroed(size);
+    if (*ptr == NULL) {
+        return fj_alloc_zeroed(ptr, size);
     }
 
-    return realloc(ptr, size);
+    void * new_ptr = realloc(*ptr, size);
+
+    if (new_ptr == NULL) {
+        return FJ_ERR(FJ_MALLOC_FAILED);
+    }
+
+    *ptr = new_ptr;
+    return FJ_OK;
 }

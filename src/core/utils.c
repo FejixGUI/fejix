@@ -15,7 +15,7 @@ uint32_t fj_u32_min(uint32_t a, uint32_t b)
 }
 
 
-fj_bool_t fj_str_eq(fj_utf8string_t a, fj_utf8string_t b)
+fj_bool_t fj_str_eq(fj_string_t a, fj_string_t b)
 {
     if (a == NULL && b == NULL) {
         return true;
@@ -25,5 +25,5 @@ fj_bool_t fj_str_eq(fj_utf8string_t a, fj_utf8string_t b)
         return false;
     }
 
-    return strcmp(a, b) == 0;
+    return strcmp((const char *) a, (const char *) b) == 0;
 }
