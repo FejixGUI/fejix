@@ -11,11 +11,11 @@
 
 /* Allocates an uninitialized block of memory.
     Works like `malloc`, but returns NULL if `size` is 0. */
-fj_err_t fj_alloc_uninit(void * FJ_OUT* ptr, size_t size);
+fj_err_t fj_alloc_uninit(void FJ_NULLABLE* FJ_OUT* ptr, size_t size);
 
 /* Allocates a block of memory initialized with zeros.
     Works like `calloc(1,)`, but returns NULL if `size` is 0. */
-fj_err_t fj_alloc_zeroed(void * FJ_OUT* ptr, size_t size);
+fj_err_t fj_alloc_zeroed(void FJ_NULLABLE* FJ_OUT* ptr, size_t size);
 
 /* Works like `free`. If `ptr` is NULL, the behavior is undefined. */
 void fj_free(void * ptr);
@@ -35,7 +35,7 @@ void fj_free(void * ptr);
     Like `realloc`, this does NOT free the old block if fails to allocate
     a new one. */
 fj_err_t fj_realloc(
-    void * FJ_INOUT* ptr,
+    void FJ_NULLABLE* FJ_INOUT* ptr,
     uint32_t item_count,
     size_t item_size
 );

@@ -19,10 +19,13 @@ struct fj_list {
 };
 
 
-fj_err_t fj_list_new(struct fj_list * FJ_OUT* list, size_t item_size);
+fj_err_t fj_list_new(
+    struct fj_list FJ_NULLABLE* FJ_OUT* list,
+    size_t item_size
+);
 
 fj_err_t fj_list_clone(
-    struct fj_list * FJ_OUT* destination,
+    struct fj_list FJ_NULLABLE* FJ_OUT* destination,
     struct fj_list * source
 );
 
