@@ -6,26 +6,77 @@ Here are some consistency guidelines.
 
 * Use C99.
 
-## Formatting
+## Comments
 
-* Use `/*...*/` comments, without any additional "cosmetical" characters.
-    ```c
-    /* This is a good comment.
-        It contains no garbage.
-        It is properly indented. */
-    void a(void);
+Use block comments without any additional decoration.
+Use the following almost-plain-text syntax:
+```c
+/* Here is a summary of the function.
 
-    /* This is a bad comment.
-     * It is hard to type and edit.
-     */
-    void a(void);
+    Here is some additional information.
 
-    /**************************************
-     * This is an especially bad comment. *
-     **************************************/
-    void a(void);
+    === ARGS ===
 
-    ```
+    Here is something about the arguments.
+
+    === RETURNS ===
+
+    Here is something about the return value.
+
+    === DETAILS ===
+
+    Here is some more detailed information.
+    Typically, this section is quite long.
+    This may include quite a lot of text. */
+void a(void);
+
+```
+
+Break paragraphs and list items with empty lines:
+
+```
+This is paragraph 1.
+And this is too.
+
+This is paragraph 2.
+And so is this.
+
+Shopping list:
+
+- item 1
+
+- item 2
+```
+
+You can use some formatting:
+
+```
+`inline code`
+
+_emphasis_
+
+
+- unordered
+
+- list
+
+
+1. ordered
+
+2. list
+
+
+- This is an item of an unordered list.
+
+    + this is an item of an ordered list.
+
+```
+
+## General formatting
+
+* Put `{` on the same line as the definition, except for functions.
+
+* Put each variable declaration on its own line.
 
 * Put spaces around `*`:
     ```c
@@ -37,56 +88,23 @@ Here are some consistency guidelines.
     void (* function_pointer)(uint32_t * arg)
     ```
 
-* Put `{` on the same line as the signature, except for functions.
+* Put `const` AFTER the object it annotates:
 
     ```c
-    enum|struct|union x {
-        ...
-    };
-
-    uint32_t var[] = {
-        ...
-    };
-
-    void function()
-    {
-        ...
-    }
-
-    struct some_struct_type long_function_definition(
-        struct argument_type const ** const *** some_long_argument,
-        const struct argument_type ** const * another_argument
-    )
-    {
-
-    }
+    /* mutable pointer to constant char */
+    char const * a;
+    /* constant pointer to mutable char */
+    char * const a;
+    /* constant pointer to constant char */
+    char const * const a;
     ```
 
-* Put each variable declaration on its own line.
+## More
 
-    ```c
-    struct somestruct * a;
-    struct somestruct * b;
-    uint32_t i;
-    uint32_t j;
-    uint32_t k;
-    ```
+Use Fejix base types and error handling.
 
-## Types
-
-* Use `fj_bool_t` instead of `bool`. Use `true`/`false` instead of `1`/`0`.
-
-    `fj_bool_t` has a fixed size, so it is more preferable in public
-    declarations.
-
-    We use C99, so `<stdbool.h>` and `true`/`false` are available.
-
-* Use `fj_str_t` instead of `const char *`.
-
-## Error handling
-
-Use the Fejix macros for error handling.
-
-See [fejix/utils.h](../../include/fejix/utils.h).
+See:
+* [fejix/base.h](../../include/fejix/base.h)
+* [fejix/utils.h](../../include/fejix/utils.h)
 
 <!-- TODO Finish style notes -->

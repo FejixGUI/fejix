@@ -25,5 +25,5 @@ fj_bool_t fj_str_eq(fj_string_t a, fj_string_t b)
         return false;
     }
 
-    return strcmp((const char *) a, (const char *) b) == 0;
+    return strcmp((char const *) a, (char const *) b) == 0;
 }

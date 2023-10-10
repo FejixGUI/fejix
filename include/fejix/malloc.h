@@ -11,31 +11,26 @@
 
 /* Allocates an uninitialized block of memory.
     Works like `malloc`, but returns NULL if `size` is 0. */
-fj_err_t fj_alloc_uninit(void FJ_NULLABLE* FJ_OUT* ptr, size_t size);
+fj_err_t fj_alloc_uninit(void * FJ_NULLABLE * FJ_OUT ptr, size_t size);
 
 /* Allocates a block of memory initialized with zeros.
     Works like `calloc(1,)`, but returns NULL if `size` is 0. */
-fj_err_t fj_alloc_zeroed(void FJ_NULLABLE* FJ_OUT* ptr, size_t size);
+fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE * FJ_OUT ptr, size_t size);
 
 /* Works like `free`. If `ptr` is NULL, the behavior is undefined. */
 void fj_free(void * ptr);
 
-/* * If both `item_count` and `item_size` are greater than 0:
-        - If `ptr` is not NULL:
-            + reallocates the block, returns a new block
-        - If `ptr` is NULL:
-            + calls `fj_alloc_zeroed`, returns a new block
-     * If either `item_count` or `item_size` is 0:
-        - If `ptr` is not NULL:
-            + calls `fj_free`, returns NULL
-        - If `ptr` is NULL:
-            + does nothing, returns NULL
-    Works similarly to `realloc`, but with distinct `item_count` and
-    `item_size`.
-    Like `realloc`, this does NOT free the old block if fails to allocate
-    a new one. */
+/* Similar to `realloc`, but with distinct `item_count` and `item_size`.
+
+    - `fj_realloc(NULL, 0, 0) = nothing`
+    - `fj_realloc(NULL, x, y) = fj_alloc_zeroed(x*y)`
+    - `fj_realloc(ptr, 0, 0) = fj_free(ptr)`
+    - `fj_realloc(ptr, x, y) = fj_realloc(ptr, x*y)`
+
+    If reallocation fails, this does not change the given pointer,
+    does not free the old block and returns an error. */
 fj_err_t fj_realloc(
-    void FJ_NULLABLE* FJ_INOUT* ptr,
+    void * FJ_NULLABLE * FJ_INOUT ptr,
     uint32_t item_count,
     size_t item_size
 );

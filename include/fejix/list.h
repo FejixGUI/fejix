@@ -5,7 +5,7 @@
 #include <fejix/base.h>
 
 
-typedef fj_bool_t (*fj_comparator_t)(void * a, void * b);
+typedef fj_bool_t (* fj_comparator_t)(void * a, void * b);
 
 
 /* Dynamically-allocated linear array. */
@@ -20,18 +20,21 @@ struct fj_list {
 
 
 fj_err_t fj_list_new(
-    struct fj_list FJ_NULLABLE* FJ_OUT* list,
+    struct fj_list * FJ_NULLABLE * FJ_OUT list,
     size_t item_size
 );
 
 fj_err_t fj_list_clone(
-    struct fj_list FJ_NULLABLE* FJ_OUT* destination,
+    struct fj_list * FJ_NULLABLE * FJ_OUT destination,
     struct fj_list * source
 );
 
 void fj_list_del(struct fj_list * list);
 
 /* Clones the item into the list.
+
+    === RETURNS ===
+
     Returns an error if the index is out of `[0; length]`. */
 fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, void * item);
 
@@ -47,11 +50,15 @@ fj_err_t fj_list_pop(struct fj_list * list);
 void * fj_list_get(struct fj_list * list, uint32_t index);
 
 /* Linearly searches for the item using the predicate function.
+
     This is the same as:
     `fj_list_search(list, item, predicate, 0, list->length-1)`.
-    # Returns
-    * The index of `item` if it is present.
-    *`list->length` if the item was not found.*/
+
+    === RETURNS ===
+
+    - The index of the item if it was found.
+
+    - The length of the array if the item was not found. */
 uint32_t fj_list_find(
     struct fj_list * list,
     void * item,
@@ -59,13 +66,22 @@ uint32_t fj_list_find(
 );
 
 /* Linearly searches for the item using the predicate function.
-    The search begins with the start index and ends after the end index is
-    reached. If `end_index < start_index`, then the search is done in backward
-    direction.
-    `start_index` and `end_index` are clamped to `0 .. list->length-1`
-    # Returns
-    * The index of `item` if it is present.
-    *`list->length` if the item was not found. */
+
+    === ARGS ===
+
+    - `start_index` - the index at which the search will start.
+        Clamped to `0..length-1`.
+
+    - `end_index` - the index at which the search will end.
+        If `end_index < start_index`, the search will be performed in backwards
+        direction.
+        Clamped to `0..length-1`.
+
+    === RETURNS ===
+
+    - The index of the item if it was found.
+
+    - The length of the array if the item was not found. */
 uint32_t fj_list_search(
     struct fj_list * list,
     void * item,

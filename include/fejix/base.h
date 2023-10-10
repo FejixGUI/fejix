@@ -26,15 +26,21 @@
 #define FJ_STR(STRING_LITERAL) ((fj_string_t)(STRING_LITERAL))
 
 
-/* This type has a fixed size, unlike `_Bool`.
+/* Integer numeric type of a fixed size. This is a replacement of `_Bool`,
+    which has no specificly defined size.
+
+    === USAGE ===
+
     Use the standard `true` or `false` for this.
 
-    **Be careful:** this is an integral numeric type.
-    Therefore, `(fj_bool_t) 0.5 == false` while `(bool) 0.5 == true` */
+    === CAUTION ===
+
+    This is a numeric type. Therefore, `(fj_bool_t) 0.5 == false` while
+    `(bool) 0.5 == true`. */
 typedef uint8_t fj_bool_t;
 
 /* UTF-8 string. */
-typedef const uint8_t * fj_string_t;
+typedef uint8_t const * fj_string_t;
 
 /* Mutable UTF-8 string. */
 typedef uint8_t * fj_string_mut_t;

@@ -39,53 +39,26 @@
 typedef int32_t fj_schedule_t;
 
 
-struct fj_client;
+struct fj_client_info {
+    fj_string_t client_id;
 
-FJ_DEFINE_VERSION(fj_client_listener, v_0_2)
-struct fj_client_listener {
-    fj_err_t (*init)(struct fj_client * client);
-
-    /* `run_result` is the result returned from the last `run` iteration,
-        either from the client listener or from the internal library code. */
-    fj_err_t (*deinit)(struct fj_client * client, fj_err_t run_result);
-
-    /* Called on every event loop iteration. */
-    fj_err_t (*run)(struct fj_client * client);
+    fj_err_t (*init)
 };
 
 
-struct fj_client * fj_client_new(
-    fj_idstring_t client_id,
-    const struct fj_client_listener * listener
-);
+struct fj_platform_entrypoint {
+    fj_string_t platform_name;
 
-void fj_client_del(struct fj_client * client);
+    fj_err_t (*launch)(
+        void * user_data,
+        struct fj_client_info * client_info
+    );
+};
 
-/* Returns the name of the platform selected by the library.
 
-    The algorithm is the following:
-    - check `FEJIX_PLATFORM` environment variable (if exists, the value is
-        returned);
-    - check `XDG_SESSION_TYPE` environment variable (if exists and equal to
-        "x11" or "wayland", the value is returned);
-    - return the first name on the list of platform names or NULL if it is
-        empty.
+fj_string_t fj_get_selected_platform_name(void);
 
-    Use `fj_client_get_platforms` to get the list of the available platform
-    names. */
-fj_utf8string_t fj_select_platform(void);
 
-/* Get a list of all built-in platforms. */
-void fj_client_get_platforms(uint32_t * count, fj_utf8string_t const ** names);
-
-/* Runs the platform selected by the `fj_select_platform`.
-    If the client does not have the client listener set, returns an error. */
-fj_err_t fj_client_run(struct fj_client * client);
-
-fj_schedule_t * fj_client_get_schedule(struct fj_client * client);
-
-/* Always returns a valid pointer. */
-fj_ptr_t * fj_client_get_user_data(struct fj_client * client);
 
 
 #endif
