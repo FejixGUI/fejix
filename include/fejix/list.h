@@ -10,7 +10,7 @@ typedef fj_bool_t (* fj_comparator_t)(void * a, void * b);
 
 /* Dynamically-allocated linear array. */
 struct fj_list {
-    void * items;
+    void * FJ_ARRAY items;
     size_t item_size;
     /* Number of currently stored elements */
     uint32_t length;
@@ -57,7 +57,6 @@ void * fj_list_get(struct fj_list * list, uint32_t index);
     === RETURNS ===
 
     - The index of the item if it was found.
-
     - The length of the array if the item was not found. */
 uint32_t fj_list_find(
     struct fj_list * list,
@@ -80,7 +79,6 @@ uint32_t fj_list_find(
     === RETURNS ===
 
     - The index of the item if it was found.
-
     - The length of the array if the item was not found. */
 uint32_t fj_list_search(
     struct fj_list * list,

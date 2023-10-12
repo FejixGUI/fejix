@@ -32,7 +32,7 @@ void a(void);
 
 ```
 
-Break paragraphs and list items with empty lines:
+Break paragraphs and multi-line list items with empty lines:
 
 ```
 This is paragraph 1.
@@ -44,8 +44,15 @@ And so is this.
 Shopping list:
 
 - item 1
-
 - item 2
+
+Long shopping list:
+
+- some very
+    very long item 1
+
+- some very
+    very long item 2
 ```
 
 You can use some formatting:
@@ -57,18 +64,25 @@ _emphasis_
 
 
 - unordered
-
 - list
 
 
 1. ordered
-
 2. list
+
+
+- This item spans
+    multiple lines.
+
+- Please, put empty lines between
+    such items.
 
 
 - This is an item of an unordered list.
 
-    + this is an item of an ordered list.
+    + this is an item of a nested unordered list.
+
+        ++ this item is nested even further
 
 ```
 
@@ -81,8 +95,8 @@ _emphasis_
 * Put spaces around `*`:
     ```c
     uint32_t * var;
-    uint32_t ** var2;
-    uint32_t *** var3;
+    uint32_t * * var2;
+    uint32_t * * * var3;
     uint32_t * function(uint32_t * arg);
     void function(uint32_t * arg);
     void (* function_pointer)(uint32_t * arg)
@@ -101,10 +115,11 @@ _emphasis_
 
 ## More
 
-Use Fejix base types and error handling.
+Use Fejix base types, memmory allocation and error handling.
 
 See:
 * [fejix/base.h](../../include/fejix/base.h)
+* [fejix/malloc.h](../../include/fejix/malloc.h)
 * [fejix/utils.h](../../include/fejix/utils.h)
 
 <!-- TODO Finish style notes -->

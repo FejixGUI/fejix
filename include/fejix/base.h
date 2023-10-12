@@ -16,6 +16,9 @@
 /* Annotates a pointer to a variable that can be an output just as an input. */
 #define FJ_INOUT
 
+/* Annotates a pointer that repressents an array. */
+#define FJ_ARRAY
+
 /* Annotates a user function that will be called by the library. */
 #define FJ_CALLBACK
 
@@ -23,7 +26,7 @@
 #define FJ_OK NULL
 
 /* Does the type conversion required to use string literals as `fj_string_t`. */
-#define FJ_STR(STRING_LITERAL) ((fj_string_t)(STRING_LITERAL))
+#define FJ_UTF8(STRING_LITERAL) ((fj_string_t)(STRING_LITERAL))
 
 
 /* Integer numeric type of a fixed size. This is a replacement of `_Bool`,
@@ -40,10 +43,10 @@
 typedef uint8_t fj_bool_t;
 
 /* UTF-8 string. */
-typedef uint8_t const * fj_string_t;
+typedef uint8_t const * FJ_ARRAY fj_string_t;
 
 /* Mutable UTF-8 string. */
-typedef uint8_t * fj_string_mut_t;
+typedef uint8_t * FJ_ARRAY fj_string_mut_t;
 
 /* Error message string. */
 typedef fj_string_t fj_err_t;
