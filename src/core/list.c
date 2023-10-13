@@ -20,14 +20,14 @@ static uint32_t last_index(struct fj_list * list)
 /* Modifies the capacity, but leaves length as is */
 static fj_err_t list_resize(struct fj_list * list, uint32_t capacity)
 {
-    FJ_TRY_INIT
+    FJ_INIT_ERRORS;
 
     FJ_TRY fj_realloc(&list->items, capacity, list->item_size);
 
     if (FJ_FAILED) {
         list->capacity = 0;
         list->length = 0;
-        return FJ_ERR(FJ_MALLOC_FAILED);
+        return FJ_LAST_ERROR;
     }
 
     list->capacity = capacity;
@@ -78,7 +78,7 @@ static void shift_items_left(struct fj_list * list, uint32_t dst_index)
 
 static fj_err_t list_copy(struct fj_list * dst, struct fj_list * src)
 {
-    FJ_TRY_INIT;
+    FJ_INIT_ERRORS;
 
     FJ_TRY list_resize(dst, src->capacity);
 
@@ -100,7 +100,7 @@ fj_err_t fj_list_new(
     size_t item_size
 )
 {
-    FJ_TRY_INIT;
+    FJ_INIT_ERRORS;
 
     FJ_TRY fj_alloc_zeroed((void **) list, sizeof **list);
 
@@ -119,7 +119,7 @@ fj_err_t fj_list_clone(
     struct fj_list * source
 )
 {
-    FJ_TRY_INIT;
+    FJ_INIT_ERRORS;
 
     FJ_TRY fj_list_new(destination, source->item_size);
 
@@ -150,12 +150,16 @@ void fj_list_del(struct fj_list * list)
 
 fj_err_t fj_list_insert(struct fj_list * list, uint32_t index, void * item)
 {
+    FJ_INIT_ERRORS;
+
     if (index > last_index(list)+1) {
         return FJ_ERR("cannot insert to list (index out of range)");
     }
 
-    if (list_grow(list) != FJ_OK) {
-        return FJ_ERR(FJ_MALLOC_FAILED);
+    FJ_TRY list_grow(list);
+
+    if (FJ_FAILED) {
+        return FJ_LAST_ERROR;
     }
 
     list->length++;
