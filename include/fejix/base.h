@@ -19,9 +19,6 @@
 /* Annotates a pointer that repressents an array. */
 #define FJ_ARRAY
 
-/* Annotates a user function that will be called by the library. */
-#define FJ_CALLBACK
-
 /* A value of `fj_err_t` that means that there are no errors. */
 #define FJ_OK NULL
 

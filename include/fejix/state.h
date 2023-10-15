@@ -24,7 +24,7 @@ enum fj_state_flags_values {
 
 
 struct fj_state_info {
-    fj_err_t (* FJ_NULLABLE FJ_CALLBACK init)(
+    fj_err_t (* FJ_NULLABLE on_init)(
         void * FJ_NULLABLE user_data
     );
 
@@ -33,7 +33,7 @@ struct fj_state_info {
         void * FJ_NULLABLE value
     );
 
-    fj_err_t (* FJ_NULLABLE FJ_CALLBACK handle_change)(
+    fj_err_t (* FJ_NULLABLE on_change)(
         void * FJ_NULLABLE user_data,
         void * FJ_NULLABLE new_value
     );

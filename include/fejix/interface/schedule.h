@@ -38,5 +38,7 @@
 /* Contains timeout in milliseconds or magic values. */
 typedef int32_t fj_schedule_t;
 
+// TODO query schedule gradularity, run callback (onschedule?)
+
 
 #endif
