@@ -4,6 +4,7 @@
 
 #include <fejix/base.h>
 
+// TODO add initial size
 
 typedef fj_bool_t (* fj_comparator_t)(void * a, void * b);
 

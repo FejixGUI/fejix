@@ -19,10 +19,14 @@ enum fj_launcher_flags_values {
         When it returns, the program entrypoint should return. */
     FJ_LAUNCHER_BLOCKING = (1<<0),
 
+    /* When present, if the launcher is blocking, identifies that the launcher
+        can be launched multiple times. */
+    FJ_LAUNCHER_REUSABLE = (1<<1),
+
     /* `launch()` function only sets the launch info for the launcher.
         After it returns, the library entrypoint should return for the launcher
         to run. */
-    FJ_LAUNCHER_DEFERRED = (1<<1),
+    FJ_LAUNCHER_DEFERRED = (1<<2),
 };
 
 
