@@ -28,7 +28,7 @@ enum fj_launcher_flags_values {
 
 
 struct fj_client_interface_listener {
-    void (* FJ_CALLBACK init)(
+    fj_err_t (* FJ_CALLBACK init)(
         void * FJ_NULLABLE user_data,
         void * interface
     );
