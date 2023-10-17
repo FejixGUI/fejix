@@ -8,7 +8,8 @@
 typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id_values {
-    FJ_IID_SCHEDULE = 1,
+    FJ_IID_CLIENT_DATA = 0,
+    FJ_IID_SCHEDULE,
 };
 
 
@@ -31,46 +32,22 @@ enum fj_launcher_flags_values {
 
 
 struct fj_interface_config_info {
+    void * FJ_NULLABLE interface_listener;
     fj_interface_id_t interface_id;
-    fj_bool_t request_init;
-};
-
-
-struct fj_interface_info {
-    void const * interface;
-    fj_interface_id_t interface_id;
-};
-
-
-struct fj_client_config_info {
-    /* These are the configs of the interfaces built into the library.
-        The interfaces may not be actually initialised in the future
-        because they may not be supported by the shell.
-        Therefore, request all the interface that you may need to use. */
-    struct fj_interface_config_info * FJ_NULLABLE FJ_ARRAY interface_configs;
-
-    uint32_t interface_config_count;
-};
-
-
-struct fj_client_info {
-    void * client_data;
-
-    struct fj_interface_info const * FJ_NULLABLE FJ_ARRAY interfaces;
-
-    uint32_t interface_count;
 };
 
 
 struct fj_launch_info {
-    fj_err_t (* on_config)(
+    /* Called during the launch before the client gets initialised. */
+    fj_err_t (* on_launch)(
         void * FJ_NULLABLE user_data,
-        struct fj_client_config_info const * config_info
+        struct fj_interface_config_info * FJ_ARRAY configs
     );
 
-    fj_err_t (* on_init)(
+    /* Called during the unlaunch after the client gets deinitialised. */
+    fj_err_t (* on_unlaunch)(
         void * FJ_NULLABLE user_data,
-        struct fj_client_info const * client_info
+        fj_err_t run_error
     );
 
     void * FJ_NULLABLE user_data;
@@ -82,6 +59,14 @@ struct fj_launcher {
 
     fj_string_t name;
     fj_launcher_flags_t flags;
+};
+
+
+struct fj_client_data_listener {
+    fj_err_t (* on_init)(
+        void * FJ_NULLABLE user_data,
+        void * client_data
+    );
 };
 
 
