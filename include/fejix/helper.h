@@ -2,8 +2,7 @@
 #define FEJIX_HELPER_H_
 
 
-#include <fejix/base.h>
-#include <fejix/gprotocol.h>
+#include <fejix/protocol.h>
 
 
 void fj_helper_get_process_args(
@@ -18,7 +17,7 @@ void fj_helper_set_process_args(
 
 /** Runs a common implementation of a graphical client.
 
-    TODO docs
+    TODO docs about fj_user_load
 
     === RETURNS ===
 

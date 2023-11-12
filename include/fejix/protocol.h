@@ -1,5 +1,5 @@
-#ifndef FEJIX_CLIENT_H_
-#define FEJIX_CLIENT_H_
+#ifndef FEJIX_PROTOCOL_H_
+#define FEJIX_PROTOCOL_H_
 
 
 #include <fejix/base.h>
@@ -40,8 +40,8 @@ typedef fj_err_t (fj_property_requestor_fn_t)(
 typedef fj_err_t (fj_property_listener_fn_t)(
     void * FJ_NULLABLE callback_data,
     void * object,
-    void const * FJ_NULLABLE property_value,
-    fj_property_event_t property_event
+    fj_property_event_t property_event,
+    void const * FJ_NULLABLE property_value
 );
 
 typedef void (fj_property_listener_setter_fn_t)(
@@ -49,42 +49,22 @@ typedef void (fj_property_listener_setter_fn_t)(
     fj_property_listener_fn_t property_listener
 );
 
-struct fj_property_info {
+struct fj_property {
     fj_property_id_t property_id;
     fj_property_requestor_fn_t * FJ_NULLABLE request;
     fj_property_listener_setter_fn_t * FJ_NULLABLE set_listener;
 };
 
-struct fj_class_info {
+struct fj_class {
     void const * class_methods;
-    struct fj_property_info const * FJ_ARRAY property_list;
+    struct fj_property const * FJ_ARRAY properties;
     uint32_t property_count;
 };
 
-typedef void (fj_class_listener_fn_t)(
-    void * FJ_NULLABLE callback_data,
-    struct fj_class_info const * class_info
-);
-
-typedef void (fj_class_listener_setter_fn_t)(
-    void * state,
-    fj_class_listener_fn_t class_listener
-);
-
-struct fj_class_init_info {
-    fj_class_id_t class_id;
-    fj_class_listener_setter_fn_t * set_listener;
-};
-
-struct fj_gprotocol_info {
-    /** Gets the list of class initialisers.
-
-        To initialise a class, you need to set the class listener.
-
-        The returned array is ordered by the class id. */
-    void (* get_class_init_list)(
-        struct fj_class_init_info const * FJ_ARRAY * FJ_OUT class_init_list,
-        uint32_t * FJ_OUT class_init_count
+struct fj_protocol {
+    void (* get_classes)(
+        struct fj_class const * FJ_ARRAY * FJ_OUT classes,
+        uint32_t * FJ_OUT count
     );
 
     fj_err_t (* create_state)(
@@ -107,16 +87,16 @@ struct fj_gprotocol_info {
     );
 };
 
-/** Returns the name of the gprotocol that the program should try to use.
+/** Returns the name of the protocol that the program should try to use.
 
-    First, it tries to read the `FEJIX_GPROTOCOL` environment variable.
+    First, it tries to read the `FEJIX_PROTOCOL` environment variable.
     If that fails, it tries to read `XDG_SESSION_TYPE`.
-    If that fails, it returns the name of the first gprotocol on the list. */
-fj_string_t fj_gprotocol_get_hint(void);
+    If that fails, it returns the name of the first protocol on the list. */
+fj_string_t fj_get_protocol_hint(void);
 
-void fj_gprotocol_get_list(
-    struct fj_gprotocol_info const * FJ_ARRAY * FJ_OUT gprotocol_list,
-    uint32_t * FJ_OUT gprotocol_count
+void fj_get_protocols(
+    struct fj_protocol const * FJ_ARRAY * FJ_OUT protocols,
+    uint32_t * FJ_OUT protocol_count
 );
 
 
