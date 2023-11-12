@@ -7,10 +7,10 @@
 #include <sys/poll.h>
 
 
-/* Unix file descriptor */
+/** Unix file descriptor */
 typedef uint32_t fj_unixpoller_fd_t;
 
-/* Example: `POLLIN|POLLOUT` */
+/** Example: `POLLIN|POLLOUT` */
 typedef uint16_t fj_unixpoller_event_mask_t;
 
 typedef fj_err_t (*fj_unixpoller_callback_t)(
@@ -34,7 +34,7 @@ fj_err_t fj_unixpoller_watch(
     fj_unixpoller_callback_t callback
 );
 
-/* Ensures that the file descriptor is not being watched.
+/** Ensures that the file descriptor is not being watched.
     If the file descriptor has not beed added to the watching list, this
     returns `FJ_OK`. */
 fj_err_t fj_unixpoller_unwatch(
@@ -42,7 +42,7 @@ fj_err_t fj_unixpoller_unwatch(
     fj_unixpoller_fd_t file_descriptor
 );
 
-/* # Parameters
+/** # Parameters
     * `client` - unused by `poll` itself, but passed to the callbacks.
     * `timeout` - if negative, this will poll forever,
         if zero, this will return immediately. */
@@ -56,7 +56,7 @@ fj_unixpoller_fd_t fj_unixpoller_get_interruptor(
     struct fj_unixpoller * poller
 );
 
-/* Used to wakeup `fj_unixpoller_poll` from other threads. */
+/** Used to wakeup `fj_unixpoller_poll` from other threads. */
 fj_err_t fj_unixpoller_interrupt(
     fj_unixpoller_fd_t interruptor
 );

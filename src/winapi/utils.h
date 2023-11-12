@@ -6,7 +6,7 @@
 #include <windows.h>
 
 
-/* Converts UTF-8 to Windows multibyte encoding.
+/** Converts UTF-8 to Windows multibyte encoding.
     The returned string must be freed with `fj_free`.
     # Returns
     NULL if the given string is invalid:

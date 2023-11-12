@@ -11,7 +11,7 @@ Here are some consistency guidelines.
 Use block comments without any additional decoration.
 Use the following almost-plain-text syntax:
 ```c
-/* Here is a summary of the function.
+/** Here is a summary of the function.
 
     Here is some additional information.
 
@@ -95,31 +95,41 @@ _emphasis_
 * Put spaces around `*`:
     ```c
     uint32_t * var;
-    uint32_t * * var2;
-    uint32_t * * * var3;
+    uint32_t ** var;
+    uint32_t *** var; // No annotations, so spaces between '*' are not necessary
+    uint32_t * const * var;
+    uint32_t * * const var;
+    uint32_t const * * const * var;
     uint32_t * function(uint32_t * arg);
     void function(uint32_t * arg);
     void (* function_pointer)(uint32_t * arg)
     ```
 
+## Annotating types
+
 * Put `const` AFTER the object it annotates:
 
     ```c
-    /* mutable pointer to constant char */
+    /** mutable pointer to constant char */
     char const * a;
-    /* constant pointer to mutable char */
+    /** constant pointer to mutable char */
     char * const a;
-    /* constant pointer to constant char */
+    /** constant pointer to constant char */
     char const * const a;
     ```
 
+* Annotate in/out/inout pointers in the following way:
+    - `_in_ Type Arg` = `Type const * Arg` (only read but not write)
+    - `_out_ Type Arg` = `Type * FJ_OUT Arg` (only write but not read)
+    - `_inout_ Type Arg` = `Type * Arg` (both read and write)
+
 ## More
 
-Use Fejix base types, memmory allocation and error handling.
+Use Fejix base types, memory allocation and error handling.
 
 See:
 * [fejix/base.h](../../include/fejix/base.h)
 * [fejix/malloc.h](../../include/fejix/malloc.h)
 * [fejix/utils.h](../../include/fejix/utils.h)
 
-<!-- TODO Finish style notes -->
+**TODO: Finish docs.**
