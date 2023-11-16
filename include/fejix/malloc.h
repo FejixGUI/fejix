@@ -12,12 +12,12 @@
 /** Allocates an uninitialized block of memory.
     Works like `malloc`, but allocating 0 bytes is always an error.
     When this fails, sets `ptr` to NULL. */
-fj_err_t fj_alloc_uninit(void * FJ_NULLABLE * FJ_OUT ptr, size_t size);
+fj_err_t fj_alloc_uninit(void * FJ_NULLABLE FJ_OUT * ptr, size_t size);
 
 /** Allocates a block of memory initialized with zeros.
     Works like `calloc(1,)`, but allocating 0 bytes is always an error.
     When this fails, sets `ptr` to NULL. */
-fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE * FJ_OUT ptr, size_t size);
+fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE FJ_OUT * ptr, size_t size);
 
 /** Works like `free`. If `ptr` is NULL, the behavior is undefined. */
 void fj_free(void * ptr);

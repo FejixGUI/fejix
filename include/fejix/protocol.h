@@ -21,18 +21,18 @@ enum fj_class_id_values {
 typedef uint32_t fj_property_id_t;
 
 enum fj_property_id_values {
-    FJ_PROP_WINDOW_SIZE // TODO
+    FJ_PROPERTY_WINDOW_SIZE // TODO
 };
 
-typedef uint32_t fj_property_event_t;
+typedef uint32_t fj_property_event_flags_t;
 
-enum fj_property_event_values {
-    FJ_PROPERTY_REQUESTED,
-    FJ_PROPERTY_SET,
+enum fj_property_event_flags_values {
+    FJ_PROPERTY_SET         = (1<<0),
+    FJ_PROPERTY_MUTABLE     = (1<<1),
 };
 
 typedef fj_err_t (fj_property_requestor_fn_t)(
-    void * client,
+    void * state,
     void * object,
     void const * FJ_NULLABLE property_value
 );
@@ -40,7 +40,7 @@ typedef fj_err_t (fj_property_requestor_fn_t)(
 typedef fj_err_t (fj_property_listener_fn_t)(
     void * FJ_NULLABLE callback_data,
     void * object,
-    fj_property_event_t property_event,
+    fj_property_event_flags_t property_event,
     void const * FJ_NULLABLE property_value
 );
 
@@ -63,12 +63,12 @@ struct fj_class {
 
 struct fj_protocol {
     void (* get_classes)(
-        struct fj_class const * FJ_ARRAY * FJ_OUT classes,
-        uint32_t * FJ_OUT count
+        struct fj_class const * FJ_ARRAY FJ_OUT * classes,
+        uint32_t FJ_OUT * count
     );
 
     fj_err_t (* create_state)(
-        void * FJ_NULLABLE * FJ_OUT state
+        void * FJ_NULLABLE FJ_OUT * state
     );
 
     void (* destroy_state)(
@@ -95,8 +95,8 @@ struct fj_protocol {
 fj_string_t fj_get_protocol_hint(void);
 
 void fj_get_protocols(
-    struct fj_protocol const * FJ_ARRAY * FJ_OUT protocols,
-    uint32_t * FJ_OUT protocol_count
+    struct fj_protocol const * FJ_ARRAY FJ_OUT * protocols,
+    uint32_t FJ_OUT * protocol_count
 );
 
 

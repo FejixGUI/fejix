@@ -118,10 +118,21 @@ _emphasis_
     char const * const a;
     ```
 
-* Annotate in/out/inout pointers in the following way:
+* Annotate in/out/inout arguments in the following way:
     - `_in_ Type Arg` = `Type const * Arg` (only read but not write)
-    - `_out_ Type Arg` = `Type * FJ_OUT Arg` (only write but not read)
+    - `_out_ Type Arg` = `Type FJ_OUT * Arg` (only write but not read)
     - `_inout_ Type Arg` = `Type * Arg` (both read and write)
+
+* Put pointer annotations in the following order:
+
+    ```
+    *, FJ_NULLABLE, FJ_ARRAY, const/FJ_OUT
+    ```
+
+    The logic behind this is that `FJ_NULLABLE` and `FJ_ARRAY` specify "types"
+    of pointers, whereas `const`/`FJ_OUT` specify access rules.
+    Continuing the previous two guidelines, we first write types and then
+    access specifiers.
 
 ## More
 

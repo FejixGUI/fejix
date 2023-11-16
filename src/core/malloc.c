@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-fj_err_t fj_alloc_uninit(void * FJ_NULLABLE * FJ_OUT ptr, size_t size)
+fj_err_t fj_alloc_uninit(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
 {
     if (size == 0) {
         ptr = NULL;
@@ -22,7 +22,7 @@ fj_err_t fj_alloc_uninit(void * FJ_NULLABLE * FJ_OUT ptr, size_t size)
 }
 
 
-fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE * FJ_OUT ptr, size_t size)
+fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
 {
     if (size == 0) {
         *ptr = NULL;
