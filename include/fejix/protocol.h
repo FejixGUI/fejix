@@ -24,23 +24,62 @@ enum fj_property_id_values {
     FJ_PROPERTY_WINDOW_SIZE // TODO
 };
 
+typedef uint32_t fj_property_request_flags_t;
+
+enum fj_property_request_flags_values {
+    /** Indicates that the client must update the property with the given value.
+        If not set, indicates that the client must request the property value
+        and the value argument given to the requestor function must be
+        ignored. */
+    FJ_REQUEST_UPDATE = (1<<0),
+
+    /** Indicates that the requestor function does not have to send the request
+        immediately. That is, if the protocol encourages batching update
+        requests and then sending them all at once, the requestor function
+        can do exactly that. The cached requests will be sent the next time
+        a non-cacheable request is sent.
+        If not set, indicates that the requestor function should send the
+        request immediately.
+
+        === DETAILS ===
+
+        The exact behavior of this flag and platform support is not yet defined.
+        FIXME */
+    FJ_REQUEST_CACHEABLE = (1<<1),
+};
+
 typedef uint32_t fj_property_event_flags_t;
 
 enum fj_property_event_flags_values {
-    FJ_PROPERTY_SET         = (1<<0),
-    FJ_PROPERTY_MUTABLE     = (1<<1),
+    /** Indicates that the event being handled is a request for an update.
+        That is, the property is being updated.
+        If not set, indicates that the property is not being updated. */
+    FJ_EVENT_UPDATING = (1<<0),
+
+    /** Indicates that the property has already been updated.
+        If not set, indicates that the event being handled is only a request
+        for an update, not the update itself.
+
+        This flag makes sense only when `FJ_EVENT_UPDATING` is set. */
+    FJ_EVENT_UPDATED = (1<<1),
+
+    /** Indicates that the property is updatable by the client.
+        If not set, indicates that update requests sent by the client
+        may be rejected. */
+    FJ_EVENT_UPDATABLE = (1<<2),
 };
 
 typedef fj_err_t (fj_property_requestor_fn_t)(
     void * state,
     void * object,
+    fj_property_request_flags_t request_flags,
     void const * FJ_NULLABLE property_value
 );
 
 typedef fj_err_t (fj_property_listener_fn_t)(
     void * FJ_NULLABLE callback_data,
     void * object,
-    fj_property_event_flags_t property_event,
+    fj_property_event_flags_t event_flags,
     void const * FJ_NULLABLE property_value
 );
 
