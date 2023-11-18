@@ -1,10 +1,11 @@
 # Fejix window management library
 
-Fejix is a cross-platform window management library.
+Fejix is a cross-platform low-level graphical protocols abstraction library.
 Written in C99.
 
 > This library is in early development.
-> For now, there is just an emoji: 🌸
+> For now, there is just an emoji: 🌸.
+> Yay.
 
 ## Build
 
