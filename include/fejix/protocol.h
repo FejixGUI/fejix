@@ -34,10 +34,11 @@ enum fj_property_request_flags_values {
     FJ_REQUEST_UPDATE = (1<<0),
 
     /** Indicates that the requestor function does not have to send the request
-        immediately. That is, if the protocol encourages batching update
-        requests and then sending them all at once, the requestor function
+        immediately. That is, if the protocol encourages caching update
+        requests and then sending them all at one batch, the requestor function
         can do exactly that. The cached requests will be sent the next time
         a non-cacheable request is sent.
+
         If not set, indicates that the requestor function should send the
         request immediately.
 
@@ -90,13 +91,13 @@ typedef void (fj_property_listener_setter_fn_t)(
 
 struct fj_property {
     fj_property_id_t property_id;
-    fj_property_requestor_fn_t * FJ_NULLABLE request;
-    fj_property_listener_setter_fn_t * FJ_NULLABLE set_listener;
+    fj_property_requestor_fn_t * request;
+    fj_property_listener_setter_fn_t * set_listener;
 };
 
 struct fj_class {
-    void const * class_methods;
-    struct fj_property const * FJ_ARRAY properties;
+    void const * methods;
+    struct fj_property const * FJ_NULLABLE FJ_ARRAY properties;
     uint32_t property_count;
 };
 
