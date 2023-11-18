@@ -8,7 +8,7 @@
 typedef uint32_t fj_run_type_t;
 
 enum fj_run_type_values {
-    /** Represents most kinds of main program functions. */
+    /** Represents most kinds of main program entrypoints. */
     FJ_RUN_TYPE_MAIN,
 };
 
@@ -31,7 +31,7 @@ enum fj_property_request_flags_values {
         If not set, indicates that the client must request the property value
         and the value argument given to the requestor function must be
         ignored. */
-    FJ_REQUEST_UPDATE = (1<<0),
+    FJ_PROPERTY_REQUEST_UPDATE = (1<<0),
 
     /** Indicates that the requestor function does not have to send the request
         immediately. That is, if the protocol encourages caching update
@@ -42,11 +42,8 @@ enum fj_property_request_flags_values {
         If not set, indicates that the requestor function should send the
         request immediately.
 
-        === DETAILS ===
-
-        The exact behavior of this flag and platform support is not yet defined.
-        FIXME */
-    FJ_REQUEST_CACHEABLE = (1<<1),
+        TODO Finish cacheable requests */
+    FJ_PROPERTY_REQUEST_CACHEABLE = (1<<1),
 };
 
 typedef uint32_t fj_property_event_flags_t;
@@ -55,19 +52,26 @@ enum fj_property_event_flags_values {
     /** Indicates that the event being handled is a request for an update.
         That is, the property is being updated.
         If not set, indicates that the property is not being updated. */
-    FJ_EVENT_UPDATING = (1<<0),
+    FJ_PROPERTY_EVENT_UPDATING = (1<<0),
 
     /** Indicates that the property has already been updated.
         If not set, indicates that the event being handled is only a request
         for an update, not the update itself.
 
-        This flag makes sense only when `FJ_EVENT_UPDATING` is set. */
-    FJ_EVENT_UPDATED = (1<<1),
+        This flag makes sense only when `FJ_PROPERTY_EVENT_UPDATING` is set. */
+    FJ_PROPERTY_EVENT_UPDATED = (1<<1),
 
     /** Indicates that the property is updatable by the client.
         If not set, indicates that update requests sent by the client
         may be rejected. */
-    FJ_EVENT_UPDATABLE = (1<<2),
+    FJ_PROPERTY_EVENT_UPDATABLE = (1<<2),
+};
+
+typedef uint32_t fj_class_event_flags_t;
+
+enum fj_class_event_flags_values {
+    FJ_CLASS_EVENT_INIT,
+    FJ_CLASS_EVENT_DEINIT,
 };
 
 typedef fj_err_t (fj_property_requestor_fn_t)(
@@ -80,6 +84,7 @@ typedef fj_err_t (fj_property_requestor_fn_t)(
 typedef fj_err_t (fj_property_listener_fn_t)(
     void * FJ_NULLABLE callback_data,
     void * object,
+    fj_property_id_t property_id,
     fj_property_event_flags_t event_flags,
     void const * FJ_NULLABLE property_value
 );
@@ -87,6 +92,17 @@ typedef fj_err_t (fj_property_listener_fn_t)(
 typedef void (fj_property_listener_setter_fn_t)(
     void * object,
     fj_property_listener_fn_t property_listener
+);
+
+typedef fj_err_t (fj_class_listener_fn_t)(
+    void * callback_data,
+    fj_class_id_t class_id,
+    fj_class_event_flags_t event_flags
+);
+
+typedef void (fj_class_listener_setter_fn_t)(
+    void * state,
+    fj_class_listener_fn_t * listener
 );
 
 struct fj_property {
@@ -97,6 +113,10 @@ struct fj_property {
 
 struct fj_class {
     void const * methods;
+
+    fj_class_listener_setter_fn_t * set_listener;
+
+    /** This array is sorted by property IDs. */
     struct fj_property const * FJ_NULLABLE FJ_ARRAY properties;
     uint32_t property_count;
 };
@@ -134,6 +154,7 @@ struct fj_protocol {
     If that fails, it returns the name of the first protocol on the list. */
 fj_string_t fj_get_protocol_hint(void);
 
+/** The returned array is sorted by protocol names. */
 void fj_get_protocols(
     struct fj_protocol const * FJ_ARRAY FJ_OUT * protocols,
     uint32_t FJ_OUT * protocol_count
