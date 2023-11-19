@@ -21,8 +21,8 @@
 #   define FJ_UNUSED(X)
 #endif
 
-/** Get length of a static array. */
-#define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
+/** Get length of a fixed-length array. */
+#define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 
 #define FJ_STRINGIFY(ARG) FJ_STRINGIFY_IMPL(ARG)
 #define FJ_STRINGIFY_IMPL(ARG) #ARG

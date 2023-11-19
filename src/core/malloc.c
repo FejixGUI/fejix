@@ -46,7 +46,7 @@ void fj_free(void * ptr)
 
 
 fj_err_t fj_realloc_uninit(
-    void * FJ_NULLABLE FJ_ARRAY * FJ_INOUT ptr,
+    void * FJ_NULLABLE FJ_ARRAY * ptr,
     uint32_t item_count,
     size_t item_size
 )
@@ -78,7 +78,7 @@ fj_err_t fj_realloc_uninit(
 
 
 fj_err_t fj_realloc_zeroed(
-    void * FJ_NULLABLE FJ_ARRAY * FJ_INOUT ptr,
+    void * FJ_NULLABLE FJ_ARRAY * ptr,
     uint32_t old_item_count,
     uint32_t new_item_count,
     size_t item_size

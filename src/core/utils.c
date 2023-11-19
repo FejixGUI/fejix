@@ -15,7 +15,7 @@ uint32_t fj_u32_min(uint32_t a, uint32_t b)
 }
 
 
-fj_bool_t fj_str_eq(fj_string_t a, fj_string_t b)
+fj_bool_t fj_str_eq(fj_string_t FJ_NULLABLE a, fj_string_t FJ_NULLABLE b)
 {
     if (a == NULL && b == NULL) {
         return true;

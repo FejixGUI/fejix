@@ -122,8 +122,11 @@ struct fj_class {
 };
 
 struct fj_protocol {
+    fj_string_t name;
+
+    /** The returned array is sorted by class ID. */
     void (* get_classes)(
-        struct fj_class const * FJ_ARRAY FJ_OUT * classes,
+        struct fj_class const * const * FJ_ARRAY FJ_OUT * classes,
         uint32_t FJ_OUT * count
     );
 
@@ -156,7 +159,7 @@ fj_string_t fj_get_protocol_hint(void);
 
 /** The returned array is sorted by protocol names. */
 void fj_get_protocols(
-    struct fj_protocol const * FJ_ARRAY FJ_OUT * protocols,
+    struct fj_protocol const * const * FJ_ARRAY FJ_OUT * protocols,
     uint32_t FJ_OUT * protocol_count
 );
 

@@ -5,11 +5,11 @@ target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 target_sources(fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
-    "${FEJIX_SRC}/core/list.c"
-    "${FEJIX_SRC}/generic/client.c"
-    "${FEJIX_SRC}/generic/shell.c"
+    "${FEJIX_SRC}/core/protocol.c"
 )
 
+
+# FIXME Update CMake build files
 if(FEJIX_PLATFORM_X11)
     target_sources(fejix PRIVATE
         "${FEJIX_SRC}/x11/client.c"
