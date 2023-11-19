@@ -6,13 +6,16 @@
 #include <windows.h>
 
 
-/** Converts UTF-8 to Windows multibyte encoding.
+/** Converts UTF-8 to Windows multibyte ("wide") encoding.
     The returned string must be freed with `fj_free`.
-    # Returns
-    NULL if the given string is invalid:
-    * the length of the given string is 0
-    * the given string contains invlaid Unicode */
-LPWSTR fj_winapi_utf8_to_wstr(fj_utf8string_t utf8_string);
+
+    === Returns ===
+
+    Returns an error if the given string is invalid UTF-8. */
+fj_err_t fj_winapi_utf8_to_wstr(
+    fj_string_t utf8_string,
+    LPWSTR FJ_NULLABLE FJ_OUT * wide_string
+);
 
 
 #endif
