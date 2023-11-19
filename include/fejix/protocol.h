@@ -43,7 +43,7 @@ enum fj_property_request_flags_values {
         request immediately.
 
         TODO Finish cacheable requests */
-    FJ_PROPERTY_REQUEST_CACHEABLE = (1<<1),
+    // FJ_PROPERTY_REQUEST_CACHEABLE = (1<<1),
 };
 
 typedef uint32_t fj_property_event_flags_t;
@@ -107,7 +107,7 @@ typedef void (fj_class_listener_setter_fn_t)(
 
 struct fj_property {
     fj_property_id_t property_id;
-    fj_property_requestor_fn_t * request;
+    fj_property_requestor_fn_t * FJ_NULLABLE request;
     fj_property_listener_setter_fn_t * set_listener;
 };
 
