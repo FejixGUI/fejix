@@ -8,19 +8,19 @@
 #define USE_PROTOCOL(NAME) &NAME,
 
 
-#ifdef FJ_PROTOCOL_WINAPI
+#ifdef FJ_OPT_WINAPI
     LINK_PROTOCOL(fj_winapi_protocol)
 #endif
-#ifdef FJ_PROTOCOL_X11
+#ifdef FJ_OPT_X11
     LINK_PROTOCOL(fj_x11_protocol)
 #endif
 
 static struct fj_protocol const * const protocol_list[] = {
 
-#ifdef FJ_PROTOCOL_WINAPI
+#ifdef FJ_OPT_WINAPI
     USE_PROTOCOL(fj_winapi_protocol)
 #endif
-#ifdef FJ_PROTOCOL_X11
+#ifdef FJ_OPT_X11
     USE_PROTOCOL(fj_x11_protocol)
 #endif
 

@@ -6,7 +6,6 @@
 #include <string.h>
 
 
-// TODO: test passing an empty utf8 string here
 fj_err_t fj_winapi_utf8_to_wstr(
     fj_string_t utf8_string,
     LPWSTR FJ_NULLABLE FJ_OUT * wide_string

@@ -1,15 +1,11 @@
-if(FEJIX_PROTOCOL_X11)
+if(FJ_OPT_X11)
 
-    target_link_libraries(fejix "X11" "X11-xcb" "xcb")
-
-    target_link_libraries(fejix "xcb-sync")
-
-    if(FEJIX_FEATURE_WINMANAGER)
-        target_link_libraries(fejix "xcb-icccm")
-    endif()
+    target_link_libraries(fejix "X11" "X11-xcb" "xcb" "xcb-sync" "xcb-icccm")
 
 endif()
 
-if(FEJIX_PROTOCOL_WINAPI)
+if(FJ_OPT_WINAPI)
+
     target_compile_definitions(fejix PRIVATE "UNICODE" "_UNICODE")
+
 endif()

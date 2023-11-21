@@ -1,15 +1,27 @@
+option(BUILD_TESTS OFF)
+
+if(BUILD_TESTS)
+
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    message(FATAL_ERROR "Building tests requires CMAKE_BUILD_TYPE=\"Debug\"")
+    message(
+        FATAL_ERROR
+        "***** You must specify CMAKE_BUILD_TYPE=\"Debug\" to enable tests"
+    )
 endif()
 
 enable_testing()
 
-macro(fejix_add_test test_name source_file)
-    add_executable(${test_name} "${source_file}")
+include_directories("${FEJIX_INCLUDE}")
+include_directories("${FEJIX_ROOT}")
+
+macro(fejix_add_simple_c_test test_name c_source_file)
+    add_executable(${test_name} "${c_source_file}")
     target_link_libraries(${test_name} fejix)
-    add_test(NAME ${test_name} COMMAND ${test_name})
+    add_test(NAME ${test_name} COMMAND "${test_name}")
 endmacro()
 
+if(FJ_OPT_WINAPI)
+    fejix_add_simple_c_test(winapi_test "${FEJIX_TESTS}/winapi/utils.c")
+endif()
 
-
-# fejix_add_test(fejix_test_name "${FEJIX_TESTS}/path/to/file.c")
+endif()

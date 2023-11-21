@@ -2,36 +2,20 @@ target_include_directories(fejix PUBLIC "${FEJIX_INCLUDE}")
 target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 
 
-target_sources(fejix PRIVATE
+# Fejix core
+target_sources(
+    fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/protocol.c"
 )
 
 
-# FIXME Update CMake build files
-if(FEJIX_PLATFORM_X11)
-    target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/x11/client.c"
-    )
-endif()
-
-if(FEJIX_PLATFORM_WINAPI)
-    target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/winapi/client.c"
+if(FJ_OPT_WINAPI)
+    target_sources(
+        fejix PRIVATE
+        "${FEJIX_SRC}/winapi/protocol.c"
         "${FEJIX_SRC}/winapi/utils.c"
-    )
-
-    if(FEJIX_FEATURE_SHELL)
-        target_sources(fejix PRIVATE
-            "${FEJIX_SRC}/winapi/features/shell.c"
-        )
-    endif()
-endif()
-
-if(FEJIX_FEATURE_UNIXPOLLER)
-    target_sources(fejix PRIVATE
-        "${FEJIX_SRC}/unixpoller/unixpoller.c"
     )
 endif()
 
@@ -43,7 +27,6 @@ foreach(file ${fejix_source_files})
 
     set_property(
         SOURCE "${file}"
-        APPEND PROPERTY COMPILE_DEFINITIONS
-        "FJ_FILENAME=\"${filename}\""
+        APPEND PROPERTY COMPILE_DEFINITIONS "FJ_FILENAME=\"${filename}\""
     )
 endforeach()
