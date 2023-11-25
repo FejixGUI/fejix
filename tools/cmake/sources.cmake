@@ -8,6 +8,7 @@ target_sources(
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/protocol.c"
+    "${FEJIX_SRC}/core/helper.c"
 )
 
 

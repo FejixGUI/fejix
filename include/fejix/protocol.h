@@ -7,26 +7,26 @@
 
 typedef uint32_t fj_run_type_t;
 
-enum fj_run_type_values {
+enum fj_run_type {
     /** Represents most kinds of main program entrypoints. */
     FJ_RUN_TYPE_MAIN,
 };
 
-typedef uint32_t fj_class_id_t;
+typedef uint32_t fj_interface_id_t;
 
-enum fj_class_id_values {
-    FJ_CLASS_WINDOW // TODO
+enum fj_interface_id {
+    FJ_IID_WINDOW // TODO
 };
 
 typedef uint32_t fj_property_id_t;
 
-enum fj_property_id_values {
-    FJ_PROPERTY_WINDOW_SIZE // TODO
+enum fj_property_id {
+    FJ_PID_WINDOW_SIZE // TODO
 };
 
 typedef uint32_t fj_property_request_flags_t;
 
-enum fj_property_request_flags_values {
+enum fj_property_request_flags {
     /** Indicates that the client must update the property with the given value.
         If not set, indicates that the client must request the property value
         and the value argument given to the requestor function must be
@@ -48,7 +48,7 @@ enum fj_property_request_flags_values {
 
 typedef uint32_t fj_property_event_flags_t;
 
-enum fj_property_event_flags_values {
+enum fj_property_event_flags {
     /** Indicates that the event being handled is a request for an update.
         That is, the property is being updated.
         If not set, indicates that the property is not being updated. */
@@ -67,11 +67,11 @@ enum fj_property_event_flags_values {
     FJ_PROPERTY_EVENT_UPDATABLE = (1<<2),
 };
 
-typedef uint32_t fj_class_event_flags_t;
+typedef uint32_t fj_interface_event_flags_t;
 
-enum fj_class_event_flags_values {
-    FJ_CLASS_EVENT_INIT,
-    FJ_CLASS_EVENT_DEINIT,
+enum fj_interface_event_flags {
+    FJ_INTERFACE_EVENT_INIT,
+    FJ_INTERFACE_EVENT_DEINIT,
 };
 
 typedef fj_err_t (fj_property_requestor_fn_t)(
@@ -94,15 +94,15 @@ typedef void (fj_property_listener_setter_fn_t)(
     fj_property_listener_fn_t property_listener
 );
 
-typedef fj_err_t (fj_class_listener_fn_t)(
+typedef fj_err_t (fj_interface_listener_fn_t)(
     void * callback_data,
-    fj_class_id_t class_id,
-    fj_class_event_flags_t event_flags
+    fj_interface_id_t interface_id,
+    fj_interface_event_flags_t event_flags
 );
 
-typedef void (fj_class_listener_setter_fn_t)(
+typedef void (fj_interface_listener_setter_fn_t)(
     void * state,
-    fj_class_listener_fn_t * listener
+    fj_interface_listener_fn_t * listener
 );
 
 struct fj_property {
@@ -111,24 +111,25 @@ struct fj_property {
     fj_property_listener_setter_fn_t * set_listener;
 };
 
-struct fj_class {
-    void const * methods;
+struct fj_interface {
+    fj_interface_id_t interface_id;
 
-    fj_class_listener_setter_fn_t * set_listener;
-
+    /** May be 0 if the interface does not have any properties. */
+    uint32_t property_count;
     /** This array is sorted by property IDs. */
     struct fj_property const * FJ_NULLABLE FJ_ARRAY properties;
-    uint32_t property_count;
+
+    void const * methods;
+    fj_interface_listener_setter_fn_t * set_listener;
 };
 
 struct fj_protocol {
     fj_string_t name;
 
-    /** The returned array is sorted by class ID. */
-    void (* get_classes)(
-        struct fj_class const * const * FJ_ARRAY FJ_OUT * classes,
-        uint32_t FJ_OUT * count
-    );
+    /** Always greater than 0. */
+    uint32_t interface_count;
+    /** This array is sorted by interface IDs. */
+    struct fj_interface const * const * FJ_ARRAY interfaces;
 
     fj_err_t (* create_state)(
         void * FJ_NULLABLE FJ_OUT * state
@@ -150,14 +151,9 @@ struct fj_protocol {
     );
 };
 
-/** Returns the name of the protocol that the program should try to use.
 
-    First, it tries to read the `FEJIX_PROTOCOL` environment variable.
-    If that fails, it tries to read `XDG_SESSION_TYPE`.
-    If that fails, it returns the name of the first protocol on the list. */
-fj_string_t fj_get_protocol_hint(void);
-
-/** The returned array is sorted by protocol names. */
+/** The returned array is sorted by protocol names.
+    Protocol count is always greater than 0. */
 void fj_get_protocols(
     struct fj_protocol const * const * FJ_ARRAY FJ_OUT * protocols,
     uint32_t FJ_OUT * protocol_count
