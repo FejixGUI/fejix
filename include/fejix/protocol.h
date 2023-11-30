@@ -15,35 +15,60 @@ enum fj_run_type {
 typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id {
-    FJ_IID_WINDOW // TODO
+    FJ_IID_PROTOCOL = 1,
+    FJ_IID_WINDOW,
+    // TODO
 };
 
 typedef uint32_t fj_property_id_t;
 
 enum fj_property_id {
-    FJ_PID_WINDOW_SIZE // TODO
+    FJ_PID_INIT = 0,
+    FJ_PID_WINDOW_SIZE = (FJ_IID_WINDOW<<16),
+    // TODO
+};
+
+typedef uint32_t fj_property_flags_t;
+
+enum fj_property_flags {
+    FJ_PROPERTY_GETTABLE_ASYNC = (1<<0),
+    FJ_PROPERTY_UPDATABLE_ASYNC = (1<<1),
+    FJ_PROPERTY_GETTABLE_SYNC = (1<<2),
+    FJ_PROPERTY_UPDATABLE_SYNC = (1<<3),
+    FJ_PROPERTY_MONITORABLE = (1<<4),
 };
 
 typedef uint32_t fj_property_request_flags_t;
 
 enum fj_property_request_flags {
     /** Indicates that the client must update the property with the given value.
-        If not set, indicates that the client must request the property value
+        If not set, indicates that the client must get the property value
         and the value argument given to the requestor function must be
-        ignored. */
+        ignored. The value will be received by the property listener callback.
+
+        === IF UNSUPPORTED ===
+
+        If the property is not updatable and this flag is specified, the
+        requestor function silently ignores the request.
+
+        If the property is not gettable and this flag is not specified, the
+        requestor function silently ignores the request. */
     FJ_PROPERTY_REQUEST_UPDATE = (1<<0),
 
-    /** Indicates that the requestor function does not have to send the request
-        immediately. That is, if the protocol encourages caching update
-        requests and then sending them all at one batch, the requestor function
-        can do exactly that. The cached requests will be sent the next time
-        a non-cacheable request is sent.
+    /** Indicates that the client must monitor all the external changes to the
+        property if possible.
+        If not set, indicates that the client can ignore the external changes.
 
-        If not set, indicates that the requestor function should send the
-        request immediately.
+        === DETAILS ===
 
-        TODO Finish cacheable requests */
-    // FJ_PROPERTY_REQUEST_CACHEABLE = (1<<1),
+        A request with this flag must be sent before the property gets the first
+        update event, otherwise this flag may be ignored.
+
+        === IF UNSUPPORTED ===
+
+        If the property is not monitorable, the requestor function silently
+        ignores this flag. */
+    FJ_PROPERTY_REQUEST_MONITOR = (1<<1),
 };
 
 typedef uint32_t fj_property_event_flags_t;
@@ -67,26 +92,14 @@ enum fj_property_event_flags {
     FJ_PROPERTY_EVENT_UPDATABLE = (1<<2),
 };
 
-typedef uint32_t fj_interface_event_flags_t;
-
-enum fj_interface_event_flags {
-    FJ_INTERFACE_EVENT_INIT,
-    FJ_INTERFACE_EVENT_DEINIT,
-};
-
-typedef fj_err_t (fj_property_requestor_fn_t)(
-    void * state,
-    void * object,
-    fj_property_request_flags_t request_flags,
-    void const * FJ_NULLABLE property_value
-);
-
+/** `event_value` can be not the actual value of the property. */
 typedef fj_err_t (fj_property_listener_fn_t)(
+    void * state,
     void * FJ_NULLABLE callback_data,
     void * object,
     fj_property_id_t property_id,
     fj_property_event_flags_t event_flags,
-    void const * FJ_NULLABLE property_value
+    void const * FJ_NULLABLE event_value
 );
 
 typedef void (fj_property_listener_setter_fn_t)(
@@ -94,25 +107,36 @@ typedef void (fj_property_listener_setter_fn_t)(
     fj_property_listener_fn_t property_listener
 );
 
-typedef fj_err_t (fj_interface_listener_fn_t)(
-    void * callback_data,
-    fj_interface_id_t interface_id,
-    fj_interface_event_flags_t event_flags
-);
 
-typedef void (fj_interface_listener_setter_fn_t)(
-    void * state,
-    fj_interface_listener_fn_t * listener
-);
+struct fj_method_request {
+    void * argument;
+};
+
+struct fj_property_request {
+    void * FJ_NULLABLE object;
+    void * FJ_NULLABLE value;
+    fj_property_request_flags_t flags;
+};
+
+union fj_request {
+    struct fj_property_request property;
+    struct fj_method_request method;
+};
+
+struct fj_command {
+    void const * requestor;
+    union fj_request request;
+};
 
 struct fj_property {
-    fj_property_id_t property_id;
-    fj_property_requestor_fn_t * FJ_NULLABLE request;
+    fj_property_id_t id;
+    fj_property_flags_t flags;
+    void const * FJ_NULLABLE requestor;
     fj_property_listener_setter_fn_t * set_listener;
 };
 
 struct fj_interface {
-    fj_interface_id_t interface_id;
+    fj_interface_id_t id;
 
     /** May be 0 if the interface does not have any properties. */
     uint32_t property_count;
@@ -120,7 +144,6 @@ struct fj_interface {
     struct fj_property const * FJ_NULLABLE FJ_ARRAY properties;
 
     void const * methods;
-    fj_interface_listener_setter_fn_t * set_listener;
 };
 
 struct fj_protocol {
@@ -139,15 +162,23 @@ struct fj_protocol {
         void * state
     );
 
-    void (* set_callback_data)(
-        void * state,
-        void * FJ_NULLABLE callback_data
-    );
-
     fj_err_t (* run)(
         void * state,
+        void * callback_data,
         fj_run_type_t run_type,
         void * FJ_NULLABLE run_info
+    );
+
+    /** Executes the given commands in the most efficient way.
+        The commands may be executed out of order.
+
+        The executed_list is expected to be the same length as the command list
+        and to be initialised to all false. */
+    fj_err_t (* execute_commands)(
+        void * state,
+        uint32_t command_count,
+        struct fj_command const * commands,
+        fj_bool_t * executed_list
     );
 };
 
