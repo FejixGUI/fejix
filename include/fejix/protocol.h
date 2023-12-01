@@ -38,15 +38,15 @@ enum fj_property_flags {
 
     /** Only regards the GET requests. UPDATE requests are always sync. */
     FJ_PROPERTY_SYNC = (1<<3),
-    /** Only regards the GET requests. UPDATE requests are always sync. */
+    /** Only regards the GET requests. UPDATE requests are always sync.
+        The async requests are generally not obligated to eventually get a
+        response. */
     FJ_PROPERTY_ASYNC = (1<<4),
 };
 
 typedef uint32_t fj_property_listen_flags_t;
 
 enum fj_property_listen_flags {
-    FJ_PROPERTY_LISTEN_IGNORE = 0,
-
     /** Indicates that the client must monitor all the external changes to the
         property if possible.
 
@@ -61,8 +61,6 @@ enum fj_property_listen_flags {
 typedef uint32_t fj_property_request_flags_t;
 
 enum fj_property_request_flags {
-    FJ_PROPERTY_REQUEST_GET = 0,
-
     /** Indicates that the client must update the property with the given value.
 
         If not set, indicates that the client must get the property value
@@ -77,8 +75,6 @@ enum fj_property_request_flags {
         If the property is not gettable and this flag is not specified, the
         requestor function silently ignores the request. */
     FJ_PROPERTY_REQUEST_UPDATE = (1<<0),
-
-    FJ_PROPERTY_REQUEST_ASYNC = 0,
 
     /** Indicates that the response of the request must be handled
         synchronously, awaited and processed immediately.
