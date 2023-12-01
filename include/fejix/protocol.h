@@ -5,11 +5,18 @@
 #include <fejix/base.h>
 
 
-typedef uint32_t fj_run_type_t;
+#define FJ_PROTOCOL_VERSION_MAKE(MAJOR, MINOR) (((MAJOR)<<16)|(MINOR))
+#define FJ_PROTOCOL_VERSION_MAJOR(VERSION) ((VERSION)>>16)
+#define FJ_PROTOCOL_VERSION_MINOR(VERSION) ((VERSION)&0x0000FFFF)
 
-enum fj_run_type {
+
+typedef uint32_t fj_protocol_version_t;
+
+typedef uint32_t fj_invoke_type_t;
+
+enum fj_invoke_type {
     /** Represents most kinds of main program entrypoints. */
-    FJ_RUN_TYPE_MAIN,
+    FJ_INVOKE_TYPE_MAIN,
 };
 
 typedef uint32_t fj_interface_id_t;
@@ -130,7 +137,7 @@ typedef void (fj_property_listener_setter_fn_t)(
 
 
 struct fj_method_call_request {
-    void * argument;
+    void * FJ_NULLABLE argument;
 };
 
 struct fj_property_request {
@@ -171,6 +178,8 @@ struct fj_interface {
 struct fj_protocol {
     fj_string_t name;
 
+    fj_protocol_version_t version;
+
     /** Always greater than 0. */
     uint32_t interface_count;
     /** This array is sorted by interface IDs. */
@@ -184,23 +193,27 @@ struct fj_protocol {
         void * state
     );
 
-    fj_err_t (* run)(
+    void (* set_callback_data)(
         void * state,
-        void * callback_data,
-        fj_run_type_t run_type,
-        void * FJ_NULLABLE run_info
+        void * FJ_NULLABLE callback_data
+    );
+
+    fj_err_t (* invoke)(
+        void * state,
+        fj_invoke_type_t invoke_type,
+        void * FJ_NULLABLE invoke_data
     );
 
     /** Executes the given commands in the most efficient way.
         The commands may be executed out of order.
 
-        The executed_list is expected to be the same length as the command list
-        and to be initialised to all false. */
+        The executed_flags is expected to be the same length as the
+        command list and to be initialised to all false. */
     fj_err_t (* execute_commands)(
         void * state,
         uint32_t command_count,
         struct fj_command const * commands,
-        fj_bool_t * executed_list
+        fj_bool_t * executed_flags
     );
 };
 

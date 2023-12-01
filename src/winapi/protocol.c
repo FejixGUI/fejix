@@ -21,13 +21,14 @@ void (* set_callback_data)(
 
 fj_err_t (* run)(
     void * state,
-    fj_run_type_t run_type,
-    void * FJ_NULLABLE run_info
+    fj_invoke_type_t invoke_type,
+    void * FJ_NULLABLE invoke_data
 );
 
 
 struct fj_protocol const fj_winapi_protocol = {
     .name = FJ_UTF8("winapi"),
+    .version = FJ_PROTOCOL_VERSION_MAKE(0, 1),
 
     .interface_count = 0,
     .interfaces = NULL,
