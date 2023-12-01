@@ -23,25 +23,48 @@ enum fj_interface_id {
 typedef uint32_t fj_property_id_t;
 
 enum fj_property_id {
-    FJ_PID_INIT = 0,
-    FJ_PID_WINDOW_SIZE = (FJ_IID_WINDOW<<16),
+    FJ_PID_PROTOCOL_INIT = (FJ_IID_PROTOCOL<<16),
+    FJ_PID_WINDOW_INIT = (FJ_IID_WINDOW<<16),
+    FJ_PID_WINDOW_SIZE,
     // TODO
 };
 
 typedef uint32_t fj_property_flags_t;
 
 enum fj_property_flags {
-    FJ_PROPERTY_GETTABLE_ASYNC = (1<<0),
-    FJ_PROPERTY_UPDATABLE_ASYNC = (1<<1),
-    FJ_PROPERTY_GETTABLE_SYNC = (1<<2),
-    FJ_PROPERTY_UPDATABLE_SYNC = (1<<3),
-    FJ_PROPERTY_MONITORABLE = (1<<4),
+    FJ_PROPERTY_MONITORABLE = (1<<0),
+    FJ_PROPERTY_UPDATABLE = (1<<1),
+    FJ_PROPERTY_GETTABLE = (1<<2),
+
+    /** Only regards the GET requests. UPDATE requests are always sync. */
+    FJ_PROPERTY_SYNC = (1<<3),
+    /** Only regards the GET requests. UPDATE requests are always sync. */
+    FJ_PROPERTY_ASYNC = (1<<4),
+};
+
+typedef uint32_t fj_property_listen_flags_t;
+
+enum fj_property_listen_flags {
+    FJ_PROPERTY_LISTEN_IGNORE = 0,
+
+    /** Indicates that the client must monitor all the external changes to the
+        property if possible.
+
+        If not set, indicates that the client can ignore the external changes.
+
+        === IF UNSUPPORTED ===
+
+        If the property is not monitorable, this flag gets silently ignored. */
+    FJ_PROPERTY_LISTEN_MONITOR = (1<<0),
 };
 
 typedef uint32_t fj_property_request_flags_t;
 
 enum fj_property_request_flags {
+    FJ_PROPERTY_REQUEST_GET = 0,
+
     /** Indicates that the client must update the property with the given value.
+
         If not set, indicates that the client must get the property value
         and the value argument given to the requestor function must be
         ignored. The value will be received by the property listener callback.
@@ -55,20 +78,16 @@ enum fj_property_request_flags {
         requestor function silently ignores the request. */
     FJ_PROPERTY_REQUEST_UPDATE = (1<<0),
 
-    /** Indicates that the client must monitor all the external changes to the
-        property if possible.
-        If not set, indicates that the client can ignore the external changes.
+    FJ_PROPERTY_REQUEST_ASYNC = 0,
 
-        === DETAILS ===
-
-        A request with this flag must be sent before the property gets the first
-        update event, otherwise this flag may be ignored.
+    /** Indicates that the response of the request must be handled
+        synchronously, awaited and processed immediately.
 
         === IF UNSUPPORTED ===
 
-        If the property is not monitorable, the requestor function silently
-        ignores this flag. */
-    FJ_PROPERTY_REQUEST_MONITOR = (1<<1),
+        If the specified synchronousity is not supported, this flag is ignored.
+        */
+    FJ_PROPERTY_REQUEST_SYNC = (1<<1),
 };
 
 typedef uint32_t fj_property_event_flags_t;
@@ -76,51 +95,58 @@ typedef uint32_t fj_property_event_flags_t;
 enum fj_property_event_flags {
     /** Indicates that the event being handled is a request for an update.
         That is, the property is being updated.
+
         If not set, indicates that the property is not being updated. */
-    FJ_PROPERTY_EVENT_UPDATING = (1<<0),
-
-    /** Indicates that the property has already been updated.
-        If not set, indicates that the event being handled is only a request
-        for an update, not the update itself.
-
-        This flag makes sense only when `FJ_PROPERTY_EVENT_UPDATING` is set. */
-    FJ_PROPERTY_EVENT_UPDATED = (1<<1),
-
-    /** Indicates that the property is updatable by the client.
-        If not set, indicates that update requests sent by the client
-        may be rejected. */
-    FJ_PROPERTY_EVENT_UPDATABLE = (1<<2),
+    FJ_PROPERTY_EVENT_UPDATE = (1<<0),
 };
 
-/** `event_value` can be not the actual value of the property. */
+
+struct fj_property_event {
+    void * state;
+    void * FJ_NULLABLE callback_data;
+    void * object;
+    fj_property_id_t property_id;
+    fj_property_event_flags_t event_flags;
+    /** Does not have to be the property value. */
+    void const * FJ_NULLABLE event_data;
+
+    /** This makes sense only when `FJ_PROPERTY_EVENT_UPDATE` is set.
+
+        If not NULL, indicates that the property update has not been finished
+        yet and that the update can be interrupted by the client in order to
+        change the value that will be actually assigned to the property.
+
+        If NULL, indicates that the update has already been finished and it
+        can be safely assumed that the property already has the specified value.
+        */
+    void * FJ_NULLABLE interrupt_context;
+};
+
 typedef fj_err_t (fj_property_listener_fn_t)(
-    void * state,
-    void * FJ_NULLABLE callback_data,
-    void * object,
-    fj_property_id_t property_id,
-    fj_property_event_flags_t event_flags,
-    void const * FJ_NULLABLE event_value
+    struct fj_property_event * event
 );
 
 typedef void (fj_property_listener_setter_fn_t)(
     void * object,
-    fj_property_listener_fn_t property_listener
+    fj_property_listener_fn_t property_listener,
+    fj_property_listen_flags_t flags
 );
 
 
-struct fj_method_request {
+struct fj_method_call_request {
     void * argument;
 };
 
 struct fj_property_request {
-    void * FJ_NULLABLE object;
-    void * FJ_NULLABLE value;
+    void * object;
+    void * FJ_NULLABLE request_data;
+    void * FJ_NULLABLE interrupt_context;
     fj_property_request_flags_t flags;
 };
 
 union fj_request {
     struct fj_property_request property;
-    struct fj_method_request method;
+    struct fj_method_call_request method;
 };
 
 struct fj_command {
