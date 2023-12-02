@@ -1,6 +1,6 @@
 # Fejix window management library
 
-Fejix is a cross-platform low-level graphical protocols abstraction library.
+Fejix is a cross-platform low-level abstraction library for object-oriented communication protocols of graphical shells.
 Written in C99.
 
 > This library is in early development.
