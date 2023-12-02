@@ -27,6 +27,7 @@ enum fj_property_id {
     FJ_PID_PROTOCOL_CLIENT_ID,
     FJ_PID_WINDOW_INIT = (FJ_IID_WINDOW<<16),
     FJ_PID_WINDOW_SIZE,
+    FJ_PID_WINDOW_TITLE,
     // TODO
 };
 
@@ -35,21 +36,22 @@ typedef uint32_t fj_property_flags_t;
 enum fj_property_flags {
     FJ_PROPERTY_MONITORABLE = (1<<0),
     FJ_PROPERTY_UPDATABLE = (1<<1),
-    FJ_PROPERTY_GETTABLE = (1<<2),
+    FJ_PROPERTY_RETRIEVABLE = (1<<2),
 
-    /** Only regards the GET requests. UPDATE requests are always sync. */
+    /** Only regards the RETRIEVE requests. UPDATE requests are always SYNC. */
     FJ_PROPERTY_SYNC = (1<<3),
-    /** Only regards the GET requests. UPDATE requests are always sync.
-        The async requests are generally not obligated to eventually get a
-        response. */
-    FJ_PROPERTY_ASYNC = (1<<4),
 };
 
 typedef uint32_t fj_property_listen_flags_t;
 
 enum fj_property_listen_flags {
-    /** Indicates that the client must monitor all the external changes to the
-        property if possible.
+    /** Specifies if the client should monitor the external changes to the
+        property.
+
+        If set, indicates that the client must monitor all the external
+        changes to the property if possible.
+        Note that this is more of a hint and generally there is no guarantee
+        that *any* changes will be monitored.
 
         If not set, indicates that the client can ignore the external changes.
 
@@ -62,38 +64,58 @@ enum fj_property_listen_flags {
 typedef uint32_t fj_property_request_flags_t;
 
 enum fj_property_request_flags {
-    /** Indicates that the client must update the property with the given value.
+    /** Specifies the type of the request.
 
-        If not set, indicates that the client must get the property value
-        and the value argument given to the requestor function must be
-        ignored. The value will be received by the property listener callback.
+        If set, indicates that this is an UPDATE request.
+        That is, that the client must update the property with the given value.
+
+        If not set, indicates that this is a RETRIEVE request.
+        That is, the client must retrieve the property value.
+        The request data given to the requestor function is ignored.
+        The value will be received by the property listener function.
 
         === IF UNSUPPORTED ===
 
-        If the property is not updatable and this flag is specified, the
-        requestor function silently ignores the request.
-
-        If the property is not gettable and this flag is not specified, the
-        requestor function silently ignores the request. */
+        If the specified action is unsupported, the request is ignored. */
     FJ_PROPERTY_REQUEST_UPDATE = (1<<0),
 
-    /** Indicates that the response of the request must be handled
-        synchronously, awaited and processed immediately.
+    /** Specifies the synchronousity of the RETRIEVE request.
+        All UPDATE requests are SYNC anyway, so this flag is ignored for them.
+
+        If set, indicates that the request must be SYNC (synchrounous).
+        That is, the response must be awaited and processed immediately,
+        before the command execution finishes.
+
+        If no set, indicates that the request may be ASYNC (asynchronous).
+        That is, the response does not have to be awaited, so it may be
+        received some time in the future.
+
+        === NOTES ===
+
+        Generally there is no guarantee that ASYNC requests finish.
+        That is, the client may eventually never receive the response of
+        an ASYNC request.
 
         === IF UNSUPPORTED ===
 
-        If the specified synchronousity is not supported, this flag is ignored.
-        */
+        If the specified synchronousity is unsupported, this flag is ignored
+        and the RETRIEVE request proceeds with the supported synchronousity.
+
+        If the RETRIEVE action is unsupported, the request is ignored. */
     FJ_PROPERTY_REQUEST_SYNC = (1<<1),
 };
 
 typedef uint32_t fj_property_event_flags_t;
 
 enum fj_property_event_flags {
-    /** Indicates that the event being handled is a request for an update.
-        That is, the property is being updated.
+    /** Specifies the type of the request that produced the event.
 
-        If not set, indicates that the property is not being updated. */
+        If set, indicates that the event was produced by the UPDATE request.
+        That is, either the client or the shell have updated the property value.
+
+        If not set, indicates that the event was produced by the RETRIEVE
+        request. That is, the client has executed a request to retrieve the
+        property value. */
     FJ_PROPERTY_EVENT_UPDATE = (1<<0),
 };
 
@@ -103,7 +125,9 @@ struct fj_property_event {
     void * FJ_NULLABLE callback_data;
     void * object;
     fj_property_id_t property_id;
+
     fj_property_event_flags_t event_flags;
+
     /** Does not have to be the property value. */
     void const * FJ_NULLABLE event_data;
 
@@ -115,7 +139,13 @@ struct fj_property_event {
 
         If NULL, indicates that the update has already been finished and it
         can be safely assumed that the property already has the specified value.
-        */
+
+        === USAGE ===
+
+        To interrupt a request, the client must execute an UPDATE request
+        with the interrupt context inside the property listener during the
+        interruptable UDPATE event.
+        Such requests are also called UPDATE/INTERRUPT. */
     void * FJ_NULLABLE interrupt_context;
 };
 
@@ -130,25 +160,32 @@ typedef void (fj_property_listener_setter_fn_t)(
 );
 
 
-struct fj_method_call_request {
-    void * FJ_NULLABLE argument;
-};
-
-struct fj_property_request {
-    void * object;
-    void * FJ_NULLABLE request_data;
-    void * FJ_NULLABLE interrupt_context;
-    fj_property_request_flags_t flags;
-};
-
-union fj_request {
-    struct fj_property_request property;
-    struct fj_method_call_request method;
-};
-
 struct fj_command {
     void const * requestor;
-    union fj_request request;
+
+    union fj_request {
+        /** Produces a request to the property.
+
+        === USAGE ===
+
+        For RETRIEVE or UPDATE requests this must be used *outside* the
+        property listener, or otherwise the behavior is undefined
+        Sometimes, this may result in infinite recursion.
+
+        For UPDATE/INTERRUPT requests this must be used *inside* the property
+        listener. */
+        struct fj_property_request {
+            void * object;
+            void * FJ_NULLABLE request_data;
+            void * FJ_NULLABLE interrupt_context;
+            fj_property_request_flags_t flags;
+        } property;
+
+        /** Produces a method call. */
+        struct fj_method_call_request {
+            void * FJ_NULLABLE argument;
+        } method;
+    } request;
 };
 
 struct fj_property {
