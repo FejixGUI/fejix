@@ -28,7 +28,7 @@ fj_err_t (* run)(
 
 struct fj_protocol const fj_winapi_protocol = {
     .name = FJ_UTF8("winapi"),
-    .version = FJ_PROTOCOL_VERSION_MAKE(0, 1),
+    .version = FJ_VERSION(0, 1),
 
     .interface_count = 0,
     .interfaces = NULL,

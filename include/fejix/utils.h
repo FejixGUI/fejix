@@ -5,6 +5,8 @@
 #include <fejix/base.h>
 
 
+/* Idea of a static version check.
+
 #ifdef NDEBUG
 #   define FJ_PROVIDE_VERSION(NAME, VERSION)
 #   define FJ_REQUIRE_VERSION(NAME, VERSION)
@@ -14,6 +16,7 @@
 #   define FJ_REQUIRE_VERSION(NAME, VERSION) \
         FJ_VERSION_##VERSION##_##NAME _fj_version_guard(void);
 #endif
+*/
 
 #ifdef NDEBUG
 #   define FJ_UNUSED(X) (void) X;
@@ -47,6 +50,7 @@
 
 /** Formats the given error message. `TEXT` must be a string literal. */
 #define FJ_ERR(TEXT_LITERAL) FJ_UTF8(FJ_UTIL_ERROR_TITLE TEXT_LITERAL)
+
 
 uint32_t fj_u32_max(uint32_t a, uint32_t b);
 

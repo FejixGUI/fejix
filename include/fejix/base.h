@@ -25,6 +25,22 @@
     string. */
 #define FJ_UTF8(STRING_LITERAL) ((fj_string_t)(STRING_LITERAL))
 
+/** Makes a version number from two unsigned integers (max is UINT16_MAX). */
+#define FJ_VERSION(MAJOR, MINOR) \
+    ((((fj_version_t)(MAJOR)) << 16) | ((fj_version_t)(MINOR)))
+
+/** Gets the major component of the version. */
+#define FJ_VERSION_MAJOR(VERSION) ((VERSION) >> 16)
+
+/** Gets the minor component of the version. */
+#define FJ_VERSION_MINOR(VERSION) ((VERSION) & 0x0000FFFF)
+
+/** Represents a MAJOR.MINOR tuple.
+    The higher half contains the major component.
+    The lower half contains the minor component.
+    Therefore, it is safe to compare versions as normal numbers. */
+typedef uint32_t fj_version_t;
+
 /** Integer numeric type of a fixed size. This is a replacement of `_Bool`,
     which has no specificly defined size.
 

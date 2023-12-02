@@ -5,13 +5,6 @@
 #include <fejix/base.h>
 
 
-#define FJ_PROTOCOL_VERSION_MAKE(MAJOR, MINOR) (((MAJOR)<<16)|(MINOR))
-#define FJ_PROTOCOL_VERSION_MAJOR(VERSION) ((VERSION)>>16)
-#define FJ_PROTOCOL_VERSION_MINOR(VERSION) ((VERSION)&0x0000FFFF)
-
-
-typedef uint32_t fj_protocol_version_t;
-
 typedef uint32_t fj_invoke_type_t;
 
 enum fj_invoke_type {
@@ -31,6 +24,7 @@ typedef uint32_t fj_property_id_t;
 
 enum fj_property_id {
     FJ_PID_PROTOCOL_INIT = (FJ_IID_PROTOCOL<<16),
+    FJ_PID_PROTOCOL_CLIENT_ID,
     FJ_PID_WINDOW_INIT = (FJ_IID_WINDOW<<16),
     FJ_PID_WINDOW_SIZE,
     // TODO
@@ -176,9 +170,11 @@ struct fj_interface {
 };
 
 struct fj_protocol {
+    /** Maximum length of a protocol name is 64 bytes, including the null
+        terminator. */
     fj_string_t name;
 
-    fj_protocol_version_t version;
+    fj_version_t version;
 
     /** Always greater than 0. */
     uint32_t interface_count;
@@ -193,13 +189,9 @@ struct fj_protocol {
         void * state
     );
 
-    void (* set_callback_data)(
-        void * state,
-        void * FJ_NULLABLE callback_data
-    );
-
     fj_err_t (* invoke)(
         void * state,
+        void * FJ_NULLABLE callback_data,
         fj_invoke_type_t invoke_type,
         void * FJ_NULLABLE invoke_data
     );
