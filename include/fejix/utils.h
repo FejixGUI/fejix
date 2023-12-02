@@ -30,7 +30,7 @@
 #define FJ_STRINGIFY(ARG) FJ_STRINGIFY_IMPL(ARG)
 #define FJ_STRINGIFY_IMPL(ARG) #ARG
 
-#define FJ_INIT_ERRORS fj_err_t _fj_err = FJ_OK;
+#define FJ_INIT_ERRORS fj_err_t _fj_err = FJ_OK; (void) _fj_err;
 #define FJ_TRY _fj_err =
 #define FJ_LAST_ERROR (_fj_err)
 #define FJ_FAILED (_fj_err != FJ_OK)
