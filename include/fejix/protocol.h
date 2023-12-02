@@ -76,11 +76,10 @@ enum fj_property_request_flags {
 
         === IF UNSUPPORTED ===
 
-        If the specified action is unsupported, the request is ignored. */
+        If the specified action is unsupported, the request fails. */
     FJ_PROPERTY_REQUEST_UPDATE = (1<<0),
 
     /** Specifies the synchronousity of the RETRIEVE request.
-        All UPDATE requests are SYNC anyway, so this flag is ignored for them.
 
         If set, indicates that the request must be SYNC (synchrounous).
         That is, the response must be awaited and processed immediately,
@@ -98,10 +97,10 @@ enum fj_property_request_flags {
 
         === IF UNSUPPORTED ===
 
-        If the specified synchronousity is unsupported, this flag is ignored
-        and the RETRIEVE request proceeds with the supported synchronousity.
+        All UPDATE requests are SYNC anyway, so this flag is ignored for them.
 
-        If the RETRIEVE action is unsupported, the request is ignored. */
+        If the specified synchronousity is unsupported, this flag is ignored
+        and the RETRIEVE request proceeds with the supported synchronousity. */
     FJ_PROPERTY_REQUEST_SYNC = (1<<1),
 };
 
@@ -191,7 +190,7 @@ struct fj_command {
 struct fj_property {
     fj_property_id_t id;
     fj_property_flags_t flags;
-    void const * FJ_NULLABLE requestor;
+    void const * requestor;
     fj_property_listener_setter_fn_t * set_listener;
 };
 
@@ -203,7 +202,7 @@ struct fj_interface {
     /** This array is sorted by property IDs. */
     struct fj_property const * FJ_NULLABLE FJ_ARRAY properties;
 
-    void const * methods;
+    void const * FJ_NULLABLE methods;
 };
 
 struct fj_protocol {
@@ -236,8 +235,12 @@ struct fj_protocol {
     /** Executes the given commands in the most efficient way.
         The commands may be executed out of order.
 
-        The executed_flags is expected to be the same length as the
-        command list and to be initialised to all false. */
+        === ARGS ===
+
+        - `executed_flags` - an array of boolean flags, each one indicates if
+            the corresponding command in the `commands` array has been executed.
+            This must be the same length as `commands` and must be
+            initialised to all false. */
     fj_err_t (* execute_commands)(
         void * state,
         uint32_t command_count,

@@ -5,16 +5,16 @@
 #include <fejix/base.h>
 
 
-/* Idea of a static version check.
+/* Idea of a per-object static version check.
 
 #ifdef NDEBUG
 #   define FJ_PROVIDE_VERSION(NAME, VERSION)
 #   define FJ_REQUIRE_VERSION(NAME, VERSION)
 #else
 #   define FJ_PROVIDE_VERSION(NAME, VERSION) \
-        typedef void FJ_VERSION_##VERSION##_##NAME;
+        typedef void (FJ_VERSION_##VERSION##_##NAME)(void);
 #   define FJ_REQUIRE_VERSION(NAME, VERSION) \
-        FJ_VERSION_##VERSION##_##NAME _fj_version_guard(void);
+        FJ_VERSION_##VERSION##_##NAME _fj_version_guard;
 #endif
 */
 
