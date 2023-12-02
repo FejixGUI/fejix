@@ -148,9 +148,7 @@ struct fj_property_event {
     void * FJ_NULLABLE interrupt_context;
 };
 
-typedef fj_err_t (fj_property_listener_fn_t)(
-    struct fj_property_event * event
-);
+typedef fj_err_t (fj_property_listener_fn_t)(struct fj_property_event * event);
 
 typedef void (fj_property_listener_setter_fn_t)(
     void * object,
@@ -217,13 +215,9 @@ struct fj_protocol {
     /** This array is sorted by interface IDs. */
     struct fj_interface const * const * FJ_ARRAY interfaces;
 
-    fj_err_t (* create_state)(
-        void * FJ_NULLABLE FJ_OUT * state
-    );
+    fj_err_t (* create_state)(void * FJ_NULLABLE FJ_OUT * state);
 
-    void (* destroy_state)(
-        void * state
-    );
+    void (* destroy_state)(void * state);
 
     fj_err_t (* invoke)(
         void * state,
