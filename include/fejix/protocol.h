@@ -14,20 +14,25 @@ enum fj_invoke_type {
 
 typedef uint32_t fj_interface_id_t;
 
+/** `INT` means "interface". */
 enum fj_interface_id {
-    FJ_IID_PROTOCOL = 1,
-    FJ_IID_WINDOW,
+    FJ_PROTOCOL_INT = 1,
+    FJ_WINDOW_INT,
     // TODO
 };
 
 typedef uint32_t fj_property_id_t;
 
+/** `INT` means that the property belongs to the interface itself, not the
+    object of the interface. Such properties may be called `static` in terms
+    of object-oriented programming. */
 enum fj_property_id {
-    FJ_PID_PROTOCOL_INIT = (FJ_IID_PROTOCOL<<16),
-    FJ_PID_PROTOCOL_CLIENT_ID,
-    FJ_PID_WINDOW_INIT = (FJ_IID_WINDOW<<16),
-    FJ_PID_WINDOW_SIZE,
-    FJ_PID_WINDOW_TITLE,
+    FJ_PROTOCOL_INT_INIT = (FJ_PROTOCOL_INT<<16),
+    FJ_PROTOCOL_INT_CLIENT_ID,
+    FJ_WINDOW_INT_INIT = (FJ_WINDOW_INT<<16),
+    FJ_WINDOW_INIT,
+    FJ_WINDOW_SIZE,
+    FJ_WINDOW_TITLE,
     // TODO
 };
 
