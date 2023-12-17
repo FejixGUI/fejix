@@ -134,6 +134,17 @@ _emphasis_
     Continuing the previous two guidelines, we first write types and then
     access specifiers.
 
+## Annotating functions
+
+* Write `static` on its own line:
+    ```c
+    static
+    void f(void)
+    {
+        // ...
+    }
+    ```
+
 ## More
 
 Use Fejix base types, memory allocation and error handling.

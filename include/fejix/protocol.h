@@ -226,9 +226,9 @@ struct fj_protocol {
 
     fj_err_t (* invoke)(
         void * state,
-        void * FJ_NULLABLE callback_data,
         fj_invoke_type_t invoke_type,
-        void * FJ_NULLABLE invoke_data
+        void * FJ_NULLABLE invoke_data,
+        void * FJ_NULLABLE callback_data
     );
 
     /** Executes the given commands in the most efficient way.

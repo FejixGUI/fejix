@@ -6,8 +6,9 @@
 
 
 typedef fj_err_t (fj_user_loader_fn_t)(
+    void * state,
     struct fj_protocol const * protocol,
-    void * state
+    void * FJ_OUT * callback_data
 );
 
 

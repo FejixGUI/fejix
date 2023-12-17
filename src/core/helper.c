@@ -5,8 +5,11 @@
 #include <stdio.h>
 
 
-static uint32_t _argc;
-static fj_string_t const * FJ_ARRAY _argv;
+static
+uint32_t _argc;
+
+static
+fj_string_t const * FJ_ARRAY _argv;
 
 
 void fj_helper_get_process_args(
@@ -59,9 +62,10 @@ fj_string_t FJ_NULLABLE fj_helper_get_protocol_hint(void)
 }
 
 
-static struct fj_protocol const * FJ_NULLABLE find_protocol(
+static
+struct fj_protocol const * FJ_NULLABLE find_protocol(
     fj_string_t protocol_hint,
-    struct fj_protocol const * const * protocols,
+    struct fj_protocol const * const * FJ_ARRAY protocols,
     uint32_t protocol_count
 )
 {
@@ -75,7 +79,8 @@ static struct fj_protocol const * FJ_NULLABLE find_protocol(
 }
 
 
-static void print_protocols(
+static
+void print_protocols(
     struct fj_protocol const * const * protocols,
     uint32_t protocol_count
 )
@@ -95,7 +100,8 @@ static void print_protocols(
 
 
 /** Returns NULL on failure. Prints error to stderr. */
-static struct fj_protocol const * FJ_NULLABLE get_protocol(void)
+static
+struct fj_protocol const * FJ_NULLABLE get_protocol(void)
 {
     struct fj_protocol const * const * protocols;
     uint32_t protocol_count;
@@ -123,22 +129,26 @@ static struct fj_protocol const * FJ_NULLABLE get_protocol(void)
 }
 
 
+static
 fj_err_t protocol_main_run(struct fj_protocol const * protocol, void * state)
 {
     FJ_INIT_ERRORS
 
-    FJ_TRY fj_user_load(protocol, state);
+    void * callback_data = NULL;
+
+    FJ_TRY fj_user_load(state, protocol, &callback_data);
 
     if (FJ_FAILED) {
         return FJ_LAST_ERROR;
     }
 
-    FJ_TRY protocol->run(state, FJ_RUN_TYPE_MAIN, NULL);
+    FJ_TRY protocol->invoke(state, FJ_INVOKE_TYPE_MAIN, NULL, callback_data);
 
     return FJ_LAST_ERROR;
 }
 
 
+static
 fj_err_t protocol_main(struct fj_protocol const * protocol)
 {
     FJ_INIT_ERRORS

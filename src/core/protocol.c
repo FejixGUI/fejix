@@ -2,24 +2,46 @@
 #include <fejix/utils.h>
 
 
-#define LINK_PROTOCOL(NAME) extern struct fj_protocol const NAME;
-#define USE_PROTOCOL(NAME) &NAME,
-
-
+#ifdef FJ_OPT_ANDK
+    extern struct fj_protocol const fj_andk_protocol;
+#endif
+#ifdef FJ_OPT_COCOA
+    extern struct fj_protocol const fj_cocoa_protocol;
+#endif
+#ifdef FJ_OPT_UIKIT
+    extern struct fj_protocol const fj_uikit_protocol;
+#endif
+#ifdef FJ_OPT_WAYLAND
+    extern struct fj_protocol const fj_wayland_protocol;
+#endif
 #ifdef FJ_OPT_WINAPI
-    LINK_PROTOCOL(fj_winapi_protocol)
+    extern struct fj_protocol const fj_winapi_protocol;
 #endif
 #ifdef FJ_OPT_X11
-    LINK_PROTOCOL(fj_x11_protocol)
+    extern struct fj_protocol const fj_x11_protocol;
 #endif
 
-static struct fj_protocol const * const _protocols[] = {
 
+static
+struct fj_protocol const * const _protocols[] = {
+
+#ifdef FJ_OPT_ANDK
+    &fj_andk_protocol,
+#endif
+#ifdef FJ_OPT_COCOA
+    &fj_cocoa_protocol,
+#endif
+#ifdef FJ_OPT_UIKIT
+    &fj_uikit_protocol,
+#endif
+#ifdef FJ_OPT_WAYLAND
+    &fj_wayland_protocol,
+#endif
 #ifdef FJ_OPT_WINAPI
-    USE_PROTOCOL(fj_winapi_protocol)
+    &fj_winapi_protocol,
 #endif
 #ifdef FJ_OPT_X11
-    USE_PROTOCOL(fj_x11_protocol)
+    &fj_x11_protocol,
 #endif
 
 };
