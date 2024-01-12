@@ -35,6 +35,7 @@
 /** Gets the minor component of the version. */
 #define FJ_VERSION_MINOR(VERSION) ((VERSION) & 0x0000FFFF)
 
+
 /** Represents a MAJOR.MINOR tuple.
     The higher half contains the major component.
     The lower half contains the minor component.
@@ -51,7 +52,7 @@ typedef uint32_t fj_version_t;
     === CAUTION ===
 
     This is a numeric type. Therefore, `(fj_bool_t) 0.5 == false` while
-    `(bool) 0.5 == true`. */
+    `(bool) 0.5 == true`. Never convert arbitrary objects to booleans. */
 typedef uint8_t fj_bool_t;
 
 /* UTF-8 null-terminated string. */

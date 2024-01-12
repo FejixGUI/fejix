@@ -46,10 +46,10 @@
 
 #define FJ_UTIL_LINE FJ_STRINGIFY(__LINE__)
 
-#define FJ_UTIL_ERROR_TITLE "[" FJ_UTIL_FILENAME ":" FJ_UTIL_LINE "] "
+#define FJ_UTIL_ERROR_HEADER "[" FJ_UTIL_FILENAME ":" FJ_UTIL_LINE "] "
 
 /** Formats the given error message. `TEXT` must be a string literal. */
-#define FJ_ERR(TEXT_LITERAL) FJ_UTF8(FJ_UTIL_ERROR_TITLE TEXT_LITERAL)
+#define FJ_ERR(TEXT_LITERAL) FJ_UTF8(FJ_UTIL_ERROR_HEADER TEXT_LITERAL)
 
 
 uint32_t fj_u32_max(uint32_t a, uint32_t b);

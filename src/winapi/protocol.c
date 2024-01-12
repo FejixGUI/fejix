@@ -117,7 +117,7 @@ fj_err_t execute_commands(
 }
 
 
-struct fj_protocol const fj_winapi_protocol = {
+struct fj_bus const fj_winapi_bus = {
     .name = FJ_UTF8("winapi"),
     .version = FJ_VERSION(0, 1),
 

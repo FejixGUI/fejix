@@ -7,8 +7,8 @@ target_sources(
     fejix PRIVATE
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
-    "${FEJIX_SRC}/core/protocol.c"
-    "${FEJIX_SRC}/core/helper.c"
+    "${FEJIX_SRC}/core/bus.c"
+    "${FEJIX_SRC}/core/ext.c"
 )
 
 
