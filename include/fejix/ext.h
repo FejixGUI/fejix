@@ -47,7 +47,10 @@ struct fj_bus const * FJ_NULLABLE fj_ext_get_bus(
 
     === RETURNS ===
 
-    Returns 0 on success or -1 on failure. */
+    Returns:
+    - `0` on success
+    - `-1` if fails to find the appropriate bus
+    - `-2` if fails to run the program. */
 int32_t fj_ext_main(void);
 
 

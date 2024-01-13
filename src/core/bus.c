@@ -23,7 +23,7 @@
 
 
 static
-struct fj_bus const * const _buses[] = {
+struct fj_bus const * const bus_list[] = {
 
 #ifdef FJ_OPT_ANDK
     &fj_andk_bus,
@@ -52,8 +52,8 @@ void fj_get_buses(
     struct fj_bus const * const * FJ_ARRAY FJ_OUT * buses
 )
 {
-    *bus_count = FJ_ARRLEN(_buses);
-    *buses = _buses;
+    *bus_count = FJ_ARRLEN(bus_list);
+    *buses = bus_list;
 }
 
 

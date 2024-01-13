@@ -6,10 +6,20 @@
 
 
 static
-uint32_t _argc;
+uint32_t global_argc;
 
 static
-fj_string_t const * FJ_ARRAY _argv;
+fj_string_t const * FJ_ARRAY global_argv;
+
+static
+fj_string_t bus_names[] = {
+    FJ_UTF8("andk"),
+    FJ_UTF8("cocoa"),
+    FJ_UTF8("uikit"),
+    FJ_UTF8("wayland"),
+    FJ_UTF8("winapi"),
+    FJ_UTF8("x11"),
+};
 
 
 void fj_ext_get_process_args(
@@ -17,8 +27,8 @@ void fj_ext_get_process_args(
     fj_string_t const * FJ_ARRAY FJ_OUT * argv
 )
 {
-    *argc = _argc;
-    *argv = _argv;
+    *argc = global_argc;
+    *argv = global_argv;
 }
 
 
@@ -27,8 +37,8 @@ void fj_ext_set_process_args(
     fj_string_t const * FJ_ARRAY argv
 )
 {
-    _argc = argc;
-    _argv = argv;
+    global_argc = argc;
+    global_argv = argv;
 }
 
 
@@ -56,13 +66,7 @@ fj_string_t FJ_NULLABLE fj_ext_get_bus_name_hint(void)
 
 fj_string_t fj_ext_get_bus_name(fj_bus_id_t bus_id)
 {
-    static
-    fj_string_t names[] = {
-        FJ_UTF8("andk"), FJ_UTF8("cocoa"), FJ_UTF8("uikit"),
-        FJ_UTF8("wayland"), FJ_UTF8("winapi"), FJ_UTF8("x11"),
-    };
-
-    return names[bus_id];
+    return bus_names[bus_id];
 }
 
 
@@ -209,7 +213,7 @@ int32_t fj_ext_main(void)
     fj_err_t err = run_bus_or_print_error(bus);
 
     if (err != FJ_OK) {
-        return -1;
+        return -2;
     }
 
     return 0;

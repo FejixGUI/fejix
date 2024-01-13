@@ -19,7 +19,7 @@ enum fj_bus_id {
     FJ_BUS_WAYLAND,
     /** Windows API */
     FJ_BUS_WINAPI,
-    /** X11 protocol for the Xorg server */
+    /** X11 protocol */
     FJ_BUS_X11,
 };
 
@@ -47,7 +47,7 @@ enum fj_bus_message_id {
 struct fj_message {
     fj_socket_id_t socket_id;
     fj_message_id_t message;
-    void const * message_transport;
+    struct fj_socket const * socket;
     void * socket_context;
     void * device_context;
     void * message_data;
@@ -63,7 +63,18 @@ typedef fj_err_t (fj_bus_listener_t)(
 struct fj_socket {
     fj_socket_id_t id;
     void const * methods;
-    void const * message_transport;
+    void const * static_data;
+
+    fj_err_t (* open)(
+        void * bus_context,
+        void * extra_info,
+        void FJ_OUT * socket_context
+    );
+
+    void (* close)(
+        void * bus_context,
+        void * socket_context
+    );
     //TODO
 };
 

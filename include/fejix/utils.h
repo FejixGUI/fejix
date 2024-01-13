@@ -5,6 +5,20 @@
 #include <fejix/base.h>
 
 
+#ifdef UINT64_MAX
+#   define FJ_HAS_UINT64
+#endif
+
+#ifdef UINTPTR_MAX
+#   define FJ_HAS_UINTPTR
+#endif
+
+
+#ifndef FJ_HAS_UINTPTR
+#   error Fejix requires uintptr_t to exist
+#endif
+
+
 /* Idea of a per-object static version check.
 
 #ifdef NDEBUG
@@ -52,9 +66,20 @@
 #define FJ_ERR(TEXT_LITERAL) FJ_UTF8(FJ_UTIL_ERROR_HEADER TEXT_LITERAL)
 
 
-uint32_t fj_u32_max(uint32_t a, uint32_t b);
+/** Double-evaluates the arguments. */
+#define FJ_MIN(A, B) (((A) < (B)) ? (A) : (B))
 
-uint32_t fj_u32_min(uint32_t a, uint32_t b);
+/** Double-evaluates the arguments. */
+#define FJ_MAX(A, B) (((A) > (B)) ? (A) : (B))
+
+
+uint32_t fj_uint32_hash32(uint32_t x);
+
+#ifdef FJ_HAS_UINT64
+    uint32_t fj_uint64_hash32(uint64_t x);
+#endif
+
+uint32_t fj_uintptr_hash32(uintptr_t x);
 
 /** Accepts NULL as arguments. `NULL==NULL`, but `NULL!=""` */
 fj_bool_t fj_str_eq(fj_string_t FJ_NULLABLE a, fj_string_t FJ_NULLABLE b);
