@@ -5,6 +5,8 @@ target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 # Fejix core
 target_sources(
     fejix PRIVATE
+    "${FEJIX_SRC}/core/vec.c"
+    "${FEJIX_SRC}/core/map.c"
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/utils.c"
     "${FEJIX_SRC}/core/bus.c"
@@ -15,7 +17,6 @@ target_sources(
 if(FJ_OPT_WINAPI)
     target_sources(
         fejix PRIVATE
-        "${FEJIX_SRC}/winapi/protocol.c"
         "${FEJIX_SRC}/winapi/utils.c"
     )
 endif()

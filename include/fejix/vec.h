@@ -7,7 +7,7 @@
 
 /* Converts the pointer to the items from an untyped pointer to a types pointer.
     This is intended to be a faster way to access the items. */
-#define FJ_VEC_OF(VEC, TYPE) (((TYPE) *) (VEC)->items)
+#define FJ_VEC_OF(VEC, TYPE) ((TYPE *) (VEC)->items)
 
 #define FJ_VEC_LAST_INDEX(VEC) ((VEC)->length - 1)
 

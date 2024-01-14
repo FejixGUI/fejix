@@ -149,7 +149,7 @@ void fj_vec_copy_items(
     uint32_t item_count
 )
 {
-    uint8_t * destination = (uint8_t *) vec->items + destination_index;
+    uint8_t * destination = fj_vec_offset(vec, destination_index);
     size_t copy_size = item_count * vec->item_size;
     memcpy(destination, items, copy_size);
 }
