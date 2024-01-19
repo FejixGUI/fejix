@@ -48,7 +48,21 @@ uint32_t vec_get_capacity_to_shrink(struct fj_vec * vec)
 static
 fj_err_t vec_set_capacity(struct fj_vec * vec, uint32_t capacity)
 {
-    return fj_realloc_uninit(&vec->items, capacity, vec->item_size);
+    FJ_INIT_ERRORS
+
+    if (vec->capacity == capacity) {
+        return FJ_OK;
+    }
+
+    FJ_TRY fj_realloc_uninit(&vec->items, capacity, vec->item_size);
+
+    if (FJ_FAILED) {
+        return FJ_LAST_ERROR;
+    }
+
+    vec->capacity = capacity;
+
+    return FJ_OK;
 }
 
 
@@ -99,27 +113,6 @@ void shift_items_to_shrink(
     uint32_t item_move_count = vec->length - source_index;
     memmove(dst, src, item_move_count * vec->item_size);
 }
-
-
-/*
-static
-fj_err_t vec_copy(struct fj_vec * dst, struct fj_vec * src)
-{
-    FJ_INIT_ERRORS
-
-    FJ_TRY fj_vec_ensure_capacity(dst, src->capacity);
-
-    if (FJ_FAILED) {
-        return FJ_LAST_ERROR;
-    }
-
-    dst->length = src->length;
-
-    size_t copy_size = src->length * src->item_size;
-    memcpy(dst->items, src->items, copy_size);
-
-    return FJ_OK;
-}*/
 
 
 void fj_vec_init(struct fj_vec * vec, size_t item_size)
