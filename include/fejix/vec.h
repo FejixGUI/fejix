@@ -157,15 +157,4 @@ uint32_t fj_vec_find(
 );
 
 
-void fj_vec_sort(
-    struct fj_vec * vec,
-    fj_vec_item_compararator_fn_t predicate
-);
-
-uint32_t fj_vec_binsearch(
-    struct fj_vec * vec,
-    fj_vec_item_compararator_fn_t predicate
-);
-
-
 #endif

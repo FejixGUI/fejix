@@ -35,10 +35,17 @@ fj_err_t fj_map_init(struct fj_map * map);
 void fj_map_deinit(struct fj_map * map);
 
 /** Removes the element if `value` is NULL. */
-fj_err_t fj_map_set(struct fj_map * map, uintptr_t key, void * value);
+fj_err_t fj_map_set(
+    struct fj_map * map,
+    uintptr_t key,
+    void * FJ_NULLABLE value
+);
 
 /** Returns NULL if the element was not found. */
-void * FJ_NULLABLE fj_map_get(struct fj_map const * map, uintptr_t key);
+void * FJ_NULLABLE fj_map_get(
+    struct fj_map const * map,
+    uintptr_t key
+);
 
 /** Modifying the map while iterating over it is undefined behavior. */
 void fj_map_foreach(

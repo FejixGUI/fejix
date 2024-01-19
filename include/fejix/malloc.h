@@ -5,10 +5,6 @@
 #include <fejix/base.h>
 
 
-/** Example: `FJ_ERR(FJ_MALLOC_FAILED)` */
-#define FJ_MALLOC_FAILED "memory allocation failed"
-
-
 /** Allocates an uninitialized block of memory.
     Works like `malloc`, but allocating 0 bytes is always an error.
     When this fails, sets `ptr` to NULL. */

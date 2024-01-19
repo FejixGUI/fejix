@@ -15,7 +15,7 @@ fj_err_t fj_alloc_uninit(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
     *ptr = malloc(size);
 
     if (*ptr == NULL) {
-        return FJ_ERR(FJ_MALLOC_FAILED);
+        return FJ_ERR("memory allocation failed");
     }
 
     return FJ_OK;
@@ -32,7 +32,7 @@ fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
     *ptr = calloc(1, size);
 
     if (*ptr == NULL) {
-        return FJ_ERR(FJ_MALLOC_FAILED);
+        return FJ_ERR("memory allocation failed");
     }
 
     return FJ_OK;
@@ -69,7 +69,7 @@ fj_err_t fj_realloc_uninit(
     void * new_ptr = realloc(*ptr, size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR(FJ_MALLOC_FAILED);
+        return FJ_ERR("memory reallocation failed");
     }
 
     *ptr = new_ptr;
@@ -104,7 +104,7 @@ fj_err_t fj_realloc_zeroed(
     void * new_ptr = realloc(old_ptr, new_size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR(FJ_MALLOC_FAILED);
+        return FJ_ERR("memory reallocation failed");
     }
 
     if (new_size > old_size) {
