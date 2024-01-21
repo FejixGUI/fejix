@@ -7,17 +7,17 @@
 
 /* Converts the pointer to the items from an untyped pointer to a types pointer.
     This is intended to be a faster way to access the items. */
-#define FJ_VEC_OF(VEC, TYPE) ((TYPE *) (VEC)->items)
+#define FJ_VEC_OF(VEC, TYPE) ((TYPE *) (VEC).items)
 
-#define FJ_VEC_LAST_INDEX(VEC) ((VEC)->length - 1)
+#define FJ_VEC_LAST_INDEX(VEC) ((VEC).length - 1)
 
 /** Evaluates to the index at which the insertion becomes pushing,
     i.e. no items should be shifted. */
-#define FJ_VEC_PUSH_INDEX(VEC) ((VEC)->length)
+#define FJ_VEC_PUSH_INDEX(VEC) ((VEC).length)
 
-#define FJ_VEC_IS_EMPTY(VEC) ((VEC)->length == 0)
+#define FJ_VEC_IS_EMPTY(VEC) ((VEC).length == 0)
 
-#define FJ_VEC_HOLDS_ITEMS(VEC) ((VEC)->items != NULL)
+#define FJ_VEC_HAS_ALLOCATED(VEC) ((VEC).items != NULL)
 
 
 typedef fj_bool_t (* fj_vec_item_compararator_fn_t)(void * a, void * b);
@@ -30,7 +30,7 @@ struct fj_vec {
     /* Number of currently allocated elements */
     uint32_t capacity;
     size_t item_size;
-    void * FJ_ARRAY items;
+    void * FJ_ARRAY FJ_NULLABLE items;
 };
 
 

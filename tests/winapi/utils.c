@@ -18,7 +18,7 @@ int main(void) {
         return 1;
     }
 
-    fj_free(wide_string);
+    fj_free((void *) &wide_string);
 
     return 0;
 }

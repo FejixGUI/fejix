@@ -15,7 +15,7 @@ fj_err_t fj_winapi_utf8_to_wstr(
 
     char const * c_string = (char const *) utf8_string;
 
-    uint32_t output_chars_count = MultiByteToWideChar(
+    int32_t output_chars_count = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
         c_string,
@@ -43,7 +43,7 @@ fj_err_t fj_winapi_utf8_to_wstr(
     );
 
     if (result == 0) {
-        fj_free(*wide_string);
+        fj_free((void *) wide_string);
         return FJ_ERR("cannot convert invalid UTF-8 to wide string");
     }
 

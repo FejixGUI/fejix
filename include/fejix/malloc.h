@@ -15,8 +15,11 @@ fj_err_t fj_alloc_uninit(void * FJ_NULLABLE FJ_OUT * ptr, size_t size);
     When this fails, sets `ptr` to NULL. */
 fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE FJ_OUT * ptr, size_t size);
 
-/** Works like `free`. If `ptr` is NULL, the behavior is undefined. */
-void fj_free(void * ptr);
+/** Frees a block of memory.
+    This takes a reference to a pointer, frees the memory behind the pointer
+    and assigns the pointer to NULL.
+    If the pointer behind the reference is NULL, the behavior is undefined. */
+void fj_free(void ** ptr);
 
 /** Similar to `realloc`, but with distinct `item_count` and `item_size`.
 

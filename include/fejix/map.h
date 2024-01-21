@@ -5,6 +5,11 @@
 #include <fejix/base.h>
 
 
+#define FJ_MAP_IS_EMPTY(MAP) ((MAP)->element_count == 0)
+
+#define FJ_MAP_HAS_ALLOCATED(MAP) ((MAP)->buckets != NULL)
+
+
 struct fj_map_element {
     uintptr_t key;
     void * value;
@@ -15,11 +20,11 @@ struct fj_map_node {
     struct fj_map_element element;
 };
 
-/** Hash table of `uintptr_t` -> `void *`, whose elements are not NULL. */
+/** Hash table of `uintptr_t` -> `void *`, where values are not NULL. */
 struct fj_map {
     uint32_t element_count;
     uint32_t bucket_count;
-    struct fj_map_node * FJ_NULLABLE * FJ_ARRAY buckets;
+    struct fj_map_node * FJ_NULLABLE * FJ_ARRAY FJ_NULLABLE buckets;
 };
 
 
@@ -30,7 +35,7 @@ typedef fj_bool_t (* fj_map_foreach_callback_t)(
 );
 
 
-fj_err_t fj_map_init(struct fj_map * map);
+void fj_map_init(struct fj_map * map);
 
 void fj_map_deinit(struct fj_map * map);
 

@@ -191,7 +191,7 @@ void free_nodes(struct fj_map_node * list_head)
 
     while (node != NULL) {
         struct fj_map_node * next_node = node->next;
-        fj_free(node);
+        fj_free((void *) &node);
         node = next_node;
     }
 }
@@ -231,17 +231,17 @@ fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
     FJ_INIT_ERRORS
 
-    struct fj_map_node ** buckets = NULL;
-
-    FJ_TRY fj_realloc_uninit(
-        (void *) &map->buckets, bucket_count, sizeof(*map->buckets)
+    FJ_TRY fj_realloc_zeroed(
+        (void *) &map->buckets,
+        map->bucket_count,
+        bucket_count,
+        sizeof(*map->buckets)
     );
 
     if (FJ_FAILED) {
         return FJ_LAST_ERROR;
     }
 
-    map->buckets = buckets;
     map->bucket_count = bucket_count;
 
     return FJ_OK;
@@ -251,11 +251,15 @@ fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 static
 fj_err_t resize_map(struct fj_map * map, fj_bool_t grow)
 {
+    uint32_t bucket_count = 0;
+
     if (grow) {
-        return resize_buckets(map, map->bucket_count * 2);
+        bucket_count = map->bucket_count * 2;
+    } else {
+        bucket_count = FJ_MAX(1, map->bucket_count / 2);
     }
 
-    return resize_buckets(map, FJ_MAX(1, map->bucket_count / 2));
+    return resize_buckets(map, bucket_count);
 }
 
 
@@ -270,8 +274,8 @@ fj_err_t rehash(struct fj_map * map, fj_bool_t grow)
 
     if (FJ_FAILED) {
         free_nodes(list_head);
-        fj_free(map->buckets);
-        fj_free(map);
+        fj_free((void *) &map->buckets);
+        fj_free((void *) &map);
 
         return FJ_LAST_ERROR;
     }
@@ -304,7 +308,7 @@ fj_err_t map_remove(struct fj_map * map, uintptr_t key)
         return FJ_OK;
     }
 
-    fj_free(node);
+    fj_free((void *) &node);
 
     map->element_count--;
 
@@ -390,17 +394,13 @@ void bucket_foreach_node(
 }
 
 
-fj_err_t fj_map_init(struct fj_map * map)
+static
+fj_err_t map_allocate(struct fj_map * map)
 {
     FJ_INIT_ERRORS
 
-    *map = (struct fj_map) { 0 };
-
     FJ_TRY fj_realloc_zeroed(
-        (void *) &map->buckets,
-        0,
-        1,
-        sizeof(*map->buckets)
+        (void *) &map->buckets, 0, 1, sizeof(*map->buckets)
     );
 
     if (FJ_FAILED) {
@@ -413,21 +413,8 @@ fj_err_t fj_map_init(struct fj_map * map)
 }
 
 
-void fj_map_deinit(struct fj_map * map)
-{
-    struct fj_map_node * list_head = extract_nodes(map);
-
-    if (list_head != NULL) {
-        free_nodes(list_head);
-    }
-
-    if (map->buckets != NULL) {
-        fj_free(map->buckets);
-    }
-}
-
-
-fj_err_t fj_map_set(struct fj_map * map, uintptr_t key, void * value)
+static
+fj_err_t map_set(struct fj_map * map, uintptr_t key, void * value)
 {
     if (value == NULL) {
         return map_remove(map, key);
@@ -441,7 +428,8 @@ fj_err_t fj_map_set(struct fj_map * map, uintptr_t key, void * value)
 }
 
 
-void * fj_map_get(struct fj_map const * map, uintptr_t key)
+static
+void * FJ_NULLABLE map_get(struct fj_map const * map, uintptr_t key)
 {
     struct fj_map_element * element = map_find(map, key);
 
@@ -450,6 +438,56 @@ void * fj_map_get(struct fj_map const * map, uintptr_t key)
     }
 
     return element->value;
+}
+
+
+void fj_map_init(struct fj_map * map)
+{
+    *map = (struct fj_map) { 0 };
+}
+
+
+void fj_map_deinit(struct fj_map * map)
+{
+    if (!FJ_MAP_HAS_ALLOCATED(map)) {
+        return;
+    }
+
+    struct fj_map_node * list_head = extract_nodes(map);
+
+    if (list_head != NULL) {
+        free_nodes(list_head);
+    }
+
+    if (map->buckets != NULL) {
+        fj_free((void *) &map->buckets);
+    }
+}
+
+
+fj_err_t fj_map_set(struct fj_map * map, uintptr_t key, void * value)
+{
+    FJ_INIT_ERRORS
+
+    if (!FJ_MAP_HAS_ALLOCATED(map)) {
+        FJ_TRY map_allocate(map);
+
+        if (FJ_FAILED) {
+            return FJ_LAST_ERROR;
+        }
+    }
+
+    return map_set(map, key, value);
+}
+
+
+void * FJ_NULLABLE fj_map_get(struct fj_map const * map, uintptr_t key)
+{
+    if (!FJ_MAP_HAS_ALLOCATED(map)) {
+        return NULL;
+    }
+
+    return map_get(map, key);
 }
 
 

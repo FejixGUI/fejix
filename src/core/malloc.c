@@ -39,9 +39,10 @@ fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
 }
 
 
-void fj_free(void * ptr)
+void fj_free(void ** ptr)
 {
-    free(ptr);
+    free(*ptr);
+    *ptr = NULL;
 }
 
 

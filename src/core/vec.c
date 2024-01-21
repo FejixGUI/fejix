@@ -125,11 +125,10 @@ void fj_vec_init(struct fj_vec * vec, size_t item_size)
 
 void fj_vec_deinit(struct fj_vec * vec)
 {
-    if (FJ_VEC_HOLDS_ITEMS(vec)) {
-        fj_free(vec->items);
+    if (FJ_VEC_HAS_ALLOCATED(*vec)) {
+        fj_free((void *) &vec->items);
     }
 
-    vec->items = NULL;
     vec->length = 0;
     vec->capacity = 0;
 }
@@ -162,7 +161,10 @@ fj_err_t fj_vec_insert_uninit(
         return FJ_LAST_ERROR;
     }
 
-    if (!FJ_VEC_IS_EMPTY(vec) && destination_index != FJ_VEC_PUSH_INDEX(vec)) {
+    if (
+        !FJ_VEC_IS_EMPTY(*vec)
+        && destination_index != FJ_VEC_PUSH_INDEX(*vec)
+    ) {
         shift_items_to_grow(vec, destination_index, item_count);
     }
 
@@ -178,11 +180,8 @@ fj_err_t fj_vec_remove_items(
     uint32_t item_count
 )
 {
-    if (
-        !FJ_VEC_IS_EMPTY(vec)
-        && start_index + item_count <= FJ_VEC_LAST_INDEX(vec)
-    ) {
-        shift_items_to_shrink(vec, start_index, item_count);
+    if (start_index + item_count <= FJ_VEC_LAST_INDEX(*vec)) {
+        shift_items_to_shrink(vec, start_index+item_count, item_count);
     }
 
     vec->length -= item_count;
@@ -214,13 +213,13 @@ fj_err_t fj_vec_insert_items(
 
 fj_err_t fj_vec_push_item(struct fj_vec * vec, void * item)
 {
-    return fj_vec_insert_items(vec, item, FJ_VEC_PUSH_INDEX(vec), 1);
+    return fj_vec_insert_items(vec, item, FJ_VEC_PUSH_INDEX(*vec), 1);
 }
 
 
 fj_err_t fj_vec_pop_item(struct fj_vec * vec)
 {
-    return fj_vec_remove_items(vec, FJ_VEC_LAST_INDEX(vec), 1);
+    return fj_vec_remove_items(vec, FJ_VEC_LAST_INDEX(*vec), 1);
 }
 
 
@@ -241,7 +240,11 @@ uint32_t fj_vec_find(
     fj_vec_item_compararator_fn_t predicate
 )
 {
-    return fj_vec_search(vec, item, predicate, 0, FJ_VEC_LAST_INDEX(vec));
+    if (FJ_VEC_IS_EMPTY(*vec)) {
+        return vec->length;
+    }
+
+    return fj_vec_search(vec, item, predicate, 0, FJ_VEC_LAST_INDEX(*vec));
 }
 
 

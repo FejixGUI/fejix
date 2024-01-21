@@ -21,6 +21,7 @@ macro(fejix_add_simple_c_test test_name c_source_file)
 endmacro()
 
 fejix_add_simple_c_test(core_vec_test "${FEJIX_TESTS}/core/vec.c")
+fejix_add_simple_c_test(core_map_test "${FEJIX_TESTS}/core/map.c")
 
 if(FJ_OPT_WINAPI)
     fejix_add_simple_c_test(winapi_test "${FEJIX_TESTS}/winapi/utils.c")
