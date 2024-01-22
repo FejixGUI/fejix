@@ -7,6 +7,11 @@
 #include <stdbool.h>
 
 
+#ifdef UINT64_MAX
+#   define FJ_HAS_UINT64
+#endif
+
+
 /** Annotates a pointer that can be NULL. */
 #define FJ_NULLABLE
 
@@ -23,7 +28,7 @@
 
 /** Does the type conversion required to use the string literal as a UTF-8
     string. */
-#define FJ_UTF8(STRING_LITERAL) ((fj_string_t)(STRING_LITERAL))
+#define FJ_UTF8(STRING_LITERAL) ((fj_string_t)(void *) (STRING_LITERAL))
 
 /** Makes a version number from two unsigned integers (max is UINT16_MAX). */
 #define FJ_VERSION(MAJOR, MINOR) \
