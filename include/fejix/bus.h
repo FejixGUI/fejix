@@ -40,8 +40,18 @@ enum fj_socket_id {
 typedef uint32_t fj_message_id_t;
 
 enum fj_bus_message_id {
-    FJ_MESSAGE_BUS_SETUP,
-    FJ_MESSAGE_BUS_SHUTDOWN,
+    FJ_MSG_BUS_OPENED,
+    FJ_MSG_BUS_CLOSING,
+    FJ_MSG_BUS_CLOSE,
+    FJ_MSG_OBJECT_ACTIVATE,
+    FJ_MSG_OBJECT_DEACTIVATE,
+};
+
+typedef uint32_t fj_feature_id_t;
+
+// TODO come up with an interface for message support
+enum fj_feature_id {
+    FJ_FEATURE_MESSAGE,
 };
 
 struct fj_message {
@@ -54,7 +64,9 @@ struct fj_message {
 };
 
 typedef fj_err_t (fj_bus_listener_t)(
-    void * callback_data,
+    struct fj_socket const * bus,
+    void * bus_context,
+    void * FJ_NULLABLE callback_data,
     uint32_t message_count,
     struct fj_message const * FJ_ARRAY messages
 );
@@ -67,7 +79,6 @@ struct fj_socket {
 
     fj_err_t (* open)(
         void * bus_context,
-        void * extra_info,
         void FJ_OUT * socket_context
     );
 
@@ -75,7 +86,28 @@ struct fj_socket {
         void * bus_context,
         void * socket_context
     );
-    //TODO
+
+    fj_err_t (* open_device)(
+        void * bus_context,
+        void * socket_context,
+        void * device_handle,
+        void const * FJ_NULLABLE device_open_info,
+        void * FJ_OUT * device_context
+    );
+
+    void (* close_device)(
+        void * bus_context,
+        void * socket_context,
+        void * device_context
+    );
+
+    // TODO Extend this to make it able to retrive more extended info
+    fj_bool_t (* supports)(
+        void * socket_context,
+        void * FJ_NULLABLE device_context,
+        uint32_t feature_id,
+        void const * feature_info
+    );
 };
 
 struct fj_bus {
@@ -165,6 +197,9 @@ fj_err_t fj_bus_send(
     uint32_t message_count,
     struct fj_message const * FJ_ARRAY messages
 );
+
+
+// TODO functions for socket methods
 
 
 #endif

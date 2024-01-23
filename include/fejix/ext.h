@@ -5,7 +5,7 @@
 #include <fejix/bus.h>
 
 
-fj_bus_listener_t fj_user_bus_listener;
+fj_bus_listener_t fj_ext_user_bus_listener;
 
 
 void fj_ext_get_process_args(
@@ -51,7 +51,7 @@ struct fj_bus const * FJ_NULLABLE fj_ext_get_bus(
     - `0` on success
     - `-1` if fails to find the appropriate bus
     - `-2` if fails to run the program. */
-int32_t fj_ext_main(void);
+int32_t fj_ext_common_main(void);
 
 
 #endif
