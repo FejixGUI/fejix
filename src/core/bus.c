@@ -117,3 +117,70 @@ fj_err_t fj_bus_send(
 {
     return bus->send(bus_context, message_count, messages);
 }
+
+
+fj_err_t fj_socket_open(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * FJ_NULLABLE FJ_OUT * socket_context
+)
+{
+    return socket->open(bus_context, socket_context);
+}
+
+
+void fj_socket_close(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context
+)
+{
+    socket->close(bus_context, socket_context);
+}
+
+
+fj_err_t fj_socket_open_device(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context,
+    void * device_handle,
+    void * FJ_NULLABLE device_open_info,
+    void * FJ_NULLABLE FJ_OUT * device_context
+)
+{
+    return socket->open_device(
+        bus_context,
+        socket_context,
+        device_handle,
+        device_open_info,
+        device_context
+    );
+}
+
+
+void fj_socket_close_device(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context,
+    void * device_context
+)
+{
+    socket->close_device(bus_context, socket_context, device_context);
+}
+
+
+fj_bool_t fj_socket_supports(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context,
+    void * FJ_NULLABLE device_context,
+    fj_message_id_t message_id
+)
+{
+    return socket->supports(
+        bus_context,
+        socket_context,
+        device_context,
+        message_id
+    );
+}

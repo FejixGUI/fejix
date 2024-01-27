@@ -6,6 +6,7 @@
 
 
 struct program_data {
+    fj_bus_listener_t * bus_listener;
     struct fj_bus const * const * FJ_ARRAY buses;
     uint32_t bus_count;
     fj_string_t FJ_NULLABLE bus_name_hint;
@@ -138,7 +139,7 @@ fj_err_t run_bus(struct program_data * data)
     struct fj_bus const * bus = data->selected_bus;
     void * bus_context = NULL;
 
-    FJ_TRY fj_bus_open(bus, &bus_context, fj_ext_user_bus_listener);
+    FJ_TRY fj_bus_open(bus, &bus_context, data->bus_listener);
 
     if (FJ_FAILED) {
         return FJ_LAST_ERROR;
@@ -209,11 +210,13 @@ void print_error_from_run_bus(struct program_data * data, fj_err_t err)
 }
 
 
-int32_t fj_ext_common_main(void)
+int32_t fj_ext_standalone_main(fj_bus_listener_t * bus_listener)
 {
     FJ_INIT_ERRORS
 
     struct program_data data = { 0 };
+
+    data.bus_listener = bus_listener;
 
     get_buses(&data);
 

@@ -39,19 +39,15 @@ enum fj_socket_id {
 
 typedef uint32_t fj_message_id_t;
 
-enum fj_bus_message_id {
+enum fj_message_id {
     FJ_MSG_BUS_OPENED,
     FJ_MSG_BUS_CLOSING,
     FJ_MSG_BUS_CLOSE,
+    FJ_MSG_SOCKET_DEVICE_ADDED,
+    FJ_MSG_SOCKET_DEVICE_REMOVED,
+    FJ_MSG_SOCKET_DEVICES_UPDATE,
     FJ_MSG_OBJECT_ACTIVATE,
     FJ_MSG_OBJECT_DEACTIVATE,
-};
-
-typedef uint32_t fj_feature_id_t;
-
-// TODO come up with an interface for message support
-enum fj_feature_id {
-    FJ_FEATURE_MESSAGE,
 };
 
 struct fj_message {
@@ -74,12 +70,12 @@ typedef fj_err_t (fj_bus_listener_t)(
 
 struct fj_socket {
     fj_socket_id_t id;
-    void const * methods;
-    void const * static_data;
+    void const * FJ_NULLABLE methods;
+    void const * FJ_NULLABLE static_data;
 
     fj_err_t (* open)(
         void * bus_context,
-        void FJ_OUT * socket_context
+        void * FJ_NULLABLE FJ_OUT * socket_context
     );
 
     void (* close)(
@@ -91,8 +87,8 @@ struct fj_socket {
         void * bus_context,
         void * socket_context,
         void * device_handle,
-        void const * FJ_NULLABLE device_open_info,
-        void * FJ_OUT * device_context
+        void * FJ_NULLABLE device_open_info,
+        void * FJ_NULLABLE FJ_OUT * device_context
     );
 
     void (* close_device)(
@@ -101,12 +97,11 @@ struct fj_socket {
         void * device_context
     );
 
-    // TODO Extend this to make it able to retrive more extended info
     fj_bool_t (* supports)(
+        void * bus_context,
         void * socket_context,
         void * FJ_NULLABLE device_context,
-        uint32_t feature_id,
-        void const * feature_info
+        fj_message_id_t message_id
     );
 };
 
@@ -125,7 +120,7 @@ struct fj_bus {
 
     void (* set_callback_data)(
         void * bus_context,
-        void * callback_data
+        void * FJ_NULLABLE callback_data
     );
 
     /** The returned array is sorted by socket IDs. */
@@ -198,8 +193,41 @@ fj_err_t fj_bus_send(
     struct fj_message const * FJ_ARRAY messages
 );
 
+fj_err_t fj_socket_open(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * FJ_NULLABLE FJ_OUT * socket_context
+);
 
-// TODO functions for socket methods
+void fj_socket_close(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context
+);
+
+fj_err_t fj_socket_open_device(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context,
+    void * device_handle,
+    void * FJ_NULLABLE device_open_info,
+    void * FJ_NULLABLE FJ_OUT * device_context
+);
+
+void fj_socket_close_device(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context,
+    void * device_context
+);
+
+fj_bool_t fj_socket_supports(
+    struct fj_socket * socket,
+    void * bus_context,
+    void * socket_context,
+    void * FJ_NULLABLE device_context,
+    fj_message_id_t message_id
+);
 
 
 #endif
