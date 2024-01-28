@@ -44,25 +44,40 @@ enum fj_message_id {
     FJ_MSG_BUS_CLOSING,
     FJ_MSG_BUS_CLOSE,
     FJ_MSG_SOCKET_DEVICE_ADDED,
-    FJ_MSG_SOCKET_DEVICE_REMOVED,
+    FJ_MSG_SOCKET_DEVICE_REMOVING,
     FJ_MSG_SOCKET_DEVICES_UPDATE,
-    FJ_MSG_OBJECT_ACTIVATE,
-    FJ_MSG_OBJECT_DEACTIVATE,
+};
+
+/** Must be the first field of every bus context.
+    This enables the usage of `fj_bus_context_get_xxx()`. */
+struct fj_bus_context_base {
+    struct fj_bus const * bus;
+    void * FJ_NULLABLE user_data;
+};
+
+/** Must be the first field of every socket context.
+    This enables the usage of `fj_socket_context_get_xxx()`. */
+struct fj_socket_context_base {
+    struct fj_socket const * socket;
+    void * bus_context;
+};
+
+/** Must be the first field of every device context.
+    This enables the usage of `fj_device_context_get_xxx()`. */
+struct fj_device_context_base {
+    void * socket_context;
+    void * device_handle;
+    void * FJ_NULLABLE parent_context;
 };
 
 struct fj_message {
-    fj_socket_id_t socket_id;
     fj_message_id_t message;
-    struct fj_socket const * socket;
-    void * socket_context;
     void * device_context;
     void * message_data;
 };
 
 typedef fj_err_t (fj_bus_listener_t)(
-    struct fj_socket const * bus,
     void * bus_context,
-    void * FJ_NULLABLE callback_data,
     uint32_t message_count,
     struct fj_message const * FJ_ARRAY messages
 );
@@ -70,8 +85,8 @@ typedef fj_err_t (fj_bus_listener_t)(
 
 struct fj_socket {
     fj_socket_id_t id;
-    void const * FJ_NULLABLE methods;
-    void const * FJ_NULLABLE static_data;
+    void const * FJ_NULLABLE interface;
+    void const * FJ_NULLABLE private;
 
     fj_err_t (* open)(
         void * bus_context,
@@ -79,12 +94,10 @@ struct fj_socket {
     );
 
     void (* close)(
-        void * bus_context,
         void * socket_context
     );
 
     fj_err_t (* open_device)(
-        void * bus_context,
         void * socket_context,
         void * device_handle,
         void * FJ_NULLABLE device_open_info,
@@ -92,15 +105,11 @@ struct fj_socket {
     );
 
     void (* close_device)(
-        void * bus_context,
-        void * socket_context,
         void * device_context
     );
 
     fj_bool_t (* supports)(
-        void * bus_context,
-        void * socket_context,
-        void * FJ_NULLABLE device_context,
+        void * device_context,
         fj_message_id_t message_id
     );
 };
@@ -116,11 +125,6 @@ struct fj_bus {
 
     void (* close)(
         void * bus_context
-    );
-
-    void (* set_callback_data)(
-        void * bus_context,
-        void * FJ_NULLABLE callback_data
     );
 
     /** The returned array is sorted by socket IDs. */
@@ -166,12 +170,6 @@ void fj_bus_close(
     void * bus_context
 );
 
-void fj_bus_set_callback_data(
-    struct fj_bus const * bus,
-    void * bus_context,
-    void * callback_data
-);
-
 void fj_bus_get_sockets(
     struct fj_bus const * bus,
     void * bus_context,
@@ -200,14 +198,10 @@ fj_err_t fj_socket_open(
 );
 
 void fj_socket_close(
-    struct fj_socket * socket,
-    void * bus_context,
     void * socket_context
 );
 
 fj_err_t fj_socket_open_device(
-    struct fj_socket * socket,
-    void * bus_context,
     void * socket_context,
     void * device_handle,
     void * FJ_NULLABLE device_open_info,
@@ -215,18 +209,53 @@ fj_err_t fj_socket_open_device(
 );
 
 void fj_socket_close_device(
-    struct fj_socket * socket,
-    void * bus_context,
-    void * socket_context,
     void * device_context
 );
 
 fj_bool_t fj_socket_supports(
-    struct fj_socket * socket,
-    void * bus_context,
-    void * socket_context,
-    void * FJ_NULLABLE device_context,
+    void * device_context,
     fj_message_id_t message_id
+);
+
+struct fj_bus const * fj_bus_context_get_bus(
+    void const * bus_context
+);
+
+void * FJ_NULLABLE fj_bus_context_get_user_data(
+    void const * bus_context
+);
+
+void fj_bus_context_set_user_data(
+    void * bus_context,
+    void * FJ_NULLABLE user_data
+);
+
+struct fj_socket const * fj_socket_context_get_socket(
+    void const * socket_context
+);
+
+void * fj_socket_context_get_bus_context(
+    void const * socket_context
+);
+
+struct fj_bus const * fj_socket_context_get_bus(
+    void const * socket_context
+);
+
+void * FJ_NULLABLE fj_device_context_get_parent(
+    void const * device_context
+);
+
+void * fj_device_context_get_handle(
+    void const * device_context
+);
+
+void * fj_device_context_get_socket_context(
+    void const * device_context
+);
+
+struct fj_socket const * fj_device_context_get_socket(
+    void const * device_context
 );
 
 

@@ -76,16 +76,6 @@ void fj_bus_close(
 }
 
 
-void fj_bus_set_callback_data(
-    struct fj_bus const * bus,
-    void * bus_context,
-    void * callback_data
-)
-{
-    bus->set_callback_data(bus_context, callback_data);
-}
-
-
 void fj_bus_get_sockets(
     struct fj_bus const * bus,
     void * bus_context,
@@ -130,26 +120,21 @@ fj_err_t fj_socket_open(
 
 
 void fj_socket_close(
-    struct fj_socket * socket,
-    void * bus_context,
     void * socket_context
 )
 {
-    socket->close(bus_context, socket_context);
+    fj_socket_context_get_socket(socket_context)->close(socket_context);
 }
 
 
 fj_err_t fj_socket_open_device(
-    struct fj_socket * socket,
-    void * bus_context,
     void * socket_context,
     void * device_handle,
     void * FJ_NULLABLE device_open_info,
     void * FJ_NULLABLE FJ_OUT * device_context
 )
 {
-    return socket->open_device(
-        bus_context,
+    return fj_socket_context_get_socket(socket_context)->open_device(
         socket_context,
         device_handle,
         device_open_info,
@@ -159,28 +144,105 @@ fj_err_t fj_socket_open_device(
 
 
 void fj_socket_close_device(
-    struct fj_socket * socket,
-    void * bus_context,
-    void * socket_context,
     void * device_context
 )
 {
-    socket->close_device(bus_context, socket_context, device_context);
+    fj_device_context_get_socket(device_context)->close_device(device_context);
 }
 
 
 fj_bool_t fj_socket_supports(
-    struct fj_socket * socket,
-    void * bus_context,
-    void * socket_context,
-    void * FJ_NULLABLE device_context,
+    void * device_context,
     fj_message_id_t message_id
 )
 {
-    return socket->supports(
-        bus_context,
-        socket_context,
+    return fj_device_context_get_socket(device_context)->supports(
         device_context,
         message_id
+    );
+}
+
+
+struct fj_bus const * fj_bus_context_get_bus(
+    void const * bus_context
+)
+{
+    return ((struct fj_bus_context_base *) bus_context)->bus;
+}
+
+
+void * FJ_NULLABLE fj_bus_context_get_user_data(
+    void const * bus_context
+)
+{
+    return ((struct fj_bus_context_base *) bus_context)->user_data;
+}
+
+
+void fj_bus_context_set_user_data(
+    void * bus_context,
+    void * FJ_NULLABLE user_data
+)
+{
+    ((struct fj_bus_context_base *) bus_context)->user_data = user_data;
+}
+
+
+struct fj_socket const * fj_socket_context_get_socket(
+    void const * socket_context
+)
+{
+    return ((struct fj_socket_context_base *) socket_context)->socket;
+}
+
+
+void * fj_socket_context_get_bus_context(
+    void const * socket_context
+)
+{
+    return ((struct fj_socket_context_base *) socket_context)->bus_context;
+}
+
+
+struct fj_bus const * fj_socket_context_get_bus(
+    void const * socket_context
+)
+{
+    return fj_bus_context_get_bus(
+        fj_socket_context_get_bus_context(socket_context)
+    );
+}
+
+
+void * FJ_NULLABLE fj_device_context_get_parent(
+    void const * device_context
+)
+{
+    return ((struct fj_device_context_base *) device_context)->parent_context;
+}
+
+
+void * fj_device_context_get_handle(
+    void const * device_context
+)
+{
+    return ((struct fj_device_context_base *) device_context)->device_handle;
+}
+
+
+void * fj_device_context_get_socket_context(
+    void const * device_context
+)
+{
+    return ((struct fj_device_context_base *) device_context)->socket_context;
+}
+
+
+struct fj_socket const * fj_device_context_get_socket(
+    void const * device_context
+)
+{
+    return fj_socket_context_get_socket(
+        fj_device_context_get_socket_context(device_context)
     );
 }
