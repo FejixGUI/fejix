@@ -1,11 +1,13 @@
 set(
     FEJIX_OPTIONS
 
-    # Protocols
-    "FJ_OPT_WINAPI"
+    # Buses
+    "FJ_OPT_ANDK"
+    "FJ_OPT_COCOA"
+    "FJ_OPT_NOOP"
     "FJ_OPT_X11"
     "FJ_OPT_WAYLAND"
-    "FJ_OPT_COCOA"
+    "FJ_OPT_WINAPI"
 
     # Graphics APIs
     "FJ_OPT_PIXMAP"
@@ -22,15 +24,20 @@ foreach(option ${FEJIX_OPTIONS})
 endforeach()
 
 if(
-    NOT FJ_OPT_WINAPI
+        NOT FJ_OPT_ANDK
+    AND NOT FJ_OPT_COCOA
     AND NOT FJ_OPT_X11
     AND NOT FJ_OPT_WAYLAND
-    AND NOT FJ_OPT_COCOA
+    AND NOT FJ_OPT_WINAPI
+
+    AND NOT FJ_OPT_NOOP
 )
-    message(
-        FATAL_ERROR
-        "***** You must enable at least one protocol (FJ_OPT_XXX=ON)"
-    )
+    message(WARNING "<<<FEJIX>>> No bus specified, selecting a noop bus.")
+    set(FJ_OPT_NOOP ON)
+endif()
+
+if(FJ_OPT_NOOP)
+    message(WARNING "<<<FEJIX>>> Noop bus is enabled!")
 endif()
 
 foreach(option ${FEJIX_OPTIONS})

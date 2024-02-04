@@ -139,15 +139,15 @@ fj_err_t run_bus(struct program_data * data)
     struct fj_bus const * bus = data->selected_bus;
     void * bus_context = NULL;
 
-    FJ_TRY fj_bus_open(bus, &bus_context, data->bus_listener);
+    FJ_TRY bus->open(&bus_context, data->bus_listener);
 
     if (FJ_FAILED) {
         return FJ_LAST_ERROR;
     }
 
-    FJ_TRY fj_bus_serve(bus, bus_context, FJ_SERVE_TYPE_MAIN, NULL);
+    FJ_TRY bus->serve(bus_context, FJ_SERVE_TYPE_MAIN, NULL);
 
-    fj_bus_close(bus, bus_context);
+    bus->close(bus_context);
 
     return FJ_LAST_ERROR;
 }
