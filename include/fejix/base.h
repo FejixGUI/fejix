@@ -30,6 +30,8 @@
     string. */
 #define FJ_UTF8(STRING_LITERAL) ((fj_string_t)(void *) (STRING_LITERAL))
 
+#define FJ_FIRST_MESSAGE_OF(SOCKET_ID) ((SOCKET_ID)<<16)
+
 /** Makes a version number from two unsigned integers (max is UINT16_MAX). */
 #define FJ_VERSION(MAJOR, MINOR) \
     ((((fj_version_t)(MAJOR)) << 16) | ((fj_version_t)(MINOR)))
@@ -39,6 +41,10 @@
 
 /** Gets the minor component of the version. */
 #define FJ_VERSION_MINOR(VERSION) ((VERSION) & 0x0000FFFF)
+
+
+/** Identifier of bus, socket, message or capability. */
+typedef uint32_t fj_id_t;
 
 
 /** Represents a MAJOR.MINOR tuple.
@@ -68,6 +74,16 @@ typedef uint8_t * FJ_ARRAY fj_string_mut_t;
 
 /* Error message string. */
 typedef fj_string_t fj_err_t;
+
+
+enum fj_id_limits {
+    FJ_ID_BUS_MIN       = 0x00000001,
+    FJ_ID_BUS_MAX       = 0x000000FF,
+    FJ_ID_SOCKET_MIN    = 0x00000100,
+    FJ_ID_SOCKET_MAX    = 0x00007FFF,
+    FJ_ID_MESSAGE_MIN   = 0x00100000,
+    FJ_ID_MESSAGE_MAX   = 0x7FFFFFFF,
+};
 
 
 #endif

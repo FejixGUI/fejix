@@ -5,12 +5,10 @@
 #include <fejix/base.h>
 
 
-typedef uint32_t fj_bus_id_t;
-
 /** The variants are sorted alphabetically. */
 enum fj_bus_id {
     /** Android Native Development Kit */
-    FJ_BUS_ANDK = 1,
+    FJ_BUS_ANDK = FJ_ID_BUS_MIN,
     /** Apple Cocoa */
     FJ_BUS_COCOA,
     /** No-operation testing bus that contains no sockets and is basically a
@@ -27,35 +25,18 @@ enum fj_bus_id {
     FJ_BUS_X11,
 };
 
-typedef uint32_t fj_socket_id_t;
-
 enum fj_socket_id {
-    FJ_SOCKET_WINDOW = 1,
-    FJ_SOCKET_GEOMETRY,
+    /** Messages of this socket may be implemented by any other socket. */
+    FJ_SOCKET_GENERIC = FJ_ID_SOCKET_MIN,
+    FJ_SOCKET_WINDOW,
     FJ_SOCKET_BUS_WAKEUP,
 };
 
-typedef uint32_t fj_message_id_t;
-
 enum fj_generic_message_id {
-    FJ_MSG_SOCKET_DEVICE_ADDED = 1,
-    FJ_MSG_SOCKET_DEVICE_REMOVED,
-
-    /** Sets whether the user needs to receive regular DEVICE_ADDED/REMOVED
-        messages, in other words, if the user wants to monitor the devices.
-        If the user does NOT want to monitor the socket devices, the socket
-        may skip regular updating of the device list, which may prevent some
-        unnecessary overhead.
-
-        The opened devices will always receive their DEVICE_REMOVED
-        message, regardless of this setting.
-
-        The initial sequence of DEVICE_ADDED messages will always be issued
-        by every socket when committing the first time after the socket was
-        opened.
-
-        The socket can ignore this setting and always monitor its devices. */
-    FJ_MSG_SOCKET_SET_DEVICE_MONITOR_REQUIRED,
+    FJ_GENERIC_DEVICE_ADDED = FJ_FIRST_MESSAGE_OF(FJ_SOCKET_GENERIC),
+    FJ_GENERIC_DEVICE_REMOVED,
+    FJ_GENERIC_CAPABILITY,
+    FJ_GENERIC_MONITOR_DEVICES,
 };
 
 typedef uint32_t fj_serve_type_t;
@@ -100,14 +81,13 @@ struct fj_socket_context_base {
 struct fj_device_context_base {
     void * socket_context;
     void * device_handle;
-    void * FJ_NULLABLE dependent_device_context;
 };
 
 struct fj_message {
     void * socket_context;
     void * FJ_NULLABLE device_context;
+    fj_id_t message;
     void * message_data;
-    fj_message_id_t message;
 };
 
 typedef fj_err_t (fj_bus_listener_t)(
@@ -118,7 +98,7 @@ typedef fj_err_t (fj_bus_listener_t)(
 
 
 struct fj_bus {
-    fj_bus_id_t id;
+    fj_id_t id;
     fj_version_t version;
 
     fj_err_t (* open)(
@@ -145,10 +125,13 @@ struct fj_bus {
 
 
 struct fj_socket {
-    fj_socket_id_t id;
+    fj_id_t id;
     void const * FJ_NULLABLE interface;
     void const * FJ_NULLABLE private;
 
+    /** This is a buffered operation. When committing it, the socket will
+        send initial capability messages in order to notify the user what
+        messages can be sent to the socket or its devices. */
     fj_err_t (* open)(
         void * bus_context,
         void * FJ_NULLABLE FJ_OUT * socket_context
@@ -158,10 +141,9 @@ struct fj_socket {
         void * socket_context
     );
 
-    /** Device info should contain at least the device handle. */
     fj_err_t (* open_device)(
         void * socket_context,
-        void * device_info,
+        void * device,
         void * FJ_NULLABLE FJ_OUT * device_context
     );
 
@@ -169,7 +151,7 @@ struct fj_socket {
         void * device_context
     );
 
-    /** Buffers the message. */
+    /** Buffers the message. Unsupported messages are ignored. */
     fj_err_t (* send)(
         struct fj_message const * message
     );
