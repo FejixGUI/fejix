@@ -1,7 +1,7 @@
-#include <fejix/bus.h>
-#include <fejix/utils.h>
+#include <src/wayland/bus.h>
 
-#include <stdio.h>
+#include <fejix/utils.h>
+#include <fejix/malloc.h>
 
 
 static
@@ -9,8 +9,14 @@ fj_err_t bus_open(
     void * FJ_NULLABLE FJ_OUT * bus_context
 )
 {
-    FJ_UNUSED(bus_context)
-    FJ_UNUSED(bus_listener)
+    FJ_INIT_ERRORS
+
+    FJ_TRY fj_alloc_zeroed(bus_context, sizeof(struct fj_wayland_bus_context));
+
+    if (FJ_FAILED) {
+        return FJ_LAST_ERROR;
+    }
+
     return FJ_OK;
 }
 
@@ -20,7 +26,7 @@ void bus_close(
     void * bus_context
 )
 {
-    FJ_UNUSED(bus_context)
+    fj_free(bus_context);
 }
 
 
@@ -35,26 +41,12 @@ fj_err_t bus_serve(
     FJ_UNUSED(serve_type)
     FJ_UNUSED(serve_data)
 
-    printf(
-        "Note: Fejix is running a NOOP bus, this is just a test."
-    );
-
     return FJ_OK;
 }
 
 
-static
-fj_err_t bus_commit(
-    void * bus_context
-)
-{
-    FJ_UNUSED(bus_context)
-    return FJ_OK;
-}
-
-
-struct fj_bus const fj_noop_bus = {
-    .id = FJ_BUS_NOOP,
+struct fj_bus const fj_wayland_bus = {
+    .id = FJ_BUS_WAYLAND,
     .version = FJ_VERSION(0, 1),
     .open = bus_open,
     .close = bus_close,

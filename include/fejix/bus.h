@@ -5,16 +5,19 @@
 #include <fejix/base.h>
 
 
-/** The variants are sorted alphabetically. */
+#define FJ_FIRST_MESSAGE_ID(SOCKET_ID) ((SOCKET_ID)<<16)
+
+
+/** The variants are sorted alphabetically except for NOOP. */
 enum fj_bus_id {
-    /** Android Native Development Kit */
-    FJ_BUS_ANDK = FJ_ID_BUS_MIN,
-    /** Apple Cocoa */
-    FJ_BUS_COCOA,
     /** No-operation testing bus that contains no sockets and is basically a
         dummy. This may be useful for some cases when you need to build the
         library without any real buses. */
     FJ_BUS_NOOP,
+    /** Android Native Development Kit */
+    FJ_BUS_ANDK,
+    /** Apple Cocoa */
+    FJ_BUS_COCOA,
     /** Apple UI Kit */
     FJ_BUS_UIKIT,
     /** Wayland protocol */
@@ -26,75 +29,71 @@ enum fj_bus_id {
 };
 
 enum fj_socket_id {
-    /** Messages of this socket may be implemented by any other socket. */
-    FJ_SOCKET_GENERIC = FJ_ID_SOCKET_MIN,
+    FJ_SOCKET_GENERIC,
+    FJ_SOCKET_SCHEDULER,
     FJ_SOCKET_WINDOW,
-    FJ_SOCKET_BUS_WAKEUP,
+    FJ_SOCKET_SURFACE,
+    FJ_SOCKET_POINTER_INPUT,
+    FJ_SOCKET_KEYBOARD_INPUT,
+    FJ_SOCKET_TOUCHPAD_INPUT,
+    FJ_SOCKET_BLANK,
+    FJ_SOCKET_RASTER,
+    FJ_SOCKET_OPENGL,
+    FJ_SOCKET_VULKAN,
 };
 
 enum fj_generic_message_id {
-    FJ_GENERIC_DEVICE_ADDED = FJ_FIRST_MESSAGE_OF(FJ_SOCKET_GENERIC),
-    FJ_GENERIC_DEVICE_REMOVED,
-    FJ_GENERIC_CAPABILITY,
-    FJ_GENERIC_MONITOR_DEVICES,
+    FJ_GENERIC_SOCKET_OPEN = FJ_FIRST_MESSAGE_ID(FJ_SOCKET_GENERIC),
+    FJ_GENERIC_SOCKET_CLOSE,
+    FJ_GENERIC_DEVICE_ADD,
+    FJ_GENERIC_DEVICE_REMOVE,
+    FJ_GENERIC_DEVICE_OPEN,
+    FJ_GENERIC_DEVICE_CLOSE,
 };
-
-typedef uint32_t fj_serve_type_t;
 
 enum fj_serve_type {
     /** Represents most kinds of main program entrypoints. */
-    FJ_SERVE_TYPE_MAIN = 1,
+    FJ_SERVE_TYPE_MAIN,
 };
 
-typedef uint32_t fj_bus_schedule_command_t;
 
-enum fj_bus_schedule_command {
-    FJ_SCHEDULE_WAIT_FOREVER = 0,
-    FJ_SCHEDULE_WAIT_INTERVAL,
-    FJ_SCHEDULE_QUIT,
-};
-
-struct fj_bus_schedule {
-    fj_bus_schedule_command_t command;
-    uint32_t interval_ms;
-};
-
-/** Must be the first field of every bus context. */
-struct fj_bus_context_base {
-    struct fj_bus const * bus;
-
-    /** The array is sorted by socket IDs. */
-    struct fj_socket const * const * FJ_ARRAY sockets;
-    uint32_t socket_count;
-
-    struct fj_bus_schedule schedule;
-    void * FJ_NULLABLE user_data;
-};
-
-/** Must be the first field of every socket context. */
-struct fj_socket_context_base {
-    struct fj_socket const * socket;
+struct fj_socket_context_base FJ_INHERITABLE {
     void * bus_context;
+    struct fj_socket const * socket;
 };
 
-/** Must be the first field of every device context. */
-struct fj_device_context_base {
+
+struct fj_device_context_base FJ_INHERITABLE {
     void * socket_context;
-    void * device_handle;
+    void * device;
 };
+
 
 struct fj_message {
     void * socket_context;
     void * FJ_NULLABLE device_context;
     fj_id_t message;
-    void * message_data;
+    void * FJ_NULLABLE message_data;
 };
+
 
 typedef fj_err_t (fj_bus_listener_t)(
     void * bus_context,
-    uint32_t message_count,
-    struct fj_message const * FJ_ARRAY messages
+    struct fj_message const * message
 );
+
+
+struct fj_bus_context_base FJ_INHERITABLE {
+    struct fj_bus const * bus;
+
+    /** The array is sorted by socket IDs. */
+    struct fj_socket const * const * FJ_NULLABLE FJ_ARRAY sockets;
+    uint32_t socket_count;
+
+    fj_bus_listener_t * listener;
+
+    void * FJ_NULLABLE user_data;
+};
 
 
 struct fj_bus {
@@ -102,8 +101,7 @@ struct fj_bus {
     fj_version_t version;
 
     fj_err_t (* open)(
-        void * FJ_NULLABLE FJ_OUT * bus_context,
-        fj_bus_listener_t * bus_listener
+        void * FJ_NULLABLE FJ_OUT * bus_context
     );
 
     void (* close)(
@@ -112,14 +110,8 @@ struct fj_bus {
 
     fj_err_t (* serve)(
         void * bus_context,
-        fj_serve_type_t serve_type,
+        fj_id_t serve_type,
         void * FJ_NULLABLE serve_data
-    );
-
-    /** Commits all the buffered changes to the shell.
-        This must be called inside the `serve` method. */
-    fj_err_t (* commit)(
-        void * bus_context
     );
 };
 
@@ -129,9 +121,7 @@ struct fj_socket {
     void const * FJ_NULLABLE interface;
     void const * FJ_NULLABLE private;
 
-    /** This is a buffered operation. When committing it, the socket will
-        send initial capability messages in order to notify the user what
-        messages can be sent to the socket or its devices. */
+    /** This is a buffered operation. */
     fj_err_t (* open)(
         void * bus_context,
         void * FJ_NULLABLE FJ_OUT * socket_context
@@ -151,9 +141,14 @@ struct fj_socket {
         void * device_context
     );
 
-    /** Buffers the message. Unsupported messages are ignored. */
+    /** Buffers the message. Unsupported messages may be ignored. */
     fj_err_t (* send)(
         struct fj_message const * message
+    );
+
+    fj_bool_t (* supports)(
+        void * device_context,
+        fj_id_t capability
     );
 };
 

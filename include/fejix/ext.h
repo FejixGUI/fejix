@@ -33,7 +33,7 @@ fj_string_t FJ_NULLABLE fj_ext_get_bus_name_hint(void);
 /** Returns the bus name string corresponding to the given bus id.
     The bus name is a NULL-terminated ASCII string of maximum length 32
     (including the NULL terminator). */
-fj_string_t fj_ext_get_bus_name(fj_bus_id_t bus_id);
+fj_string_t fj_ext_get_bus_name(fj_id_t bus_id);
 
 /** If the name is not NULL, searches for the bus with the given name.
     Else, if there is only one bus available, returns that bus.

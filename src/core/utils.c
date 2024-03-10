@@ -13,29 +13,23 @@ uint32_t fj_uint32_hash32(uint32_t x)
     return x;
 }
 
-#ifdef FJ_HAS_UINT64
-    uint32_t fj_uint64_hash32(uint64_t x)
-    {
-        x ^= x >> 32;
-        x *= UINT64_C(0xd6e8feb86659fd93);
-        x ^= x >> 32;
-        x *= UINT64_C(0xd6e8feb86659fd93);
-        x ^= x >> 32;
-        return (uint32_t) x;
-    }
-#endif
+uint32_t fj_uint64_hash32(uint64_t x)
+{
+    x ^= x >> 32;
+    x *= UINT64_C(0xd6e8feb86659fd93);
+    x ^= x >> 32;
+    x *= UINT64_C(0xd6e8feb86659fd93);
+    x ^= x >> 32;
+    return (uint32_t) x;
+}
 
 uint32_t fj_uintptr_hash32(uintptr_t x)
 {
-#ifdef FJ_HAS_UINT64
     if (sizeof(x) <= 4) {
         return fj_uint32_hash32((uint32_t) x);
     } else {
         return fj_uint64_hash32((uint64_t) x);
     }
-#else
-    return fj_uint32_hash32((uint32_t) x);
-#endif
 }
 
 

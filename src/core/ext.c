@@ -22,12 +22,13 @@ fj_string_t const * FJ_ARRAY global_argv;
 
 static
 fj_string_t bus_names[] = {
-    FJ_UTF8("andk"),
-    FJ_UTF8("cocoa"),
-    FJ_UTF8("uikit"),
-    FJ_UTF8("wayland"),
-    FJ_UTF8("winapi"),
-    FJ_UTF8("x11"),
+    [FJ_BUS_NOOP] = FJ_UTF8("noop"),
+    [FJ_BUS_ANDK] = FJ_UTF8("andk"),
+    [FJ_BUS_COCOA] = FJ_UTF8("cocoa"),
+    [FJ_BUS_UIKIT] = FJ_UTF8("uikit"),
+    [FJ_BUS_WAYLAND] = FJ_UTF8("wayland"),
+    [FJ_BUS_WINAPI] = FJ_UTF8("winapi"),
+    [FJ_BUS_X11] = FJ_UTF8("x11"),
 };
 
 
@@ -75,7 +76,7 @@ fj_string_t FJ_NULLABLE fj_ext_get_bus_name_hint(void)
 }
 
 
-fj_string_t fj_ext_get_bus_name(fj_bus_id_t bus_id)
+fj_string_t fj_ext_get_bus_name(fj_id_t bus_id)
 {
     return bus_names[bus_id];
 }
@@ -139,11 +140,14 @@ fj_err_t run_bus(struct program_data * data)
     struct fj_bus const * bus = data->selected_bus;
     void * bus_context = NULL;
 
-    FJ_TRY bus->open(&bus_context, data->bus_listener);
+    FJ_TRY bus->open(&bus_context);
 
     if (FJ_FAILED) {
         return FJ_LAST_ERROR;
     }
+
+    struct fj_bus_context_base * bus_context_base = bus_context;
+    bus_context_base->listener = data->bus_listener;
 
     FJ_TRY bus->serve(bus_context, FJ_SERVE_TYPE_MAIN, NULL);
 

@@ -62,9 +62,7 @@
 
 uint32_t fj_uint32_hash32(uint32_t x);
 
-#ifdef FJ_HAS_UINT64
-    uint32_t fj_uint64_hash32(uint64_t x);
-#endif
+uint32_t fj_uint64_hash32(uint64_t x);
 
 /** Requires that pointers support clear conversions to `uintptr_t`, that is,
     if `a_ptr == b_ptr`, then `(uintptr_t) a_ptr == (uintptr_t) b_ptr`,

@@ -2,14 +2,14 @@
 #include <fejix/utils.h>
 
 
+#ifdef FJ_OPT_NOOP
+    extern struct fj_bus const fj_noop_bus;
+#endif
 #ifdef FJ_OPT_ANDK
     extern struct fj_bus const fj_andk_bus;
 #endif
 #ifdef FJ_OPT_COCOA
     extern struct fj_bus const fj_cocoa_bus;
-#endif
-#ifdef FJ_OPT_NOOP
-    extern struct fj_bus const fj_noop_bus;
 #endif
 #ifdef FJ_OPT_UIKIT
     extern struct fj_bus const fj_uikit_bus;
@@ -28,14 +28,14 @@
 static
 struct fj_bus const * const bus_list[] = {
 
+#ifdef FJ_OPT_NOOP
+    &fj_noop_bus,
+#endif
 #ifdef FJ_OPT_ANDK
     &fj_andk_bus,
 #endif
 #ifdef FJ_OPT_COCOA
     &fj_cocoa_bus,
-#endif
-#ifdef FJ_OPT_NOOP
-    &fj_noop_bus,
 #endif
 #ifdef FJ_OPT_UIKIT
     &fj_uikit_bus,
