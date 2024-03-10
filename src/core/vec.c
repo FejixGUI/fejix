@@ -236,22 +236,22 @@ void * fj_vec_offset(struct fj_vec * vec, uint32_t index)
 
 uint32_t fj_vec_find(
     struct fj_vec * vec,
-    void * item,
-    fj_vec_item_compararator_fn_t predicate
+    fj_vec_search_fn_t predicate,
+    void * data
 )
 {
     if (FJ_VEC_IS_EMPTY(*vec)) {
         return vec->length;
     }
 
-    return fj_vec_search(vec, item, predicate, 0, FJ_VEC_LAST_INDEX(*vec));
+    return fj_vec_search(vec, predicate, data, 0, FJ_VEC_LAST_INDEX(*vec));
 }
 
 
 uint32_t fj_vec_search(
     struct fj_vec * vec,
-    void * item,
-    fj_vec_item_compararator_fn_t predicate,
+    fj_vec_search_fn_t predicate,
+    void * data,
     uint32_t start_index,
     uint32_t end_index
 )
@@ -260,9 +260,9 @@ uint32_t fj_vec_search(
     int32_t step = start_index < end_index ? 1 : -1;
 
     for ( ; index < vec->length; index += step) {
-        void * vec_item = fj_vec_offset(vec, index);
+        void * item = fj_vec_offset(vec, index);
 
-        if (predicate(vec_item, item) == true) {
+        if (predicate(data, item) == true) {
             return index;
         }
     }

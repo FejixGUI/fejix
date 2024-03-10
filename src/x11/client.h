@@ -3,7 +3,7 @@
 
 
 #include "src/client.h"
-#include "src/modules/unixpoller/unixpoller.h"
+#include "src/modules/fdpoll/fdpoll.h"
 
 #include <xcb/xcb.h>
 #include <X11/Xlib.h>
@@ -15,8 +15,8 @@ struct fj_x11_data {
 
     xcb_connection_t * connection;
     Display * xdisplay;
-    
-    struct fj_unixpoller * unixpoller;
+
+    struct fj_fdpoll * fdpoll;
 };
 
 

@@ -20,7 +20,7 @@
 #define FJ_VEC_HAS_ALLOCATED(VEC) ((VEC).items != NULL)
 
 
-typedef fj_bool_t (* fj_vec_item_compararator_fn_t)(void * a, void * b);
+typedef fj_bool_t (* fj_vec_search_fn_t)(void * data, void * item);
 
 
 /** Dynamically-allocated linear array. */
@@ -134,8 +134,8 @@ fj_err_t fj_vec_pop_item(struct fj_vec * vec);
     - The length of the array if the item was not found. */
 uint32_t fj_vec_search(
     struct fj_vec * vec,
-    void * item,
-    fj_vec_item_compararator_fn_t predicate,
+    fj_vec_search_fn_t predicate,
+    void * data,
     uint32_t start_index,
     uint32_t end_index
 );
@@ -144,7 +144,7 @@ uint32_t fj_vec_search(
 /** Linearly searches for the item using the predicate function.
 
     This is the same as:
-    `fj_vec_search(vec, item, predicate, 0, vec->length-1)`.
+    `fj_vec_search(vec, predicate, data, 0, FJ_VEC_LAST_INDEX(*vec))`.
 
     === RETURNS ===
 
@@ -152,8 +152,8 @@ uint32_t fj_vec_search(
     - The length of the array if the item was not found. */
 uint32_t fj_vec_find(
     struct fj_vec * vec,
-    void * item,
-    fj_vec_item_compararator_fn_t predicate
+    fj_vec_search_fn_t predicate,
+    void * data
 );
 
 

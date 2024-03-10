@@ -34,6 +34,13 @@ if(FJ_OPT_WAYLAND)
     )
 endif()
 
+if(FJ_OPT_FDPOLL)
+    target_sources(
+        fejix PRIVATE
+        "${FEJIX_SRC}/shared/fdpoll/fdpoll.c"
+    )
+endif()
+
 
 # Define "FJ_FILENAME" for every source file
 get_target_property(fejix_source_files fejix SOURCES)

@@ -17,11 +17,16 @@ set(
     # Generic features
     "FJ_OPT_CLIPBOARD"
     "FJ_OPT_ICONTRAY"
+
+    # Other components
+    "FJ_OPT_FDPOLL"
 )
 
 foreach(option ${FEJIX_OPTIONS})
     option("${option}" OFF)
 endforeach()
+
+
 
 if(
         NOT FJ_OPT_ANDK
@@ -39,6 +44,12 @@ endif()
 if(FJ_OPT_NOOP)
     message(WARNING "<<<FEJIX>>> Noop bus is enabled!")
 endif()
+
+if(FJ_OPT_WAYLAND OR FJ_OPT_X11)
+    set(FJ_OPT_FDPOLL ON)
+endif()
+
+
 
 foreach(option ${FEJIX_OPTIONS})
     if(${option})

@@ -78,10 +78,10 @@ typedef uint8_t * FJ_ARRAY fj_string_mut_t;
 /** Error message string. */
 typedef fj_string_t fj_err_t;
 
-/** Represents a rational number of a/b. */
+/** Represents a rational number of p/q. */
 struct fj_ratio {
-    int32_t a;
-    uint32_t b;
+    int32_t p;
+    uint32_t q;
 };
 
 

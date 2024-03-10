@@ -71,10 +71,10 @@ static fj_err_t x11_client_load_modules(struct fj_client * client)
 {
     struct fj_x11_data * x11_data = client->platform_data.x11;
 
-    x11_data->unixpoller = fj_unixpoller_new();
+    x11_data->fdpoll = fj_fdpoll_new();
 
-    if (x11_data->unixpoller == NULL) {
-        return FJ_ERR("cannot create unixpoller");
+    if (x11_data->fdpoll == NULL) {
+        return FJ_ERR("cannot create fdpoll");
     }
 
     return FJ_OK;
