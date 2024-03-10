@@ -13,6 +13,12 @@ target_sources(
     "${FEJIX_SRC}/core/ext.c"
 )
 
+if(FJ_OPT_NOOP)
+    target_sources(
+        fejix PRIVATE
+        "${FEJIX_SRC}/noop/bus.c"
+    )
+endif()
 
 if(FJ_OPT_WINAPI)
     target_sources(

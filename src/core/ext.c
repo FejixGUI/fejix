@@ -9,7 +9,7 @@ struct program_data {
     fj_bus_listener_t * bus_listener;
     struct fj_bus const * const * FJ_ARRAY buses;
     uint32_t bus_count;
-    fj_string_t FJ_NULLABLE bus_name_hint;
+    fj_string_t FJ_NULLABLE bus_name;
     struct fj_bus const * FJ_NULLABLE selected_bus;
 };
 
@@ -54,9 +54,18 @@ void fj_ext_set_process_args(
 
 fj_string_t FJ_NULLABLE fj_ext_get_bus_name_hint(void)
 {
-    fj_string_t bus = NULL;
+    uint32_t bus_count;
+    struct fj_bus const * const * FJ_ARRAY buses;
 
-    bus = (fj_string_t) getenv("FEJIX_PROTOCOL");
+    fj_get_buses(&bus_count, &buses);
+
+    if (bus_count == 1) {
+        return fj_ext_get_bus_name(buses[0]->id);
+    }
+
+    fj_string_t bus;
+
+    bus = (fj_string_t) getenv("FEJIX_BUS");
 
     if (bus != NULL) {
         return bus;
@@ -83,7 +92,7 @@ fj_string_t fj_ext_get_bus_name(fj_id_t bus_id)
 
 
 struct fj_bus const * FJ_NULLABLE fj_ext_get_bus(
-    fj_string_t FJ_NULLABLE name_hint
+    fj_string_t name
 )
 {
     uint32_t bus_count;
@@ -91,18 +100,10 @@ struct fj_bus const * FJ_NULLABLE fj_ext_get_bus(
 
     fj_get_buses(&bus_count, &buses);
 
-    if (name_hint == NULL) {
-        if (bus_count == 1) {
-            return buses[0];
-        }
-
-        return NULL;
-    }
-
     for (uint32_t i=0; i<bus_count; i++) {
         fj_string_t bus_name = fj_ext_get_bus_name(buses[i]->id);
 
-        if (fj_str_eq(bus_name, name_hint)) {
+        if (fj_str_eq(bus_name, name)) {
             return buses[i];
         }
     }
@@ -121,11 +122,16 @@ void get_buses(struct program_data * data)
 static
 fj_err_t select_bus(struct program_data * data)
 {
-    data->bus_name_hint = fj_ext_get_bus_name_hint();
-    data->selected_bus = fj_ext_get_bus(data->bus_name_hint);
+    data->bus_name = fj_ext_get_bus_name_hint();
+
+    if (data->bus_name == NULL) {
+        return FJ_ERR("cannot select a graphical bus");
+    }
+
+    data->selected_bus = fj_ext_get_bus(data->bus_name);
 
     if (data->selected_bus == NULL) {
-        return FJ_ERR("cannot select a graphical bus");
+        return FJ_ERR("cannot find the given graphical bus");
     }
 
     return FJ_OK;
@@ -162,8 +168,9 @@ void print_help(void)
 {
     fprintf(
         stderr,
-        "Note: define 'FEJIX_BUS' or 'XDG_SESSION_TYPE' environment variables"
-        " to specify which graphical bus to use.\n"
+        "Note: define 'FEJIX_BUS' or 'XDG_SESSION_TYPE' environment "
+        "variables to specify which graphical bus to use.\n"
+        "If there is only one built-in bus, it will be used unconditionally.\n"
     );
 }
 
@@ -193,8 +200,8 @@ void print_error_from_select_bus(struct program_data * data, fj_err_t err)
 {
     printf("Error: '%s'\n", err);
 
-    if (data->bus_name_hint != NULL) {
-        fprintf(stderr, "Unknown graphical bus '%s'.\n", data->bus_name_hint);
+    if (data->bus_name != NULL) {
+        fprintf(stderr, "Unknown graphical bus '%s'.\n", data->bus_name);
     } else {
         fprintf(stderr, "No graphical bus specified.\n");
     }

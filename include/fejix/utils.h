@@ -24,6 +24,8 @@
 #   define FJ_UNUSED(X)
 #endif
 
+#define FJ_INTEND_UNUSED(X) (void) X;
+
 /** Get length of a fixed-length array. */
 #define FJ_ARRLEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 

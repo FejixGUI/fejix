@@ -1,7 +1,13 @@
 #include <fejix/bus.h>
 #include <fejix/utils.h>
+#include <fejix/malloc.h>
 
 #include <stdio.h>
+
+
+struct fj_noop_bus_context {
+    struct fj_bus_context_base FJ_INHERIT base;
+};
 
 
 static
@@ -9,9 +15,7 @@ fj_err_t bus_open(
     void * FJ_NULLABLE FJ_OUT * bus_context
 )
 {
-    FJ_UNUSED(bus_context)
-    FJ_UNUSED(bus_listener)
-    return FJ_OK;
+    return fj_alloc_zeroed(bus_context, sizeof(struct fj_noop_bus_context));
 }
 
 
@@ -20,7 +24,7 @@ void bus_close(
     void * bus_context
 )
 {
-    FJ_UNUSED(bus_context)
+    fj_free(bus_context);
 }
 
 
@@ -31,24 +35,12 @@ fj_err_t bus_serve(
     void * FJ_NULLABLE serve_data
 )
 {
-    FJ_UNUSED(bus_context)
-    FJ_UNUSED(serve_type)
-    FJ_UNUSED(serve_data)
+    FJ_INTEND_UNUSED(bus_context)
+    FJ_INTEND_UNUSED(serve_type)
+    FJ_INTEND_UNUSED(serve_data)
 
-    printf(
-        "Note: Fejix is running a NOOP bus, this is just a test."
-    );
+    printf("Note: Fejix is running NOOP bus, it does nothing.\n");
 
-    return FJ_OK;
-}
-
-
-static
-fj_err_t bus_commit(
-    void * bus_context
-)
-{
-    FJ_UNUSED(bus_context)
     return FJ_OK;
 }
 

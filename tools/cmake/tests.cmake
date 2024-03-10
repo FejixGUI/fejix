@@ -23,6 +23,10 @@ endmacro()
 fejix_add_simple_c_test(core_vec_test "${FEJIX_TESTS}/core/vec.c")
 fejix_add_simple_c_test(core_map_test "${FEJIX_TESTS}/core/map.c")
 
+if(FJ_OPT_NOOP)
+    fejix_add_simple_c_test(noop_test "${FEJIX_TESTS}/noop/noop.c")
+endif()
+
 if(FJ_OPT_WINAPI)
     fejix_add_simple_c_test(winapi_test "${FEJIX_TESTS}/winapi/utils.c")
 endif()

@@ -25,7 +25,8 @@ void fj_ext_set_process_args(
 /** Returns the name of the protocol that the program should try to use,
     deduced from the environment.
 
-    First, it tries to read the `FEJIX_PROTOCOL` environment variable.
+    First, if there is only one bus available, this function returns its name.
+    Otherwise, it tries to read the `FEJIX_BUS` environment variable.
     If that fails, it tries to read `XDG_SESSION_TYPE`.
     If that fails, returns NULL. */
 fj_string_t FJ_NULLABLE fj_ext_get_bus_name_hint(void);
@@ -35,11 +36,9 @@ fj_string_t FJ_NULLABLE fj_ext_get_bus_name_hint(void);
     (including the NULL terminator). */
 fj_string_t fj_ext_get_bus_name(fj_id_t bus_id);
 
-/** If the name is not NULL, searches for the bus with the given name.
-    Else, if there is only one bus available, returns that bus.
-    Else, returns NULL. */
+/** Searches for the bus with the given name. */
 struct fj_bus const * FJ_NULLABLE fj_ext_get_bus(
-    fj_string_t FJ_NULLABLE name_hint
+    fj_string_t name_hint
 );
 
 
