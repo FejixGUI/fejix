@@ -8,7 +8,7 @@
 
 fj_err_t fj_winapi_utf8_to_wstr(
     fj_string_t utf8_string,
-    LPWSTR FJ_NULLABLE FJ_OUT * wide_string
+    LPWSTR fjOPTION fjOUT * wide_string
 )
 {
     FJ_INIT_ERRORS
@@ -44,7 +44,7 @@ fj_err_t fj_winapi_utf8_to_wstr(
 
     if (result == 0) {
         fj_free((void *) wide_string);
-        return FJ_ERR("cannot convert invalid UTF-8 to wide string");
+        return FJ_RESULT("cannot convert invalid UTF-8 to wide string");
     }
 
     return FJ_OK;

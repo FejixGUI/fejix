@@ -7,7 +7,7 @@
 
 static
 fj_err_t bus_open(
-    void * FJ_NULLABLE FJ_OUT * bus_context,
+    void *fjOPTION fjOUT * bus_context,
     fj_bus_listener_t * bus_listener
 )
 {
@@ -28,7 +28,7 @@ static
 fj_err_t bus_serve(
     void * bus_context,
     fj_serve_type_t serve_type,
-    void * FJ_NULLABLE serve_data
+    void *fjOPTION serve_data
 )
 {
     return FJ_OK;

@@ -9,7 +9,7 @@
 int main(void) {
     FJ_INIT_ERRORS
 
-    LPWSTR FJ_NULLABLE wide_string = NULL;
+    LPWSTR fjOPTION wide_string = NULL;
 
     FJ_TRY fj_winapi_utf8_to_wstr(FJ_UTF8(""), &wide_string);
 

@@ -5,6 +5,39 @@
 #include <string.h>
 
 
+uint32_t fj_vec_get_last_index(struct fj_vec const * vec)
+{
+    return vec->length - 1;
+}
+
+uint32_t fj_vec_get_push_index(struct fj_vec const * vec)
+{
+    return vec->length;
+}
+
+fj_bool32_t fj_vec_is_empty(struct fj_vec const * vec)
+{
+    return vec->length == 0;
+}
+
+fj_bool32_t fj_vec_has_allocated(struct fj_vec const * vec)
+{
+    return vec->items != NULL;
+}
+
+void *fjARRAY_OPTION fj_vec_offset(
+    struct fj_vec const * vec,
+    uint32_t offset_index
+)
+{
+    if (offset_index >= vec->capacity) {
+        return NULL;
+    }
+
+    return (uint8_t *) vec->items + vec->item_size * offset_index;
+}
+
+
 /** Small optimization to reduce the amount of allocations. */
 static
 uint32_t vec_get_min_capacity(struct fj_vec * vec)
@@ -45,10 +78,9 @@ uint32_t vec_get_capacity_to_shrink(struct fj_vec * vec)
 }
 
 
-static
-fj_err_t vec_set_capacity(struct fj_vec * vec, uint32_t capacity)
+fj_err_t fj_vec_resize(struct fj_vec * vec, uint32_t capacity)
 {
-    FJ_INIT_ERRORS
+    FJ_INIT_TRY
 
     if (vec->capacity == capacity) {
         return FJ_OK;
@@ -56,20 +88,27 @@ fj_err_t vec_set_capacity(struct fj_vec * vec, uint32_t capacity)
 
     FJ_TRY fj_realloc_uninit(&vec->items, capacity, vec->item_size);
 
-    if (FJ_FAILED) {
-        return FJ_LAST_ERROR;
+    FJ_ELSE {
+        return FJ_RESULT;
     }
 
     vec->capacity = capacity;
+    vec->length = FJ_MIN(vec->length, vec->capacity);
 
     return FJ_OK;
 }
 
 
-fj_err_t fj_vec_ensure_reserved(struct fj_vec * vec, uint32_t reserved_items)
+fj_err_t fj_vec_resize_to_reserve(struct fj_vec * vec, uint32_t reserved_items)
 {
     uint32_t new_capacity = vec_get_capacity_to_grow(vec, reserved_items);
-    return vec_set_capacity(vec, new_capacity);
+    return fj_vec_resize(vec, new_capacity);
+}
+
+
+fj_err_t fj_vec_resize_to_fit(struct fj_vec * vec)
+{
+    return fj_vec_resize(vec, vec->length);
 }
 
 
@@ -77,18 +116,12 @@ static
 fj_err_t vec_maybe_shrink(struct fj_vec * vec)
 {
     uint32_t new_capacity = vec_get_capacity_to_shrink(vec);
-    return vec_set_capacity(vec, new_capacity);
-}
-
-
-fj_err_t fj_vec_shrink_to_fit(struct fj_vec * vec)
-{
-    return vec_set_capacity(vec, vec->length);
+    return fj_vec_resize(vec, new_capacity);
 }
 
 
 static
-void shift_items_to_grow(
+void shift_items_for_insert(
     struct fj_vec * vec,
     uint32_t source_index,
     uint32_t item_distance
@@ -102,7 +135,7 @@ void shift_items_to_grow(
 
 
 static
-void shift_items_to_shrink(
+void shift_items_for_remove(
     struct fj_vec * vec,
     uint32_t source_index,
     uint32_t item_distance
@@ -117,15 +150,15 @@ void shift_items_to_shrink(
 
 void fj_vec_init(struct fj_vec * vec, size_t item_size)
 {
-    *vec = (struct fj_vec) { 0 };
-
-    vec->item_size = item_size;
+    *vec = (struct fj_vec) {
+        .item_size = item_size
+    };
 }
 
 
 void fj_vec_deinit(struct fj_vec * vec)
 {
-    if (FJ_VEC_HAS_ALLOCATED(*vec)) {
+    if (fj_vec_has_allocated(vec)) {
         fj_free((void *) &vec->items);
     }
 
@@ -134,7 +167,7 @@ void fj_vec_deinit(struct fj_vec * vec)
 }
 
 
-void fj_vec_copy_items(
+void fj_vec_replace_items(
     struct fj_vec * vec,
     void * items,
     uint32_t destination_index,
@@ -153,22 +186,43 @@ fj_err_t fj_vec_insert_uninit(
     uint32_t item_count
 )
 {
-    FJ_INIT_ERRORS
+    FJ_INIT_TRY
 
-    FJ_TRY fj_vec_ensure_reserved(vec, item_count);
+    FJ_TRY fj_vec_resize_to_reserve(vec, item_count);
 
-    if (FJ_FAILED) {
-        return FJ_LAST_ERROR;
+    FJ_ELSE {
+        return FJ_RESULT;
     }
 
     if (
-        !FJ_VEC_IS_EMPTY(*vec)
-        && destination_index != FJ_VEC_PUSH_INDEX(*vec)
+        !fj_vec_is_empty(vec)
+        && destination_index != fj_vec_get_push_index(vec)
     ) {
-        shift_items_to_grow(vec, destination_index, item_count);
+        shift_items_for_insert(vec, destination_index, item_count);
     }
 
     vec->length += item_count;
+
+    return FJ_OK;
+}
+
+
+fj_err_t fj_vec_insert_items(
+    struct fj_vec * vec,
+    void * items,
+    uint32_t destination_index,
+    uint32_t item_count
+)
+{
+    FJ_INIT_TRY
+
+    FJ_TRY fj_vec_insert_uninit(vec, destination_index, item_count);
+
+    FJ_ELSE {
+        return FJ_RESULT;
+    }
+
+    fj_vec_replace_items(vec, items, destination_index, item_count);
 
     return FJ_OK;
 }
@@ -180,8 +234,8 @@ fj_err_t fj_vec_remove_items(
     uint32_t item_count
 )
 {
-    if (start_index + item_count <= FJ_VEC_LAST_INDEX(*vec)) {
-        shift_items_to_shrink(vec, start_index+item_count, item_count);
+    if (start_index + item_count <= fj_vec_get_last_index(vec)) {
+        shift_items_for_remove(vec, start_index+item_count, item_count);
     }
 
     vec->length -= item_count;
@@ -190,82 +244,13 @@ fj_err_t fj_vec_remove_items(
 }
 
 
-fj_err_t fj_vec_insert_items(
-    struct fj_vec * vec,
-    void * items,
-    uint32_t destination_index,
-    uint32_t item_count
-)
-{
-    FJ_INIT_ERRORS
-
-    FJ_TRY fj_vec_insert_uninit(vec, destination_index, item_count);
-
-    if (FJ_FAILED) {
-        return FJ_LAST_ERROR;
-    }
-
-    fj_vec_copy_items(vec, items, destination_index, item_count);
-
-    return FJ_OK;
-}
-
-
 fj_err_t fj_vec_push_item(struct fj_vec * vec, void * item)
 {
-    return fj_vec_insert_items(vec, item, FJ_VEC_PUSH_INDEX(*vec), 1);
+    return fj_vec_insert_items(vec, item, fj_vec_get_push_index(vec), 1);
 }
 
 
 fj_err_t fj_vec_pop_item(struct fj_vec * vec)
 {
-    return fj_vec_remove_items(vec, FJ_VEC_LAST_INDEX(*vec), 1);
-}
-
-
-void * fj_vec_offset(struct fj_vec * vec, uint32_t index)
-{
-    if (index >= vec->length) {
-        return NULL;
-    }
-
-    uint8_t * items = (uint8_t *) vec->items;
-    return items + index * vec->item_size;
-}
-
-
-uint32_t fj_vec_find(
-    struct fj_vec * vec,
-    fj_vec_search_fn_t predicate,
-    void * data
-)
-{
-    if (FJ_VEC_IS_EMPTY(*vec)) {
-        return vec->length;
-    }
-
-    return fj_vec_search(vec, predicate, data, 0, FJ_VEC_LAST_INDEX(*vec));
-}
-
-
-uint32_t fj_vec_search(
-    struct fj_vec * vec,
-    fj_vec_search_fn_t predicate,
-    void * data,
-    uint32_t start_index,
-    uint32_t end_index
-)
-{
-    uint32_t index = start_index;
-    int32_t step = start_index < end_index ? 1 : -1;
-
-    for ( ; index < vec->length; index += step) {
-        void * item = fj_vec_offset(vec, index);
-
-        if (predicate(data, item) == true) {
-            return index;
-        }
-    }
-
-    return vec->length;
+    return fj_vec_remove_items(vec, fj_vec_get_last_index(vec), 1);
 }

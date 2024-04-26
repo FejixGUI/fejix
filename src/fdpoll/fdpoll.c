@@ -16,7 +16,7 @@ fj_err_t process_events(
 
     struct pollfd * pollfds = FJ_VEC_OF(poller->pollfds, struct pollfd);
 
-    fj_fdpoll_callback_fn_t * * FJ_ARRAY callbacks = FJ_VEC_OF(
+    fj_fdpoll_callback_fn_t * *fjARRAY callbacks = FJ_VEC_OF(
         poller->callbacks,
         fj_fdpoll_callback_fn_t *
     );
@@ -54,7 +54,7 @@ fj_err_t process_interruption(
     FJ_INTEND_UNUSED(callback_data)
 
     if (events & (POLLERR|POLLHUP|POLLNVAL)) {
-        return FJ_ERR("error on interruptor FD");
+        return FJ_RESULT("error on interruptor FD");
     }
 
     uint8_t buffer[1];
@@ -74,7 +74,7 @@ fj_err_t fj_fdpoll_init(struct fj_fdpoll * poller)
     int pipe_result = pipe((int32_t *) poller->interrupt_pipe);
 
     if (pipe_result < 0) {
-        return FJ_ERR("fdpoll pipe failed");
+        return FJ_RESULT("fdpoll pipe failed");
     }
 
     FJ_TRY fj_fdpoll_add(
@@ -196,7 +196,7 @@ fj_err_t fj_fdpoll_poll(
     );
 
     if (result < 0) {
-        return FJ_ERR("fdpoll poll failed");
+        return FJ_RESULT("fdpoll poll failed");
     }
 
     if (result == 0) {
@@ -223,7 +223,7 @@ fj_err_t fj_fdpoll_interrupt(
     ssize_t written_count = write(interruptor, buffer, 1);
 
     if (written_count < 0) {
-        return FJ_ERR("fdpoll failed to write to interruptor FD");
+        return FJ_RESULT("fdpoll failed to write to interruptor FD");
     }
 
     return FJ_OK;

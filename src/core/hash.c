@@ -1,7 +1,5 @@
 #include <fejix/utils.h>
 
-#include <string.h>
-
 
 uint32_t fj_uint32_hash32(uint32_t x)
 {
@@ -30,18 +28,4 @@ uint32_t fj_uintptr_hash32(uintptr_t x)
     } else {
         return fj_uint64_hash32((uint64_t) x);
     }
-}
-
-
-fj_bool_t fj_str_eq(fj_string_t FJ_NULLABLE a, fj_string_t FJ_NULLABLE b)
-{
-    if (a == NULL && b == NULL) {
-        return true;
-    }
-
-    if (a == NULL || b == NULL) {
-        return false;
-    }
-
-    return strcmp((char const *) a, (char const *) b) == 0;
 }

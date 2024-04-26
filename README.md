@@ -1,10 +1,13 @@
 # Fejix window management library
 
-Fejix is a cross-platform low-level abstraction library for object-oriented communication protocols of graphical shells.
-Written in C99.
+Fejix is a cross-platform C99 library that abstracts graphical protocols.
+It can perform tasks like window management, graphical API initialisation,
+input and more.
 
-> This library is in early development.
-> For now, there is just an emoji: 🌸.
+> This library is in the earliest development stage.
+>
+> The most interesting thing to see here is this emoji: 🌸.
+>
 > Yay.
 
 ## Build
@@ -20,7 +23,7 @@ mkdir ./build
 
 # Configure the build
 cmake -S . -B ./build
-# Or if you need to specify any options:
+# Or if you need to specify some options:
 cmake -S . -B ./build -D {OPTION1}={VALUE1} -D {OPTION2}={VALUE2}
 
 # Perform the build

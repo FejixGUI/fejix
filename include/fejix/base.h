@@ -7,82 +7,47 @@
 #include <stdbool.h>
 
 
+/** Annotates an output function argument. The argument should be write-only.
+    This is an opposite of `const`, which annotates read-only values. */
+#define fjOUT
 
-/** Annotates a pointer that can be NULL. */
-#define FJ_NULLABLE
+/** Annotates a nullable pointer. */
+#define fjOPTION
 
-/** Annotates a pointer to an output variable.
-    The value behind the pointer will only be written and never read.
-    Therefore, the output variable does not have to be initialised. */
-#define FJ_OUT
+/** Annotates an array pointer. */
+#define fjARRAY
 
-/** Annotates a pointer that repressents an array. */
-#define FJ_ARRAY
+/** Annotates a nullable array pointer. */
+#define fjARRAY_OPTION
 
 /** Annotates a struct that is a "base class" and is inheritable.
     The inheritance happens by putting the base struct as the first field of
     "derived classes" so that they can be safely dereferenced as the base
     struct. */
-#define FJ_INHERITABLE
+#define fjINHERITABLE
 
 /** Annotates the first field of a struct that inherits a base struct. */
-#define FJ_INHERIT
+#define fjINHERIT
 
-/** A value of `fj_err_t` that means that there are no errors. */
-#define FJ_OK (NULL)
-
-/** Does the type conversion required to use the string literal as a UTF-8
-    string. */
-#define FJ_UTF8(STRING_LITERAL) ((fj_string_t)(void *) (STRING_LITERAL))
-
-/** Makes a version number from two unsigned integers (max is UINT16_MAX). */
-#define FJ_VERSION(MAJOR, MINOR) \
-    ((((fj_version_t)(MAJOR)) << 16) | ((fj_version_t)(MINOR)))
-
-/** Gets the major component of the version. */
-#define FJ_VERSION_MAJOR(VERSION) ((VERSION) >> 16)
-
-/** Gets the minor component of the version. */
-#define FJ_VERSION_MINOR(VERSION) ((VERSION) & 0x0000FFFF)
+/** Converts (char const *fjARRAY) to (uint8_t const *fjARRAY) */
+#define FJ_UTF8(STRING_LITERAL) ((uint8_t const *)(void *)(STRING_LITERAL))
 
 
-/** Identifier of bus, socket, message or capability. */
-typedef uint32_t fj_id_t;
+/** An identifier, which may take only enum values. */
+typedef uint32_t fj_enum32_t;
 
+/** Use standard `true`/`false` for this. */
+typedef uint32_t fj_bool32_t;
 
-/** Represents a MAJOR.MINOR tuple.
-    The higher half contains the major component.
-    The lower half contains the minor component.
-    Therefore, it is safe to compare versions as normal numbers. */
-typedef uint32_t fj_version_t;
+/** Error code. */
+typedef fj_enum32_t fj_err_t;
 
-/** Integer numeric type of a fixed size. This is a replacement of `_Bool`,
-    which has no specificly defined size.
-
-    === USAGE ===
-
-    Use the standard `true` or `false` for this.
-
-    === CAUTION ===
-
-    This is a numeric type. Therefore, `(fj_bool_t) 0.5 == false` while
-    `(bool) 0.5 == true`. Never convert arbitrary objects to booleans. */
-typedef uint8_t fj_bool_t;
-
-/** UTF-8 null-terminated string. */
-typedef uint8_t const * FJ_ARRAY fj_string_t;
-
-/** Mutable UTF-8 null-terminated string. */
-typedef uint8_t * FJ_ARRAY fj_string_mut_t;
-
-/** Error message string. */
-typedef fj_string_t fj_err_t;
+typedef uint64_t fj_nanoseconds_t;
 
 /** Represents a rational number of p/q. */
 struct fj_ratio {
     int32_t p;
     uint32_t q;
 };
-
 
 #endif

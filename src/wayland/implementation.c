@@ -6,7 +6,7 @@
 
 static
 fj_err_t bus_open(
-    void * FJ_NULLABLE FJ_OUT * bus_context
+    void *fjOPTION fjOUT * bus_context
 )
 {
     FJ_INIT_ERRORS
@@ -34,12 +34,12 @@ static
 fj_err_t bus_serve(
     void * bus_context,
     fj_id_t serve_type,
-    void * FJ_NULLABLE serve_data
+    void *fjOPTION serve_data
 )
 {
-    FJ_UNUSED(bus_context)
-    FJ_UNUSED(serve_type)
-    FJ_UNUSED(serve_data)
+    FJ_DEBUG_WARN_UNUSED(bus_context)
+    FJ_DEBUG_WARN_UNUSED(serve_type)
+    FJ_DEBUG_WARN_UNUSED(serve_data)
 
     return FJ_OK;
 }

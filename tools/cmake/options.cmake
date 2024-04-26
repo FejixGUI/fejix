@@ -1,7 +1,10 @@
+option(BUILD_TESTS OFF)
+
+
 set(
     FEJIX_OPTIONS
 
-    # Buses
+    # Implementations
     "FJ_OPT_ANDK"
     "FJ_OPT_COCOA"
     "FJ_OPT_NOOP"
@@ -27,22 +30,21 @@ foreach(option ${FEJIX_OPTIONS})
 endforeach()
 
 
-
 if(
-        NOT FJ_OPT_ANDK
+    NOT FJ_OPT_NOOP
+
+    AND NOT FJ_OPT_ANDK
     AND NOT FJ_OPT_COCOA
     AND NOT FJ_OPT_X11
     AND NOT FJ_OPT_WAYLAND
     AND NOT FJ_OPT_WINAPI
-
-    AND NOT FJ_OPT_NOOP
 )
-    message(WARNING "<<<FEJIX>>> No bus specified, selecting a noop bus.")
+    message(WARNING "<<<FEJIX>>> No implementation specified, selecting a NOOP bus.")
     set(FJ_OPT_NOOP ON)
 endif()
 
 if(FJ_OPT_NOOP)
-    message(WARNING "<<<FEJIX>>> Noop bus is enabled!")
+    message(WARNING "<<<FEJIX>>> NOOP implementation is enabled!")
 endif()
 
 if(FJ_OPT_WAYLAND OR FJ_OPT_X11)

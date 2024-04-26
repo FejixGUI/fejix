@@ -26,7 +26,7 @@ struct fj_fdpoll {
 };
 
 
-fj_err_t fj_fdpoll_init(struct fj_fdpoll FJ_OUT * poller);
+fj_err_t fj_fdpoll_init(struct fj_fdpoll fjOUT * poller);
 
 void fj_fdpoll_deinit(struct fj_fdpoll * poller);
 

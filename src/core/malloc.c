@@ -5,34 +5,34 @@
 #include <string.h>
 
 
-fj_err_t fj_alloc_uninit(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
+fj_err_t fj_alloc_uninit(void *fjOPTION fjOUT * ptr, size_t size)
 {
     if (size == 0) {
         ptr = NULL;
-        return FJ_ERR("cannot allocate 0 bytes");
+        return FJ_ERR_MALLOC_INVALID_ARG;
     }
 
     *ptr = malloc(size);
 
     if (*ptr == NULL) {
-        return FJ_ERR("memory allocation failed");
+        return FJ_ERR_OUT_OF_MEMORY;
     }
 
     return FJ_OK;
 }
 
 
-fj_err_t fj_alloc_zeroed(void * FJ_NULLABLE FJ_OUT * ptr, size_t size)
+fj_err_t fj_alloc_zeroed(void *fjOPTION fjOUT * ptr, size_t size)
 {
     if (size == 0) {
         *ptr = NULL;
-        return FJ_ERR("cannot allocate 0 bytes");
+        return FJ_ERR_MALLOC_INVALID_ARG;
     }
 
     *ptr = calloc(1, size);
 
     if (*ptr == NULL) {
-        return FJ_ERR("memory allocation failed");
+        return FJ_ERR_OUT_OF_MEMORY;
     }
 
     return FJ_OK;
@@ -47,7 +47,7 @@ void fj_free(void ** ptr)
 
 
 fj_err_t fj_realloc_uninit(
-    void * FJ_NULLABLE FJ_ARRAY * ptr,
+    void *fjARRAY_OPTION * ptr,
     uint32_t item_count,
     size_t item_size
 )
@@ -70,7 +70,7 @@ fj_err_t fj_realloc_uninit(
     void * new_ptr = realloc(*ptr, size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR("memory reallocation failed");
+        return FJ_ERR_OUT_OF_MEMORY;
     }
 
     *ptr = new_ptr;
@@ -79,7 +79,7 @@ fj_err_t fj_realloc_uninit(
 
 
 fj_err_t fj_realloc_zeroed(
-    void * FJ_NULLABLE FJ_ARRAY * ptr,
+    void *fjARRAY_OPTION * ptr,
     uint32_t old_item_count,
     uint32_t new_item_count,
     size_t item_size
@@ -105,7 +105,7 @@ fj_err_t fj_realloc_zeroed(
     void * new_ptr = realloc(old_ptr, new_size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR("memory reallocation failed");
+        return FJ_ERR_OUT_OF_MEMORY;
     }
 
     if (new_size > old_size) {

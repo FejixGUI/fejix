@@ -12,13 +12,13 @@ static fj_err_t x11_connect(struct fj_x11_data * x11_data)
     x11_data->xdisplay = XOpenDisplay(NULL);
 
     if (x11_data->xdisplay == NULL) {
-        return FJ_ERR("cannot connect to X11 display");
+        return FJ_RESULT("cannot connect to X11 display");
     }
 
     x11_data->connection = XGetXCBConnection(x11_data->xdisplay);
 
     if (x11_data->connection == NULL) {
-        return FJ_ERR("cannot create XCB connection");
+        return FJ_RESULT("cannot create XCB connection");
     }
 
     return FJ_OK;
@@ -36,7 +36,7 @@ static fj_err_t x11_setup(struct fj_client * client)
     struct fj_x11_data * x11_data = fj_alloc_zeroed(sizeof *x11_data);
 
     if (x11_data == NULL) {
-        return FJ_ERR(FJ_MALLOC_FAILED);
+        return FJ_RESULT(FJ_MALLOC_FAILED);
     }
 
     fj_err_t err = x11_connect(x11_data);
@@ -74,7 +74,7 @@ static fj_err_t x11_client_load_modules(struct fj_client * client)
     x11_data->fdpoll = fj_fdpoll_new();
 
     if (x11_data->fdpoll == NULL) {
-        return FJ_ERR("cannot create fdpoll");
+        return FJ_RESULT("cannot create fdpoll");
     }
 
     return FJ_OK;
