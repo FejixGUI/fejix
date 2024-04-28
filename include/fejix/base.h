@@ -32,6 +32,7 @@
 /** Converts (char const *fjARRAY) to (uint8_t const *fjARRAY) */
 #define FJ_UTF8(STRING_LITERAL) ((uint8_t const *)(void *)(STRING_LITERAL))
 
+#define FJ_DEFINE_HANDLE(TYPE) typedef struct TYPE##_handle TYPE;
 
 /** An identifier, which may take only enum values. */
 typedef uint32_t fj_enum32_t;

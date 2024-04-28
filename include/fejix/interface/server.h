@@ -1,13 +1,17 @@
-#ifndef FEJIX_SOCKET_SCHEDULER_H_
-#define FEJIX_SOCKET_SCHEDULER_H_
+#ifndef FEJIX_SERVER_H_
+#define FEJIX_SERVER_H_
 
 
 #include <fejix/implementation.h>
+#include <fejix/interface/instance.h>
 
 
-enum fj_serve_type {
+FJ_DEFINE_HANDLE(fj_server_t)
+
+
+enum fj_server_serve_type {
     /** Represents most kinds of main program entrypoints. */
-    FJ_SERVE_TYPE_MAIN,
+    FJ_SERVER_SERVE_TYPE_MAIN,
 };
 
 enum fj_server_schedule_type {
@@ -22,56 +26,61 @@ enum fj_server_message_id {
 };
 
 
+struct fj_message {
+    fj_enum32_t sender_interface_id;
+    fj_enum32_t message_id;
+    void * sender_object;
+    void *fjOPTION message_data;
+};
+
 typedef fj_err_t (fj_server_callback_fn_t)(
     void * callback_data,
-    void * server_context,
+    fj_server_t * server,
     struct fj_message const * message
 );
-
 
 struct fj_server_info {
     void * callback_data;
     fj_server_callback_fn_t * callback;
 };
 
+fjINHERITABLE
 struct fj_server_signal {
-    void * signal_data;
-
     fj_err_t (* signal)(
         struct fj_server_signal const * signal
     );
 };
 
 struct fj_server_schedule {
-    fj_enum32_t schedule;
+    fj_enum32_t schedule_type;
 
     fj_nanoseconds_t timeout;
 };
 
 struct fj_server {
     fj_err_t (* create)(
-        void * instance,
+        fj_instance_t * instance,
         struct fj_server_info const * info,
-        void * fjOUT * server_context
+        fj_server_t * fjOUT * server
     );
 
     fj_err_t (* destroy)(
-        void * server_context
+        fj_server_t * server
     );
 
     fj_err_t (* serve)(
-        void * server_context,
+        fj_server_t * server,
         fj_enum32_t serve_type,
         void * serve_data
     );
 
     void (* get_signal)(
-        void * server_context,
-        struct fj_server_signal fjOUT * signal
+        fj_server_t * server,
+        struct fj_server_signal const * fjOUT * signal
     );
 
     void (* set_schedule)(
-        void * server_context,
+        fj_server_t * server,
         struct fj_server_schedule const * schedule
     );
 };

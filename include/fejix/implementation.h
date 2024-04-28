@@ -28,16 +28,11 @@ enum fj_implementation_id {
 enum fj_interface_id {
     FJ_INSTANCE,
     FJ_SERVER,
-    FJ_COMPOSITOR,
-    FJ_DISPLAY,
+    FJ_RENDER_MANAGER,
+    FJ_COMPOSITING_MANAGER,
+    FJ_DISPLAY_MANAGER,
 };
 
-struct fj_message {
-    fj_enum32_t sender_interface_id;
-    fj_enum32_t message_id;
-    void * sender_object;
-    void *fjOPTION message_data;
-};
 
 struct fj_implementation {
     fj_enum32_t implementation_id;

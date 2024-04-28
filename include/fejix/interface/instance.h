@@ -6,6 +6,9 @@
 #include <fejix/implementation.h>
 
 
+FJ_DEFINE_HANDLE(fj_instance_t)
+
+
 struct fj_instance_info {
     /** In format of "com.some_organisation.some_program.some_module".
         This will be automatically converted to the native format. */
@@ -16,11 +19,11 @@ struct fj_instance {
     fj_err_t (* create)(
         struct fj_implementation const * implementation,
         struct fj_instance_info const * info,
-        void * fjOUT * instance_context
+        fj_instance_t * fjOUT * context
     );
 
     fj_err_t (* destroy)(
-        void * instance_context
+        fj_instance_t * context
     );
 };
 
