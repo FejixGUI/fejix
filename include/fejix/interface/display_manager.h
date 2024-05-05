@@ -5,8 +5,8 @@
 #include <fejix/base.h>
 
 
-FJ_DEFINE_HANDLE(fj_display_manager_t)
-FJ_DEFINE_HANDLE(fj_display_context_t)
+FJ_DEFINE_UNIQUE_TYPE(fj_display_manager_t)
+FJ_DEFINE_UNIQUE_TYPE(fj_display_context_t)
 
 
 #endif

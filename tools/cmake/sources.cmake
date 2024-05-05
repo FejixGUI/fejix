@@ -5,9 +5,9 @@ target_include_directories(fejix PRIVATE "${FEJIX_ROOT}")
 # Fejix core
 target_sources(
     fejix PRIVATE
+    "${FEJIX_SRC}/core/any.c"
     "${FEJIX_SRC}/core/malloc.c"
     "${FEJIX_SRC}/core/vec.c"
-    "${FEJIX_SRC}/core/hash.c"
     "${FEJIX_SRC}/core/map.c"
     "${FEJIX_SRC}/core/implementation.c"
     "${FEJIX_SRC}/core/ext.c"
@@ -16,28 +16,28 @@ target_sources(
 if(FJ_OPT_NOOP)
     target_sources(
         fejix PRIVATE
-        "${FEJIX_SRC}/noop/implementation.c"
+        "${FEJIX_SRC}/implementation/noop/implementation.c"
     )
 endif()
 
 if(FJ_OPT_WINAPI)
     target_sources(
         fejix PRIVATE
-        "${FEJIX_SRC}/winapi/utils.c"
+        "${FEJIX_SRC}/implementation/winapi/utils.c"
     )
 endif()
 
 if(FJ_OPT_WAYLAND)
     target_sources(
         fejix PRIVATE
-        "${FEJIX_SRC}/wayland/implementation.c"
+        "${FEJIX_SRC}/implementation/wayland/implementation.c"
     )
 endif()
 
-if(FJ_OPT_FDPOLL)
+if(FJ_OPT_UNIXPOLL)
     target_sources(
         fejix PRIVATE
-        "${FEJIX_SRC}/fdpoll/fdpoll.c"
+        "${FEJIX_SRC}/platform/ipc/unixpoll/unixpoll.c"
     )
 endif()
 

@@ -32,7 +32,9 @@
 /** Converts (char const *fjARRAY) to (uint8_t const *fjARRAY) */
 #define FJ_UTF8(STRING_LITERAL) ((uint8_t const *)(void *)(STRING_LITERAL))
 
-#define FJ_DEFINE_HANDLE(TYPE) typedef struct TYPE##_handle TYPE;
+/** Creates a unique typedef. Such typedefs are used in public API to make
+    pointers to internal structures type-safe. */
+#define FJ_DEFINE_UNIQUE_TYPE(TYPE) typedef struct TYPE##_type TYPE;
 
 /** An identifier, which may take only enum values. */
 typedef uint32_t fj_enum32_t;
@@ -45,10 +47,25 @@ typedef fj_enum32_t fj_err_t;
 
 typedef uint64_t fj_nanoseconds_t;
 
-/** Represents a rational number of p/q. */
 struct fj_ratio {
-    int32_t p;
-    uint32_t q;
+    int32_t numerator;
+    uint32_t denominator;
 };
+
+struct fj_position2d {
+    int32_t x;
+    int32_t y;
+};
+
+struct fj_size2d {
+    uint32_t width;
+    uint32_t height;
+};
+
+struct fj_rect2d {
+    struct fj_position2d position;
+    struct fj_size2d size;
+};
+
 
 #endif

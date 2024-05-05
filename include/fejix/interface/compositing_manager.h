@@ -8,23 +8,24 @@
 #include <fejix/interface/display_manager.h>
 
 
-FJ_DEFINE_HANDLE(fj_compositing_manager_t)
-FJ_DEFINE_HANDLE(fj_compositing_context_t)
+FJ_DEFINE_UNIQUE_TYPE(fj_compositing_manager_t)
+FJ_DEFINE_UNIQUE_TYPE(fj_compositing_context_t)
 
 
 enum fj_compositing_manager_message_id {
-    FJ_COMPOSITING_CONTEXT_SIZE_CHANGED,
+    FJ_COMPOSITING_CONTEXT_CREATED,
+    FJ_COMPOSITING_CONTEXT_DESTROYED,
 };
 
 
 struct fj_compositing_context_info {
     fj_compositing_context_t *fjOPTION old_context;
-    fj_display_context_t *fjOPTION display_context;
-    fj_rendering_context_t * rendering_context;
+    fj_rendering_context_t * source;
+    fj_compositing_context_t *fjOPTION destination;
 };
 
-struct fj_compositing_context_caps {
-    uint32_t max_subcompositing_depth;
+struct fj_compositing_context_desc {
+    fj_bool32_t allows_subcompositing;
 };
 
 struct fj_compositing_manager {
@@ -34,7 +35,7 @@ struct fj_compositing_manager {
     );
 
     fj_err_t (* destroy)(
-        fj_compositing_manager_t * compositing_manager
+        fj_compositing_manager_t * manager
     );
 
     fj_err_t (* create_context)(
@@ -48,10 +49,16 @@ struct fj_compositing_manager {
         fj_compositing_context_t * context
     );
 
-    void (* get_context_caps)(
+    void (* get_context_desc)(
         fj_compositing_manager_t * manager,
         fj_compositing_context_t * context,
-        struct fj_compositing_context_caps fjOUT * context_caps
+        struct fj_compositing_context_desc fjOUT * context_desc
+    );
+
+    fj_err_t (* set_context_attachments)(
+        fj_compositing_manager_t * manager,
+        fj_compositing_context_t * context,
+        void const * attachments // TODO
     );
 };
 

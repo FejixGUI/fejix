@@ -6,7 +6,7 @@
 #include <fejix/interface/instance.h>
 
 
-FJ_DEFINE_HANDLE(fj_server_t)
+FJ_DEFINE_UNIQUE_TYPE(fj_server_t)
 
 
 enum fj_server_serve_type {
@@ -33,21 +33,23 @@ struct fj_message {
     void *fjOPTION message_data;
 };
 
-typedef fj_err_t (fj_server_callback_fn_t)(
-    void * callback_data,
-    fj_server_t * server,
-    struct fj_message const * message
-);
+fjINHERITABLE
+struct fj_server_callback {
+    fj_err_t (* call)(
+        struct fj_server_callback const * callback,
+        fj_server_t * server,
+        struct fj_message const * message
+    );
+};
 
 struct fj_server_info {
-    void * callback_data;
-    fj_server_callback_fn_t * callback;
+    struct fj_server_callback const * callback;
 };
 
 fjINHERITABLE
-struct fj_server_signal {
+struct fj_server_interrupt_signal {
     fj_err_t (* signal)(
-        struct fj_server_signal const * signal
+        struct fj_server_interrupt_signal const * signal
     );
 };
 
@@ -74,9 +76,9 @@ struct fj_server {
         void * serve_data
     );
 
-    void (* get_signal)(
+    void (* get_interrupt_signal)(
         fj_server_t * server,
-        struct fj_server_signal const * fjOUT * signal
+        struct fj_server_interrupt_signal const * fjOUT * signal
     );
 
     void (* set_schedule)(

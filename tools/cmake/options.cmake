@@ -22,7 +22,7 @@ set(
     "FJ_OPT_ICONTRAY"
 
     # Other components
-    "FJ_OPT_FDPOLL"
+    "FJ_OPT_UNIXPOLL"
 )
 
 foreach(option ${FEJIX_OPTIONS})
@@ -39,7 +39,7 @@ if(
     AND NOT FJ_OPT_WAYLAND
     AND NOT FJ_OPT_WINAPI
 )
-    message(WARNING "<<<FEJIX>>> No implementation specified, selecting a NOOP bus.")
+    message(WARNING "<<<FEJIX>>> No implementation specified, selecting a NOOP implementation.")
     set(FJ_OPT_NOOP ON)
 endif()
 
@@ -48,7 +48,7 @@ if(FJ_OPT_NOOP)
 endif()
 
 if(FJ_OPT_WAYLAND OR FJ_OPT_X11)
-    set(FJ_OPT_FDPOLL ON)
+    set(FJ_OPT_UNIXPOLL ON)
 endif()
 
 

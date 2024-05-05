@@ -6,11 +6,11 @@
 #include <fejix/implementation.h>
 
 
-FJ_DEFINE_HANDLE(fj_instance_t)
+FJ_DEFINE_UNIQUE_TYPE(fj_instance_t)
 
 
 struct fj_instance_info {
-    /** In format of "com.some_organisation.some_program.some_module".
+    /** In format of "Com.Some_Organisation.Some_Program.Some_Module".
         This will be automatically converted to the native format. */
     uint8_t const *fjARRAY program_name;
 };

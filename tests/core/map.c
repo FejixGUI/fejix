@@ -15,41 +15,61 @@ int main(void)
     char const * b = "b";
     char const * c = "c";
 
-    fj_map_init(&m);
+    char const * const * ap;
+    char const * const * bp;
+    char const * const * cp;
 
-    FJ_TRY fj_map_set(&m, 1, (void *) a);
+    fj_map_init(&m, FJ_TYPE_U32, FJ_TYPE_PTR);
+
+    FJ_TRY fj_map_set(&m, FJ_U32(1), FJ_PTR(a));
     assert(FJ_RESULT == FJ_OK);
 
-    FJ_TRY fj_map_set(&m, 2, (void *) b);
+    FJ_TRY fj_map_set(&m, FJ_U32(2), FJ_PTR(b));
     assert(FJ_RESULT == FJ_OK);
 
-    FJ_TRY fj_map_set(&m, 3, (void *) c);
+    FJ_TRY fj_map_set(&m, FJ_U32(3), FJ_PTR(c));
     assert(FJ_RESULT == FJ_OK);
 
-    assert(fj_map_get(&m, 1) == a);
-    assert(fj_map_get(&m, 2) == b);
-    assert(fj_map_get(&m, 3) == c);
+    ap = fj_map_get(&m, FJ_U32(1));
+    bp = fj_map_get(&m, FJ_U32(2));
+    cp = fj_map_get(&m, FJ_U32(3));
 
-    FJ_TRY fj_map_set(&m, 2, NULL);
+    assert(*ap == a);
+    assert(*bp == b);
+    assert(*cp == c);
+
+    FJ_TRY fj_map_remove(&m, FJ_U32(2));
     assert(FJ_RESULT == FJ_OK);
 
-    assert(fj_map_get(&m, 1) == a);
-    assert(fj_map_get(&m, 2) == NULL);
-    assert(fj_map_get(&m, 3) == c);
+    ap = fj_map_get(&m, FJ_U32(1));
+    bp = fj_map_get(&m, FJ_U32(2));
+    cp = fj_map_get(&m, FJ_U32(3));
 
-    FJ_TRY fj_map_set(&m, 2, NULL);
+    assert(*ap == a);
+    assert(bp == NULL);
+    assert(*cp == c);
+
+    FJ_TRY fj_map_remove(&m, FJ_U32(2));
     assert(FJ_RESULT == FJ_OK);
 
-    assert(fj_map_get(&m, 1) == a);
-    assert(fj_map_get(&m, 2) == NULL);
-    assert(fj_map_get(&m, 3) == c);
+    ap = fj_map_get(&m, FJ_U32(1));
+    bp = fj_map_get(&m, FJ_U32(2));
+    cp = fj_map_get(&m, FJ_U32(3));
 
-    FJ_TRY fj_map_set(&m, 3, NULL);
+    assert(*ap == a);
+    assert(bp == NULL);
+    assert(*cp == c);
+
+    FJ_TRY fj_map_remove(&m, FJ_U32(3));
     assert(FJ_RESULT == FJ_OK);
 
-    assert(fj_map_get(&m, 1) == a);
-    assert(fj_map_get(&m, 2) == NULL);
-    assert(fj_map_get(&m, 3) == NULL);
+    ap = fj_map_get(&m, FJ_U32(1));
+    bp = fj_map_get(&m, FJ_U32(2));
+    cp = fj_map_get(&m, FJ_U32(3));
+
+    assert(*ap == a);
+    assert(bp == NULL);
+    assert(cp == NULL);
 
     fj_map_deinit(&m);
 

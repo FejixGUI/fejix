@@ -3,11 +3,12 @@
 
 
 #include <fejix/base.h>
+#include <fejix/any.h>
 
 
 struct fj_map_element {
-    uintptr_t key;
-    void * value;
+    union fj_any key;
+    union fj_any value;
 };
 
 struct fj_map_node {
@@ -15,8 +16,9 @@ struct fj_map_node {
     struct fj_map_element element;
 };
 
-/** Hash table of `uintptr_t` -> `void *`, where values are not NULL. */
 struct fj_map {
+    fj_enum32_t key_type;
+    fj_enum32_t value_type;
     uint32_t element_count;
     uint32_t bucket_count;
     struct fj_map_node *fjOPTION *fjARRAY_OPTION buckets;
@@ -30,7 +32,9 @@ struct fj_map_iter {
 
 
 void fj_map_init(
-    struct fj_map * map
+    struct fj_map * map,
+    fj_enum32_t key_type,
+    fj_enum32_t value_type
 );
 
 void fj_map_deinit(
@@ -45,17 +49,21 @@ fj_bool32_t fj_map_has_allocated(
     struct fj_map const * map
 );
 
-/** Removes the element if `value` is NULL. */
 fj_err_t fj_map_set(
     struct fj_map * map,
-    uintptr_t key,
-    void *fjOPTION value
+    union fj_any key,
+    union fj_any value
 );
 
-/** Returns NULL if the element was not found. */
+/** Returns the pointer to value. Returns NULL if the element was not found. */
 void *fjOPTION fj_map_get(
     struct fj_map const * map,
-    uintptr_t key
+    union fj_any key
+);
+
+fj_err_t fj_map_remove(
+    struct fj_map * map,
+    union fj_any key
 );
 
 

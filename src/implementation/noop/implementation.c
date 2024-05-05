@@ -8,8 +8,8 @@ void const *fjOPTION noop_get_interface(
     fj_enum32_t interface_id
 )
 {
-    (void) implementation;
-    (void) interface_id;
+    FJ_UNUSED(implementation);
+    FJ_UNUSED(interface_id);
 
     return NULL;
 }

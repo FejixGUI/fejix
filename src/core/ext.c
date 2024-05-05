@@ -16,6 +16,7 @@ uint8_t const *fjARRAY error_descriptions[] = {
     [FJ_OK] = FJ_UTF8("success"),
 
     [FJ_ERR_UNKNOWN] = FJ_UTF8("unknown error"),
+    [FJ_ERR_INTERFACE_UNSUPPORTED] = FJ_UTF8("interface unsupported"),
     [FJ_ERR_OUT_OF_MEMORY] = FJ_UTF8("out of memory"),
     [FJ_ERR_MALLOC_INVALID_ARG] = FJ_UTF8("invalid memory allocation arg"),
 };
@@ -41,20 +42,17 @@ uint8_t const *fjARRAY implementation_names[] = {
     [FJ_IMPLEMENTATION_NOOP] = FJ_UTF8("noop"),
     [FJ_IMPLEMENTATION_ANDK] = FJ_UTF8("andk"),
     [FJ_IMPLEMENTATION_COCOA] = FJ_UTF8("cocoa"),
-    [FJ_IMPLEMENTATION_UIKIT] = FJ_UTF8("uikit"),
     [FJ_IMPLEMENTATION_WAYLAND] = FJ_UTF8("wayland"),
     [FJ_IMPLEMENTATION_WINAPI] = FJ_UTF8("winapi"),
     [FJ_IMPLEMENTATION_X11] = FJ_UTF8("x11"),
 };
 
 
-uint8_t const *fjARRAY_OPTION fj_ext_get_implementation_hint(void)
+uint8_t const *fjARRAY_OPTION fj_ext_get_implementation_hint(
+    uint32_t impl_count,
+    struct fj_implementation const * const *fjARRAY impls
+)
 {
-    uint32_t impl_count;
-    struct fj_implementation const * const *fjARRAY impls;
-
-    fj_get_builtin_implementations(&impl_count, &impls);
-
     if (impl_count == 1) {
         return fj_ext_get_implementation_name(impls[0]->implementation_id);
     }
@@ -90,15 +88,12 @@ uint8_t const *fjARRAY_OPTION fj_ext_get_implementation_name(
 }
 
 
-struct fj_implementation const *fjOPTION fj_ext_find_builtin_implementation(
-    uint8_t const *fjARRAY implementation_name
+struct fj_implementation const *fjOPTION fj_ext_find_implementation(
+    uint8_t const *fjARRAY implementation_name,
+    uint32_t impl_count,
+    struct fj_implementation const * const *fjARRAY impls
 )
 {
-    uint32_t impl_count;
-    struct fj_implementation const * const *fjARRAY impls;
-
-    fj_get_builtin_implementations(&impl_count, &impls);
-
     for (uint32_t i=0; i<impl_count; i++) {
         fj_enum32_t impl_id = impls[i]->implementation_id;
         uint8_t const * name = fj_ext_get_implementation_name(impl_id);

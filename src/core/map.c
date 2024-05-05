@@ -1,7 +1,6 @@
 #include <fejix/map.h>
 #include <fejix/malloc.h>
 #include <fejix/utils.h>
-#include <fejix/hash.h>
 
 #include <string.h>
 
@@ -22,23 +21,37 @@ fj_bool32_t fj_map_has_allocated(struct fj_map const * map)
 
 
 static
-uintptr_t get_key(struct fj_map_node * node)
+union fj_any get_key(struct fj_map_node const * node)
 {
     return node->element.key;
 }
 
 
 static
-uint32_t get_bucket_index(uintptr_t key, uint32_t bucket_count)
+fj_bool32_t key_eq(
+    struct fj_map const * map,
+    struct fj_map_node const * node,
+    union fj_any key
+)
 {
-    return fj_uintptr_hash32(key) % bucket_count;
+    return fj_any_eq(get_key(node), key, map->key_type);
 }
 
 
 static
-struct fj_map_node * * get_bucket(struct fj_map const * map, uintptr_t key)
+uint32_t get_bucket_index(
+    struct fj_map const * map,
+    union fj_any key
+)
 {
-    uint32_t index = get_bucket_index(key, map->bucket_count);
+    return fj_any_hash32(key, map->key_type) % map->bucket_count;
+}
+
+
+static
+struct fj_map_node * * get_bucket(struct fj_map const * map, union fj_any key)
+{
+    uint32_t index = get_bucket_index(map, key);
     return &map->buckets[index];
 }
 
@@ -102,8 +115,9 @@ void raw_insert(struct fj_map * map, struct fj_map_node * node)
 
 static
 void find_node_in_bucket(
+    struct fj_map const * map,
     struct fj_map_node * * bucket,
-    uintptr_t key,
+    union fj_any key,
     struct fj_map_node *fjOPTION fjOUT * found_node,
     struct fj_map_node *fjOPTION fjOUT * found_previous_node
 )
@@ -118,12 +132,12 @@ void find_node_in_bucket(
     struct fj_map_node * previous_node = NULL;
     struct fj_map_node * current_node = *bucket;
 
-    while (current_node != NULL && get_key(current_node) != key) {
+    while (current_node != NULL && !key_eq(map, current_node, key)) {
         previous_node = current_node;
         current_node = current_node->next;
     }
 
-    if (current_node != NULL && get_key(current_node) == key) {
+    if (current_node != NULL && key_eq(map, current_node, key)) {
         *found_node = current_node;
         *found_previous_node = previous_node;
     }
@@ -131,13 +145,13 @@ void find_node_in_bucket(
 
 
 static
-struct fj_map_node * raw_remove(struct fj_map * map, uintptr_t key)
+struct fj_map_node * raw_remove(struct fj_map * map, union fj_any key)
 {
     struct fj_map_node * * bucket = get_bucket(map, key);
 
     struct fj_map_node * node;
     struct fj_map_node * prev_node;
-    find_node_in_bucket(bucket, key, &node, &prev_node);
+    find_node_in_bucket(map, bucket, key, &node, &prev_node);
 
     if (node == NULL) {
         return NULL;
@@ -312,7 +326,7 @@ fj_err_t validate_map(struct fj_map * map)
 
 
 static
-fj_err_t map_remove(struct fj_map * map, uintptr_t key)
+fj_err_t map_remove(struct fj_map * map, union fj_any key)
 {
     struct fj_map_node * node = raw_remove(map, key);
 
@@ -329,13 +343,13 @@ fj_err_t map_remove(struct fj_map * map, uintptr_t key)
 
 
 static
-struct fj_map_element * map_find(struct fj_map const * map, uintptr_t key)
+struct fj_map_element * map_find(struct fj_map const * map, union fj_any key)
 {
     struct fj_map_node ** bucket = get_bucket(map, key);
 
     struct fj_map_node * prev_node;
     struct fj_map_node * node;
-    find_node_in_bucket(bucket, key, &node, &prev_node);
+    find_node_in_bucket(map, bucket, key, &node, &prev_node);
 
     if (node == NULL) {
         return NULL;
@@ -348,7 +362,11 @@ struct fj_map_element * map_find(struct fj_map const * map, uintptr_t key)
 /** Returns true if the value was updated, false if the record does not exist
     in the map. */
 static
-fj_bool32_t map_update(struct fj_map * map, uintptr_t key, void * value)
+fj_bool32_t map_update(
+    struct fj_map * map,
+    union fj_any key,
+    union fj_any value
+)
 {
     struct fj_map_element * element = map_find(map, key);
 
@@ -363,7 +381,7 @@ fj_bool32_t map_update(struct fj_map * map, uintptr_t key, void * value)
 
 
 static
-fj_err_t map_insert(struct fj_map * map, uintptr_t key, void * value)
+fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 {
     FJ_INIT_TRY
 
@@ -405,12 +423,8 @@ fj_err_t map_allocate(struct fj_map * map)
 
 
 static
-fj_err_t map_set(struct fj_map * map, uintptr_t key, void * value)
+fj_err_t map_set(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    if (value == NULL) {
-        return map_remove(map, key);
-    }
-
     if (map_update(map, key, value)) {
         return FJ_OK;
     }
@@ -420,7 +434,7 @@ fj_err_t map_set(struct fj_map * map, uintptr_t key, void * value)
 
 
 static
-void *fjOPTION map_get(struct fj_map const * map, uintptr_t key)
+void *fjOPTION map_get(struct fj_map const * map, union fj_any key)
 {
     struct fj_map_element * element = map_find(map, key);
 
@@ -428,13 +442,20 @@ void *fjOPTION map_get(struct fj_map const * map, uintptr_t key)
         return NULL;
     }
 
-    return element->value;
+    return &element->value;
 }
 
 
-void fj_map_init(struct fj_map * map)
+void fj_map_init(
+    struct fj_map * map,
+    fj_enum32_t key_type,
+    fj_enum32_t value_type
+)
 {
-    *map = (struct fj_map) { 0 };
+    *map = (struct fj_map) {
+        .key_type = key_type,
+        .value_type = value_type
+    };
 }
 
 
@@ -456,7 +477,7 @@ void fj_map_deinit(struct fj_map * map)
 }
 
 
-fj_err_t fj_map_set(struct fj_map * map, uintptr_t key, void * value)
+fj_err_t fj_map_set(struct fj_map * map, union fj_any key, union fj_any value)
 {
     FJ_INIT_TRY
 
@@ -472,13 +493,23 @@ fj_err_t fj_map_set(struct fj_map * map, uintptr_t key, void * value)
 }
 
 
-void *fjOPTION fj_map_get(struct fj_map const * map, uintptr_t key)
+void *fjOPTION fj_map_get(struct fj_map const * map, union fj_any key)
 {
     if (!fj_map_has_allocated(map)) {
         return NULL;
     }
 
     return map_get(map, key);
+}
+
+
+fj_err_t fj_map_remove(struct fj_map * map, union fj_any key)
+{
+    if (!fj_map_has_allocated(map)) {
+        return FJ_OK;
+    }
+
+    return map_remove(map, key);
 }
 
 
