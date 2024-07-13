@@ -1,8 +1,9 @@
-#include <fejix/map.h>
-#include <fejix/error.h>
-#include <fejix/utils.h>
+#include <fejix/core/map.h>
+#include <fejix/core/error.h>
+#include <fejix/core/utils.h>
 
 #include <assert.h>
+#include <stdio.h>
 
 
 int main(void)
@@ -72,6 +73,8 @@ int main(void)
     assert(cp == NULL);
 
     fj_map_deinit(&m);
+
+    puts("OK");
 
     return 0;
 }

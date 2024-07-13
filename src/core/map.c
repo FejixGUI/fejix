@@ -1,6 +1,7 @@
-#include <fejix/map.h>
-#include <fejix/malloc.h>
-#include <fejix/utils.h>
+#include <fejix/core/map.h>
+
+#include <fejix/core/malloc.h>
+#include <fejix/core/utils.h>
 
 #include <string.h>
 
@@ -118,8 +119,8 @@ void find_node_in_bucket(
     struct fj_map const * map,
     struct fj_map_node * * bucket,
     union fj_any key,
-    struct fj_map_node *fjOPTION fjOUT * found_node,
-    struct fj_map_node *fjOPTION fjOUT * found_previous_node
+    struct fj_map_node */*?*/ /*out*/ * found_node,
+    struct fj_map_node */*?*/ /*out*/ * found_previous_node
 )
 {
     *found_node = NULL;
@@ -434,7 +435,7 @@ fj_err_t map_set(struct fj_map * map, union fj_any key, union fj_any value)
 
 
 static
-void *fjOPTION map_get(struct fj_map const * map, union fj_any key)
+void */*?*/ map_get(struct fj_map const * map, union fj_any key)
 {
     struct fj_map_element * element = map_find(map, key);
 
@@ -493,7 +494,7 @@ fj_err_t fj_map_set(struct fj_map * map, union fj_any key, union fj_any value)
 }
 
 
-void *fjOPTION fj_map_get(struct fj_map const * map, union fj_any key)
+void */*?*/ fj_map_get(struct fj_map const * map, union fj_any key)
 {
     if (!fj_map_has_allocated(map)) {
         return NULL;
@@ -514,7 +515,7 @@ fj_err_t fj_map_remove(struct fj_map * map, union fj_any key)
 
 
 void fj_map_iter_init(
-    struct fj_map_iter fjOUT * iter,
+    struct fj_map_iter /*out*/ * iter,
     struct fj_map const * map
 )
 {
@@ -533,7 +534,7 @@ fj_bool32_t fj_map_iter_finished(struct fj_map_iter const * iter)
 static
 fj_bool32_t iter_process_result(
     struct fj_map_iter * iter,
-    struct fj_map_element * fjOUT * element
+    struct fj_map_element * /*out*/ * element
 )
 {
     if (iter->current_node == NULL) {
@@ -598,7 +599,7 @@ void iter_walk_buckets(struct fj_map_iter * iter)
 
 fj_bool32_t fj_map_iter_next(
     struct fj_map_iter * iter,
-    struct fj_map_element *fjOPTION fjOUT * element
+    struct fj_map_element */*?*/ /*out*/ * element
 )
 {
     if (iter_can_walk_nodes(iter)) {

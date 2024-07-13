@@ -1,13 +1,13 @@
-#ifndef FEJIX_VEC_H_
-#define FEJIX_VEC_H_
+#ifndef FEJIX_CORE_VEC_H_
+#define FEJIX_CORE_VEC_H_
 
 
-#include <fejix/base.h>
+#include <fejix/core/base.h>
 
 
 /** Dynamically-allocated linear array. */
 struct fj_vec {
-    void *fjARRAY_OPTION items;
+    void */*[]?*/ items;
 
     /* Number of currently stored elements */
     uint32_t length;
@@ -66,7 +66,7 @@ fj_bool32_t fj_vec_has_allocated(
     struct fj_vec const * vec
 );
 
-void *fjARRAY_OPTION fj_vec_offset(
+void */*[]?*/ fj_vec_offset(
     struct fj_vec const * vec,
     uint32_t offset_index
 );

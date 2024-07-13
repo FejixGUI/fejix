@@ -1,5 +1,5 @@
-#ifndef FEJIX_BASE_H_
-#define FEJIX_BASE_H_
+#ifndef FEJIX_CORE_BASE_H_
+#define FEJIX_CORE_BASE_H_
 
 
 #include <stdint.h>
@@ -7,29 +7,7 @@
 #include <stdbool.h>
 
 
-/** Annotates an output function argument. The argument should be write-only.
-    This is an opposite of `const`, which annotates read-only values. */
-#define fjOUT
-
-/** Annotates a nullable pointer. */
-#define fjOPTION
-
-/** Annotates an array pointer. */
-#define fjARRAY
-
-/** Annotates a nullable array pointer. */
-#define fjARRAY_OPTION
-
-/** Annotates a struct that is a "base class" and is inheritable.
-    The inheritance happens by putting the base struct as the first field of
-    "derived classes" so that they can be safely dereferenced as the base
-    struct. */
-#define fjINHERITABLE
-
-/** Annotates the first field of a struct that inherits a base struct. */
-#define fjINHERIT
-
-/** Converts (char const *fjARRAY) to (uint8_t const *fjARRAY) */
+/** Converts (char const *) to (uint8_t const *) */
 #define FJ_UTF8(STRING_LITERAL) ((uint8_t const *)(void *)(STRING_LITERAL))
 
 /** Creates a unique typedef. Such typedefs are used in public API to make
@@ -45,7 +23,7 @@ typedef uint32_t fj_bool32_t;
 /** Error code. */
 typedef fj_enum32_t fj_err_t;
 
-typedef uint64_t fj_nanoseconds_t;
+typedef double fj_seconds_t;
 
 struct fj_ratio {
     int32_t numerator;
@@ -53,6 +31,11 @@ struct fj_ratio {
 };
 
 struct fj_position2d {
+    uint32_t x;
+    uint32_t y;
+};
+
+struct fj_offset2d {
     int32_t x;
     int32_t y;
 };
@@ -64,6 +47,11 @@ struct fj_size2d {
 
 struct fj_rect2d {
     struct fj_position2d position;
+    struct fj_size2d size;
+};
+
+struct fj_viewport2d {
+    struct fj_offset2d offset;
     struct fj_size2d size;
 };
 

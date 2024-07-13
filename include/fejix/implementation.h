@@ -2,16 +2,10 @@
 #define FEJIX_IMPLEMENTATION_H_
 
 
-#include <fejix/base.h>
+#include <fejix/core/base.h>
 
 
-/** The variants are sorted alphabetically except for NOOP. */
 enum fj_implementation_id {
-    /** No-operation testing implementation that contains no interfaces and is
-        basically a dummy.
-        This may be useful for some cases when you need to build the library
-        without any real implementation. */
-    FJ_IMPLEMENTATION_NOOP,
     /** Android Native Development Kit */
     FJ_IMPLEMENTATION_ANDK,
     /** Apple Cocoa */
@@ -22,12 +16,13 @@ enum fj_implementation_id {
     FJ_IMPLEMENTATION_WINAPI,
     /** X11 protocol */
     FJ_IMPLEMENTATION_X11,
+
+    FJ_IMPLEMENTATION_MAX,
 };
 
 enum fj_interface_id {
-    FJ_INSTANCE,
-    FJ_SERVER,
-    FJ_RENDER_MANAGER,
+    FJ_CLIENT,
+    FJ_RENDERING_MANAGER,
     FJ_COMPOSITING_MANAGER,
     FJ_DISPLAY_MANAGER,
 };
@@ -36,20 +31,22 @@ enum fj_interface_id {
 struct fj_implementation {
     fj_enum32_t implementation_id;
 
-    void *fjOPTION static_data;
+    void */*?*/ static_data;
 
-    void const *fjOPTION (* get_interface)(
-        struct fj_implementation const * implementation,
-        fj_enum32_t interface_id
-    );
+    struct fj_client const */*?*/ client;
 };
 
 
-/** The returned array is sorted by implementation IDs.
-    Implementation count is always greater than 0. */
+/** The returned array is sorted by implementation IDs. */
 void fj_get_builtin_implementations(
-    uint32_t fjOUT * implementation_count,
-    struct fj_implementation const * const *fjARRAY fjOUT * implementations
+    struct fj_implementation const * const */*[]?*/ /*out*/ * implementations,
+    uint32_t /*out*/ * implementation_count
+);
+
+/** Returns the implementation name corresponding to the given ID.
+    Returns NULL for non-existing IDs */
+uint8_t const */*[]?*/ fj_get_implementation_name(
+    fj_enum32_t implementation_id
 );
 
 

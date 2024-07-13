@@ -1,8 +1,8 @@
-#ifndef FJ_ANY_H_
-#define FJ_ANY_H_
+#ifndef FEJIX_CORE_ANY_H_
+#define FEJIX_CORE_ANY_H_
 
 
-#include <fejix/base.h>
+#include <fejix/core/base.h>
 
 
 #define FJ_U32(X)  ((union fj_any) { .u32  = (uint32_t) (X) })

@@ -1,6 +1,7 @@
-#include <fejix/vec.h>
-#include <fejix/malloc.h>
-#include <fejix/utils.h>
+#include <fejix/core/vec.h>
+
+#include <fejix/core/malloc.h>
+#include <fejix/core/utils.h>
 
 #include <string.h>
 
@@ -25,7 +26,7 @@ fj_bool32_t fj_vec_has_allocated(struct fj_vec const * vec)
     return vec->items != NULL;
 }
 
-void *fjARRAY_OPTION fj_vec_offset(
+void */*[]?*/ fj_vec_offset(
     struct fj_vec const * vec,
     uint32_t offset_index
 )

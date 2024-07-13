@@ -14,7 +14,7 @@
     Returns an error if the given string is invalid UTF-8. */
 fj_err_t fj_winapi_utf8_to_wstr(
     fj_string_t utf8_string,
-    LPWSTR fjOPTION fjOUT * wide_string
+    LPWSTR /*?*/ /*out*/ * wide_string
 );
 
 

@@ -1,21 +1,21 @@
-#include <src/platform/ipc/unixpoll/unixpoll.h>
+#include <src/shared/unixpoller/unixpoller.h>
 
-#include <fejix/malloc.h>
-#include <fejix/utils.h>
+#include <fejix/core/malloc.h>
+#include <fejix/core/utils.h>
 
+#include <math.h>
 #include <unistd.h>
 
 
 static
 fj_err_t process_events(
-    void * callback_data,
     struct fj_unixpoller * poller
 )
 {
     FJ_INIT_TRY
 
     struct pollfd * pollfds = poller->pollfds.items;
-    fj_unixpoll_callback_fn_t * * callbacks = poller->callbacks.items;
+    fj_unixpoller_callback_fn_t * * callbacks = poller->callbacks.items;
 
     for (uint32_t i = 0; i < poller->pollfds.length; i++) {
 
@@ -24,7 +24,7 @@ fj_err_t process_events(
         }
 
         FJ_TRY
-        callbacks[i](callback_data, pollfds[i].fd, pollfds[i].revents);
+        callbacks[i](poller->callback_data, pollfds[i].fd, pollfds[i].revents);
 
         FJ_ELSE {
             return FJ_RESULT;
@@ -40,8 +40,8 @@ fj_err_t process_events(
 static
 fj_err_t process_interruption(
     void * callback_data,
-    fj_unixfd_t fd,
-    fj_unixpoll_event_mask_t events
+    fj_unixpoller_fd_t fd,
+    fj_unixpoller_event_mask_t events
 )
 {
     FJ_UNUSED(callback_data)
@@ -57,12 +57,34 @@ fj_err_t process_interruption(
 }
 
 
-fj_err_t fj_unixpoll_init(struct fj_unixpoller * poller)
+static
+fj_err_t interrupt(
+    struct fj_client_interrupt_signal const * _signal
+)
+{
+    struct fj_unixpoller_interrupt_signal const * signal = (void *) _signal;
+
+    uint8_t buffer[1] = { 42 };
+    ssize_t written_count = write(signal->interrupt_fd, buffer, 1);
+
+    if (written_count < 0) {
+        return FJ_ERR_IO_ERROR;
+    }
+
+    return FJ_OK;
+}
+
+
+
+fj_err_t fj_unixpoller_init(
+    struct fj_unixpoller * poller,
+    void * callback_data
+)
 {
     FJ_INIT_TRY
 
     fj_vec_init(&poller->pollfds, sizeof(struct pollfd));
-    fj_vec_init(&poller->callbacks, sizeof(fj_unixpoll_callback_fn_t *));
+    fj_vec_init(&poller->callbacks, sizeof(fj_unixpoller_callback_fn_t *));
 
     int pipe_result = pipe((int32_t *) poller->interrupt_pipe);
 
@@ -70,16 +92,21 @@ fj_err_t fj_unixpoll_init(struct fj_unixpoller * poller)
         return FJ_ERR_IO_ERROR;
     }
 
+    poller->timeout = 0.0;
+    poller->callback_data = callback_data;
+    poller->interrupt_signal.interrupt_fd = poller->interrupt_pipe[1];
+    poller->interrupt_signal.interrupt_signal.interrupt = interrupt;
+
     FJ_TRY
-    fj_unixpoll_add(
+    fj_unixpoller_add(
         poller,
-        fj_unixpoll_get_interruptor(poller),
+        poller->interrupt_signal.interrupt_fd,
         POLLIN,
         process_interruption
     );
 
     FJ_ELSE {
-        fj_unixpoll_deinit(poller);
+        fj_unixpoller_deinit(poller);
         return FJ_RESULT;
     }
 
@@ -87,7 +114,9 @@ fj_err_t fj_unixpoll_init(struct fj_unixpoller * poller)
 }
 
 
-void fj_unixpoll_deinit(struct fj_unixpoller * poller)
+void fj_unixpoller_deinit(
+    struct fj_unixpoller * poller
+)
 {
     if (poller->interrupt_pipe[0] != 0) {
         close(poller->interrupt_pipe[0]);
@@ -99,11 +128,11 @@ void fj_unixpoll_deinit(struct fj_unixpoller * poller)
 }
 
 
-fj_err_t fj_unixpoll_add(
+fj_err_t fj_unixpoller_add(
     struct fj_unixpoller * poller,
-    fj_unixfd_t file_descriptor,
-    fj_unixpoll_event_mask_t events_to_watch,
-    fj_unixpoll_callback_fn_t * callback
+    fj_unixpoller_fd_t file_descriptor,
+    fj_unixpoller_event_mask_t events_to_watch,
+    fj_unixpoller_callback_fn_t * callback
 )
 {
     FJ_INIT_TRY
@@ -133,7 +162,7 @@ fj_err_t fj_unixpoll_add(
 
 
 static
-fj_err_t fdpoll_remove_index(
+fj_err_t remove_index(
     struct fj_unixpoller * poller,
     uint32_t index
 )
@@ -158,9 +187,9 @@ fj_err_t fdpoll_remove_index(
 }
 
 
-fj_err_t fj_unixpoll_remove(
+fj_err_t fj_unixpoller_remove(
     struct fj_unixpoller * poller,
-    fj_unixfd_t file_descriptor
+    fj_unixpoller_fd_t file_descriptor
 )
 {
     FJ_INIT_TRY
@@ -170,7 +199,7 @@ fj_err_t fj_unixpoll_remove(
     for (uint32_t i=0; i<poller->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
             FJ_TRY
-            fdpoll_remove_index(poller, i);
+            remove_index(poller, i);
 
             FJ_ELSE {
                 return FJ_RESULT;
@@ -185,29 +214,28 @@ fj_err_t fj_unixpoll_remove(
 
 
 static
-int32_t convert_poll_timeout(uint32_t timeout)
+int32_t to_poll_timeout(fj_seconds_t timeout)
 {
-    if (timeout == UINT32_MAX) {
+    if (isinf(timeout)) {
         return -1;
     }
 
-    if (timeout > UINT16_MAX) {
-        return UINT16_MAX;
+    if (timeout <= 0.0) {
+        return 0;
     }
 
-    return (int32_t) timeout;
+    // milliseconds
+    return (int32_t) (timeout * 1000.0);
 }
 
-fj_err_t fj_unixpoll_poll(
-    struct fj_unixpoller * poller,
-    uint32_t timeout_ms,
-    void * callback_data
+fj_err_t fj_unixpoller_poll(
+    struct fj_unixpoller * poller
 )
 {
     int32_t result = poll(
         poller->pollfds.items,
         poller->pollfds.length,
-        convert_poll_timeout(timeout_ms)
+        to_poll_timeout(poller->timeout)
     );
 
     if (result < 0) {
@@ -218,28 +246,5 @@ fj_err_t fj_unixpoll_poll(
         return FJ_OK;
     }
 
-    return process_events(callback_data, poller);
-}
-
-
-fj_unixfd_t fj_unixpoll_get_interruptor(
-    struct fj_unixpoller * poller
-)
-{
-    return poller->interrupt_pipe[1];
-}
-
-
-fj_err_t fj_unixpoll_interrupt(
-    fj_unixfd_t interruptor
-)
-{
-    uint8_t buffer[1] = { 42 };
-    ssize_t written_count = write(interruptor, buffer, 1);
-
-    if (written_count < 0) {
-        return FJ_ERR_IO_ERROR;
-    }
-
-    return FJ_OK;
+    return process_events(poller);
 }

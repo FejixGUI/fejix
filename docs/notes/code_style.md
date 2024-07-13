@@ -55,7 +55,8 @@ Here are some consistency guidelines.
 
 ## Annotations
 
-* Put `const` AFTER the object it annotates:
+* Put `const` AFTER the object it annotates. The reason is that we read types
+    from right to left:
 
     ```c
     /** mutable pointer to constant char */
@@ -68,7 +69,7 @@ Here are some consistency guidelines.
 
 * Annotate in/out/inout arguments in the following way:
     - `_in_ Type Arg` = `Type const * Arg` (read-only value)
-    - `_out_ Type Arg` = `Type fjOUT * Arg` (write-only value)
+    - `_out_ Type Arg` = `Type /*out*/ * Arg` (write-only value)
     - `_inout_ Type Arg` = `Type * Arg` (both readable and writable)
 
 * Annotate pointers in public interfaces.
@@ -78,14 +79,14 @@ Here are some consistency guidelines.
     /** x is a non-nullable pointer to one `uint8_t const` */
     void f(uint8_t const * x);
 
-    /** x is a nullable pointer to one `uint8_t const` */
-    void f(uint8_t const *fjOPTION x);
-
     /** x is a non-nullable pointer to an array of `uint8_t const` */
-    void f(uint8_t const *fjARRAY x);
+    void f(uint8_t const */*[]*/ x);
+
+    /** x is a nullable pointer to one `uint8_t const` */
+    void f(uint8_t const */*?*/ x);
 
     /** x is a nullable pointer to an array of `uint8_t const` */
-    void f(uint8_t const *fjARRAY_OPTION x);
+    void f(uint8_t const */*[]?*/ x);
 
     ```
 
@@ -96,6 +97,40 @@ Here are some consistency guidelines.
     {
         // ...
     }
+    ```
+
+* Annotate extendable and extended structures (usually used for callbacks):
+
+    ```c
+
+    /*extendable*/
+    struct callback {
+        void (*call)(struct callback * this, int x);
+    };
+
+    void call_callback(struct callback * callback)
+    {
+        callback->call(callback, 123);
+    }
+
+    struct my_callback {
+        struct callback /*extend*/ callback;
+        int y;
+    };
+
+    void my_call(struct callback * _this, int x)
+    {
+        struct my_callback * this = (void *) _this;
+        printf("%d + %d = %d\n", x, this->y, x + this->y);
+    }
+
+    int main(void)
+    {
+        struct my_callback my_callback = { { my_call }, 456 };
+
+        call_callback((void *) &my_callback);
+    }
+
     ```
 
 ## More

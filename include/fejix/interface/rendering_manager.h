@@ -2,7 +2,7 @@
 #define FEJIX_RENDERING_MANAGER_H_
 
 
-#include <fejix/base.h>
+#include <fejix/core/base.h>
 
 
 FJ_DEFINE_UNIQUE_TYPE(fj_rendering_manager_t)

@@ -1,0 +1,31 @@
+option(
+    'implementations',
+    type: 'array',
+    value: [],
+    choices: [
+        'andk',
+        'cocoa',
+        'wayland',
+        'winapi',
+        'x11'
+    ]
+)
+
+option(
+    'features',
+    type: 'array',
+    value: [],
+    choices: [
+        'directx',
+        'metal',
+        'opengl',
+        'softer',
+        'vulkan',
+
+        'clipboard',
+        'monitors',
+        'notifications',
+        'taskbar',
+        'tray',
+    ]
+)

@@ -1,6 +1,6 @@
-#include <fejix/vec.h>
-#include <fejix/error.h>
-#include <fejix/utils.h>
+#include <fejix/core/vec.h>
+#include <fejix/core/error.h>
+#include <fejix/core/utils.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -48,6 +48,8 @@ int main(void)
     }
 
     fj_vec_deinit(&v);
+
+    puts("OK");
 
     return 0;
 }

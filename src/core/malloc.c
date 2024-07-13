@@ -1,15 +1,16 @@
-#include <fejix/malloc.h>
-#include <fejix/utils.h>
+#include <fejix/core/malloc.h>
+
+#include <fejix/core/utils.h>
 
 #include <malloc.h>
 #include <string.h>
 
 
-fj_err_t fj_alloc_uninit(void *fjOPTION fjOUT * ptr, size_t size)
+fj_err_t fj_alloc_uninit(void */*?*/ /*out*/ * ptr, size_t size)
 {
     if (size == 0) {
         ptr = NULL;
-        return FJ_ERR_MALLOC_INVALID_ARG;
+        return FJ_ERR_INVALID_ALLOCATION;
     }
 
     *ptr = malloc(size);
@@ -22,11 +23,11 @@ fj_err_t fj_alloc_uninit(void *fjOPTION fjOUT * ptr, size_t size)
 }
 
 
-fj_err_t fj_alloc_zeroed(void *fjOPTION fjOUT * ptr, size_t size)
+fj_err_t fj_alloc_zeroed(void */*?*/ /*out*/ * ptr, size_t size)
 {
     if (size == 0) {
         *ptr = NULL;
-        return FJ_ERR_MALLOC_INVALID_ARG;
+        return FJ_ERR_INVALID_ALLOCATION;
     }
 
     *ptr = calloc(1, size);
@@ -47,7 +48,7 @@ void fj_free(void ** ptr)
 
 
 fj_err_t fj_realloc_uninit(
-    void *fjARRAY_OPTION * ptr,
+    void */*[]?*/ * ptr,
     uint32_t item_count,
     size_t item_size
 )
@@ -79,7 +80,7 @@ fj_err_t fj_realloc_uninit(
 
 
 fj_err_t fj_realloc_zeroed(
-    void *fjARRAY_OPTION * ptr,
+    void */*[]?*/ * ptr,
     uint32_t old_item_count,
     uint32_t new_item_count,
     size_t item_size
