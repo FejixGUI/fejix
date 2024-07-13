@@ -2,7 +2,6 @@
 #define FEJIX_WAYLAND_CLIENT_H_
 
 
-#include <fejix/implementation.h>
 #include <fejix/interface/client.h>
 
 #include <src/shared/unixpoller/unixpoller.h>
@@ -17,6 +16,7 @@ struct fj_wayland_client_data {
     struct fj_unixpoller unixpoller;
 
     struct wl_display * display;
+    struct wl_registry * registry;
 };
 
 

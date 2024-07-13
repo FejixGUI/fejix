@@ -87,10 +87,9 @@ fj_err_t fj_vec_resize(struct fj_vec * vec, uint32_t capacity)
         return FJ_OK;
     }
 
-    FJ_TRY fj_realloc_uninit(&vec->items, capacity, vec->item_size);
-
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_try fj_realloc_uninit(&vec->items, capacity, vec->item_size);
+    fj_else {
+        return fj_result;
     }
 
     vec->capacity = capacity;
@@ -189,10 +188,9 @@ fj_err_t fj_vec_insert_uninit(
 {
     FJ_INIT_TRY
 
-    FJ_TRY fj_vec_resize_to_reserve(vec, item_count);
-
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_try fj_vec_resize_to_reserve(vec, item_count);
+    fj_else {
+        return fj_result;
     }
 
     if (
@@ -217,10 +215,9 @@ fj_err_t fj_vec_insert_items(
 {
     FJ_INIT_TRY
 
-    FJ_TRY fj_vec_insert_uninit(vec, destination_index, item_count);
-
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_try fj_vec_insert_uninit(vec, destination_index, item_count);
+    fj_else {
+        return fj_result;
     }
 
     fj_vec_replace_items(vec, items, destination_index, item_count);

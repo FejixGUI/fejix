@@ -133,6 +133,26 @@ Here are some consistency guidelines.
 
     ```
 
+## Errors
+
+Fallible function example:
+
+```c
+
+fj_err_t some_func(void)
+{
+    FJ_INIT_TRY
+
+    fj_try other_func();
+    fj_else {
+        return fj_result; // returns the result of last `fj_try` statement
+    }
+
+    return FJ_OK;
+}
+
+```
+
 ## More
 
 Use Fejix base types, memory allocation and error handling.

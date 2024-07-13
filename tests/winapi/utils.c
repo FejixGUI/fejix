@@ -11,7 +11,7 @@ int main(void) {
 
     LPWSTR /*?*/ wide_string = NULL;
 
-    FJ_TRY fj_winapi_utf8_to_wstr(FJ_UTF8(""), &wide_string);
+    fj_try fj_winapi_utf8_to_wstr(FJ_UTF8(""), &wide_string);
 
     if (FJ_FAILED) {
         fprintf(stderr, "Failed to convert empty string: %s\n", FJ_LAST_ERROR);

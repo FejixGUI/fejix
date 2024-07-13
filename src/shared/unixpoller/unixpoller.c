@@ -23,11 +23,11 @@ fj_err_t process_events(
             continue;
         }
 
-        FJ_TRY
+        fj_try
         callbacks[i](poller->callback_data, pollfds[i].fd, pollfds[i].revents);
 
-        FJ_ELSE {
-            return FJ_RESULT;
+        fj_else {
+            return fj_result;
         }
 
         pollfds[i].revents = 0;
@@ -97,7 +97,7 @@ fj_err_t fj_unixpoller_init(
     poller->interrupt_signal.interrupt_fd = poller->interrupt_pipe[1];
     poller->interrupt_signal.interrupt_signal.interrupt = interrupt;
 
-    FJ_TRY
+    fj_try
     fj_unixpoller_add(
         poller,
         poller->interrupt_signal.interrupt_fd,
@@ -105,9 +105,9 @@ fj_err_t fj_unixpoller_init(
         process_interruption
     );
 
-    FJ_ELSE {
+    fj_else {
         fj_unixpoller_deinit(poller);
-        return FJ_RESULT;
+        return fj_result;
     }
 
     return FJ_OK;
@@ -143,18 +143,18 @@ fj_err_t fj_unixpoller_add(
         .revents = 0,
     };
 
-    FJ_TRY
+    fj_try
     fj_vec_push_item(&poller->pollfds, &pollfd);
 
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_else {
+        return fj_result;
     }
 
-    FJ_TRY
+    fj_try
     fj_vec_push_item(&poller->callbacks, &callback);
 
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_else {
+        return fj_result;
     }
 
     return FJ_OK;
@@ -169,18 +169,18 @@ fj_err_t remove_index(
 {
     FJ_INIT_TRY
 
-    FJ_TRY
+    fj_try
     fj_vec_remove_items(&poller->pollfds, index, 1);
 
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_else {
+        return fj_result;
     }
 
-    FJ_TRY
+    fj_try
     fj_vec_remove_items(&poller->callbacks, index, 1);
 
-    FJ_ELSE {
-        return FJ_RESULT;
+    fj_else {
+        return fj_result;
     }
 
     return FJ_OK;
@@ -198,11 +198,11 @@ fj_err_t fj_unixpoller_remove(
 
     for (uint32_t i=0; i<poller->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
-            FJ_TRY
+            fj_try
             remove_index(poller, i);
 
-            FJ_ELSE {
-                return FJ_RESULT;
+            fj_else {
+                return fj_result;
             }
 
             break;
@@ -239,7 +239,7 @@ fj_err_t fj_unixpoller_poll(
     );
 
     if (result < 0) {
-        return FJ_ERR_MESSAGE_RECEIVE_ERROR;
+        return FJ_ERR_IO_ERROR;
     }
 
     if (result == 0) {

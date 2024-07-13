@@ -22,14 +22,14 @@ int main(void)
 
     fj_map_init(&m, FJ_TYPE_U32, FJ_TYPE_PTR);
 
-    FJ_TRY fj_map_set(&m, FJ_U32(1), FJ_PTR(a));
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_map_set(&m, FJ_U32(1), FJ_PTR(a));
+    assert(fj_result == FJ_OK);
 
-    FJ_TRY fj_map_set(&m, FJ_U32(2), FJ_PTR(b));
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_map_set(&m, FJ_U32(2), FJ_PTR(b));
+    assert(fj_result == FJ_OK);
 
-    FJ_TRY fj_map_set(&m, FJ_U32(3), FJ_PTR(c));
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_map_set(&m, FJ_U32(3), FJ_PTR(c));
+    assert(fj_result == FJ_OK);
 
     ap = fj_map_get(&m, FJ_U32(1));
     bp = fj_map_get(&m, FJ_U32(2));
@@ -39,8 +39,8 @@ int main(void)
     assert(*bp == b);
     assert(*cp == c);
 
-    FJ_TRY fj_map_remove(&m, FJ_U32(2));
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_map_remove(&m, FJ_U32(2));
+    assert(fj_result == FJ_OK);
 
     ap = fj_map_get(&m, FJ_U32(1));
     bp = fj_map_get(&m, FJ_U32(2));
@@ -50,8 +50,8 @@ int main(void)
     assert(bp == NULL);
     assert(*cp == c);
 
-    FJ_TRY fj_map_remove(&m, FJ_U32(2));
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_map_remove(&m, FJ_U32(2));
+    assert(fj_result == FJ_OK);
 
     ap = fj_map_get(&m, FJ_U32(1));
     bp = fj_map_get(&m, FJ_U32(2));
@@ -61,8 +61,8 @@ int main(void)
     assert(bp == NULL);
     assert(*cp == c);
 
-    FJ_TRY fj_map_remove(&m, FJ_U32(3));
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_map_remove(&m, FJ_U32(3));
+    assert(fj_result == FJ_OK);
 
     ap = fj_map_get(&m, FJ_U32(1));
     bp = fj_map_get(&m, FJ_U32(2));

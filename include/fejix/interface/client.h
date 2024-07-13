@@ -29,7 +29,6 @@ struct fj_message {
 struct fj_client_callback {
     fj_err_t (* call)(
         struct fj_client_callback const * callback,
-        fj_client_data_t * client,
         struct fj_message const * message
     );
 };

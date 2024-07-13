@@ -4,11 +4,10 @@
 
 #include <fejix/core/base.h>
 
-
 #define FJ_INIT_TRY fj_err_t _fj_err = FJ_OK;
-#define FJ_TRY _fj_err =
-#define FJ_ELSE if (_fj_err != FJ_OK)
-#define FJ_RESULT (_fj_err)
+#define fj_try _fj_err =
+#define fj_else if (_fj_err != FJ_OK)
+#define fj_result (_fj_err)
 
 
 enum fj_err {
@@ -19,7 +18,8 @@ enum fj_err {
     FJ_ERR_OUT_OF_MEMORY,
     FJ_ERR_INVALID_ALLOCATION,
     FJ_ERR_IO_ERROR,
-    FJ_ERR_MESSAGE_RECEIVE_ERROR,
+    FJ_ERR_MESSAGE_READ_ERROR,
+    FJ_ERR_SHELL_CONNECTION_ERROR,
 
     FJ_ERR_MAX,
 };

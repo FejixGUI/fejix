@@ -24,7 +24,7 @@ fj_err_t fj_winapi_utf8_to_wstr(
         0 /* output chars count (unknown, asking for it) */
     );
 
-    FJ_TRY fj_alloc_uninit(
+    fj_try fj_alloc_uninit(
         (void *) wide_string,
         output_chars_count * sizeof(WCHAR)
     );
@@ -44,7 +44,7 @@ fj_err_t fj_winapi_utf8_to_wstr(
 
     if (result == 0) {
         fj_free((void *) wide_string);
-        return FJ_RESULT("cannot convert invalid UTF-8 to wide string");
+        return fj_result("cannot convert invalid UTF-8 to wide string");
     }
 
     return FJ_OK;

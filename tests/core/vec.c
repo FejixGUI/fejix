@@ -21,14 +21,14 @@ int main(void)
 
     fj_vec_init(&v, sizeof(int));
 
-    FJ_TRY fj_vec_push_item(&v, &_1);
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_vec_push_item(&v, &_1);
+    assert(fj_result == FJ_OK);
 
-    FJ_TRY fj_vec_push_item(&v, &_2);
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_vec_push_item(&v, &_2);
+    assert(fj_result == FJ_OK);
 
-    FJ_TRY fj_vec_insert_items(&v, &_3, 0, 1);
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_vec_insert_items(&v, &_3, 0, 1);
+    assert(fj_result == FJ_OK);
 
     assert(v.length == 3);
 
@@ -37,8 +37,8 @@ int main(void)
         assert(v_items[0] == 3 && v_items[1] == 1 && v_items[2] == 2);
     }
 
-    FJ_TRY fj_vec_remove_items(&v, 1, 1);
-    assert(FJ_RESULT == FJ_OK);
+    fj_try fj_vec_remove_items(&v, 1, 1);
+    assert(fj_result == FJ_OK);
 
     assert(v.length == 2);
 
