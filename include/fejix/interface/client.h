@@ -61,8 +61,8 @@ struct fj_client {
         void * serve_data
     );
 
-    /** timeout also accepts negatives, 0.0 and INFINITY.
-        Negative timeout means quit. */
+    /** timeout also accepts 0.0 (no wait), INFINITY (wait forever),
+        and NAN (quit). */
     void (* set_timeout)(
         fj_client_data_t * client,
         fj_seconds_t timeout

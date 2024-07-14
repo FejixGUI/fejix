@@ -12,3 +12,11 @@ input and more.
 > The most interesting thing to see here is this emoji: 🌸.
 >
 > Yay.
+
+## Build
+
+```sh
+meson setup build
+meson configure build -D implementations=impl1,impl2,impl3 -D features=feat1,feat2,feat3
+meson compile -C build
+```

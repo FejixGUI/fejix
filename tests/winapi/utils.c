@@ -18,7 +18,7 @@ int main(void) {
         return 1;
     }
 
-    fj_free((void *) &wide_string);
+    fj_free_auto(&wide_string);
 
     return 0;
 }

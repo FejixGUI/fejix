@@ -65,5 +65,9 @@ fj_err_t fj_unixpoller_poll(
     struct fj_unixpoller * poller
 );
 
+fj_bool32_t fj_unixpoller_should_finish(
+    struct fj_unixpoller * poller
+);
+
 
 #endif

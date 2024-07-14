@@ -17,6 +17,7 @@ uint8_t const */*[]*/ const error_descriptions[] = {
     [FJ_ERR_INVALID_ALLOCATION] = FJ_UTF8("invalid memory allocation"),
     [FJ_ERR_IO_ERROR] = FJ_UTF8("IO error"),
     [FJ_ERR_MESSAGE_READ_ERROR] = FJ_UTF8("message read error"),
+    [FJ_ERR_MESSAGE_SEND_ERROR] = FJ_UTF8("message send error"),
     [FJ_ERR_SHELL_CONNECTION_ERROR] = FJ_UTF8("shell connection error"),
 };
 

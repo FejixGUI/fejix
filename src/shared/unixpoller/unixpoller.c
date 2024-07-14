@@ -23,9 +23,11 @@ fj_err_t process_events(
             continue;
         }
 
-        fj_try
-        callbacks[i](poller->callback_data, pollfds[i].fd, pollfds[i].revents);
-
+        fj_try callbacks[i](
+            poller->callback_data,
+            pollfds[i].fd,
+            pollfds[i].revents
+        );
         fj_else {
             return fj_result;
         }
@@ -143,16 +145,12 @@ fj_err_t fj_unixpoller_add(
         .revents = 0,
     };
 
-    fj_try
-    fj_vec_push_item(&poller->pollfds, &pollfd);
-
+    fj_try fj_vec_push_item(&poller->pollfds, &pollfd);
     fj_else {
         return fj_result;
     }
 
-    fj_try
-    fj_vec_push_item(&poller->callbacks, &callback);
-
+    fj_try fj_vec_push_item(&poller->callbacks, &callback);
     fj_else {
         return fj_result;
     }
@@ -169,16 +167,12 @@ fj_err_t remove_index(
 {
     FJ_INIT_TRY
 
-    fj_try
-    fj_vec_remove_items(&poller->pollfds, index, 1);
-
+    fj_try fj_vec_remove_items(&poller->pollfds, index, 1);
     fj_else {
         return fj_result;
     }
 
-    fj_try
-    fj_vec_remove_items(&poller->callbacks, index, 1);
-
+    fj_try fj_vec_remove_items(&poller->callbacks, index, 1);
     fj_else {
         return fj_result;
     }
@@ -198,9 +192,7 @@ fj_err_t fj_unixpoller_remove(
 
     for (uint32_t i=0; i<poller->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
-            fj_try
-            remove_index(poller, i);
-
+            fj_try remove_index(poller, i);
             fj_else {
                 return fj_result;
             }
@@ -220,7 +212,7 @@ int32_t to_poll_timeout(fj_seconds_t timeout)
         return -1;
     }
 
-    if (timeout <= 0.0) {
+    if (timeout <= 0.0 || isnan(timeout)) {
         return 0;
     }
 
@@ -228,9 +220,7 @@ int32_t to_poll_timeout(fj_seconds_t timeout)
     return (int32_t) (timeout * 1000.0);
 }
 
-fj_err_t fj_unixpoller_poll(
-    struct fj_unixpoller * poller
-)
+fj_err_t fj_unixpoller_poll(struct fj_unixpoller * poller)
 {
     int32_t result = poll(
         poller->pollfds.items,
@@ -247,4 +237,10 @@ fj_err_t fj_unixpoller_poll(
     }
 
     return process_events(poller);
+}
+
+
+fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller * poller)
+{
+    return isnan(poller->timeout);
 }

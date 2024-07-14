@@ -218,7 +218,7 @@ void free_nodes(struct fj_map_node * list_head)
 
     while (node != NULL) {
         struct fj_map_node * next_node = node->next;
-        fj_free((void *) &node);
+        fj_free_auto(&node);
         node = next_node;
     }
 }
@@ -258,11 +258,8 @@ fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
     FJ_INIT_TRY
 
-    fj_try fj_realloc_zeroed(
-        (void *) &map->buckets,
-        map->bucket_count,
-        bucket_count,
-        sizeof(*map->buckets)
+    fj_try fj_realloc_zeroed_auto(
+        &map->buckets, map->bucket_count, bucket_count
     );
     fj_else {
         return fj_result;
@@ -299,8 +296,8 @@ fj_err_t rehash(struct fj_map * map, fj_bool32_t grow)
     fj_try resize_map(map, grow);
     fj_else {
         free_nodes(list_head);
-        fj_free((void *) &map->buckets);
-        fj_free((void *) &map);
+        fj_free_auto(&map->buckets);
+        fj_free_auto(&map);
 
         return fj_result;
     }
@@ -333,7 +330,7 @@ fj_err_t map_remove(struct fj_map * map, union fj_any key)
         return FJ_OK;
     }
 
-    fj_free((void *) &node);
+    fj_free_auto(&node);
 
     map->element_count--;
 
@@ -386,7 +383,7 @@ fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 
     struct fj_map_node * node = NULL;
 
-    fj_try fj_alloc_zeroed((void *) &node, sizeof(*node));
+    fj_try fj_alloc_zeroed_auto(&node);
     fj_else {
         return fj_result;
     }
@@ -406,9 +403,7 @@ fj_err_t map_allocate(struct fj_map * map)
 {
     FJ_INIT_TRY
 
-    fj_try fj_realloc_zeroed(
-        (void *) &map->buckets, 0, 1, sizeof(*map->buckets)
-    );
+    fj_try fj_realloc_zeroed_auto(&map->buckets, 0, 1);
     fj_else {
         return fj_result;
     }
@@ -469,7 +464,7 @@ void fj_map_deinit(struct fj_map * map)
     }
 
     if (map->buckets != NULL) {
-        fj_free((void *) &map->buckets);
+        fj_free_auto(&map->buckets);
     }
 }
 

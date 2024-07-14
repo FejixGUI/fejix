@@ -7,7 +7,6 @@
 #include <src/shared/unixpoller/unixpoller.h>
 
 #include <wayland-client.h>
-#include <wayland-client-core.h>
 
 
 struct fj_wayland_client_data {
@@ -17,6 +16,10 @@ struct fj_wayland_client_data {
 
     struct wl_display * display;
     struct wl_registry * registry;
+
+    uint32_t compositor_id;
+    uint32_t compositor_version;
+    struct wl_compositor * compositor;
 };
 
 

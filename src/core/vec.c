@@ -159,7 +159,7 @@ void fj_vec_init(struct fj_vec * vec, size_t item_size)
 void fj_vec_deinit(struct fj_vec * vec)
 {
     if (fj_vec_has_allocated(vec)) {
-        fj_free((void *) &vec->items);
+        fj_free_auto(&vec->items);
     }
 
     vec->length = 0;
@@ -169,7 +169,7 @@ void fj_vec_deinit(struct fj_vec * vec)
 
 void fj_vec_replace_items(
     struct fj_vec * vec,
-    void * items,
+    void const * items,
     uint32_t destination_index,
     uint32_t item_count
 )
@@ -208,7 +208,7 @@ fj_err_t fj_vec_insert_uninit(
 
 fj_err_t fj_vec_insert_items(
     struct fj_vec * vec,
-    void * items,
+    void const * items,
     uint32_t destination_index,
     uint32_t item_count
 )
@@ -242,7 +242,7 @@ fj_err_t fj_vec_remove_items(
 }
 
 
-fj_err_t fj_vec_push_item(struct fj_vec * vec, void * item)
+fj_err_t fj_vec_push_item(struct fj_vec * vec, void const * item)
 {
     return fj_vec_insert_items(vec, item, fj_vec_get_push_index(vec), 1);
 }

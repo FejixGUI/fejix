@@ -31,8 +31,6 @@ enum fj_interface_id {
 struct fj_implementation {
     fj_enum32_t implementation_id;
 
-    void */*?*/ static_data;
-
     struct fj_client const */*?*/ client;
 };
 

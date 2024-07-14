@@ -77,7 +77,7 @@ void */*[]?*/ fj_vec_offset(
     Does not check the index. */
 void fj_vec_replace_items(
     struct fj_vec * vec,
-    void * items,
+    void const * items,
     uint32_t destination_index,
     uint32_t item_count
 );
@@ -90,7 +90,7 @@ fj_err_t fj_vec_insert_uninit(
 
 fj_err_t fj_vec_insert_items(
     struct fj_vec * vec,
-    void * items,
+    void const * items,
     uint32_t destination_index,
     uint32_t item_count
 );
@@ -105,7 +105,7 @@ fj_err_t fj_vec_remove_items(
 /** Works like `insert`. Copies the item into the end of the list. */
 fj_err_t fj_vec_push_item(
     struct fj_vec * vec,
-    void * item
+    void const * item
 );
 
 /** Removes the last item of the list. */

@@ -36,9 +36,7 @@ endif
 
 # SOURCES
 
-fejix_src = []
-
-fejix_src += [
+fejix_src = [
     'src/implementation.c',
 
     'src/core/any.c',
@@ -51,10 +49,13 @@ fejix_src += [
     'src/ext/helper.c',
 ]
 
+dependencies = []
 shared_modules = []
 
 
 if 'wayland' in implementations
+    dependencies += dependency('wayland-client', required: true)
+
     shared_modules += ['unixpoll']
 
     fejix_src += [
@@ -67,7 +68,7 @@ endif
 
 if 'unixpoll' in shared_modules
     fejix_src += [
-        'src/shared/unixpoll/unixpoll.c'
+        'src/shared/unixpoller/unixpoller.c'
     ]
 endif
 
@@ -75,30 +76,41 @@ endif
 fejix = library(
     'fejix',
     sources: fejix_src,
-    include_directories: ['.', 'include'],
+    dependencies: dependencies,
+    include_directories: ['include', '.'],
+)
+
+fejix_dep = declare_dependency(
+    link_with: fejix,
+    include_directories: ['include']
 )
 
 
 # TESTS
 
-test(
-    'test_core_map',
-    executable(
-        'test_core_map',
-        sources: ['tests/core/map.c'],
-        build_by_default: false,
+if not meson.is_subproject()
+    fejix_internal_dep = declare_dependency(
         link_with: fejix,
-        include_directories: ['.', 'include']
+        include_directories: ['include', '.']
     )
-)
 
-test(
-    'test_core_vec',
-    executable(
-        'test_core_vec',
-        sources: ['tests/core/vec.c'],
-        build_by_default: false,
-        link_with: fejix,
-        include_directories: ['.', 'include']
+    executable('dev', sources: ['tests/dev.c'], dependencies: fejix_internal_dep)
+
+    test(
+        'test_core_map',
+        executable(
+            'test_core_map',
+            sources: ['tests/core/map.c'],
+            dependencies: fejix_internal_dep
+        )
     )
-)
+
+    test(
+        'test_core_vec',
+        executable(
+            'test_core_vec',
+            sources: ['tests/core/vec.c'],
+            dependencies: fejix_internal_dep
+        )
+    )
+endif
