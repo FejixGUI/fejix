@@ -30,14 +30,14 @@ enum fj_interface_id {
 
 struct fj_implementation {
     fj_enum32_t implementation_id;
-
+    fj_version_t interface_version;
     struct fj_client const */*?*/ client;
 };
 
 
 /** The returned array is sorted by implementation IDs. */
 void fj_get_builtin_implementations(
-    struct fj_implementation const * const */*[]?*/ /*out*/ * implementations,
+    struct fj_implementation const *const */*[]? out*/ * implementations,
     uint32_t /*out*/ * implementation_count
 );
 

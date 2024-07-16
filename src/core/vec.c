@@ -26,10 +26,7 @@ fj_bool32_t fj_vec_has_allocated(struct fj_vec const * vec)
     return vec->items != NULL;
 }
 
-void */*[]?*/ fj_vec_offset(
-    struct fj_vec const * vec,
-    uint32_t offset_index
-)
+void */*[]?*/ fj_vec_offset(struct fj_vec const * vec, uint32_t offset_index)
 {
     if (offset_index >= vec->capacity) {
         return NULL;
@@ -121,11 +118,7 @@ fj_err_t vec_maybe_shrink(struct fj_vec * vec)
 
 
 static
-void shift_items_for_insert(
-    struct fj_vec * vec,
-    uint32_t source_index,
-    uint32_t item_distance
-)
+void shift_items_for_insert(struct fj_vec * vec, uint32_t source_index, uint32_t item_distance)
 {
     uint8_t * src = fj_vec_offset(vec, source_index);
     uint8_t * dst = src + item_distance * vec->item_size;
@@ -135,11 +128,7 @@ void shift_items_for_insert(
 
 
 static
-void shift_items_for_remove(
-    struct fj_vec * vec,
-    uint32_t source_index,
-    uint32_t item_distance
-)
+void shift_items_for_remove(struct fj_vec * vec, uint32_t source_index, uint32_t item_distance)
 {
     uint8_t * src = fj_vec_offset(vec, source_index);
     uint8_t * dst = src - item_distance * vec->item_size;
@@ -180,11 +169,7 @@ void fj_vec_replace_items(
 }
 
 
-fj_err_t fj_vec_insert_uninit(
-    struct fj_vec * vec,
-    uint32_t destination_index,
-    uint32_t item_count
-)
+fj_err_t fj_vec_insert_uninit(struct fj_vec * vec, uint32_t destination_index, uint32_t item_count)
 {
     FJ_INIT_TRY
 
@@ -193,10 +178,7 @@ fj_err_t fj_vec_insert_uninit(
         return fj_result;
     }
 
-    if (
-        !fj_vec_is_empty(vec)
-        && destination_index != fj_vec_get_push_index(vec)
-    ) {
+    if (!fj_vec_is_empty(vec) && destination_index != fj_vec_get_push_index(vec)) {
         shift_items_for_insert(vec, destination_index, item_count);
     }
 
@@ -226,11 +208,7 @@ fj_err_t fj_vec_insert_items(
 }
 
 
-fj_err_t fj_vec_remove_items(
-    struct fj_vec * vec,
-    uint32_t start_index,
-    uint32_t item_count
-)
+fj_err_t fj_vec_remove_items(struct fj_vec * vec, uint32_t start_index, uint32_t item_count)
 {
     if (start_index + item_count <= fj_vec_get_last_index(vec)) {
         shift_items_for_remove(vec, start_index+item_count, item_count);

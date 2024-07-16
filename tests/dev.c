@@ -14,7 +14,7 @@
 
 
 struct fj_implementation const * impl = NULL;
-fj_client_data_t * client;
+fj_client_t * client;
 
 
 fj_err_t callback(
@@ -34,7 +34,7 @@ int main(void)
 {
     FJ_INIT_TRY
 
-    struct fj_implementation const * const */*[]?*/ implementations;
+    struct fj_implementation const *const */*[]?*/ implementations;
     uint32_t implementation_count;
 
     fj_get_builtin_implementations(&implementations, &implementation_count);

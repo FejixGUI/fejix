@@ -24,7 +24,7 @@ extern struct fj_implementation const fj_x11_implementation;
 #ifdef FJ_OPT_ANY_IMPLEMENTATION
 
     static
-    struct fj_implementation const * const implementation_list[] = {
+    struct fj_implementation const *const implementation_list[] = {
 
 #   ifdef FJ_OPT_ANDK
         &fj_andk_implementation,
@@ -64,7 +64,7 @@ uint8_t const */*[]?*/ fj_get_implementation_name(
 
 
 void fj_get_builtin_implementations(
-    struct fj_implementation const * const */*[]?*/ /*out*/ * implementations,
+    struct fj_implementation const *const */*[]? out*/ * implementations,
     uint32_t /*out*/ * implementation_count
 )
 {

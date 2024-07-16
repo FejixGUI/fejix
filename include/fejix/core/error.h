@@ -26,9 +26,7 @@ enum fj_err {
 };
 
 
-uint8_t const */*[]*/ fj_get_error_description(
-    fj_err_t error
-);
+uint8_t const */*[]*/ fj_get_error_description(fj_err_t error);
 
 
 #endif

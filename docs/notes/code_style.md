@@ -5,6 +5,7 @@ Here are some consistency guidelines.
 ## General
 
 * Use C99.
+* Follow [.editorconfig](../../.editorconfig) (100-char lines, LF, 4 spaces).
 
 ## Formatting
 
@@ -32,6 +33,29 @@ Here are some consistency guidelines.
     }
     ```
 
+* Put arguments either all on the same line as the function name, or each on its own line:
+    ```c
+    void f(int aaaaaaaaaaaaaaaaaaaa, int bbbbbbbbbbbbbbbb, int cccccccccccccccccccc)...
+
+    void f(
+        int aaaaaaaaaaaaaaaaaaaaaaaaaaaa,
+        int bbbbbbbbbbbbbbbbbbbbbbbbbbbb,
+        int cccccccccccccccccccccccccccc,
+        int dddddddddddddddddddddddddddd
+    )...
+    ```
+
+* Always put everything on its own line for data structures:
+
+    ```c
+    struct X {
+        void (* method)(
+            int a,          // every argument is on its own line
+            int b
+        )
+    };
+    ```
+
 * Put each variable declaration on its own line:
 
     ```c
@@ -45,9 +69,9 @@ Here are some consistency guidelines.
     uint32_t * var;
     uint32_t * * var;
     uint32_t * * * var;
-    uint32_t * const * var;
-    uint32_t * * const var;
-    uint32_t const * * const * var;
+    uint32_t *const * var;
+    uint32_t * *const var;
+    uint32_t const * *const * var;
     uint32_t * function(uint32_t * arg);
     void function(uint32_t * arg);
     void (* function_pointer)(uint32_t * arg)
@@ -62,9 +86,9 @@ Here are some consistency guidelines.
     /** mutable pointer to constant char */
     char const * a;
     /** constant pointer to mutable char */
-    char * const a;
+    char *const a;
     /** constant pointer to constant char */
-    char const * const a;
+    char const *const a;
     ```
 
 * Annotate in/out/inout arguments in the following way:
@@ -75,7 +99,6 @@ Here are some consistency guidelines.
 * Annotate pointers in public interfaces.
 
     ```c
-
     /** x is a non-nullable pointer to one `uint8_t const` */
     void f(uint8_t const * x);
 
@@ -87,7 +110,17 @@ Here are some consistency guidelines.
 
     /** x is a nullable pointer to an array of `uint8_t const` */
     void f(uint8_t const */*[]?*/ x);
+    ```
 
+* Put pointer annotations together with the asterisk:
+
+    ```c
+    int * x;
+    int */*[]?*/ x;
+    int *const x;
+    int */*[]?*/const x;
+    int */*out*/ x;
+    int */*[]? out*/ x;
     ```
 
 * Annotate static functions with `static` on its own line:
@@ -102,10 +135,9 @@ Here are some consistency guidelines.
 * Annotate extendable and extended structures (usually used for callbacks):
 
     ```c
-
     /*extendable*/
     struct callback {
-        void (*call)(struct callback * this, int x);
+        void (* call)(struct callback * this, int x);
     };
 
     void call_callback(struct callback * callback)
@@ -128,9 +160,8 @@ Here are some consistency guidelines.
     {
         struct my_callback my_callback = { { my_call }, 456 };
 
-        call_callback((void *) &my_callback);
+        call_callback((void *) &my_callback); // 123 + 456 = 579
     }
-
     ```
 
 ## Errors
@@ -138,7 +169,6 @@ Here are some consistency guidelines.
 Fallible function example:
 
 ```c
-
 fj_err_t some_func(void)
 {
     FJ_INIT_TRY
@@ -150,16 +180,16 @@ fj_err_t some_func(void)
 
     return FJ_OK;
 }
-
 ```
 
 ## More
 
-Use Fejix base types, memory allocation and error handling.
+Use Fejix base types, memory allocation, error handling and utils.
 
 See:
-* [fejix/base.h](../../include/fejix/base.h)
-* [fejix/malloc.h](../../include/fejix/malloc.h)
-* [fejix/error.h](../../include/fejix/error.h)
+* [fejix/core/base.h](../../include/fejix/core/base.h)
+* [fejix/core/malloc.h](../../include/fejix/core/malloc.h)
+* [fejix/core/error.h](../../include/fejix/core/error.h)
+* [fejix/core/utils.h](../../include/fejix/core/utils.h)
 
 **TODO: Finish docs.**

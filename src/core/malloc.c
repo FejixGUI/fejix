@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-fj_err_t fj_alloc_uninit(void */*?*/ /*out*/ * ptr, size_t size)
+fj_err_t fj_alloc_uninit(void */*? out*/ * ptr, size_t size)
 {
     if (size == 0) {
         ptr = NULL;
@@ -23,7 +23,7 @@ fj_err_t fj_alloc_uninit(void */*?*/ /*out*/ * ptr, size_t size)
 }
 
 
-fj_err_t fj_alloc_zeroed(void */*?*/ /*out*/ * ptr, size_t size)
+fj_err_t fj_alloc_zeroed(void */*? out*/ * ptr, size_t size)
 {
     if (size == 0) {
         *ptr = NULL;
@@ -47,11 +47,7 @@ void fj_free(void ** ptr)
 }
 
 
-fj_err_t fj_realloc_uninit(
-    void */*[]?*/ * ptr,
-    uint32_t item_count,
-    size_t item_size
-)
+fj_err_t fj_realloc_uninit(void */*[]?*/ * ptr, uint32_t item_count, size_t item_size)
 {
     size_t size = item_count * item_size;
 

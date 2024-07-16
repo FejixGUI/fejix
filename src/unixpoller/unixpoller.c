@@ -1,4 +1,4 @@
-#include <src/shared/unixpoller/unixpoller.h>
+#include <src/unixpoller/unixpoller.h>
 
 #include <fejix/core/malloc.h>
 #include <fejix/core/utils.h>
@@ -8,9 +8,7 @@
 
 
 static
-fj_err_t process_events(
-    struct fj_unixpoller * poller
-)
+fj_err_t process_events(struct fj_unixpoller * poller)
 {
     FJ_INIT_TRY
 
@@ -46,7 +44,7 @@ fj_err_t process_interruption(
     fj_unixpoller_event_mask_t events
 )
 {
-    FJ_UNUSED(callback_data)
+    FJ_ARG_UNUSED(callback_data)
 
     if (events & (POLLERR|POLLHUP|POLLNVAL)) {
         return FJ_ERR_IO_ERROR;
@@ -60,9 +58,7 @@ fj_err_t process_interruption(
 
 
 static
-fj_err_t interrupt(
-    struct fj_client_interrupt_signal const * _signal
-)
+fj_err_t interrupt(struct fj_client_interrupt_signal const * _signal)
 {
     struct fj_unixpoller_interrupt_signal const * signal = (void *) _signal;
 
@@ -78,10 +74,7 @@ fj_err_t interrupt(
 
 
 
-fj_err_t fj_unixpoller_init(
-    struct fj_unixpoller * poller,
-    void * callback_data
-)
+fj_err_t fj_unixpoller_init(struct fj_unixpoller * poller, void * callback_data)
 {
     FJ_INIT_TRY
 
@@ -116,9 +109,7 @@ fj_err_t fj_unixpoller_init(
 }
 
 
-void fj_unixpoller_deinit(
-    struct fj_unixpoller * poller
-)
+void fj_unixpoller_deinit(struct fj_unixpoller * poller)
 {
     if (poller->interrupt_pipe[0] != 0) {
         close(poller->interrupt_pipe[0]);
@@ -160,10 +151,7 @@ fj_err_t fj_unixpoller_add(
 
 
 static
-fj_err_t remove_index(
-    struct fj_unixpoller * poller,
-    uint32_t index
-)
+fj_err_t remove_index(struct fj_unixpoller * poller, uint32_t index)
 {
     FJ_INIT_TRY
 
@@ -181,10 +169,7 @@ fj_err_t remove_index(
 }
 
 
-fj_err_t fj_unixpoller_remove(
-    struct fj_unixpoller * poller,
-    fj_unixpoller_fd_t file_descriptor
-)
+fj_err_t fj_unixpoller_remove(struct fj_unixpoller * poller, fj_unixpoller_fd_t file_descriptor)
 {
     FJ_INIT_TRY
 

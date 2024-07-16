@@ -12,7 +12,8 @@
 
 #define FJ_FILEPOS __FILE__ ":" FJ_STRINGIFY(__LINE__)
 
-#define FJ_UNUSED(VALUE) (void) VALUE;
+#define FJ_ARG_UNUSED(ARG) (void) ARG;
+#define FJ_ARG_CONVERT(ARG, CONVERTED) CONVERTED = (void *) ARG;
 
 /** Get length of a fixed-length array. */
 #define FJ_ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))

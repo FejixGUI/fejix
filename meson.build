@@ -59,16 +59,16 @@ if 'wayland' in implementations
     shared_modules += ['unixpoll']
 
     fejix_src += [
-        'src/implementation/wayland/implementation.c',
+        'src/wayland/implementation.c',
 
-        'src/implementation/wayland/interface/client/client.c',
+        'src/wayland/client/client.c',
     ]
 endif
 
 
 if 'unixpoll' in shared_modules
     fejix_src += [
-        'src/shared/unixpoller/unixpoller.c'
+        'src/unixpoller/unixpoller.c'
     ]
 endif
 

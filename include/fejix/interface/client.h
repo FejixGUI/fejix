@@ -5,12 +5,12 @@
 #include <fejix/implementation.h>
 
 
-FJ_DEFINE_UNIQUE_TYPE(fj_client_data_t)
+typedef struct fj_client_t fj_client_t;
 
 
-enum fj_client_serve_type {
+enum fj_client_run_type {
     /** Represents most kinds of main program entrypoints. */
-    FJ_CLIENT_SERVE_TYPE_MAIN,
+    FJ_CLIENT_RUN_TYPE_MAIN,
 };
 
 enum fj_client_message_id {
@@ -47,32 +47,41 @@ struct fj_client_info {
 
 struct fj_client {
     fj_err_t (* create)(
-        fj_client_data_t */*?*/ /*out*/ * client,
+        fj_client_t */*? out*/ * client,
         struct fj_client_info const * info
     );
 
     fj_err_t (* destroy)(
-        fj_client_data_t * client
+        fj_client_t * client
     );
 
-    fj_err_t (* serve)(
-        fj_client_data_t * client,
-        fj_enum32_t serve_type,
-        void * serve_data
+    fj_err_t (* run)(
+        fj_client_t * client,
+        fj_enum32_t run_type,
+        void * run_data
     );
 
-    /** timeout also accepts 0.0 (no wait), INFINITY (wait forever),
-        and NAN (quit). */
     void (* set_timeout)(
-        fj_client_data_t * client,
+        fj_client_t * client,
         fj_seconds_t timeout
     );
 
-    void (* get_interrupt_signal)(
-        fj_client_data_t * client,
-        struct fj_client_interrupt_signal const * /*out*/ * signal
+    struct fj_client_interrupt_signal const * (* get_interrupt_signal)(
+        fj_client_t * client
     );
 };
+
+
+fj_err_t fj_client_create(fj_client_t */*? out*/ * client, struct fj_client_info const * info);
+
+fj_err_t fj_client_destroy(fj_client_t * client);
+
+fj_err_t fj_client_serve(fj_client_t * client, fj_enum32_t serve_type, void * serve_data);
+
+/** timeout also accepts 0.0 (no wait), INFINITY (wait forever), and NAN (quit). */
+void fj_client_set_timeout(fj_client_t * client, fj_seconds_t timeout);
+
+struct fj_client_interrupt_signal const * fj_client_get_interrupt_signal(fj_client_t * client);
 
 
 #endif

@@ -6,7 +6,7 @@
 
 
 uint8_t const */*[]?*/ fj_ext_get_implementation_hint(
-    struct fj_implementation const * const */*[]*/ impls,
+    struct fj_implementation const *const */*[]*/ impls,
     uint32_t impl_count
 )
 {
@@ -38,7 +38,7 @@ uint8_t const */*[]?*/ fj_ext_get_implementation_hint(
 
 
 struct fj_implementation const */*?*/ fj_ext_find_implementation(
-    struct fj_implementation const * const */*[]*/ impls,
+    struct fj_implementation const *const */*[]*/ impls,
     uint32_t impl_count,
     uint8_t const */*[]*/ implementation_name
 )

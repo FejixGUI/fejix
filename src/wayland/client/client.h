@@ -4,12 +4,12 @@
 
 #include <fejix/interface/client.h>
 
-#include <src/shared/unixpoller/unixpoller.h>
+#include <src/unixpoller/unixpoller.h>
 
 #include <wayland-client.h>
 
 
-struct fj_wayland_client_data {
+struct fj_wayland_client {
     struct fj_client_callback const * callback;
 
     struct fj_unixpoller unixpoller;

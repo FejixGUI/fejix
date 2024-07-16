@@ -1,5 +1,5 @@
-#ifndef FEJIX_SHARED_UNIXPOLLER_H_
-#define FEJIX_SHARED_UNIXPOLLER_H_
+#ifndef FEJIX_UNIXPOLLER_H_
+#define FEJIX_UNIXPOLLER_H_
 
 
 #include <fejix/interface/client.h>

@@ -2,7 +2,7 @@
 
 
 static
-uint8_t const */*[]*/ const error_descriptions[] = {
+uint8_t const */*[]*/const error_descriptions[] = {
     /* When a new error code gets added to the fj_error enum, but its
         description does not get added here, `[FJ_ERR_MAX]=` ensures that
         `error_descriptions[error_code]` returns NULL, which is handled

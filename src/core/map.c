@@ -29,21 +29,14 @@ union fj_any get_key(struct fj_map_node const * node)
 
 
 static
-fj_bool32_t key_eq(
-    struct fj_map const * map,
-    struct fj_map_node const * node,
-    union fj_any key
-)
+fj_bool32_t key_eq(struct fj_map const * map, struct fj_map_node const * node, union fj_any key)
 {
     return fj_any_eq(get_key(node), key, map->key_type);
 }
 
 
 static
-uint32_t get_bucket_index(
-    struct fj_map const * map,
-    union fj_any key
-)
+uint32_t get_bucket_index(struct fj_map const * map, union fj_any key)
 {
     return fj_any_hash32(key, map->key_type) % map->bucket_count;
 }
@@ -71,10 +64,7 @@ struct fj_map_node * get_tail_node(struct fj_map_node * list_head)
 
 
 static
-void insert_node_to_bucket(
-    struct fj_map_node * * bucket,
-    struct fj_map_node * node
-)
+void insert_node_to_bucket(struct fj_map_node * * bucket, struct fj_map_node * node)
 {
     struct fj_map_node * next = *bucket;
     *bucket = node;
@@ -119,8 +109,8 @@ void find_node_in_bucket(
     struct fj_map const * map,
     struct fj_map_node * * bucket,
     union fj_any key,
-    struct fj_map_node */*?*/ /*out*/ * found_node,
-    struct fj_map_node */*?*/ /*out*/ * found_previous_node
+    struct fj_map_node */*? out*/ * found_node,
+    struct fj_map_node */*? out*/ * found_previous_node
 )
 {
     *found_node = NULL;
@@ -248,8 +238,7 @@ fj_bool32_t map_needs_to_shrink(float load_factor)
 static
 fj_bool32_t map_is_validated(float load_factor)
 {
-    return !map_needs_to_grow(load_factor)
-        && !map_needs_to_shrink(load_factor);
+    return !map_needs_to_grow(load_factor) && !map_needs_to_shrink(load_factor);
 }
 
 
@@ -258,9 +247,7 @@ fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
     FJ_INIT_TRY
 
-    fj_try fj_realloc_zeroed_auto(
-        &map->buckets, map->bucket_count, bucket_count
-    );
+    fj_try fj_realloc_zeroed_auto(&map->buckets, map->bucket_count, bucket_count);
     fj_else {
         return fj_result;
     }
@@ -341,7 +328,7 @@ fj_err_t map_remove(struct fj_map * map, union fj_any key)
 static
 struct fj_map_element * map_find(struct fj_map const * map, union fj_any key)
 {
-    struct fj_map_node ** bucket = get_bucket(map, key);
+    struct fj_map_node * * bucket = get_bucket(map, key);
 
     struct fj_map_node * prev_node;
     struct fj_map_node * node;
@@ -355,14 +342,9 @@ struct fj_map_element * map_find(struct fj_map const * map, union fj_any key)
 }
 
 
-/** Returns true if the value was updated, false if the record does not exist
-    in the map. */
+/** Returns true if the value was updated, false if the record does not exist in the map. */
 static
-fj_bool32_t map_update(
-    struct fj_map * map,
-    union fj_any key,
-    union fj_any value
-)
+fj_bool32_t map_update(struct fj_map * map, union fj_any key, union fj_any value)
 {
     struct fj_map_element * element = map_find(map, key);
 
@@ -438,11 +420,7 @@ void */*?*/ map_get(struct fj_map const * map, union fj_any key)
 }
 
 
-void fj_map_init(
-    struct fj_map * map,
-    fj_enum32_t key_type,
-    fj_enum32_t value_type
-)
+void fj_map_init(struct fj_map * map, fj_enum32_t key_type, fj_enum32_t value_type)
 {
     *map = (struct fj_map) {
         .key_type = key_type,
@@ -504,10 +482,7 @@ fj_err_t fj_map_remove(struct fj_map * map, union fj_any key)
 }
 
 
-void fj_map_iter_init(
-    struct fj_map_iter /*out*/ * iter,
-    struct fj_map const * map
-)
+void fj_map_iter_init(struct fj_map_iter /*out*/ * iter, struct fj_map const * map)
 {
     iter->map = map;
     iter->bucket_index = 0;
@@ -589,7 +564,7 @@ void iter_walk_buckets(struct fj_map_iter * iter)
 
 fj_bool32_t fj_map_iter_next(
     struct fj_map_iter * iter,
-    struct fj_map_element */*?*/ /*out*/ * element
+    struct fj_map_element */*? out*/ * element
 )
 {
     if (iter_can_walk_nodes(iter)) {

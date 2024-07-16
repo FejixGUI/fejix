@@ -16,9 +16,9 @@ int main(void)
     char const * b = "b";
     char const * c = "c";
 
-    char const * const * ap;
-    char const * const * bp;
-    char const * const * cp;
+    char const *const * ap;
+    char const *const * bp;
+    char const *const * cp;
 
     fj_map_init(&m, FJ_TYPE_U32, FJ_TYPE_PTR);
 

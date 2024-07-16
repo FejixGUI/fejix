@@ -10,9 +10,13 @@
 /** Converts (char const *) to (uint8_t const *) */
 #define FJ_UTF8(STRING_LITERAL) ((uint8_t const *)(void *)(STRING_LITERAL))
 
-/** Creates a unique typedef. Such typedefs are used in public API to make
-    pointers to internal structures type-safe. */
-#define FJ_DEFINE_UNIQUE_TYPE(TYPE) typedef struct TYPE##_type TYPE;
+/** Semantic version of MAJOR.MINOR.PATCH, min 0.0.0, max 1024.1024.1024 */
+#define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR)<<20) | ((MINOR)<<10) | (PATCH))
+#define FJ_VERSION_MAJOR(VERSION) (((VERSION) >> 20) & 0x3FF)
+#define FJ_VERSION_MINOR(VERSION) (((VERSION) >> 10) & 0x3FF)
+#define FJ_VERSION_PATCH(VERSION) ((VERSION) & 0x3FF)
+#define FJ_VERSION_COMPATIBLE(VERSION, BASE_VERSION) \
+    ((BASE_VERSION)<=(VERSION) && (VERSION)<=FJ_VERSION(FJ_VERSION_MAJOR(BASE_VERSION)+1, 0, 0))
 
 /** An identifier, which may take only enum values. */
 typedef uint32_t fj_enum32_t;
@@ -24,6 +28,8 @@ typedef uint32_t fj_bool32_t;
 typedef fj_enum32_t fj_err_t;
 
 typedef double fj_seconds_t;
+
+typedef uint32_t fj_version_t;
 
 struct fj_ratio {
     int32_t numerator;

@@ -5,8 +5,7 @@
 #include <fejix/core/base.h>
 
 
-FJ_DEFINE_UNIQUE_TYPE(fj_rendering_manager_t)
-FJ_DEFINE_UNIQUE_TYPE(fj_rendering_context_t)
+typedef struct fj_rendering_context_t fj_rendering_context_t;
 
 
 #endif
