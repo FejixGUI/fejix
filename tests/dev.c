@@ -73,7 +73,7 @@ int main(void)
         return -1;
     }
 
-    fj_try impl->client->serve(client, FJ_CLIENT_SERVE_TYPE_MAIN, NULL);
+    fj_try impl->client->run(client, FJ_CLIENT_RUN_TYPE_MAIN, NULL);
     fj_else {
         printf("%s\n", fj_get_error_description(fj_result));
         return -1;

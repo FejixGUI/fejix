@@ -4,6 +4,7 @@
 #include <fejix/core/error.h>
 #include <fejix/core/utils.h>
 #include <wayland-client-core.h>
+#include <wayland-client-protocol.h>
 
 
 static
@@ -18,7 +19,7 @@ void handle_registry_add(
     FJ_ARG_UNUSED(registry)
     FJ_ARG_CONVERT(data, struct fj_wayland_client * client)
 
-    if (FJ_STRING_EQ(interface_name, "wl_compositor")) {
+    if (fj_streq(FJ_UTF8(interface_name), FJ_UTF8(wl_compositor_interface.name))) {
         client->compositor_id = object_id;
         client->compositor_version = interface_version;
     }
@@ -200,6 +201,7 @@ static
 void client_deinit(struct fj_wayland_client * client)
 {
     wayland_deinit(client);
+    
     fj_unixpoller_deinit(&client->unixpoller);
 }
 

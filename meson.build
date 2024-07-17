@@ -45,6 +45,7 @@ fejix_src = [
     'src/core/malloc.c',
     'src/core/map.c',
     'src/core/vec.c',
+    'src/core/utils.c',
 
     'src/ext/helper.c',
 ]

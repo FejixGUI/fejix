@@ -2,9 +2,9 @@
 #define FEJIX_CORE_UTILS_H_
 
 
+#include "fejix/core/base.h"
 #include <fejix/core/error.h>
 
-#include <string.h>
 
 
 #define FJ_STRINGIFY(X) FJ_STRINGIFY_IMPL(X)
@@ -27,8 +27,11 @@
 /** Double-evaluates the arguments. */
 #define FJ_CLAMP(X, MIN, MAX) FJ_MAX(FJ_MIN((X), (MAX)), (MIN))
 
-/** Does not check if the arguments are NULL. */
-#define FJ_STRING_EQ(A, B) (strcmp((char const *)(A), (char const *)(B)) == 0)
+
+fj_bool32_t fj_streq(uint8_t const */*[]*/ a, uint8_t const */*[]*/ b);
+
+/** The returned string must be freed manually. */
+fj_err_t fj_strdup(uint8_t const */*[]*/ str, uint8_t const */*[]? out*/ * clone);
 
 
 #endif
