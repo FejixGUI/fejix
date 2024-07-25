@@ -4,10 +4,10 @@
 
 #include <fejix/core/base.h>
 
-#define FJ_INIT_TRY fj_err_t _fj_err = FJ_OK;
-#define fj_try _fj_err =
-#define fj_else if (_fj_err != FJ_OK)
-#define fj_result (_fj_err)
+#define FJ_WITH_ERRORS fj_err_t _fj_err = FJ_OK;
+#define FJ_TRY(EXPR) _fj_err = (EXPR); if (_fj_err != FJ_OK) 
+#define FJ_CATCH(ERROR) if (_fj_err == (ERROR))
+#define FJ_RESULT (_fj_err)
 
 
 enum fj_err {

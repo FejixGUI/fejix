@@ -25,18 +25,16 @@ struct fj_message {
     void */*?*/ message_data;
 };
 
-/*extendable*/
 struct fj_client_callback {
     fj_err_t (* call)(
-        struct fj_client_callback const * callback,
+        struct fj_client_callback const * this,
         struct fj_message const * message
     );
 };
 
-/*extendable*/
-struct fj_client_interrupt_signal {
-    fj_err_t (* interrupt)(
-        struct fj_client_interrupt_signal const * signal
+struct fj_client_waker {
+    fj_err_t (* wakeup)(
+        struct fj_client_waker const * this
     );
 };
 
@@ -47,41 +45,29 @@ struct fj_client_info {
 
 struct fj_client {
     fj_err_t (* create)(
-        fj_client_t */*? out*/ * client,
+        fj_client_t */*? out*/ * this,
         struct fj_client_info const * info
     );
 
     fj_err_t (* destroy)(
-        fj_client_t * client
+        fj_client_t * this
     );
 
     fj_err_t (* run)(
-        fj_client_t * client,
+        fj_client_t * this,
         fj_enum32_t run_type,
         void * run_data
     );
 
     void (* set_timeout)(
-        fj_client_t * client,
+        fj_client_t * this,
         fj_seconds_t timeout
     );
 
-    struct fj_client_interrupt_signal const * (* get_interrupt_signal)(
-        fj_client_t * client
+    struct fj_client_waker const * (* get_waker)(
+        fj_client_t * this
     );
 };
-
-
-fj_err_t fj_client_create(fj_client_t */*? out*/ * client, struct fj_client_info const * info);
-
-fj_err_t fj_client_destroy(fj_client_t * client);
-
-fj_err_t fj_client_serve(fj_client_t * client, fj_enum32_t serve_type, void * serve_data);
-
-/** timeout also accepts 0.0 (no wait), INFINITY (wait forever), and NAN (quit). */
-void fj_client_set_timeout(fj_client_t * client, fj_seconds_t timeout);
-
-struct fj_client_interrupt_signal const * fj_client_get_interrupt_signal(fj_client_t * client);
 
 
 #endif

@@ -44,7 +44,7 @@ fj_err_t fj_winapi_utf8_to_wstr(
 
     if (result == 0) {
         fj_free_auto(wide_string);
-        return fj_result("cannot convert invalid UTF-8 to wide string");
+        return FJ_RESULT("cannot convert invalid UTF-8 to wide string");
     }
 
     return FJ_OK;

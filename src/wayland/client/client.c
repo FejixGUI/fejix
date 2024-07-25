@@ -17,7 +17,7 @@ void handle_registry_add(
 )
 {
     FJ_ARG_UNUSED(registry)
-    FJ_ARG_CONVERT(data, struct fj_wayland_client * client)
+    FJ_ARG_FROM_OPAQUE(data, struct fj_wayland_client * client)
 
     if (fj_streq(FJ_UTF8(interface_name), FJ_UTF8(wl_compositor_interface.name))) {
         client->compositor_id = object_id;
@@ -53,7 +53,7 @@ fj_err_t wayland_handle_poll_event(
 {
     FJ_ARG_UNUSED(file_descriptor)
     FJ_ARG_UNUSED(event_mask)
-    FJ_ARG_CONVERT(callback_data, struct fj_wayland_client * client)
+    FJ_ARG_FROM_OPAQUE(callback_data, struct fj_wayland_client * client)
 
     int result;
 
@@ -76,7 +76,7 @@ fj_err_t wayland_handle_poll_event(
 static
 fj_err_t wayland_init(struct fj_wayland_client * client)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     client->display = wl_display_connect(NULL);
 
@@ -84,14 +84,13 @@ fj_err_t wayland_init(struct fj_wayland_client * client)
         return FJ_ERR_SHELL_CONNECTION_ERROR;
     }
 
-    fj_try fj_unixpoller_add(
+    FJ_TRY(fj_unixpoller_add(
         &client->unixpoller,
         wl_display_get_fd(client->display),
         POLLIN,
         wayland_handle_poll_event
-    );
-    fj_else {
-        return fj_result;
+    )) {
+        return FJ_RESULT;
     }
 
     client->registry = wl_display_get_registry(client->display);
@@ -149,7 +148,7 @@ fj_err_t client_begin_poll_iteration(struct fj_wayland_client * client)
 static
 fj_err_t client_end_poll_iteration(struct fj_wayland_client * client)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     struct fj_message const message = {
         .sender_interface_id = FJ_CLIENT,
@@ -158,9 +157,8 @@ fj_err_t client_end_poll_iteration(struct fj_wayland_client * client)
         .message_data = NULL
     };
 
-    fj_try client->callback->call(client->callback, &message);
-    fj_else {
-        return fj_result;
+    FJ_TRY(client->callback->call(client->callback, &message)) {
+        return FJ_RESULT;
     }
 
     return FJ_OK;
@@ -178,19 +176,17 @@ void client_cancel_poll_iteration(struct fj_wayland_client * client)
 static
 fj_err_t client_init(struct fj_wayland_client * client, struct fj_client_info const * info)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     client->callback = info->callback;
 
-    fj_try fj_unixpoller_init(&client->unixpoller, (void *) client);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_unixpoller_init(&client->unixpoller, (void *) client)) {
+        return FJ_RESULT;
     }
 
-    fj_try wayland_init(client);
-    fj_else {
+    FJ_TRY(wayland_init(client)) {
         fj_unixpoller_deinit(&client->unixpoller);
-        return fj_result;
+        return FJ_RESULT;
     }
 
     return FJ_OK;
@@ -212,19 +208,17 @@ fj_err_t client_create(
     struct fj_client_info const * info
 )
 {
-    FJ_ARG_CONVERT(_client, struct fj_wayland_client * * client)
+    FJ_ARG_FROM_OPAQUE(_client, struct fj_wayland_client * * client)
 
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try fj_alloc_zeroed_auto(client);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_alloc_zeroed_auto(client)) {
+        return FJ_RESULT;
     }
 
-    fj_try client_init(*client, info);
-    fj_else {
+    FJ_TRY(client_init(*client, info)) {
         fj_free_auto(&client);
-        return fj_result;
+        return FJ_RESULT;
     }
 
     return FJ_OK;
@@ -234,7 +228,7 @@ fj_err_t client_create(
 static
 fj_err_t client_destroy(fj_client_t * _client)
 {
-    FJ_ARG_CONVERT(_client, struct fj_wayland_client * client)
+    FJ_ARG_FROM_OPAQUE(_client, struct fj_wayland_client * client)
 
     client_deinit(client);
     fj_free_auto(&client);
@@ -247,29 +241,26 @@ static
 fj_err_t client_run(fj_client_t * _client, fj_enum32_t serve_type, void * serve_data)
 {
     FJ_ARG_UNUSED(serve_data)
-    FJ_ARG_CONVERT(_client, struct fj_wayland_client * client)
+    FJ_ARG_FROM_OPAQUE(_client, struct fj_wayland_client * client)
 
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     if (serve_type != FJ_CLIENT_RUN_TYPE_MAIN) {
         return FJ_OK;
     }
 
     while (!fj_unixpoller_should_finish(&client->unixpoller)) {
-        fj_try client_begin_poll_iteration(client);
-        fj_else {
-            return fj_result;
+        FJ_TRY(client_begin_poll_iteration(client)) {
+            return FJ_RESULT;
         }
 
-        fj_try fj_unixpoller_poll(&client->unixpoller);
-        fj_else {
+        FJ_TRY(fj_unixpoller_poll(&client->unixpoller)) {
             client_cancel_poll_iteration(client);
-            return fj_result;
+            return FJ_RESULT;
         }
 
-        fj_try client_end_poll_iteration(client);
-        fj_else {
-            return fj_result;
+        FJ_TRY(client_end_poll_iteration(client)) {
+            return FJ_RESULT;
         }
     }
 
@@ -280,18 +271,18 @@ fj_err_t client_run(fj_client_t * _client, fj_enum32_t serve_type, void * serve_
 static
 void client_set_timeout(fj_client_t * _client, fj_seconds_t timeout)
 {
-    FJ_ARG_CONVERT(_client, struct fj_wayland_client * client)
+    FJ_ARG_FROM_OPAQUE(_client, struct fj_wayland_client * client)
 
     client->unixpoller.timeout = timeout;
 }
 
 
 static
-struct fj_client_interrupt_signal const * client_get_interrupt_signal(fj_client_t * _client)
+struct fj_client_waker const * client_get_interrupt_signal(fj_client_t * _client)
 {
-    FJ_ARG_CONVERT(_client, struct fj_wayland_client * client)
+    FJ_ARG_FROM_OPAQUE(_client, struct fj_wayland_client * client)
 
-    return &client->unixpoller.interrupt_signal.interrupt_signal;
+    return FJ_INTO_BASE_PTR(&client->unixpoller.waker);
 }
 
 
@@ -300,5 +291,5 @@ struct fj_client const fj_wayland_client = {
     .destroy = client_destroy,
     .run = client_run,
     .set_timeout = client_set_timeout,
-    .get_interrupt_signal = client_get_interrupt_signal,
+    .get_waker = client_get_interrupt_signal,
 };

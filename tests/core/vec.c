@@ -9,7 +9,7 @@
 
 int main(void)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     // TODO better tests
 
@@ -22,13 +22,13 @@ int main(void)
     fj_vec_init(&v, sizeof(int));
 
     fj_try fj_vec_push_item(&v, &_1);
-    assert(fj_result == FJ_OK);
+    assert(FJ_RESULT == FJ_OK);
 
     fj_try fj_vec_push_item(&v, &_2);
-    assert(fj_result == FJ_OK);
+    assert(FJ_RESULT == FJ_OK);
 
     fj_try fj_vec_insert_items(&v, &_3, 0, 1);
-    assert(fj_result == FJ_OK);
+    assert(FJ_RESULT == FJ_OK);
 
     assert(v.length == 3);
 
@@ -38,7 +38,7 @@ int main(void)
     }
 
     fj_try fj_vec_remove_items(&v, 1, 1);
-    assert(fj_result == FJ_OK);
+    assert(FJ_RESULT == FJ_OK);
 
     assert(v.length == 2);
 

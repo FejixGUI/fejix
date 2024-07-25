@@ -7,6 +7,8 @@
 #include <stdbool.h>
 
 
+#define FJ_DEFINE_OPAQUE_TYPE(TYPE) typedef struct TYPE TYPE;
+
 /** Converts (char const *) to (uint8_t const *) */
 #define FJ_UTF8(STRING_LITERAL) ((uint8_t const *)(void *)(STRING_LITERAL))
 

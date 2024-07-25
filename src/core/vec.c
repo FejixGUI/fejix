@@ -1,3 +1,4 @@
+#include "fejix/core/error.h"
 #include <fejix/core/vec.h>
 
 #include <fejix/core/malloc.h>
@@ -78,15 +79,14 @@ uint32_t vec_get_capacity_to_shrink(struct fj_vec * vec)
 
 fj_err_t fj_vec_resize(struct fj_vec * vec, uint32_t capacity)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     if (vec->capacity == capacity) {
         return FJ_OK;
     }
 
-    fj_try fj_realloc_uninit(&vec->items, capacity, vec->item_size);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_realloc_uninit(&vec->items, capacity, vec->item_size)) {
+        return FJ_RESULT;
     }
 
     vec->capacity = capacity;
@@ -171,11 +171,10 @@ void fj_vec_replace_items(
 
 fj_err_t fj_vec_insert_uninit(struct fj_vec * vec, uint32_t destination_index, uint32_t item_count)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try fj_vec_resize_to_reserve(vec, item_count);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_vec_resize_to_reserve(vec, item_count)) {
+        return FJ_RESULT;
     }
 
     if (!fj_vec_is_empty(vec) && destination_index != fj_vec_get_push_index(vec)) {
@@ -195,11 +194,10 @@ fj_err_t fj_vec_insert_items(
     uint32_t item_count
 )
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try fj_vec_insert_uninit(vec, destination_index, item_count);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_vec_insert_uninit(vec, destination_index, item_count)) {
+        return FJ_RESULT;
     }
 
     fj_vec_replace_items(vec, items, destination_index, item_count);

@@ -13,7 +13,10 @@
 #define FJ_FILEPOS __FILE__ ":" FJ_STRINGIFY(__LINE__)
 
 #define FJ_ARG_UNUSED(ARG) (void) ARG;
-#define FJ_ARG_CONVERT(ARG, CONVERTED) CONVERTED = (void *) ARG;
+
+#define FJ_ARG_FROM_OPAQUE(OPAQUE_ARG, VAR_DECL) VAR_DECL = (void *) OPAQUE_ARG;
+
+#define FJ_INTO_BASE_PTR(OBJECT_PTR) (&((OBJECT_PTR)->base))
 
 /** Get length of a fixed-length array. */
 #define FJ_ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))

@@ -245,11 +245,10 @@ fj_bool32_t map_is_validated(float load_factor)
 static
 fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try fj_realloc_zeroed_auto(&map->buckets, map->bucket_count, bucket_count);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_realloc_zeroed_auto(&map->buckets, map->bucket_count, bucket_count)) {
+        return FJ_RESULT;
     }
 
     map->bucket_count = bucket_count;
@@ -276,17 +275,16 @@ fj_err_t resize_map(struct fj_map * map, fj_bool32_t grow)
 static
 fj_err_t rehash(struct fj_map * map, fj_bool32_t grow)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     struct fj_map_node * list_head = extract_nodes(map);
 
-    fj_try resize_map(map, grow);
-    fj_else {
+    FJ_TRY(resize_map(map, grow)) {
         free_nodes(list_head);
         fj_free_auto(&map->buckets);
         fj_free_auto(&map);
 
-        return fj_result;
+        return FJ_RESULT;
     }
 
     reinsert_nodes(map, list_head);
@@ -361,13 +359,12 @@ fj_bool32_t map_update(struct fj_map * map, union fj_any key, union fj_any value
 static
 fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     struct fj_map_node * node = NULL;
 
-    fj_try fj_alloc_zeroed_auto(&node);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_alloc_zeroed_auto(&node)) {
+        return FJ_RESULT;
     }
 
     node->element.key = key;
@@ -383,11 +380,10 @@ fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 static
 fj_err_t map_allocate(struct fj_map * map)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try fj_realloc_zeroed_auto(&map->buckets, 0, 1);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_realloc_zeroed_auto(&map->buckets, 0, 1)) {
+        return FJ_RESULT;
     }
 
     map->bucket_count = 1;
@@ -449,12 +445,11 @@ void fj_map_deinit(struct fj_map * map)
 
 fj_err_t fj_map_set(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     if (!fj_map_has_allocated(map)) {
-        fj_try map_allocate(map);
-        fj_else {
-            return fj_result;
+        FJ_TRY(map_allocate(map)) {
+            return FJ_RESULT;
         }
     }
 

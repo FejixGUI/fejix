@@ -8,26 +8,21 @@
 
 
 static
-fj_err_t process_events(struct fj_unixpoller * poller)
+fj_err_t process_events(struct fj_unixpoller * this)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    struct pollfd * pollfds = poller->pollfds.items;
-    fj_unixpoller_callback_fn_t * * callbacks = poller->callbacks.items;
+    struct pollfd * pollfds = this->pollfds.items;
+    fj_unixpoller_callback_fn_t * * callbacks = this->callbacks.items;
 
-    for (uint32_t i = 0; i < poller->pollfds.length; i++) {
+    for (uint32_t i = 0; i < this->pollfds.length; i++) {
 
         if (pollfds[i].revents == 0) {
             continue;
         }
 
-        fj_try callbacks[i](
-            poller->callback_data,
-            pollfds[i].fd,
-            pollfds[i].revents
-        );
-        fj_else {
-            return fj_result;
+        FJ_TRY(callbacks[i](this->callback_data, pollfds[i].fd, pollfds[i].revents)) {
+            return FJ_RESULT;
         }
 
         pollfds[i].revents = 0;
@@ -38,7 +33,7 @@ fj_err_t process_events(struct fj_unixpoller * poller)
 
 
 static
-fj_err_t process_interruption(
+fj_err_t handle_wakeup(
     void * callback_data,
     fj_unixpoller_fd_t fd,
     fj_unixpoller_event_mask_t events
@@ -58,12 +53,12 @@ fj_err_t process_interruption(
 
 
 static
-fj_err_t interrupt(struct fj_client_interrupt_signal const * _signal)
+fj_err_t wakeup(struct fj_client_waker const * _this)
 {
-    struct fj_unixpoller_interrupt_signal const * signal = (void *) _signal;
+    FJ_ARG_FROM_OPAQUE(_this, struct fj_unixpoller_waker const * this)
 
     uint8_t buffer[1] = { 42 };
-    ssize_t written_count = write(signal->interrupt_fd, buffer, 1);
+    ssize_t written_count = write(this->wakeup_fd, buffer, 1);
 
     if (written_count < 0) {
         return FJ_ERR_IO_ERROR;
@@ -74,61 +69,53 @@ fj_err_t interrupt(struct fj_client_interrupt_signal const * _signal)
 
 
 
-fj_err_t fj_unixpoller_init(struct fj_unixpoller * poller, void * callback_data)
+fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_vec_init(&poller->pollfds, sizeof(struct pollfd));
-    fj_vec_init(&poller->callbacks, sizeof(fj_unixpoller_callback_fn_t *));
+    fj_vec_init(&this->pollfds, sizeof(struct pollfd));
+    fj_vec_init(&this->callbacks, sizeof(fj_unixpoller_callback_fn_t *));
 
-    int pipe_result = pipe((int32_t *) poller->interrupt_pipe);
+    int pipe_result = pipe((int32_t *) this->waker_pipe);
 
     if (pipe_result < 0) {
         return FJ_ERR_IO_ERROR;
     }
 
-    poller->timeout = 0.0;
-    poller->callback_data = callback_data;
-    poller->interrupt_signal.interrupt_fd = poller->interrupt_pipe[1];
-    poller->interrupt_signal.interrupt_signal.interrupt = interrupt;
+    this->timeout = 0.0;
+    this->callback_data = callback_data;
+    this->waker.wakeup_fd = this->waker_pipe[1];
+    this->waker.base.wakeup = wakeup;
 
-    fj_try
-    fj_unixpoller_add(
-        poller,
-        poller->interrupt_signal.interrupt_fd,
-        POLLIN,
-        process_interruption
-    );
-
-    fj_else {
-        fj_unixpoller_deinit(poller);
-        return fj_result;
+    FJ_TRY(fj_unixpoller_add(this, this->waker.wakeup_fd, POLLIN, handle_wakeup)) {
+        fj_unixpoller_deinit(this);
+        return FJ_RESULT;
     }
 
     return FJ_OK;
 }
 
 
-void fj_unixpoller_deinit(struct fj_unixpoller * poller)
+void fj_unixpoller_deinit(struct fj_unixpoller * this)
 {
-    if (poller->interrupt_pipe[0] != 0) {
-        close(poller->interrupt_pipe[0]);
-        close(poller->interrupt_pipe[1]);
+    if (this->waker_pipe[0] != 0) {
+        close(this->waker_pipe[0]);
+        close(this->waker_pipe[1]);
     }
 
-    fj_vec_deinit(&poller->pollfds);
-    fj_vec_deinit(&poller->callbacks);
+    fj_vec_deinit(&this->pollfds);
+    fj_vec_deinit(&this->callbacks);
 }
 
 
 fj_err_t fj_unixpoller_add(
-    struct fj_unixpoller * poller,
+    struct fj_unixpoller * this,
     fj_unixpoller_fd_t file_descriptor,
     fj_unixpoller_event_mask_t events_to_watch,
     fj_unixpoller_callback_fn_t * callback
 )
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     struct pollfd pollfd = {
         .fd = file_descriptor,
@@ -136,14 +123,12 @@ fj_err_t fj_unixpoller_add(
         .revents = 0,
     };
 
-    fj_try fj_vec_push_item(&poller->pollfds, &pollfd);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_vec_push_item(&this->pollfds, &pollfd)) {
+        return FJ_RESULT;
     }
 
-    fj_try fj_vec_push_item(&poller->callbacks, &callback);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_vec_push_item(&this->callbacks, &callback)) {
+        return FJ_RESULT;
     }
 
     return FJ_OK;
@@ -151,35 +136,32 @@ fj_err_t fj_unixpoller_add(
 
 
 static
-fj_err_t remove_index(struct fj_unixpoller * poller, uint32_t index)
+fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try fj_vec_remove_items(&poller->pollfds, index, 1);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_vec_remove_items(&this->pollfds, index, 1)) {
+        return FJ_RESULT;
     }
 
-    fj_try fj_vec_remove_items(&poller->callbacks, index, 1);
-    fj_else {
-        return fj_result;
+    FJ_TRY(fj_vec_remove_items(&this->callbacks, index, 1)) {
+        return FJ_RESULT;
     }
 
     return FJ_OK;
 }
 
 
-fj_err_t fj_unixpoller_remove(struct fj_unixpoller * poller, fj_unixpoller_fd_t file_descriptor)
+fj_err_t fj_unixpoller_remove(struct fj_unixpoller * this, fj_unixpoller_fd_t file_descriptor)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    struct pollfd * pollfds = poller->pollfds.items;
+    struct pollfd * pollfds = this->pollfds.items;
 
-    for (uint32_t i=0; i<poller->pollfds.length; i++) {
+    for (uint32_t i=0; i<this->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
-            fj_try remove_index(poller, i);
-            fj_else {
-                return fj_result;
+            FJ_TRY(remove_index(this, i)) {
+                return FJ_RESULT;
             }
 
             break;
@@ -205,12 +187,12 @@ int32_t to_poll_timeout(fj_seconds_t timeout)
     return (int32_t) (timeout * 1000.0);
 }
 
-fj_err_t fj_unixpoller_poll(struct fj_unixpoller * poller)
+fj_err_t fj_unixpoller_poll(struct fj_unixpoller * this)
 {
     int32_t result = poll(
-        poller->pollfds.items,
-        poller->pollfds.length,
-        to_poll_timeout(poller->timeout)
+        this->pollfds.items,
+        this->pollfds.length,
+        to_poll_timeout(this->timeout)
     );
 
     if (result < 0) {
@@ -221,11 +203,11 @@ fj_err_t fj_unixpoller_poll(struct fj_unixpoller * poller)
         return FJ_OK;
     }
 
-    return process_events(poller);
+    return process_events(this);
 }
 
 
-fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller * poller)
+fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller * this)
 {
-    return isnan(poller->timeout);
+    return isnan(this->timeout);
 }

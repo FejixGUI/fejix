@@ -32,7 +32,7 @@ fj_err_t callback(
 
 int main(void)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
     struct fj_implementation const *const */*[]?*/ implementations;
     uint32_t implementation_count;
@@ -67,21 +67,18 @@ int main(void)
         .callback = &client_callback
     };
 
-    fj_try impl->client->create(&client, &client_info);
-    fj_else {
-        printf("%s\n", fj_get_error_description(fj_result));
+    FJ_TRY(impl->client->create(&client, &client_info)) {
+        printf("%s\n", fj_get_error_description(FJ_RESULT));
         return -1;
     }
 
-    fj_try impl->client->run(client, FJ_CLIENT_RUN_TYPE_MAIN, NULL);
-    fj_else {
-        printf("%s\n", fj_get_error_description(fj_result));
+    FJ_TRY(impl->client->run(client, FJ_CLIENT_RUN_TYPE_MAIN, NULL)) {
+        printf("%s\n", fj_get_error_description(FJ_RESULT));
         return -1;
     }
 
-    fj_try impl->client->destroy(client);
-    fj_else {
-        printf("%s\n", fj_get_error_description(fj_result));
+    FJ_TRY(impl->client->destroy(client)) {
+        printf("%s\n", fj_get_error_description(FJ_RESULT));
         return -1;
     }
 

@@ -45,17 +45,6 @@ Here are some consistency guidelines.
     )...
     ```
 
-* Always put everything on its own line for data structures:
-
-    ```c
-    struct X {
-        void (* method)(
-            int a,          // every argument is on its own line
-            int b
-        )
-    };
-    ```
-
 * Put each variable declaration on its own line:
 
     ```c
@@ -132,38 +121,6 @@ Here are some consistency guidelines.
     }
     ```
 
-* Annotate extendable and extended structures (usually used for callbacks):
-
-    ```c
-    /*extendable*/
-    struct callback {
-        void (* call)(struct callback * this, int x);
-    };
-
-    void call_callback(struct callback * callback)
-    {
-        callback->call(callback, 123);
-    }
-
-    struct my_callback {
-        struct callback /*extend*/ callback;
-        int y;
-    };
-
-    void my_call(struct callback * _this, int x)
-    {
-        struct my_callback * this = (void *) _this;
-        printf("%d + %d = %d\n", x, this->y, x + this->y);
-    }
-
-    int main(void)
-    {
-        struct my_callback my_callback = { { my_call }, 456 };
-
-        call_callback((void *) &my_callback); // 123 + 456 = 579
-    }
-    ```
-
 ## Errors
 
 Fallible function example:
@@ -171,11 +128,10 @@ Fallible function example:
 ```c
 fj_err_t some_func(void)
 {
-    FJ_INIT_TRY
+    FJ_WITH_ERRORS
 
-    fj_try other_func();
-    fj_else {
-        return fj_result; // returns the result of last `fj_try` statement
+    FJ_TRY(other_func()) {
+        return FJ_RESULT;
     }
 
     return FJ_OK;
