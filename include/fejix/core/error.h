@@ -4,17 +4,11 @@
 
 #include <fejix/core/base.h>
 
-#define FJ_WITH_ERRORS fj_err_t _fj_err = FJ_OK;
-#define FJ_TRY(EXPR) _fj_err = (EXPR); if (_fj_err != FJ_OK) 
-#define FJ_CATCH(ERROR) if (_fj_err == (ERROR))
-#define FJ_RESULT (_fj_err)
-
 
 enum fj_err {
     FJ_OK = 0,
 
     FJ_ERR_UNKNOWN,
-    FJ_ERR_INTERFACE_UNSUPPORTED,
     FJ_ERR_OUT_OF_MEMORY,
     FJ_ERR_INVALID_ALLOCATION,
     FJ_ERR_IO_ERROR,

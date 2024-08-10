@@ -14,6 +14,8 @@
 #define FJ_PTR(X)  ((union fj_any) { .ptr  = (void *)    (X) })
 
 
+typedef uint32_t fj_any_type_t;
+
 enum fj_any_type {
     FJ_TYPE_U32,
     FJ_TYPE_I32,
@@ -23,6 +25,7 @@ enum fj_any_type {
     FJ_TYPE_IPTR,
     FJ_TYPE_PTR,
 };
+
 
 union fj_any {
     uint32_t  u32;
@@ -34,16 +37,10 @@ union fj_any {
     void *    ptr;
 };
 
-fj_enum32_t fj_any_eq(
-    union fj_any a,
-    union fj_any b,
-    fj_enum32_t type
-);
 
-uint32_t fj_any_hash32(
-    union fj_any x,
-    fj_enum32_t type
-);
+fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type);
+
+uint32_t fj_any_hash32(union fj_any x, fj_any_type_t type);
 
 
 #endif

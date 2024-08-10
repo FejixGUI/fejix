@@ -2,11 +2,6 @@
 
 Here are some consistency guidelines.
 
-## General
-
-* Use C99.
-* Follow [.editorconfig](../../.editorconfig) (100-char lines, LF, 4 spaces).
-
 ## Formatting
 
 * Put `{` on its own line ONLY for functions:
@@ -140,12 +135,11 @@ fj_err_t some_func(void)
 
 ## More
 
-Use Fejix base types, memory allocation, error handling and utils.
+Use Fejix base types, memory allocation and utils.
 
 See:
 * [fejix/core/base.h](../../include/fejix/core/base.h)
 * [fejix/core/malloc.h](../../include/fejix/core/malloc.h)
-* [fejix/core/error.h](../../include/fejix/core/error.h)
 * [fejix/core/utils.h](../../include/fejix/core/utils.h)
 
 **TODO: Finish docs.**

@@ -17,8 +17,8 @@ struct fj_map_node {
 };
 
 struct fj_map {
-    fj_enum32_t key_type;
-    fj_enum32_t value_type;
+    fj_any_type_t key_type;
+    fj_any_type_t value_type;
     uint32_t element_count;
     uint32_t bucket_count;
     struct fj_map_node */*?*/ */*[]?*/ buckets;
@@ -31,7 +31,7 @@ struct fj_map_iter {
 };
 
 
-void fj_map_init(struct fj_map * map, fj_enum32_t key_type, fj_enum32_t value_type);
+void fj_map_init(struct fj_map * map, fj_any_type_t key_type, fj_any_type_t value_type);
 
 void fj_map_deinit(struct fj_map * map);
 

@@ -5,17 +5,19 @@
 #include <fejix/core/base.h>
 
 
+/** Example: int * x; fj_alloc_uninit_auto(&x); *x = 3; */
 #define fj_alloc_uninit_auto(OBJECT_PTR_REF) \
     fj_alloc_uninit((void *)(OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF)))
 
-/** Example: int * x; fj_alloc_zeroed_auto(&x); */
+/** Example: int * x; fj_alloc_zeroed_auto(&x); *x = 3; */
 #define fj_alloc_zeroed_auto(OBJECT_PTR_REF) \
     fj_alloc_zeroed((void *)(OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF)))
 
+/** Example: int * x; fj_realloc_uninit_auto(&x, 0, 10); x[9] = 3; */
 #define fj_realloc_uninit_auto(ARRAY_PTR_REF, NEW_COUNT) \
     fj_realloc_uninit((void *)(ARRAY_PTR_REF), NEW_COUNT, sizeof(**(ARRAY_PTR_REF)))
 
-/** Example: int x[]; fj_realloc_zeroed_auto(&x, 0, 10); */
+/** Example: int * x; fj_realloc_zeroed_auto(&x, 0, 10); x[9] = 3; */
 #define fj_realloc_zeroed_auto(ARRAY_PTR_REF, OLD_COUNT, NEW_COUNT) \
     fj_realloc_zeroed((void *)(ARRAY_PTR_REF), OLD_COUNT, NEW_COUNT, sizeof(**(ARRAY_PTR_REF)))
 

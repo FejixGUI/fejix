@@ -5,18 +5,18 @@
 #include <fejix/implementation.h>
 
 
-/** Deduces which implementation the program should use from the environment.
-    If there is only one implementation, returns its name.
-    Returns NULL if deduction is impossible. */
-uint8_t const */*[]?*/ fj_ext_get_implementation_hint(
-    struct fj_implementation const *const */*[]*/ implementations,
-    uint32_t implementation_count
-);
+/** Returns implementation hint deduced from environment variables and/or compile options.
+    Returns NULL if there are no environment hints. */
+uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void);
 
-struct fj_implementation const */*?*/ fj_ext_find_implementation(
-    struct fj_implementation const *const */*[]*/ implementations,
+/** No implementation => returns NULL
+    One implementation => returns it
+    Many implementations + hint => finds the implementation (or NULL if not found).
+    Many implementations + no hint => returns NULL. */
+struct fj_implementation const */*?*/ fj_ext_choose_implementation(
+    struct fj_implementation const *const */*[]?*/ implementations,
     uint32_t implementation_count,
-    uint8_t const */*[]*/ implementation_name
+    uint8_t const */*[]?*/ implementation_hint
 );
 
 

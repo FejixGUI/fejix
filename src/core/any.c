@@ -37,7 +37,7 @@ uint32_t uintptr_hash32(uintptr_t x)
 
 
 
-fj_enum32_t fj_any_eq(union fj_any a, union fj_any b, fj_enum32_t type)
+fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type)
 {
     switch (type) {
         case FJ_TYPE_U32:  return a.u32  == b.u32;
@@ -52,7 +52,7 @@ fj_enum32_t fj_any_eq(union fj_any a, union fj_any b, fj_enum32_t type)
 }
 
 
-uint32_t fj_any_hash32(union fj_any x, fj_enum32_t type)
+uint32_t fj_any_hash32(union fj_any x, fj_any_type_t type)
 {
     switch (type) {
         case FJ_TYPE_U32:  return uint32_hash32(x.u32);

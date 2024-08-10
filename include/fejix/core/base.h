@@ -20,14 +20,11 @@
 #define FJ_VERSION_COMPATIBLE(VERSION, BASE_VERSION) \
     ((BASE_VERSION)<=(VERSION) && (VERSION)<=FJ_VERSION(FJ_VERSION_MAJOR(BASE_VERSION)+1, 0, 0))
 
-/** An identifier, which may take only enum values. */
-typedef uint32_t fj_enum32_t;
-
 /** Use standard `true`/`false` for this. */
 typedef uint32_t fj_bool32_t;
 
 /** Error code. */
-typedef fj_enum32_t fj_err_t;
+typedef uint32_t fj_err_t;
 
 typedef double fj_seconds_t;
 

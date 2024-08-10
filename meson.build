@@ -15,60 +15,65 @@ project(
 
 cc = meson.get_compiler('c')
 
-implementations = get_option('implementations')
-features = get_option('features')
-
 if cc.has_argument('-Wunused')
     add_project_arguments(['-Wunused'], language: ['c', 'cpp', 'objc'])
 endif
 
-if host_machine.system() in ['windows', 'cygwin']
-    add_project_arguments(['-D_CRT_SECURE_NO_WARNINGS', '-DUNICODE', '-D_UNICODE'], language: ['c', 'cpp'])
-endif
+implementations = get_option('implementations')
+features = get_option('features')
 
-foreach option : implementations + features
+all_options = implementations + features
+
+needs_windows_header_setup = host_machine.system() in ['windows', 'cygwin']
+
+has_any_implementation = implementations.length() != 0
+
+foreach option : all_options
     add_project_arguments(['-DFJ_OPT_' + option.to_upper()], language: ['c', 'cpp', 'objc'])
 endforeach
 
-if implementations.length() != 0
+if has_any_implementation
     add_project_arguments(['-DFJ_OPT_ANY_IMPLEMENTATION'], language: ['c', 'cpp', 'objc'])
+endif
+
+if needs_windows_header_setup
+    add_project_arguments(['-D_CRT_SECURE_NO_WARNINGS', '-DUNICODE', '-D_UNICODE'], language: ['c', 'cpp'])
 endif
 
 # SOURCES
 
-fejix_src = [
-    'src/implementation.c',
+public_includes = ['include']
+private_includes = ['include', '.']
 
+dependencies = []
+shared_modules = []
+
+sources = [
+    'src/implementation.c',
     'src/core/any.c',
     'src/core/error.c',
-    'src/core/geometry.c',
     'src/core/malloc.c',
     'src/core/map.c',
     'src/core/vec.c',
     'src/core/utils.c',
-
     'src/ext/helper.c',
 ]
-
-dependencies = []
-shared_modules = []
 
 
 if 'wayland' in implementations
     dependencies += dependency('wayland-client', required: true)
 
-    shared_modules += ['unixpoll']
+    shared_modules += ['unixpoller']
 
-    fejix_src += [
+    sources += [
         'src/wayland/implementation.c',
-
         'src/wayland/client/client.c',
     ]
 endif
 
 
-if 'unixpoll' in shared_modules
-    fejix_src += [
+if 'unixpoller' in shared_modules
+    sources += [
         'src/unixpoller/unixpoller.c'
     ]
 endif
@@ -76,26 +81,24 @@ endif
 
 fejix = library(
     'fejix',
-    sources: fejix_src,
+    sources: sources,
     dependencies: dependencies,
-    include_directories: ['include', '.'],
+    include_directories: private_includes,
 )
 
 fejix_dep = declare_dependency(
     link_with: fejix,
-    include_directories: ['include']
+    include_directories: public_includes
 )
 
 
 # TESTS
 
-if not meson.is_subproject()
+if get_option('build_tests')
     fejix_internal_dep = declare_dependency(
         link_with: fejix,
-        include_directories: ['include', '.']
+        include_directories: private_includes
     )
-
-    executable('dev', sources: ['tests/dev.c'], dependencies: fejix_internal_dep)
 
     test(
         'test_core_map',

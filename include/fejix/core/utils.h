@@ -2,10 +2,13 @@
 #define FEJIX_CORE_UTILS_H_
 
 
-#include "fejix/core/base.h"
 #include <fejix/core/error.h>
 
 
+#define FJ_WITH_ERRORS fj_err_t _fj_err = FJ_OK;
+#define FJ_TRY(EXPR) _fj_err = (EXPR); if (_fj_err != FJ_OK)
+#define FJ_CATCH(ERROR) if (_fj_err == (ERROR))
+#define FJ_RESULT (_fj_err)
 
 #define FJ_STRINGIFY(X) FJ_STRINGIFY_IMPL(X)
 #define FJ_STRINGIFY_IMPL(X) #X
@@ -15,8 +18,6 @@
 #define FJ_ARG_UNUSED(ARG) (void) ARG;
 
 #define FJ_ARG_FROM_OPAQUE(OPAQUE_ARG, VAR_DECL) VAR_DECL = (void *) OPAQUE_ARG;
-
-#define FJ_INTO_BASE_PTR(OBJECT_PTR) (&((OBJECT_PTR)->base))
 
 /** Get length of a fixed-length array. */
 #define FJ_ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))

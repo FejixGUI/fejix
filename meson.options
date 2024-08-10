@@ -4,7 +4,7 @@ option(
     value: [],
     choices: [
         'andk',
-        'cocoa',
+        'appkit',
         'wayland',
         'winapi',
         'x11'
@@ -29,3 +29,5 @@ option(
         'tray',
     ]
 )
+
+option('build_tests', type: 'boolean', value: false)

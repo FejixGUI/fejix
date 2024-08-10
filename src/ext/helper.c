@@ -5,15 +5,8 @@
 #include <stdlib.h>
 
 
-uint8_t const */*[]?*/ fj_ext_get_implementation_hint(
-    struct fj_implementation const *const */*[]*/ impls,
-    uint32_t impl_count
-)
+uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void)
 {
-    if (impl_count == 1) {
-        return fj_get_implementation_name(impls[0]->implementation_id);
-    }
-
     uint8_t const */*[]*/ hint;
 
     hint = FJ_UTF8(getenv("FEJIX_IMPLEMENTATION"));
@@ -34,17 +27,24 @@ uint8_t const */*[]?*/ fj_ext_get_implementation_hint(
 }
 
 
-struct fj_implementation const */*?*/ fj_ext_find_implementation(
-    struct fj_implementation const *const */*[]*/ impls,
+struct fj_implementation const */*?*/ fj_ext_choose_implementation(
+    struct fj_implementation const *const */*[]?*/ impls,
     uint32_t impl_count,
-    uint8_t const */*[]*/ implementation_name
+    uint8_t const */*[]?*/ impl_hint
 )
 {
-    for (uint32_t i=0; i<impl_count; i++) {
-        fj_enum32_t impl_id = impls[i]->implementation_id;
-        uint8_t const * name = fj_get_implementation_name(impl_id);
+    if (impl_count == 0) {
+        return NULL;
+    }
 
-        if (fj_streq(name, implementation_name)) {
+    if (impl_count == 1) {
+        return impls[0];
+    }
+
+    for (uint32_t i=0; i<impl_count; i++) {
+        uint8_t const * impl_name = fj_get_implementation_name(impls[i]->id);
+
+        if (fj_streq(impl_name, impl_hint)) {
             return impls[i];
         }
     }

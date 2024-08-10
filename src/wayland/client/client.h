@@ -10,7 +10,8 @@
 
 
 struct fj_wayland_client {
-    struct fj_client_callback const * callback;
+    struct fj_client_callbacks const * callbacks;
+    void * data;
 
     struct fj_unixpoller unixpoller;
 
