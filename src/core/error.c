@@ -18,6 +18,7 @@ uint8_t const */*[]*/const error_descriptions[] = {
     [FJ_ERR_MESSAGE_READ_ERROR] = FJ_UTF8("message read error"),
     [FJ_ERR_MESSAGE_SEND_ERROR] = FJ_UTF8("message send error"),
     [FJ_ERR_SHELL_CONNECTION_ERROR] = FJ_UTF8("shell connection error"),
+    [FJ_ERR_INVALID_TEXT_ENCODING] = FJ_UTF8("invalid text encoding"),
 };
 
 

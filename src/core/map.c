@@ -208,7 +208,7 @@ void free_nodes(struct fj_map_node * list_head)
 
     while (node != NULL) {
         struct fj_map_node * next_node = node->next;
-        fj_free_auto(&node);
+        FJ_FREE(&node);
         node = next_node;
     }
 }
@@ -247,7 +247,7 @@ fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
     FJ_WITH_ERRORS
 
-    FJ_TRY(fj_realloc_zeroed_auto(&map->buckets, map->bucket_count, bucket_count)) {
+    FJ_TRY(FJ_REALLOC_ZEROED(&map->buckets, map->bucket_count, bucket_count)) {
         return FJ_RESULT;
     }
 
@@ -281,8 +281,8 @@ fj_err_t rehash(struct fj_map * map, fj_bool32_t grow)
 
     FJ_TRY(resize_map(map, grow)) {
         free_nodes(list_head);
-        fj_free_auto(&map->buckets);
-        fj_free_auto(&map);
+        FJ_FREE(&map->buckets);
+        FJ_FREE(&map);
 
         return FJ_RESULT;
     }
@@ -315,7 +315,7 @@ fj_err_t map_remove(struct fj_map * map, union fj_any key)
         return FJ_OK;
     }
 
-    fj_free_auto(&node);
+    FJ_FREE(&node);
 
     map->element_count--;
 
@@ -363,7 +363,7 @@ fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 
     struct fj_map_node * node = NULL;
 
-    FJ_TRY(fj_alloc_zeroed_auto(&node)) {
+    FJ_TRY(FJ_ALLOC_ZEROED(&node)) {
         return FJ_RESULT;
     }
 
@@ -382,7 +382,7 @@ fj_err_t map_allocate(struct fj_map * map)
 {
     FJ_WITH_ERRORS
 
-    FJ_TRY(fj_realloc_zeroed_auto(&map->buckets, 0, 1)) {
+    FJ_TRY(FJ_REALLOC_ZEROED(&map->buckets, 0, 1)) {
         return FJ_RESULT;
     }
 
@@ -416,7 +416,7 @@ void */*?*/ map_get(struct fj_map const * map, union fj_any key)
 }
 
 
-void fj_map_init(struct fj_map * map, fj_enum32_t key_type, fj_enum32_t value_type)
+void fj_map_init(struct fj_map /*out*/ * map, fj_any_type_t key_type, fj_any_type_t value_type)
 {
     *map = (struct fj_map) {
         .key_type = key_type,
@@ -438,7 +438,7 @@ void fj_map_deinit(struct fj_map * map)
     }
 
     if (map->buckets != NULL) {
-        fj_free_auto(&map->buckets);
+        FJ_FREE(&map->buckets);
     }
 }
 

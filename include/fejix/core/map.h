@@ -31,7 +31,7 @@ struct fj_map_iter {
 };
 
 
-void fj_map_init(struct fj_map * map, fj_any_type_t key_type, fj_any_type_t value_type);
+void fj_map_init(struct fj_map /*out*/ * map, fj_any_type_t key_type, fj_any_type_t value_type);
 
 void fj_map_deinit(struct fj_map * map);
 

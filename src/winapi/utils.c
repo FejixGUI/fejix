@@ -1,50 +1,79 @@
 #include <src/winapi/utils.h>
 
-#include <fejix/malloc.h>
-#include <fejix/utils.h>
+#include <fejix/core/malloc.h>
+#include <fejix/core/utils.h>
 
 #include <string.h>
 
 
-fj_err_t fj_winapi_utf8_to_wstr(
-    fj_string_t utf8_string,
-    LPWSTR /*?*/ /*out*/ * wide_string
-)
+fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * utf16_string)
 {
-    FJ_INIT_ERRORS
+    FJ_WITH_ERRORS
 
-    char const * c_string = (char const *) utf8_string;
-
-    int32_t output_chars_count = MultiByteToWideChar(
+    int32_t output_char_count = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
-        c_string,
+        (char const *) string,
         -1, /* convert the entire string */
         NULL, /* output string */
         0 /* output chars count (unknown, asking for it) */
     );
 
-    fj_try fj_alloc_uninit(
-        (void *) wide_string,
-        output_chars_count * sizeof(WCHAR)
-    );
-
-    if (FJ_FAILED) {
-        return FJ_LAST_ERROR;
+    FJ_TRY(FJ_ARRALLOC_UNINIT(utf16_string, output_char_count)) {
+        return FJ_RESULT;
     }
 
     uint32_t result = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
-        c_string,
+        (char const *) string,
         -1, /* convert the entire string */
-        *wide_string,
-        output_chars_count
+        *utf16_string,
+        output_char_count
     );
 
     if (result == 0) {
-        fj_free_auto(wide_string);
-        return FJ_RESULT("cannot convert invalid UTF-8 to wide string");
+        FJ_FREE(utf16_string);
+        return FJ_ERR_INVALID_TEXT_ENCODING;
+    }
+
+    return FJ_OK;
+}
+
+
+fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, uint8_t const */*[] out*/ * string)
+{
+    FJ_WITH_ERRORS
+
+    int32_t output_size = WideCharToMultiByte(
+        CP_UTF8,
+        0, /* flags */
+        utf16_string,
+        -1, /* convert the entire string */
+        NULL, /* output string */
+        0, /* output chars count (unknown, asking for it) */
+        NULL,
+        NULL
+    );
+
+    FJ_TRY(FJ_ARRALLOC_UNINIT(string, output_size)) {
+        return FJ_RESULT;
+    }
+
+    uint32_t result = WideCharToMultiByte(
+        CP_UTF8,
+        0, /* flags */
+        utf16_string,
+        -1, /* convert the entire string */
+        (char *) *string,
+        output_size,
+        NULL,
+        NULL
+    );
+
+    if (result == 0) {
+        FJ_FREE(string);
+        return FJ_ERR_INVALID_TEXT_ENCODING;
     }
 
     return FJ_OK;

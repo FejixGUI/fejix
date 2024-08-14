@@ -34,8 +34,8 @@ enum fj_interface_id {
 struct fj_implementation {
     fj_implementation_id_t id;
     fj_version_t version;
-    struct fj_client const */*?*/ client;
-    struct fj_wm const */*?*/ wm;
+    struct fj_client_iface const */*?*/ client;
+    struct fj_wm_iface const */*?*/ wm;
 };
 
 

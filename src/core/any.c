@@ -28,7 +28,9 @@ uint32_t uint64_hash32(uint64_t x)
 static
 uint32_t uintptr_hash32(uintptr_t x)
 {
-    if (sizeof(x) <= 4) {
+    bool uintptr_fits_in_uint32 = sizeof(x) <= 4;
+
+    if (uintptr_fits_in_uint32) {
         return uint32_hash32((uint32_t) x);
     } else {
         return uint64_hash32((uint64_t) x);

@@ -15,9 +15,9 @@ fj_err_t fj_strdup(uint8_t const */*[]*/ str, uint8_t const */*[]? out*/ * clone
 {
     FJ_WITH_ERRORS
 
-    size_t length = strlen((void *) str);
+    size_t length = strlen(FJ_AS_CSTR(str));
 
-    FJ_TRY(fj_alloc_uninit((void *) clone, length)) {
+    FJ_TRY(FJ_ARRALLOC_UNINIT(clone, length)) {
         return FJ_RESULT;
     }
 

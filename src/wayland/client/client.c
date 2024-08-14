@@ -208,7 +208,7 @@ fj_err_t client_create(
 
     FJ_WITH_ERRORS
 
-    FJ_TRY(fj_alloc_zeroed_auto(client)) {
+    FJ_TRY(FJ_ALLOC_ZEROED(client)) {
         return FJ_RESULT;
     }
 
@@ -216,7 +216,7 @@ fj_err_t client_create(
     (*client)->data = callback_data;
 
     FJ_TRY(client_init(*client, info)) {
-        fj_free_auto(&client);
+        FJ_FREE(&client);
         return FJ_RESULT;
     }
 
@@ -230,7 +230,7 @@ fj_err_t client_destroy(fj_client_t * _client)
     FJ_ARG_FROM_OPAQUE(_client, struct fj_wayland_client * client)
 
     client_deinit(client);
-    fj_free_auto(&client);
+    FJ_FREE(&client);
 
     return FJ_OK;
 }
@@ -285,7 +285,7 @@ fj_err_t client_wakeup(fj_client_t * _client)
 }
 
 
-struct fj_client const fj_wayland_client = {
+struct fj_client_iface const fj_wayland_client_impl = {
     .create = client_create,
     .destroy = client_destroy,
     .run = client_run,

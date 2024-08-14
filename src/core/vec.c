@@ -148,7 +148,7 @@ void fj_vec_init(struct fj_vec * vec, size_t item_size)
 void fj_vec_deinit(struct fj_vec * vec)
 {
     if (fj_vec_has_allocated(vec)) {
-        fj_free_auto(&vec->items);
+        FJ_FREE(&vec->items);
     }
 
     vec->length = 0;

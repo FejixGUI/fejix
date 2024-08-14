@@ -25,7 +25,7 @@ struct fj_client_callbacks {
     fj_err_t (* idle)(void * data);
 };
 
-struct fj_client {
+struct fj_client_iface {
     /** Callbacks are referenced the entire object lifetime.
         Info data is deep-copied. */
     fj_err_t (* create)(
@@ -39,14 +39,17 @@ struct fj_client {
 
     fj_err_t (* run)(fj_client_t * this, fj_client_run_type_t run_type, void * run_data);
 
-    /** timeout:
-        0.0 - do not wait, just read what events are available
-        positive value - wait until either the timeout expires or new events come
-        INF - wait forever until new events come
-        NAN - exit */
+    /** Possible timeout values:
+        0.0 - read a message if available
+        >0.0 - wait for a message for the specified timeout
+        INF - wait for a message forever
+        NAN - exit as soon as possible (some messages may be processed before that)
+        other values - undefined behavior
+
+        If the timeout expires and no messages are available, the idle callback is called. */
     void (* set_timeout)(fj_client_t * this, fj_seconds_t timeout);
 
-    /** This method is thread-safe. */
+    /** This method is thread-safe provided that the client is not being destroyed. */
     fj_err_t (* wakeup)(fj_client_t * this);
 };
 

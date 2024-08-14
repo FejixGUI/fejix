@@ -9,14 +9,14 @@ uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void)
 {
     uint8_t const */*[]*/ hint;
 
-    hint = FJ_UTF8(getenv("FEJIX_IMPLEMENTATION"));
+    hint = FJ_AS_UTF8(getenv("FEJIX_IMPLEMENTATION"));
 
     if (hint != NULL) {
         return hint;
     }
 
 #if defined(FJ_OPT_WAYLAND) || defined(FJ_OPT_X11)
-    hint = FJ_UTF8(getenv("XDG_SESSION_TYPE"));
+    hint = FJ_AS_UTF8(getenv("XDG_SESSION_TYPE"));
 
     if (fj_streq(hint, FJ_UTF8("wayland")) || fj_streq(hint, FJ_UTF8("x11"))) {
         return hint;
