@@ -17,7 +17,7 @@ enum fj_client_run_type {
 
 
 struct fj_client_info {
-    uint8_t const */*[]*/ name;
+    char const */*[]*/ name;
 };
 
 

@@ -4,14 +4,14 @@
 
 
 static
-uint8_t const */*[]*/ implementation_names[] = {
-    [FJ_IMPLEMENTATION_MAX] = FJ_UTF8("...max implementation ID..."),
+char const */*[]*/ implementation_names[] = {
+    [FJ_IMPLEMENTATION_MAX] = "...max implementation ID...",
 
-    [FJ_IMPLEMENTATION_ANDK] = FJ_UTF8("andk"),
-    [FJ_IMPLEMENTATION_APPKIT] = FJ_UTF8("appkit"),
-    [FJ_IMPLEMENTATION_WAYLAND] = FJ_UTF8("wayland"),
-    [FJ_IMPLEMENTATION_WINAPI] = FJ_UTF8("winapi"),
-    [FJ_IMPLEMENTATION_X11] = FJ_UTF8("x11"),
+    [FJ_IMPLEMENTATION_ANDK] = "andk",
+    [FJ_IMPLEMENTATION_APPKIT] = "appkit",
+    [FJ_IMPLEMENTATION_WAYLAND] = "wayland",
+    [FJ_IMPLEMENTATION_WINAPI] = "winapi",
+    [FJ_IMPLEMENTATION_X11] = "x11",
 };
 
 
@@ -47,14 +47,14 @@ extern struct fj_implementation const fj_x11_implementation;
 #endif
 
 
-uint8_t const */*[]?*/ fj_get_implementation_name(fj_implementation_id_t implementation_id)
+char const */*[]?*/ fj_get_implementation_name(fj_implementation_id_t implementation_id)
 {
     if (implementation_id >= FJ_IMPLEMENTATION_MAX) {
         return NULL;
     }
 
     if (implementation_names[implementation_id] == NULL) {
-        return FJ_UTF8("some implementation (name not implemented yet)");
+        return "some implementation (name not implemented yet)";
     }
 
     return implementation_names[implementation_id];

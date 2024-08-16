@@ -57,7 +57,6 @@ typedef uint16_t fj_wm_layer_present_type_t;
 enum fj_wm_layer_present_type {
     FJ_WM_LAYER_PRESENT_TYPE_VISIBLE = (1<<0),
     FJ_WM_LAYER_PRESENT_TYPE_INVISIBLE = (1<<1),
-    FJ_WM_LAYER_PRESENT_TYPE_INVALID = (1<<2),
 };
 
 typedef uint16_t fj_wm_layer_mapping_flags_t;
@@ -176,7 +175,12 @@ struct fj_wm_view_mode {
     fj_wm_orientation_t orientation;
 };
 
+struct fj_wm_view_behavior_info {
+    fj_wm_view_
+};
+
 struct fj_wm_view_info {
+    struct fj_wm_view_behavior_info behavior_info;
 };
 
 struct fj_wm_view_desc {

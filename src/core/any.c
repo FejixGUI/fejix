@@ -25,20 +25,6 @@ uint32_t uint64_hash32(uint64_t x)
 }
 
 
-static
-uint32_t uintptr_hash32(uintptr_t x)
-{
-    bool uintptr_fits_in_uint32 = sizeof(x) <= 4;
-
-    if (uintptr_fits_in_uint32) {
-        return uint32_hash32((uint32_t) x);
-    } else {
-        return uint64_hash32((uint64_t) x);
-    }
-}
-
-
-
 fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type)
 {
     switch (type) {
@@ -46,9 +32,6 @@ fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type)
         case FJ_TYPE_I32:  return a.i32  == b.i32;
         case FJ_TYPE_U64:  return a.u64  == b.u64;
         case FJ_TYPE_I64:  return a.i64  == b.i64;
-        case FJ_TYPE_UPTR: return a.uptr == b.uptr;
-        case FJ_TYPE_IPTR: return a.iptr == b.iptr;
-        case FJ_TYPE_PTR:  return a.ptr  == b.ptr;
         default: return false;
     }
 }
@@ -61,16 +44,6 @@ uint32_t fj_any_hash32(union fj_any x, fj_any_type_t type)
         case FJ_TYPE_I32:  return uint32_hash32((uint32_t) x.i32);
         case FJ_TYPE_U64:  return uint64_hash32(x.u64);
         case FJ_TYPE_I64:  return uint64_hash32((uint64_t) x.i64);
-        case FJ_TYPE_UPTR: return uintptr_hash32(x.uptr);
-        case FJ_TYPE_IPTR: return uintptr_hash32((uintptr_t) x.iptr);
-
-        /* HACK uintptr_t behavior
-
-            Requires that pointers support clear conversion to uintptr_t
-            (if a_ptr == b_ptr, then (uintptr_t) a_ptr == (uintptr_t) b_ptr).
-            This not guaranteed by the standard, but works on most platforms. */
-        case FJ_TYPE_PTR:
-            return uintptr_hash32((uintptr_t) x.ptr);
 
         default: return false;
     }

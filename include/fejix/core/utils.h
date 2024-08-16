@@ -2,7 +2,7 @@
 #define FEJIX_CORE_UTILS_H_
 
 
-#include <fejix/core/error.h>
+#include <fejix/core/base.h>
 
 
 #define FJ_WITH_ERRORS fj_err_t _fj_err = FJ_OK;
@@ -32,10 +32,10 @@
 #define FJ_CLAMP(X, MIN, MAX) FJ_MAX(FJ_MIN((X), (MAX)), (MIN))
 
 
-fj_bool32_t fj_streq(uint8_t const */*[]*/ a, uint8_t const */*[]*/ b);
+fj_bool32_t fj_streq(char const */*[]*/ a, char const */*[]*/ b);
 
 /** The returned string must be freed manually. */
-fj_err_t fj_strdup(uint8_t const */*[]*/ str, uint8_t const */*[]? out*/ * clone);
+fj_err_t fj_strdup(char const */*[]*/ str, char const */*[]? out*/ * clone);
 
 
 #endif

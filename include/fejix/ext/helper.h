@@ -7,7 +7,7 @@
 
 /** Returns implementation hint deduced from environment variables and/or compile options.
     Returns NULL if there are no environment hints. */
-uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void);
+char const */*[]?*/ fj_ext_get_implementation_hint(void);
 
 /** No implementation => returns NULL
     One implementation => returns it
@@ -16,7 +16,7 @@ uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void);
 struct fj_implementation const */*?*/ fj_ext_choose_implementation(
     struct fj_implementation const *const */*[]?*/ implementations,
     uint32_t implementation_count,
-    uint8_t const */*[]?*/ implementation_hint
+    char const */*[]?*/ implementation_hint
 );
 
 

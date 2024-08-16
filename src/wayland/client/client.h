@@ -13,7 +13,10 @@ struct fj_wayland_client {
     struct fj_client_callbacks const * callbacks;
     void * data;
 
+    char const */*[]*/ name;
+
     struct fj_unixpoller unixpoller;
+    fj_err_t callback_error;
 
     struct wl_display * display;
     struct wl_registry * registry;

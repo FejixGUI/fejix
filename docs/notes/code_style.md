@@ -48,7 +48,7 @@ Here are some consistency guidelines.
     uint32_t b;
     ```
 
-* Put spaces around `*`:
+* Put spaces around `*` in types and declarations:
     ```c
     uint32_t * var;
     uint32_t * * var;
@@ -57,8 +57,8 @@ Here are some consistency guidelines.
     uint32_t * *const var;
     uint32_t const * *const * var;
     uint32_t * function(uint32_t * arg);
-    void function(uint32_t * arg);
-    void (* function_pointer)(uint32_t * arg)
+    void (* function_pointer)(uint32_t * arg);
+    uint32_t * var = (uint32_t *) some_ptr;
     ```
 
 ## Annotations
@@ -83,17 +83,17 @@ Here are some consistency guidelines.
 * Annotate pointers in public interfaces.
 
     ```c
-    /** x is a non-nullable pointer to one `uint8_t const` */
-    void f(uint8_t const * x);
+    /** x is a non-nullable pointer to one `char const` */
+    void f(char const * x);
 
-    /** x is a non-nullable pointer to an array of `uint8_t const` */
-    void f(uint8_t const */*[]*/ x);
+    /** x is a nullable pointer to one `char const` */
+    void f(char const */*?*/ x);
 
-    /** x is a nullable pointer to one `uint8_t const` */
-    void f(uint8_t const */*?*/ x);
+    /** x is a non-nullable pointer to an array of `char const` */
+    void f(char const */*[]*/ x);
 
-    /** x is a nullable pointer to an array of `uint8_t const` */
-    void f(uint8_t const */*[]?*/ x);
+    /** x is a nullable pointer to an array of `char const` */
+    void f(char const */*[]?*/ x);
     ```
 
 * Put pointer annotations together with the asterisk:

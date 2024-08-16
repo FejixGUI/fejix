@@ -5,20 +5,20 @@
 #include <stdlib.h>
 
 
-uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void)
+char const */*[]?*/ fj_ext_get_implementation_hint(void)
 {
-    uint8_t const */*[]*/ hint;
+    char const */*[]*/ hint;
 
-    hint = FJ_AS_UTF8(getenv("FEJIX_IMPLEMENTATION"));
+    hint = getenv("FEJIX_IMPLEMENTATION");
 
     if (hint != NULL) {
         return hint;
     }
 
 #if defined(FJ_OPT_WAYLAND) || defined(FJ_OPT_X11)
-    hint = FJ_AS_UTF8(getenv("XDG_SESSION_TYPE"));
+    hint = getenv("XDG_SESSION_TYPE");
 
-    if (fj_streq(hint, FJ_UTF8("wayland")) || fj_streq(hint, FJ_UTF8("x11"))) {
+    if (fj_streq(hint, "wayland") || fj_streq(hint, "x11")) {
         return hint;
     }
 #endif
@@ -30,7 +30,7 @@ uint8_t const */*[]?*/ fj_ext_get_implementation_hint(void)
 struct fj_implementation const */*?*/ fj_ext_choose_implementation(
     struct fj_implementation const *const */*[]?*/ impls,
     uint32_t impl_count,
-    uint8_t const */*[]?*/ impl_hint
+    char const */*[]?*/ impl_hint
 )
 {
     if (impl_count == 0) {
@@ -42,7 +42,7 @@ struct fj_implementation const */*?*/ fj_ext_choose_implementation(
     }
 
     for (uint32_t i=0; i<impl_count; i++) {
-        uint8_t const * impl_name = fj_get_implementation_name(impls[i]->id);
+        char const * impl_name = fj_get_implementation_name(impls[i]->id);
 
         if (fj_streq(impl_name, impl_hint)) {
             return impls[i];

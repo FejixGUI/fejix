@@ -47,7 +47,7 @@ void fj_get_builtin_implementations(
 
 /** Returns the implementation name corresponding to the given ID.
     Returns NULL for non-existing IDs */
-uint8_t const */*[]?*/ fj_get_implementation_name(
+char const */*[]?*/ fj_get_implementation_name(
     fj_implementation_id_t implementation_id
 );
 

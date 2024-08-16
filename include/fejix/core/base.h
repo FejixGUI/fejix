@@ -9,16 +9,6 @@
 
 #define FJ_DEFINE_OPAQUE_TYPE(TYPE) typedef struct TYPE TYPE;
 
-#define FJ_AS_UTF8(STRING) ((uint8_t const *)(STRING))
-#define FJ_AS_CSTR(STRING) ((char const *)(STRING))
-
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) \
-    || (defined(__cplusplus) && __cplusplus >= 201103L)
-#   define FJ_UTF8(STRING_LITERAL) (FJ_AS_UTF8(u8##STRING_LITERAL))
-#else
-#   define FJ_UTF8(STRING_LITERAL) (FJ_AS_UTF8(STRING_LITERAL))
-#endif
-
 /** Semantic version of MAJOR.MINOR.PATCH, min 0.0.0, max 1024.1024.1024 */
 #define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR)<<20) | ((MINOR)<<10) | (PATCH))
 #define FJ_VERSION_MAJOR(VERSION) (((VERSION) >> 20) & 0x3FF)
@@ -28,15 +18,30 @@
     ((BASE_VERSION)<=(VERSION) && (VERSION)<=FJ_VERSION(FJ_VERSION_MAJOR(BASE_VERSION)+1, 0, 0))
 
 
+typedef uint32_t fj_version_t;
+
 /** Use standard `true`/`false` for this. */
 typedef uint32_t fj_bool32_t;
+
+typedef double fj_seconds_t;
 
 /** Error code. */
 typedef uint32_t fj_err_t;
 
-typedef double fj_seconds_t;
+enum fj_err {
+    FJ_OK = 0,
 
-typedef uint32_t fj_version_t;
+    FJ_ERR_UNKNOWN,
+    FJ_ERR_OUT_OF_MEMORY,
+    FJ_ERR_INVALID_ALLOCATION,
+    FJ_ERR_IO_ERROR,
+    FJ_ERR_MESSAGE_READ_ERROR,
+    FJ_ERR_MESSAGE_SEND_ERROR,
+    FJ_ERR_SHELL_CONNECTION_ERROR,
+    FJ_ERR_INVALID_TEXT_ENCODING,
+
+    FJ_ERR_MAX,
+};
 
 
 struct fj_position2d {
@@ -63,6 +68,10 @@ struct fj_viewport2d {
     struct fj_offset2d offset;
     struct fj_size2d size;
 };
+
+
+char const */*[]*/ fj_get_error_description(fj_err_t error);
+
 
 
 #endif

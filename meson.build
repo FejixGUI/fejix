@@ -15,9 +15,11 @@ project(
 
 cc = meson.get_compiler('c')
 
-if cc.has_argument('-Wunused')
-    add_project_arguments(['-Wunused'], language: ['c', 'cpp', 'objc'])
-endif
+foreach arg : ['-Wunused', '-Werror=vla']
+    if cc.has_argument(arg)
+        add_project_arguments(arg, language: ['c'])
+    endif
+endforeach
 
 implementations = get_option('implementations')
 features = get_option('features')
@@ -51,7 +53,7 @@ shared_modules = []
 sources = [
     'src/implementation.c',
     'src/core/any.c',
-    'src/core/error.c',
+    'src/core/base.c',
     'src/core/malloc.c',
     'src/core/map.c',
     'src/core/vec.c',
