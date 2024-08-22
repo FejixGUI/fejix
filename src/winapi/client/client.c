@@ -3,15 +3,9 @@
 #include <fejix/interface/client.h>
 
 #include <fejix/core/utils.h>
-#include <fejix/core/malloc.h>
+#include <fejix/core/alloc.h>
 
 #include <math.h>
-
-
-enum fj_winapi_wait_result {
-    FJ_WINAPI_WAIT_RESULT_TIMEOUT,
-    FJ_WINAPI_WAIT_RESULT_MESSAGE,
-};
 
 
 static
@@ -33,12 +27,15 @@ DWORD convert_timeout(fj_seconds_t timeout)
 }
 
 static
-fj_err_t client_wait_message_or_timeout(struct fj_winapi_client * this, DWORD /*out*/ * wait_result)
+fj_err_t client_wait_message_or_timeout(
+    struct fj_winapi_client * client,
+    DWORD /*out*/ * wait_result
+)
 {
     *wait_result = MsgWaitForMultipleObjectsEx(
         0,
         NULL,
-        convert_timeout(this->timeout),
+        convert_timeout(client->timeout),
         QS_ALLINPUT,
         MWMO_INPUTAVAILABLE
     );
@@ -52,9 +49,9 @@ fj_err_t client_wait_message_or_timeout(struct fj_winapi_client * this, DWORD /*
 
 
 static
-fj_bool32_t client_next_message(struct fj_winapi_client * this, MSG /*out*/ * msg)
+fj_bool32_t client_next_message(struct fj_winapi_client * client, MSG /*out*/ * msg)
 {
-    if (isnan(this->timeout)) {
+    if (isnan(client->timeout)) {
         return false;
     }
 
@@ -69,15 +66,15 @@ fj_bool32_t client_next_message(struct fj_winapi_client * this, MSG /*out*/ * ms
 
 
 static
-fj_err_t client_dispatch_messages(struct fj_winapi_client * this)
+fj_err_t client_dispatch_messages(struct fj_winapi_client * client)
 {
     MSG msg;
-    while (client_next_message(this, &msg)) {
+    while (client_next_message(client, &msg)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
 
-        if (this->event_handling_error != FJ_OK) {
-            return this->event_handling_error;
+        if (client->event_handling_error != FJ_OK) {
+            return client->event_handling_error;
         }
     }
 
@@ -87,25 +84,25 @@ fj_err_t client_dispatch_messages(struct fj_winapi_client * this)
 
 static
 fj_err_t client_create(
-    fj_client_t */*? out*/ * _this,
+    fj_client_t */*? out*/ * client_,
     struct fj_client_callbacks const * callbacks,
     void * callback_data,
-    struct fj_client_info const * info
+    struct fj_client_info const * _info
 )
 {
-    FJ_ARG_FROM_OPAQUE(_this, struct fj_winapi_client */*? out*/ * this)
+    FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client */*? out*/ *)
     FJ_ARG_UNUSED(info)
 
     FJ_INIT_TRY
 
-    FJ_TRY(FJ_ALLOC_ZEROED(this)) {
+    FJ_TRY(FJ_ALLOC_ZEROED(client)) {
         return FJ_RESULT;
     }
 
-    (*this)->callbacks = callbacks;
-    (*this)->data = callback_data;
-    (*this)->instance = GetModuleHandle(NULL);
-    (*this)->main_thread_id = GetCurrentThreadId();
+    (*client)->callbacks = callbacks;
+    (*client)->data = callback_data;
+    (*client)->instance = GetModuleHandle(NULL);
+    (*client)->main_thread_id = GetCurrentThreadId();
 
     ensure_created_thread_event_queue();
 
@@ -114,9 +111,9 @@ fj_err_t client_create(
 
 
 static
-fj_err_t client_destroy(fj_client_t * this)
+fj_err_t client_destroy(fj_client_t * client)
 {
-    FJ_FREE(&this);
+    FJ_FREE(&client);
 
     return FJ_OK;
 }
@@ -126,37 +123,36 @@ fj_err_t client_destroy(fj_client_t * this)
 
 
 static
-fj_err_t client_run(fj_client_t * _this, fj_client_run_type_t run_type, void * run_data)
+fj_err_t client_run(fj_client_t * client_, fj_client_run_type_t run_type, void * _run_data)
 {
-    FJ_ARG_FROM_OPAQUE(_this, struct fj_winapi_client * this)
+    FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client *)
     FJ_ARG_UNUSED(run_data)
 
     FJ_INIT_TRY
 
-    if (run_type != FJ_CLIENT_RUN_TYPE_MAIN) {
+    if (run_type != FJ_CLIENT_RUN_MAIN) {
         return FJ_OK;
     }
 
-    while (!isnan(this->timeout)) {
+    FJ_TRY(client->callbacks->idle(client->data)) {
+        return FJ_RESULT;
+    }
+
+    while (!isnan(client->timeout)) {
         DWORD wait_result;
-        FJ_TRY(client_wait_message_or_timeout(this, &wait_result)) {
+        FJ_TRY(client_wait_message_or_timeout(client, &wait_result)) {
             return FJ_RESULT;
         }
 
-        switch (wait_result) {
-            case FJ_WINAPI_WAIT_RESULT_MESSAGE:
-                FJ_TRY(client_dispatch_messages(this)) {
-                    return FJ_RESULT;
-                }
-            break;
-
-            case FJ_WINAPI_WAIT_RESULT_TIMEOUT:
-                FJ_TRY(this->callbacks->idle(this->data)) {
-                    return FJ_RESULT;
-                }
-            break;
+        if (wait_result == WAIT_OBJECT_0) {
+            FJ_TRY(client_dispatch_messages(client)) {
+                return FJ_RESULT;
+            }
         }
 
+        FJ_TRY(client->callbacks->idle(client->data)) {
+            return FJ_RESULT;
+        }
     }
 
     return FJ_OK;
@@ -164,20 +160,20 @@ fj_err_t client_run(fj_client_t * _this, fj_client_run_type_t run_type, void * r
 
 
 static
-void client_set_timeout(fj_client_t * _this, fj_seconds_t timeout)
+void client_set_timeout(fj_client_t * client_, fj_seconds_t timeout)
 {
-    FJ_ARG_FROM_OPAQUE(_this, struct fj_winapi_client * this)
+    FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client *)
 
-    this->timeout = timeout;
+    client->timeout = timeout;
 }
 
 
 static
-fj_err_t client_wakeup(fj_client_t * _this)
+fj_err_t client_wakeup(fj_client_t * client_)
 {
-    FJ_ARG_FROM_OPAQUE(_this, struct fj_winapi_client * this)
+    FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client *)
 
-    BOOL result = PostThreadMessage(this->main_thread_id, WM_USER, 0, NULL);
+    BOOL result = PostThreadMessage(client->main_thread_id, WM_USER, 0, NULL);
 
     if (result == FALSE) {
         return FJ_ERR_MESSAGE_SEND_ERROR;

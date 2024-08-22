@@ -11,6 +11,14 @@ enum fj_winapi_event_handling_flags {
 };
 
 
+// TODO Add message-only window for global events
+// TODO Add timer for message-only window to handle defwindowhandle
+// TODO Add timer event handling state (TIMER_SET, unset timer if got a message earlier than it
+// signals)
+// TODO Add regular idle scheduling (to emulate how unixpoller-based systems work - they do not
+// know about new messages until they read from display FD)
+
+
 struct fj_winapi_client {
     struct fj_client_callbacks const * callbacks;
     void * data;

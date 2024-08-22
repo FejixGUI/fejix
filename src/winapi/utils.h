@@ -10,9 +10,9 @@
     The returned string must be freed with `fj_free`.
 
     Returns an error if the given string is invalid UTF-8. */
-fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * utf16_string);
+fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf16_string);
 
-fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, uint8_t const */*[] out*/ * string);
+fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const */*[] out*/ * string);
 
 
 #endif

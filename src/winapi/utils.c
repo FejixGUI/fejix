@@ -1,19 +1,19 @@
 #include <src/winapi/utils.h>
 
-#include <fejix/core/malloc.h>
+#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 
 #include <string.h>
 
 
-fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * utf16_string)
+fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf16_string)
 {
     FJ_INIT_TRY
 
     int32_t output_char_count = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
-        (char const *) string,
+        string,
         -1, /* convert the entire string */
         NULL, /* output string */
         0 /* output chars count (unknown, asking for it) */
@@ -26,7 +26,7 @@ fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * u
     uint32_t result = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
-        (char const *) string,
+        string,
         -1, /* convert the entire string */
         *utf16_string,
         output_char_count
@@ -41,7 +41,7 @@ fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * u
 }
 
 
-fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, uint8_t const */*[] out*/ * string)
+fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const */*[] out*/ * string)
 {
     FJ_INIT_TRY
 
