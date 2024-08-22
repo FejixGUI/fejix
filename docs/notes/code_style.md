@@ -116,18 +116,43 @@ Here are some consistency guidelines.
     }
     ```
 
+* Annotate unused args with a preceding underscore and `FJ_ARG_UNSUED` macro:
+    ```c
+    void f(int _unused_arg)
+    {
+        FJ_ARG_UNSUED(unused_arg)
+    }
+    ```
+
+* Annotate opaque pointer args with a following underscore and convert them with
+    `FJ_ARG_FROM_OPAQUE` macro:
+    ```c
+    FJ_DEFINE_OPAQUE_TYPE(number_t)
+
+    void f(number_t * number_)
+    {
+        FJ_ARG_FROM_OPAQUE(number, int *)
+        *number = 123;
+    }
+    ```
+
 ## Errors
 
 Fallible function example:
 
 ```c
-fj_err_t some_func(void)
+fj_err_t func(void)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
-    FJ_TRY(other_func()) {
+    initialise_something();
+
+    FJ_TRY(do_something_fallible()) {
+        terminate_something();
         return FJ_RESULT;
     }
+
+    proceed_normally();
 
     return FJ_OK;
 }

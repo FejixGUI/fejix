@@ -1,4 +1,4 @@
-#include <fejix/core/malloc.h>
+#include <fejix/core/alloc.h>
 
 #include <fejix/core/utils.h>
 

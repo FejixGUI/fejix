@@ -8,7 +8,7 @@
 
 fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * utf16_string)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     int32_t output_char_count = MultiByteToWideChar(
         CP_UTF8,
@@ -43,7 +43,7 @@ fj_err_t fj_winapi_into_utf16(uint8_t const */*[]*/ string, LPWSTR /*? out*/ * u
 
 fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, uint8_t const */*[] out*/ * string)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,

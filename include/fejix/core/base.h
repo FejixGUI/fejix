@@ -9,6 +9,8 @@
 
 #define FJ_DEFINE_OPAQUE_TYPE(TYPE) typedef struct TYPE TYPE;
 
+#define FJ_OBJECT(SOME_PTR) ((struct fj_object const *)(void const *) (SOME_PTR))
+
 /** Semantic version of MAJOR.MINOR.PATCH, min 0.0.0, max 1024.1024.1024 */
 #define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR)<<20) | ((MINOR)<<10) | (PATCH))
 #define FJ_VERSION_MAJOR(VERSION) (((VERSION) >> 20) & 0x3FF)
@@ -18,13 +20,6 @@
     ((BASE_VERSION)<=(VERSION) && (VERSION)<=FJ_VERSION(FJ_VERSION_MAJOR(BASE_VERSION)+1, 0, 0))
 
 
-typedef uint32_t fj_version_t;
-
-/** Use standard `true`/`false` for this. */
-typedef uint32_t fj_bool32_t;
-
-typedef double fj_seconds_t;
-
 /** Error code. */
 typedef uint32_t fj_err_t;
 
@@ -32,6 +27,7 @@ enum fj_err {
     FJ_OK = 0,
 
     FJ_ERR_UNKNOWN,
+    FJ_ERR_UNSUPPORTED,
     FJ_ERR_OUT_OF_MEMORY,
     FJ_ERR_INVALID_ALLOCATION,
     FJ_ERR_IO_ERROR,
@@ -42,6 +38,14 @@ enum fj_err {
 
     FJ_ERR_MAX,
 };
+
+
+typedef uint32_t fj_version_t;
+
+/** Use standard `true`/`false` for this. */
+typedef uint32_t fj_bool32_t;
+
+typedef double fj_seconds_t;
 
 
 struct fj_position2d {
@@ -68,10 +72,6 @@ struct fj_viewport2d {
     struct fj_offset2d offset;
     struct fj_size2d size;
 };
-
-
-char const */*[]*/ fj_get_error_description(fj_err_t error);
-
 
 
 #endif

@@ -24,21 +24,19 @@ endforeach
 implementations = get_option('implementations')
 features = get_option('features')
 
-all_options = implementations + features
-
-needs_windows_header_setup = host_machine.system() in ['windows', 'cygwin']
-
-has_any_implementation = implementations.length() != 0
-
-foreach option : all_options
-    add_project_arguments(['-DFJ_OPT_' + option.to_upper()], language: ['c', 'cpp', 'objc'])
+foreach option : implementations
+    add_project_arguments(['-DFJ_OPT_IMPLEMENTATION_' + option.to_upper()], language: ['c', 'cpp', 'objc'])
 endforeach
 
-if has_any_implementation
+foreach option : features
+    add_project_arguments(['-DFJ_OPT_FEATURE_' + option.to_upper()], language: ['c', 'cpp', 'objc'])
+endforeach
+
+if implementations.length() != 0
     add_project_arguments(['-DFJ_OPT_ANY_IMPLEMENTATION'], language: ['c', 'cpp', 'objc'])
 endif
 
-if needs_windows_header_setup
+if host_machine.system() in ['windows', 'cygwin']
     add_project_arguments(['-D_CRT_SECURE_NO_WARNINGS', '-DUNICODE', '-D_UNICODE'], language: ['c', 'cpp'])
 endif
 
@@ -51,10 +49,9 @@ dependencies = []
 shared_modules = []
 
 sources = [
-    'src/implementation.c',
+    'src/builtin_implementations.c',
+    'src/core/alloc.c',
     'src/core/any.c',
-    'src/core/base.c',
-    'src/core/malloc.c',
     'src/core/map.c',
     'src/core/vec.c',
     'src/core/utils.c',
@@ -70,6 +67,7 @@ if 'wayland' in implementations
     sources += [
         'src/wayland/implementation.c',
         'src/wayland/client/client.c',
+        'src/wayland/layer/layer.c',
     ]
 endif
 

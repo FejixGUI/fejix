@@ -1,5 +1,5 @@
 #include <fejix/core/utils.h>
-#include <fejix/core/malloc.h>
+#include <fejix/core/alloc.h>
 
 #include <string.h>
 
@@ -12,7 +12,7 @@ fj_bool32_t fj_streq(char const */*[]*/ a, char const */*[]*/ b)
 
 fj_err_t fj_strdup(char const */*[]*/ str, char const */*[]? out*/ * clone)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     size_t length = strlen(str);
 

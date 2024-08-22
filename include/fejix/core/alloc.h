@@ -1,5 +1,5 @@
-#ifndef FEJIX_CORE_MALLOC_H_
-#define FEJIX_CORE_MALLOC_H_
+#ifndef FEJIX_CORE_ALLOC_H_
+#define FEJIX_CORE_ALLOC_H_
 
 
 #include <fejix/core/base.h>

@@ -1,11 +1,27 @@
-#include <fejix/implementation.h>
+#include <fejix/interface/implementation.h>
 
 
-extern struct fj_client_iface fj_wayland_client_impl;
+#define CASE(IFACE_UPPERCASE, IFACE_LOWERCASE) \
+    case FJ_INTERFACE_##IFACE_UPPERCASE: { \
+        extern struct fj_##IFACE_LOWERCASE##_iface fj_wayland_##IFACE_LOWERCASE##_impl; \
+        return &fj_wayland_##IFACE_LOWERCASE##_impl; \
+    }
+
+static
+void const * get(fj_interface_id_t id)
+{
+    switch (id) {
+        default: return NULL;
+        CASE(CLIENT, client)
+        CASE(LAYER, layer)
+    }
+}
+
+#undef CASE
 
 
-struct fj_implementation fj_wayland_implementation = {
+struct fj_implementation_iface fj_wayland_implementation_impl = {
+    .get = get,
     .id = FJ_IMPLEMENTATION_WAYLAND,
     .version = FJ_VERSION(0, 0, 0),
-    .client = &fj_wayland_client_impl,
 };

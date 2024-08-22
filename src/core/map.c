@@ -1,6 +1,6 @@
 #include <fejix/core/map.h>
 
-#include <fejix/core/malloc.h>
+#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 
 #include <string.h>
@@ -245,7 +245,7 @@ fj_bool32_t map_is_validated(float load_factor)
 static
 fj_err_t resize_buckets(struct fj_map * map, size_t bucket_count)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     FJ_TRY(FJ_REALLOC_ZEROED(&map->buckets, map->bucket_count, bucket_count)) {
         return FJ_RESULT;
@@ -275,7 +275,7 @@ fj_err_t resize_map(struct fj_map * map, fj_bool32_t grow)
 static
 fj_err_t rehash(struct fj_map * map, fj_bool32_t grow)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     struct fj_map_node * list_head = extract_nodes(map);
 
@@ -359,7 +359,7 @@ fj_bool32_t map_update(struct fj_map * map, union fj_any key, union fj_any value
 static
 fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     struct fj_map_node * node = NULL;
 
@@ -380,7 +380,7 @@ fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 static
 fj_err_t map_allocate(struct fj_map * map)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     FJ_TRY(FJ_REALLOC_ZEROED(&map->buckets, 0, 1)) {
         return FJ_RESULT;
@@ -445,7 +445,7 @@ void fj_map_deinit(struct fj_map * map)
 
 fj_err_t fj_map_set(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     if (!fj_map_has_allocated(map)) {
         FJ_TRY(map_allocate(map)) {

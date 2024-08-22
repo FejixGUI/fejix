@@ -3,6 +3,7 @@
 
 
 #include <fejix/interface/client.h>
+#include <fejix/interface/layer.h>
 
 #include <src/unixpoller/unixpoller.h>
 
@@ -24,6 +25,7 @@ struct fj_wayland_client {
     uint32_t compositor_id;
     uint32_t compositor_version;
     struct wl_compositor * compositor;
+    struct fj_layer_callbacks layer_callbacks;
 };
 
 

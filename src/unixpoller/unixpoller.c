@@ -1,6 +1,5 @@
 #include <src/unixpoller/unixpoller.h>
 
-#include <fejix/core/malloc.h>
 #include <fejix/core/utils.h>
 
 #include <math.h>
@@ -10,7 +9,7 @@
 static
 fj_err_t process_events(struct fj_unixpoller * this)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     struct pollfd * pollfds = this->pollfds.items;
     fj_unixpoller_callback_fn_t * * callbacks = this->callbacks.items;
@@ -34,7 +33,7 @@ fj_err_t process_events(struct fj_unixpoller * this)
 
 static
 fj_err_t handle_wakeup(
-    void * callback_data,
+    void * _callback_data,
     fj_unixpoller_fd_t fd,
     fj_unixpoller_event_mask_t events
 )
@@ -54,7 +53,7 @@ fj_err_t handle_wakeup(
 
 fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     fj_vec_init(&this->pollfds, sizeof(struct pollfd));
     fj_vec_init(&this->callbacks, sizeof(fj_unixpoller_callback_fn_t *));
@@ -96,7 +95,7 @@ fj_err_t fj_unixpoller_add(
     fj_unixpoller_callback_fn_t * callback
 )
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     struct pollfd pollfd = {
         .fd = file_descriptor,
@@ -119,7 +118,7 @@ fj_err_t fj_unixpoller_add(
 static
 fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     FJ_TRY(fj_vec_remove_items(&this->pollfds, index, 1)) {
         return FJ_RESULT;
@@ -135,7 +134,7 @@ fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 
 fj_err_t fj_unixpoller_remove(struct fj_unixpoller * this, fj_unixpoller_fd_t file_descriptor)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     struct pollfd * pollfds = this->pollfds.items;
 

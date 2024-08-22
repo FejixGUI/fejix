@@ -26,30 +26,18 @@ typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id {
     FJ_INTERFACE_CLIENT,
-    FJ_INTERFACE_WM,
+    FJ_INTERFACE_LAYER,
     FJ_INTERFACE_CANVAS,
+    FJ_INTERFACE_BLANK,
 };
 
 
-struct fj_implementation {
+struct fj_implementation_iface {
+    void const * (* get)(fj_interface_id_t iface_id);
+
     fj_implementation_id_t id;
     fj_version_t version;
-    struct fj_client_iface const */*?*/ client;
-    struct fj_wm_iface const */*?*/ wm;
 };
-
-
-/** The returned array is sorted by implementation IDs. */
-void fj_get_builtin_implementations(
-    struct fj_implementation const *const */*[]? out*/ * implementations,
-    uint32_t /*out*/ * implementation_count
-);
-
-/** Returns the implementation name corresponding to the given ID.
-    Returns NULL for non-existing IDs */
-char const */*[]?*/ fj_get_implementation_name(
-    fj_implementation_id_t implementation_id
-);
 
 
 #endif

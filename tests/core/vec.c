@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     // TODO better tests
 

@@ -2,7 +2,7 @@
 #define FEJIX_CLIENT_H_
 
 
-#include <fejix/implementation.h>
+#include <fejix/core/base.h>
 
 
 FJ_DEFINE_OPAQUE_TYPE(fj_client_t)
@@ -12,7 +12,7 @@ typedef uint32_t fj_client_run_type_t;
 
 enum fj_client_run_type {
     /** Represents most kinds of main program entrypoints. */
-    FJ_CLIENT_RUN_TYPE_MAIN,
+    FJ_CLIENT_RUN_MAIN,
 };
 
 
@@ -22,6 +22,7 @@ struct fj_client_info {
 
 
 struct fj_client_callbacks {
+    /** Called at the beginning of run() and then after each message processing iteration. */
     fj_err_t (* idle)(void * data);
 };
 

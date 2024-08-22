@@ -5,7 +5,7 @@
 #include <fejix/core/base.h>
 
 
-#define FJ_WITH_ERRORS fj_err_t _fj_err = FJ_OK;
+#define FJ_INIT_TRY fj_err_t _fj_err = FJ_OK;
 #define FJ_TRY(EXPR) _fj_err = (EXPR); if (_fj_err != FJ_OK)
 #define FJ_CATCH(ERROR) if (_fj_err == (ERROR))
 #define FJ_RESULT (_fj_err)
@@ -15,9 +15,9 @@
 
 #define FJ_FILEPOS __FILE__ ":" FJ_STRINGIFY(__LINE__)
 
-#define FJ_ARG_UNUSED(ARG) (void) ARG;
+#define FJ_ARG_UNUSED(ARG) (void) _##ARG;
 
-#define FJ_ARG_FROM_OPAQUE(OPAQUE_ARG, VAR_DECL) VAR_DECL = (void *) OPAQUE_ARG;
+#define FJ_ARG_FROM_OPAQUE(ARG, TRANSPARENT_TYPE) TRANSPARENT_TYPE ARG = (void *) ARG##_;
 
 /** Get length of a fixed-length array. */
 #define FJ_ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))

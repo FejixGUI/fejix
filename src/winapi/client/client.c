@@ -96,7 +96,7 @@ fj_err_t client_create(
     FJ_ARG_FROM_OPAQUE(_this, struct fj_winapi_client */*? out*/ * this)
     FJ_ARG_UNUSED(info)
 
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     FJ_TRY(FJ_ALLOC_ZEROED(this)) {
         return FJ_RESULT;
@@ -131,7 +131,7 @@ fj_err_t client_run(fj_client_t * _this, fj_client_run_type_t run_type, void * r
     FJ_ARG_FROM_OPAQUE(_this, struct fj_winapi_client * this)
     FJ_ARG_UNUSED(run_data)
 
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     if (run_type != FJ_CLIENT_RUN_TYPE_MAIN) {
         return FJ_OK;

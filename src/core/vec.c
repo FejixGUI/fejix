@@ -1,6 +1,6 @@
 #include <fejix/core/vec.h>
 
-#include <fejix/core/malloc.h>
+#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 
 #include <string.h>
@@ -78,7 +78,7 @@ size_t vec_get_capacity_to_shrink(struct fj_vec * vec)
 
 fj_err_t fj_vec_resize(struct fj_vec * vec, size_t capacity)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     if (vec->capacity == capacity) {
         return FJ_OK;
@@ -170,7 +170,7 @@ void fj_vec_replace_items(
 
 fj_err_t fj_vec_insert_uninit(struct fj_vec * vec, size_t destination_index, size_t item_count)
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     FJ_TRY(fj_vec_resize_to_reserve(vec, item_count)) {
         return FJ_RESULT;
@@ -193,7 +193,7 @@ fj_err_t fj_vec_insert_items(
     size_t item_count
 )
 {
-    FJ_WITH_ERRORS
+    FJ_INIT_TRY
 
     FJ_TRY(fj_vec_insert_uninit(vec, destination_index, item_count)) {
         return FJ_RESULT;

@@ -8,4 +8,7 @@
 FJ_DEFINE_OPAQUE_TYPE(fj_canvas_t)
 
 
+// TODO We cannot leave interfaces without methods
+
+
 #endif
