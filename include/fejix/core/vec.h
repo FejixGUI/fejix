@@ -36,21 +36,43 @@ fj_err_t fj_vec_resize_to_reserve(struct fj_vec * vec, size_t reserved_items);
 fj_err_t fj_vec_resize_to_fit(struct fj_vec * vec);
 
 
-size_t fj_vec_get_last_index(struct fj_vec const * vec);
+static inline
+size_t fj_vec_get_last_index(struct fj_vec const * vec)
+{
+    return vec->length - 1;
+}
 
-size_t fj_vec_get_push_index(struct fj_vec const * vec);
+static inline
+size_t fj_vec_get_push_index(struct fj_vec const * vec)
+{
+    return vec->length;
+}
 
-fj_bool32_t fj_vec_is_empty(struct fj_vec const * vec);
+static inline
+fj_bool32_t fj_vec_is_empty(struct fj_vec const * vec)
+{
+    return vec->length == 0;
+}
 
-fj_bool32_t fj_vec_has_allocated(struct fj_vec const * vec);
+static inline
+fj_bool32_t fj_vec_has_allocated(struct fj_vec const * vec)
+{
+    return vec->items != NULL;
+}
 
-void */*[]?*/ fj_vec_offset(struct fj_vec const * vec, size_t offset_index);
+static inline
+void */*[]?*/ fj_vec_offset(struct fj_vec const * vec, size_t offset_index)
+{
+    if (offset_index >= vec->capacity) {
+        return NULL;
+    }
+
+    return (uint8_t *) vec->items + vec->item_size * offset_index;
+}
 
 
-/** Copies the items into the list.
-
-    Does not check the index. */
-void fj_vec_replace_items(
+/** Copies the items into the list. Does not check the index. */
+void fj_vec_replace(
     struct fj_vec * vec,
     void const * items,
     size_t destination_index,
@@ -63,7 +85,7 @@ fj_err_t fj_vec_insert_uninit(
     size_t item_count
 );
 
-fj_err_t fj_vec_insert_items(
+fj_err_t fj_vec_insert(
     struct fj_vec * vec,
     void const * items,
     size_t destination_index,
@@ -71,13 +93,19 @@ fj_err_t fj_vec_insert_items(
 );
 
 /** Clamps `start_index` and `start_index+item_count` to `0..length`. */
-fj_err_t fj_vec_remove_items(struct fj_vec * vec, size_t start_index, size_t item_count);
+fj_err_t fj_vec_remove(struct fj_vec * vec, size_t start_index, size_t item_count);
 
 /** Works like `insert`. Copies the item into the end of the list. */
-fj_err_t fj_vec_push_item(struct fj_vec * vec, void const * item);
+fj_err_t fj_vec_push(struct fj_vec * vec, void const * item);
 
 /** Removes the last item of the list. */
-fj_err_t fj_vec_pop_item(struct fj_vec * vec);
+fj_err_t fj_vec_pop(struct fj_vec * vec);
+
+/** Pushed the item into the front (beginning) of the vector. */
+fj_err_t fj_vec_push_front(struct fj_vec * vec, void const * item);
+
+/** Pops an item from the front (beginning) of the vector. */
+fj_err_t fj_vec_pop_front(struct fj_vec * vec);
 
 
 #endif

@@ -6,36 +6,6 @@
 #include <string.h>
 
 
-size_t fj_vec_get_last_index(struct fj_vec const * vec)
-{
-    return vec->length - 1;
-}
-
-size_t fj_vec_get_push_index(struct fj_vec const * vec)
-{
-    return vec->length;
-}
-
-fj_bool32_t fj_vec_is_empty(struct fj_vec const * vec)
-{
-    return vec->length == 0;
-}
-
-fj_bool32_t fj_vec_has_allocated(struct fj_vec const * vec)
-{
-    return vec->items != NULL;
-}
-
-void */*[]?*/ fj_vec_offset(struct fj_vec const * vec, size_t offset_index)
-{
-    if (offset_index >= vec->capacity) {
-        return NULL;
-    }
-
-    return (uint8_t *) vec->items + vec->item_size * offset_index;
-}
-
-
 /** Small optimization to reduce the amount of allocations. */
 static
 size_t vec_get_min_capacity(struct fj_vec * vec)
@@ -155,7 +125,7 @@ void fj_vec_deinit(struct fj_vec * vec)
 }
 
 
-void fj_vec_replace_items(
+void fj_vec_replace(
     struct fj_vec * vec,
     void const * items,
     size_t destination_index,
@@ -186,7 +156,7 @@ fj_err_t fj_vec_insert_uninit(struct fj_vec * vec, size_t destination_index, siz
 }
 
 
-fj_err_t fj_vec_insert_items(
+fj_err_t fj_vec_insert(
     struct fj_vec * vec,
     void const * items,
     size_t destination_index,
@@ -199,13 +169,13 @@ fj_err_t fj_vec_insert_items(
         return FJ_RESULT;
     }
 
-    fj_vec_replace_items(vec, items, destination_index, item_count);
+    fj_vec_replace(vec, items, destination_index, item_count);
 
     return FJ_OK;
 }
 
 
-fj_err_t fj_vec_remove_items(struct fj_vec * vec, size_t start_index, size_t item_count)
+fj_err_t fj_vec_remove(struct fj_vec * vec, size_t start_index, size_t item_count)
 {
     if (start_index + item_count <= fj_vec_get_last_index(vec)) {
         shift_items_for_remove(vec, start_index+item_count, item_count);
@@ -217,13 +187,25 @@ fj_err_t fj_vec_remove_items(struct fj_vec * vec, size_t start_index, size_t ite
 }
 
 
-fj_err_t fj_vec_push_item(struct fj_vec * vec, void const * item)
+fj_err_t fj_vec_push(struct fj_vec * vec, void const * item)
 {
-    return fj_vec_insert_items(vec, item, fj_vec_get_push_index(vec), 1);
+    return fj_vec_insert(vec, item, fj_vec_get_push_index(vec), 1);
 }
 
 
-fj_err_t fj_vec_pop_item(struct fj_vec * vec)
+fj_err_t fj_vec_pop(struct fj_vec * vec)
 {
-    return fj_vec_remove_items(vec, fj_vec_get_last_index(vec), 1);
+    return fj_vec_remove(vec, fj_vec_get_last_index(vec), 1);
+}
+
+
+fj_err_t fj_vec_push_front(struct fj_vec * vec, void const * item)
+{
+    return fj_vec_insert(vec, item, 0, 1);
+}
+
+
+fj_err_t fj_vec_pop_front(struct fj_vec * vec)
+{
+    return fj_vec_remove(vec, 0, 1);
 }

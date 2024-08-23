@@ -14,7 +14,7 @@ fj_err_t process_events(struct fj_unixpoller * this)
     struct pollfd * pollfds = this->pollfds.items;
     fj_unixpoller_callback_fn_t * * callbacks = this->callbacks.items;
 
-    for (uint32_t i = 0; i < this->pollfds.length; i++) {
+    for (size_t i = 0; i < this->pollfds.length; i++) {
 
         if (pollfds[i].revents == 0) {
             continue;
@@ -103,11 +103,11 @@ fj_err_t fj_unixpoller_add(
         .revents = 0,
     };
 
-    FJ_TRY(fj_vec_push_item(&this->pollfds, &pollfd)) {
+    FJ_TRY(fj_vec_push(&this->pollfds, &pollfd)) {
         return FJ_RESULT;
     }
 
-    FJ_TRY(fj_vec_push_item(&this->callbacks, &callback)) {
+    FJ_TRY(fj_vec_push(&this->callbacks, &callback)) {
         return FJ_RESULT;
     }
 
@@ -120,11 +120,11 @@ fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 {
     FJ_INIT_TRY
 
-    FJ_TRY(fj_vec_remove_items(&this->pollfds, index, 1)) {
+    FJ_TRY(fj_vec_remove(&this->pollfds, index, 1)) {
         return FJ_RESULT;
     }
 
-    FJ_TRY(fj_vec_remove_items(&this->callbacks, index, 1)) {
+    FJ_TRY(fj_vec_remove(&this->callbacks, index, 1)) {
         return FJ_RESULT;
     }
 
@@ -138,7 +138,7 @@ fj_err_t fj_unixpoller_remove(struct fj_unixpoller * this, fj_unixpoller_fd_t fi
 
     struct pollfd * pollfds = this->pollfds.items;
 
-    for (uint32_t i=0; i<this->pollfds.length; i++) {
+    for (size_t i=0; i<this->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
             FJ_TRY(remove_index(this, i)) {
                 return FJ_RESULT;

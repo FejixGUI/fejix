@@ -49,7 +49,7 @@ struct fj_layer_iface {
 
     fj_err_t (* create)(
         fj_client_t * client,
-        fj_layer_t */*out*/ * layer,
+        fj_layer_t */*? out*/ * layer,
         fj_canvas_t * canvas,
         struct fj_layer_info const * info
     );
