@@ -37,14 +37,15 @@ struct fj_layer_info {
 };
 
 struct fj_layer_callbacks {
-    fj_err_t (* sync)(void * data, fj_layer_t * layer);
+    fj_err_t (* init)(void */*?*/ data, struct fj_layer_desc const */*?*/ desc);
+
+    fj_err_t (* sync)(void */*?*/ data, fj_layer_t * layer);
 };
 
 struct fj_layer_iface {
     fj_err_t (* init)(
         fj_client_t * client,
-        struct fj_layer_callbacks const * callbacks,
-        struct fj_layer_desc /*out*/ * desc
+        struct fj_layer_callbacks const * callbacks
     );
 
     fj_err_t (* create)(

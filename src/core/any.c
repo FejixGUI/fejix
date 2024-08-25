@@ -48,13 +48,13 @@ uint32_t ptr_hash32(void * x)
 fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type)
 {
     switch (type) {
-        case FJ_TYPE_U32:  return a.u32  == b.u32;
-        case FJ_TYPE_I32:  return a.i32  == b.i32;
-        case FJ_TYPE_U64:  return a.u64  == b.u64;
-        case FJ_TYPE_I64:  return a.i64  == b.i64;
-        case FJ_TYPE_UPTR: return a.uptr == b.uptr;
-        case FJ_TYPE_IPTR: return a.iptr == b.iptr;
-        case FJ_TYPE_PTR:  return a.ptr  == b.ptr;
+        case FJ_ANY_U32:  return a.u32  == b.u32;
+        case FJ_ANY_I32:  return a.i32  == b.i32;
+        case FJ_ANY_U64:  return a.u64  == b.u64;
+        case FJ_ANY_I64:  return a.i64  == b.i64;
+        case FJ_ANY_UPTR: return a.uptr == b.uptr;
+        case FJ_ANY_IPTR: return a.iptr == b.iptr;
+        case FJ_ANY_PTR:  return a.ptr  == b.ptr;
         default: return false;
     }
 }
@@ -63,13 +63,13 @@ fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type)
 uint32_t fj_any_hash32(union fj_any x, fj_any_type_t type)
 {
     switch (type) {
-        case FJ_TYPE_U32:  return uint32_hash32(x.u32);
-        case FJ_TYPE_I32:  return uint32_hash32((uint32_t) x.i32);
-        case FJ_TYPE_U64:  return uint64_hash32(x.u64);
-        case FJ_TYPE_I64:  return uint64_hash32((uint64_t) x.i64);
-        case FJ_TYPE_UPTR: return uintptr_hash32(x.uptr);
-        case FJ_TYPE_IPTR: return uintptr_hash32((uint64_t) x.iptr);
-        case FJ_TYPE_PTR:  return ptr_hash32(x.ptr);
+        case FJ_ANY_U32:  return uint32_hash32(x.u32);
+        case FJ_ANY_I32:  return uint32_hash32((uint32_t) x.i32);
+        case FJ_ANY_U64:  return uint64_hash32(x.u64);
+        case FJ_ANY_I64:  return uint64_hash32((uint64_t) x.i64);
+        case FJ_ANY_UPTR: return uintptr_hash32(x.uptr);
+        case FJ_ANY_IPTR: return uintptr_hash32((uint64_t) x.iptr);
+        case FJ_ANY_PTR:  return ptr_hash32(x.ptr);
 
         default: return false;
     }

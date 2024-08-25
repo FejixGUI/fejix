@@ -24,10 +24,9 @@
 typedef uint32_t fj_err_t;
 
 enum fj_err {
-    FJ_OK = 0,
+    FJ_OK,
 
     FJ_ERR_UNKNOWN,
-    FJ_ERR_UNSUPPORTED,
     FJ_ERR_OUT_OF_MEMORY,
     FJ_ERR_INVALID_ALLOCATION,
     FJ_ERR_IO_ERROR,
@@ -37,6 +36,9 @@ enum fj_err {
     FJ_ERR_INVALID_TEXT_ENCODING,
 
     FJ_ERR_MAX,
+
+    /** User-defined errors should begin with this number */
+    FJ_ERR_USER = 10000,
 };
 
 

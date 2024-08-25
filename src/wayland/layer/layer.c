@@ -5,16 +5,15 @@
 
 
 static
-fj_err_t layer_init(
+fj_err_t layer_iface_init(
     fj_client_t * client_,
-    struct fj_layer_callbacks const * callbacks,
-    struct fj_layer_desc /*out*/ * desc
+    struct fj_layer_callbacks const * callbacks
 )
 {
     FJ_ARG_FROM_OPAQUE(client, struct fj_wayland_client *)
 
     if (client->compositor_id == 0) {
-        return FJ_ERR_UNSUPPORTED;
+        return FJ_OK;
     }
 
     client->layer_callbacks = *callbacks;
@@ -26,14 +25,12 @@ fj_err_t layer_init(
         client->compositor_version
     );
 
-    desc->flags = FJ_LAYER_SYNC;
-
     return FJ_OK;
 }
 
 
 static
-fj_err_t layer_create(
+fj_err_t layer_iface_create(
     fj_client_t * client_,
     fj_layer_t */*out*/ * layer_,
     fj_canvas_t * canvas,
@@ -63,7 +60,7 @@ fj_err_t layer_create(
 
 
 static
-fj_err_t layer_destroy(fj_client_t * _client, fj_layer_t * layer_)
+fj_err_t layer_iface_destroy(fj_client_t * _client, fj_layer_t * layer_)
 {
     FJ_ARG_UNUSED(client)
     FJ_ARG_FROM_OPAQUE(layer, struct fj_wayland_layer *)
@@ -76,7 +73,7 @@ fj_err_t layer_destroy(fj_client_t * _client, fj_layer_t * layer_)
 
 
 static
-fj_err_t layer_update(
+fj_err_t layer_iface_update(
     fj_client_t * _client,
     fj_layer_t * layer_,
     struct fj_layer_info const * info,
@@ -95,8 +92,8 @@ fj_err_t layer_update(
 
 
 struct fj_layer_iface const fj_wayland_layer_impl = {
-    .init = layer_init,
-    .create = layer_create,
-    .destroy = layer_destroy,
-    .update = layer_update,
+    .init = layer_iface_init,
+    .create = layer_iface_create,
+    .destroy = layer_iface_destroy,
+    .update = layer_iface_update,
 };

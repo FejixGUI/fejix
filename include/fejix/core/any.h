@@ -17,13 +17,13 @@
 typedef uint32_t fj_any_type_t;
 
 enum fj_any_type {
-    FJ_TYPE_U32,
-    FJ_TYPE_I32,
-    FJ_TYPE_U64,
-    FJ_TYPE_I64,
-    FJ_TYPE_UPTR,
-    FJ_TYPE_IPTR,
-    FJ_TYPE_PTR,
+    FJ_ANY_U32,
+    FJ_ANY_I32,
+    FJ_ANY_U64,
+    FJ_ANY_I64,
+    FJ_ANY_UPTR,
+    FJ_ANY_IPTR,
+    FJ_ANY_PTR,
 };
 
 
@@ -40,8 +40,8 @@ union fj_any {
 
 fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type);
 
-// Do not hash pointers. When hashing pointers, this converts them to uintptr_t.
-// Using the result is undefined behavior.
+/** Do not hash pointers. When hashing pointers, this converts them to uintptr_t.
+    Using the result is undefined behavior. */
 uint32_t fj_any_hash32(union fj_any x, fj_any_type_t type);
 
 

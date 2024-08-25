@@ -7,11 +7,18 @@
 #include <src/wayland/client/client.h>
 
 
+struct fj_wayland_layer_impl_data {
+    struct wl_compositor * compositor;
+    struct fj_layer_callbacks layer_callbacks;
+};
+
+
 struct fj_wayland_layer {
     fj_canvas_t * canvas;
     struct wl_surface * surface;
     struct fj_size2d size;
     fj_layer_flags_t flags;
 };
+
 
 #endif

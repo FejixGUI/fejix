@@ -37,5 +37,26 @@ fj_bool32_t fj_streq(char const */*[]*/ a, char const */*[]*/ b);
 /** The returned string must be freed manually. */
 fj_err_t fj_strdup(char const */*[]*/ str, char const */*[]? out*/ * clone);
 
+/** If x >= 2^31, then returns UINT32_MAX */
+uint32_t fj_u32_next_power_of_two(uint32_t x);
+
+/** If x = 0, then returns 1. */
+uint32_t fj_u32_prev_power_of_two(uint32_t x);
+
+/** If x is greater or equal to the highest power of two representable by size_t,
+    then returns SIZE_MAX */
+size_t fj_size_next_power_of_two(size_t x);
+
+/** If x = 0, then returns 1. */
+size_t fj_size_prev_power_of_two(size_t x);
+
+fj_bool32_t fj_dummy_true(void);
+
+fj_bool32_t fj_dummy_false(void);
+
+fj_err_t fj_dummy_ok(void);
+
+void fj_dummy_void(void);
+
 
 #endif

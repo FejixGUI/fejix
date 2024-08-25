@@ -13,7 +13,6 @@ char const */*[]*/const error_descriptions[] = {
     [FJ_OK] = "success",
 
     [FJ_ERR_UNKNOWN] = "unknown error",
-    [FJ_ERR_UNSUPPORTED] = "unsupported",
     [FJ_ERR_OUT_OF_MEMORY] = "out of memory",
     [FJ_ERR_INVALID_ALLOCATION] = "invalid memory allocation",
     [FJ_ERR_IO_ERROR] = "IO error",
@@ -37,6 +36,10 @@ char const */*[]*/ impl_names[] = {
 
 char const */*[]*/ fj_ext_get_error_description(fj_err_t error)
 {
+    if (error >= FJ_ERR_USER) {
+        return "user-defined error";
+    }
+
     if (error >= FJ_ERR_MAX) {
         return "invalid error ID";
     }

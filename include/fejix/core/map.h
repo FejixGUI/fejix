@@ -19,14 +19,14 @@ struct fj_map_node {
 struct fj_map {
     fj_any_type_t key_type;
     fj_any_type_t value_type;
-    size_t element_count;
-    size_t bucket_count;
+    uint32_t element_count;
+    uint32_t bucket_count;
     struct fj_map_node */*?*/ */*[]?*/ buckets;
 };
 
 struct fj_map_iter {
     struct fj_map const * map;
-    size_t bucket_index;
+    uint32_t bucket_index;
     struct fj_map_node */*?*/ current_node;
 };
 

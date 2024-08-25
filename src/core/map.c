@@ -36,7 +36,7 @@ fj_bool32_t key_eq(struct fj_map const * map, struct fj_map_node const * node, u
 
 
 static
-size_t get_bucket_index(struct fj_map const * map, union fj_any key)
+uint32_t get_bucket_index(struct fj_map const * map, union fj_any key)
 {
     return fj_any_hash32(key, map->key_type) % map->bucket_count;
 }
@@ -45,7 +45,7 @@ size_t get_bucket_index(struct fj_map const * map, union fj_any key)
 static
 struct fj_map_node * * get_bucket(struct fj_map const * map, union fj_any key)
 {
-    size_t index = get_bucket_index(map, key);
+    uint32_t index = get_bucket_index(map, key);
     return &map->buckets[index];
 }
 
@@ -164,7 +164,7 @@ struct fj_map_node * extract_nodes(struct fj_map * map)
     struct fj_map_node * head_node = NULL;
     struct fj_map_node * tail_node = NULL;
 
-    for (size_t i = 0; i < map->bucket_count; i++) {
+    for (uint32_t i = 0; i < map->bucket_count; i++) {
         struct fj_map_node * node = map->buckets[i];
 
         if (node == NULL) {
@@ -243,7 +243,7 @@ fj_bool32_t map_is_validated(float load_factor)
 
 
 static
-fj_err_t resize_buckets(struct fj_map * map, size_t bucket_count)
+fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
     FJ_INIT_TRY
 
@@ -260,7 +260,7 @@ fj_err_t resize_buckets(struct fj_map * map, size_t bucket_count)
 static
 fj_err_t resize_map(struct fj_map * map, fj_bool32_t grow)
 {
-    size_t bucket_count = 0;
+    uint32_t bucket_count = 0;
 
     if (grow) {
         bucket_count = map->bucket_count * 2;

@@ -11,7 +11,7 @@ int main(void)
 
     struct fj_map m;
 
-    fj_map_init(&m, FJ_TYPE_U32, FJ_TYPE_U32);
+    fj_map_init(&m, FJ_ANY_U32, FJ_ANY_U32);
 
     FJ_TRY(fj_map_set(&m, FJ_U32(1), FJ_U32(111))) { assert(false); }
 
