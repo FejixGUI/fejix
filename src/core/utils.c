@@ -89,26 +89,3 @@ size_t fj_size_prev_power_of_two(size_t x)
     return y;
 }
 
-
-fj_bool32_t fj_dummy_true(void)
-{
-    return true;
-}
-
-
-fj_bool32_t fj_dummy_false(void)
-{
-    return false;
-}
-
-
-fj_err_t fj_dummy_ok(void)
-{
-    return FJ_OK;
-}
-
-
-void fj_dummy_void(void)
-{
-    return;
-}

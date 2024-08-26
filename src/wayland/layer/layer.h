@@ -7,9 +7,9 @@
 #include <src/wayland/client/client.h>
 
 
-struct fj_wayland_layer_impl_data {
+struct fj_wayland_layer_class {
+    struct fj_layer_callbacks callbacks;
     struct wl_compositor * compositor;
-    struct fj_layer_callbacks layer_callbacks;
 };
 
 

@@ -13,6 +13,9 @@
 #define FJ_ALLOC_ZEROED(OBJECT_PTR_REF) \
     (fj_alloc_zeroed((void *)(OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF))))
 
+#define FJ_ALLOC_COPIED(OBJECT_PTR_REF, SOURCE) \
+    (fj_alloc_copied((void *)(OBJECT_PTR_REF), (void *)(SOURCE), sizeof(**(OBJECT_PTR_REF))))
+
 /** Example: int * x; FJ_ARRALLOC_UNINIT(&x, 10); x[9] = 3; */
 #define FJ_ARRALLOC_UNINIT(ARRAY_PTR_REF, COUNT) \
     (fj_alloc_uninit((void *)(ARRAY_PTR_REF), sizeof(**(ARRAY_PTR_REF)) * (COUNT)))
@@ -41,6 +44,8 @@ fj_err_t fj_alloc_uninit(void */*? out*/ * ptr, size_t size);
     Works like `calloc(1,)`, but allocating 0 bytes is always an error.
     When this fails, sets `ptr` to NULL. */
 fj_err_t fj_alloc_zeroed(void */*? out*/ * ptr, size_t size);
+
+fj_err_t fj_alloc_copied(void */*? out*/ * ptr, void const * source, size_t size);
 
 /** Frees a block of memory.
     This takes a reference to a pointer, frees the memory behind the pointer

@@ -50,13 +50,5 @@ size_t fj_size_next_power_of_two(size_t x);
 /** If x = 0, then returns 1. */
 size_t fj_size_prev_power_of_two(size_t x);
 
-fj_bool32_t fj_dummy_true(void);
-
-fj_bool32_t fj_dummy_false(void);
-
-fj_err_t fj_dummy_ok(void);
-
-void fj_dummy_void(void);
-
 
 #endif
