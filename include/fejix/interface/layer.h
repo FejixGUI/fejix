@@ -27,7 +27,7 @@ enum fj_layer_update_flags {
 };
 
 
-struct fj_layer_desc {
+struct fj_layer_caps {
     fj_layer_flags_t flags;
 };
 
@@ -37,7 +37,7 @@ struct fj_layer_info {
 };
 
 struct fj_layer_callbacks {
-    fj_err_t (* init)(void */*?*/ data, struct fj_layer_desc const */*?*/ desc);
+    fj_err_t (* init)(void */*?*/ data, struct fj_layer_caps const */*?*/ caps);
 
     fj_err_t (* sync)(void */*?*/ data, fj_layer_t * layer);
 };
@@ -52,7 +52,7 @@ struct fj_layer_iface {
         fj_client_t * client,
         fj_layer_t */*? out*/ * layer,
         fj_canvas_t * canvas,
-        struct fj_layer_info const * info
+        struct fj_layer_info const * layer_info
     );
 
     fj_err_t (* destroy)(fj_client_t * client, fj_layer_t * layer);
@@ -60,7 +60,7 @@ struct fj_layer_iface {
     fj_err_t (* update)(
         fj_client_t * client,
         fj_layer_t * layer,
-        struct fj_layer_info const * info,
+        struct fj_layer_info const * layer_info,
         fj_layer_update_flags_t update_flags
     );
 };

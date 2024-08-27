@@ -48,40 +48,44 @@ enum fj_wayland_event_group_id {
 };
 
 
-struct fj_wayland_global_desc {
+struct fj_wayland_global {
     uint32_t id;
     uint32_t version;
 };
 
 union fj_wayland_interface_desc {
-    /** Description of the static global object. */
-    struct fj_wayland_global_desc desc;
+    /** Static singleton object. */
+    struct fj_wayland_global global;
 
-    /** List of global descriptions of dynamic global objects of the same interface. */
-    struct fj_vec list;
+    /** List of dynamic globals of the same interface. */
+    struct fj_vec global_list;
 };
 
 
 struct fj_wayland_client {
     struct fj_client_callbacks const * callbacks;
+
+    /** User data */
     void * data;
 
     char const */*[]*/ name;
 
-    struct fj_unixpoller unixpoller;
-
     struct wl_display * display;
+    struct wl_registry * registry;
+    union fj_wayland_interface_desc interfaces[FJ_WAYLAND_INTERFACE_MAX];
+
+    struct fj_unixpoller unixpoller;
 
     /** Wayland callbacks record their events to this vector for later handling.
         This vector must be preallocated on startup, and freed in case of allocation failure.
         To check if event recording succeeded, check if the vector has allocated. */
     struct fj_vec recorded_events;
 
-    struct wl_registry * registry;
+    struct fj_wayland_layer_global_data */*?*/ layer;
 
-    union fj_wayland_interface_desc interface_descs[FJ_WAYLAND_INTERFACE_MAX];
-
-    struct fj_wayland_layer_class */*?*/ layer_class;
+#ifdef FJ_OPT_FEATURE_SOFTER_CANVAS
+    struct fj_wayland_softer_canvas_global_data */*?*/ softer;
+#endif
 };
 
 
@@ -105,18 +109,32 @@ struct fj_wayland_event_wrapper {
 fj_wayland_interface_type_t fj_wayland_get_interface_type(fj_wayland_interface_id_t interface_id);
 
 /** interface_id returns FJ_WAYLAND_INTERFACE_MAX on failure. */
-void fj_wayland_get_object_desc(
+void fj_wayland_get_global(
     struct fj_wayland_client * client,
     uint32_t object_id,
     fj_wayland_interface_id_t /*out*/ * interface_id,
-    struct fj_wayland_global_desc const */*? out*/ * global_desc
+    struct fj_wayland_global const */*? out*/ * global
+);
+
+/** Returns true if the global is present, false otherwise. */
+fj_bool32_t fj_wayland_get_static_global(
+    struct fj_wayland_client * client,
+    fj_wayland_interface_id_t interface_id,
+    struct fj_wayland_global const */*? out*/ * global
+);
+
+fj_err_t fj_wayland_bind_global(
+    struct fj_wayland_client * client,
+    fj_wayland_interface_id_t interface_id,
+    struct fj_wayland_global const * global,
+    void */*? out*/ * object
 );
 
 
 /** Deep-copies the event wrapper and puts it onto the recorded list.
 
     This is the only fallible function allowed in Wayland callbacks. */
-fj_err_t fj_wayland_client_record_event(
+fj_err_t fj_wayland_record_event(
     struct fj_wayland_client * client,
     struct fj_wayland_event_wrapper const * event_wrapper
 );
@@ -124,12 +142,12 @@ fj_err_t fj_wayland_client_record_event(
 /** This must be called in case of failure inside Wayland callbacks.
 
     This should only be called in Wayland callbacks and not in other functions. */
-void fj_wayland_client_record_fail(struct fj_wayland_client * client);
+void fj_wayland_record_fail(struct fj_wayland_client * client);
 
-fj_bool32_t fj_wayland_client_record_failed(struct fj_wayland_client * client);
+fj_bool32_t fj_wayland_record_failed(struct fj_wayland_client * client);
 
 /** Waits until all issued requests are processed. */
-fj_err_t fj_wayland_client_roundtrip(struct fj_wayland_client * client);
+fj_err_t fj_wayland_roundtrip(struct fj_wayland_client * client);
 
 /** This filter is called once for every event in a single pass. */
 typedef fj_bool32_t (fj_wayland_event_filter_fn_t)(
@@ -138,7 +156,7 @@ typedef fj_bool32_t (fj_wayland_event_filter_fn_t)(
     struct fj_wayland_event_wrapper const * event_wrapper
 );
 
-fj_err_t fj_wayland_client_handle_events(
+fj_err_t fj_wayland_handle_events(
     struct fj_wayland_client * client,
     void */*?*/ filter_callback_data,
     fj_wayland_event_filter_fn_t * event_filter
@@ -146,18 +164,14 @@ fj_err_t fj_wayland_client_handle_events(
 
 /** Waits until all issued requests are processed and handles the filtered events,
     which may or may not be a response to a recently issued request. */
-fj_err_t fj_wayland_client_roundtrip_and_handle_events(
+fj_err_t fj_wayland_roundtrip_and_handle_events(
     struct fj_wayland_client * client,
     void */*?*/ filter_callback_data,
     fj_wayland_event_filter_fn_t * event_filter
 );
 
-fj_err_t fj_wayland_client_bind_global(
-    struct fj_wayland_client * client,
-    struct fj_wayland_global_desc const * global_desc,
-    struct wl_interface const * global_interface,
-    void */*? out*/ * global_object
-);
+/** Such a function must at first check if its interface was intialised. */
+typedef fj_err_t (fj_wayland_interface_cleanup_fn_t)(struct fj_wayland_client * client);
 
 
 #endif

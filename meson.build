@@ -50,12 +50,16 @@ shared_modules = []
 
 sources = [
     'src/builtin_implementations.c',
+
     'src/core/alloc.c',
     'src/core/any.c',
     'src/core/map.c',
     'src/core/vec.c',
     'src/core/utils.c',
+
     'src/ext/helper.c',
+
+    'src/generic/softer.c',
 ]
 
 
@@ -69,6 +73,12 @@ if 'wayland' in implementations
         'src/wayland/client/client.c',
         'src/wayland/layer/layer.c',
     ]
+
+    if 'softer_canvas' in features
+        sources += [
+            'src/wayland/softer_canvas/softer_canvas.c'
+        ]
+    endif
 endif
 
 

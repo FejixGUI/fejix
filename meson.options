@@ -16,17 +16,15 @@ option(
     type: 'array',
     value: [],
     choices: [
-        'directx',
-        'metal',
-        'opengl',
-        'softer',
-        'vulkan',
+        'softer_canvas',
+        'opengl_canvas',
+        'vulkan_canvas',
+        'directx_canvas',
+        'metal_canvas',
 
-        'clipboard',
-        'monitors',
-        'notifications',
-        'taskbar',
-        'tray',
+        'layer_mapping',
+        'layer_nesting',
+        'layer_blending',
     ]
 )
 

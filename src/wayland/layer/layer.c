@@ -7,26 +7,38 @@
 static
 fj_err_t layer_handle_init(
     struct fj_wayland_client * client,
-    struct fj_wayland_event_wrapper const * event_wrapper
+    struct fj_wayland_event_wrapper const * _event_wrapper
 )
 {
+    FJ_ARG_UNUSED(event_wrapper)
+
+    FJ_INIT_TRY
+
+    struct fj_layer_caps layer_caps = {
+        .flags = FJ_LAYER_SYNC,
+    };
+
+    FJ_TRY(client->layer->callbacks.init(client->data, &layer_caps)) {
+        return FJ_RESULT;
+    }
+
     return FJ_OK;
 }
 
 
 static
-fj_err_t layer_class_init(
+fj_err_t layer_data_init(
     struct fj_wayland_client * client,
-    struct fj_wayland_global_desc const * global_desc
+    struct fj_wayland_global const * global
 )
 {
     FJ_INIT_TRY
 
-    FJ_TRY(fj_wayland_client_bind_global(
+    FJ_TRY(fj_wayland_bind_global(
         client,
-        global_desc,
-        &wl_compositor_interface,
-        (void **) &client->layer_class->compositor
+        FJ_WAYLAND_INTERFACE_COMPOSITOR,
+        global,
+        (void **) &client->layer->compositor
     )) {
         return FJ_RESULT;
     }
@@ -35,11 +47,11 @@ fj_err_t layer_class_init(
         .event = NULL,
         .event_size = 0,
         .event_group = FJ_WAYLAND_EVENT_GROUP_INTERFACE_INIT,
-        .event_source = (struct wl_proxy *) &client->layer_class->compositor,
+        .event_source = (struct wl_proxy *) &client->layer->compositor,
         .handle = layer_handle_init,
     };
 
-    FJ_TRY(fj_wayland_client_record_event(client, &event_wrapper)) {
+    FJ_TRY(fj_wayland_record_event(client, &event_wrapper)) {
         return FJ_RESULT;
     }
 
@@ -54,30 +66,38 @@ fj_err_t layer_init(fj_client_t * client_, struct fj_layer_callbacks const * cal
 
     FJ_INIT_TRY
 
-    struct fj_wayland_global_desc const * global_desc =
-        &client->interface_descs[FJ_WAYLAND_INTERFACE_COMPOSITOR].desc;
+    struct fj_wayland_global const * global;
 
-    if (global_desc->id == 0) {
-        FJ_TRY(callbacks->init(client->data, NULL)) {
-            return FJ_RESULT;
-        }
-
-        return FJ_OK;
+    if (!fj_wayland_get_static_global(client, FJ_WAYLAND_INTERFACE_COMPOSITOR, &global)) {
+        return callbacks->init(client->data, NULL);
     }
 
-    FJ_TRY(FJ_ALLOC_ZEROED(&client->layer_class)) {
+    FJ_TRY(FJ_ALLOC_ZEROED(&client->layer)) {
         return FJ_RESULT;
     }
 
-    client->layer_class->callbacks = *callbacks;
+    client->layer->callbacks = *callbacks;
 
-    FJ_TRY(layer_class_init(client, global_desc)) {
-        FJ_FREE(&client->layer_class);
+    FJ_TRY(layer_data_init(client, global)) {
+        FJ_FREE(&client->layer);
         return FJ_RESULT;
     }
 
     return FJ_OK;
 }
+
+
+fj_err_t fj_wayland_layer_cleanup(struct fj_wayland_client * client)
+{
+    if (client->layer == NULL) {
+        return FJ_OK;
+    }
+
+    FJ_FREE(&client->layer);
+
+    return FJ_OK;
+}
+
 
 
 static
@@ -100,10 +120,11 @@ fj_err_t layer_create(
     (*layer)->canvas = canvas;
     (*layer)->flags = info->flags;
     (*layer)->size = info->size;
-    (*layer)->surface = wl_compositor_create_surface(client->layer_class->compositor);
+    (*layer)->surface = wl_compositor_create_surface(client->layer->compositor);
 
     if ((*layer)->surface == NULL) {
         FJ_FREE(layer);
+        return FJ_ERR_REQUEST_FAILED;
     }
 
     return FJ_OK;
@@ -142,7 +163,7 @@ fj_err_t layer_update(
 }
 
 
-struct fj_layer_iface const fj_wayland_layer_impl = {
+struct fj_layer_iface const fj_wayland_layer_iface = {
     .init = layer_init,
     .create = layer_create,
     .destroy = layer_destroy,

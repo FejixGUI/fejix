@@ -19,7 +19,7 @@ char const */*[]*/const error_descriptions[] = {
     [FJ_ERR_MESSAGE_READ_ERROR] = "message read error",
     [FJ_ERR_MESSAGE_SEND_ERROR] = "message send error",
     [FJ_ERR_SHELL_CONNECTION_ERROR] = "shell connection error",
-    [FJ_ERR_CLIENT_INIT_ERROR] = "client initialisation error",
+    [FJ_ERR_REQUEST_FAILED] = "request failed",
     [FJ_ERR_INVALID_TEXT_ENCODING] = "invalid text encoding",
     [FJ_ERR_INTERFACE_INIT_ERROR] = "interface init error",
 };
