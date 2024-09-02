@@ -406,7 +406,7 @@ fj_err_t fj_wayland_handle_events(
         struct fj_wayland_event_wrapper const * wrapper;
         wrapper = fj_vec_offset(&client->recorded_events, i);
 
-        if (event_filter(client, filter_callback_data, wrapper->event)) {
+        if (event_filter(client, filter_callback_data, wrapper)) {
 
             FJ_TRY(wayland_handle_event(client, i, wrapper)) {
                 return FJ_RESULT;

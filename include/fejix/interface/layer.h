@@ -39,7 +39,7 @@ struct fj_layer_info {
 struct fj_layer_callbacks {
     fj_err_t (* init)(void */*?*/ data, struct fj_layer_caps const */*?*/ caps);
 
-    fj_err_t (* sync)(void */*?*/ data, fj_layer_t * layer);
+    fj_err_t (* update)(void */*?*/ data, fj_layer_t * layer);
 };
 
 struct fj_layer_iface {
