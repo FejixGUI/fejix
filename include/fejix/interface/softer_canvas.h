@@ -3,7 +3,6 @@
 
 
 #include <fejix/interface/client.h>
-#include <fejix/interface/canvas.h>
 
 
 FJ_DEFINE_OPAQUE_TYPE(fj_softer_canvas_t)
@@ -70,6 +69,8 @@ struct fj_softer_canvas_iface {
         fj_client_t * client,
         struct fj_softer_canvas_callbacks const * callbacks
     );
+
+    fj_err_t (* deinit)(fj_client_t * client);
 
     fj_err_t (* create)(
         fj_client_t * client,

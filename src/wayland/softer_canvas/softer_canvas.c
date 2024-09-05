@@ -34,10 +34,10 @@ fj_softer_pixel_format_t convert_pixel_format(uint32_t wayland_format)
 static
 fj_err_t handle_init_event(
     struct fj_wayland_client * client,
-    struct fj_wayland_event_wrapper const * _wrapper
+    struct fj_wayland_event_wrapper const * wrapper
 )
 {
-    FJ_ARG_UNUSED(wrapper)
+    (void) wrapper;
 
     FJ_INIT_TRY
 
@@ -80,12 +80,12 @@ fj_err_t handle_format_event(
 
 static
 void wayland_shm_format(
-    void * client_,
+    void * _client,
     struct wl_shm * shm,
     uint32_t format
 )
 {
-    FJ_ARG_FROM_OPAQUE(client, struct fj_wayland_client *)
+    struct fj_wayland_client * client = (void *) _client;
 
     FJ_INIT_TRY
 
@@ -115,23 +115,11 @@ struct wl_shm_listener wayland_shm_listener = {
 
 
 static
-fj_err_t softer_canvas_init_global_data(
-    struct fj_wayland_client * client,
-    struct fj_wayland_global const * global
-)
+fj_err_t softer_canvas_init_global_data(struct fj_wayland_client * client)
 {
     FJ_INIT_TRY
 
     fj_vec_init(&client->softer->pixel_formats, sizeof(fj_softer_pixel_format_t));
-
-    FJ_TRY(fj_wayland_bind_global(
-        client,
-        FJ_WAYLAND_INTERFACE_SHM,
-        global,
-        (void **) &client->softer->shm
-    )) {
-        return FJ_RESULT;
-    }
 
     wl_shm_add_listener(client->softer->shm, &wayland_shm_listener, client);
 
@@ -153,17 +141,18 @@ fj_err_t softer_canvas_init_global_data(
 
 static
 fj_err_t softer_canvas_init(
-    fj_client_t * client_,
+    fj_client_t * _client,
     struct fj_softer_canvas_callbacks const * callbacks
 )
 {
-    FJ_ARG_FROM_OPAQUE(client, struct fj_wayland_client *)
+    struct fj_wayland_client * client = (void *) _client;
 
     FJ_INIT_TRY
 
-    struct fj_wayland_global const * global;
+    struct fj_wayland_global const * shm_global =
+        fj_wayland_get_static_global(client, FJ_WAYLAND_INTERFACE_SHM);
 
-    if (!fj_wayland_get_static_global(client, FJ_WAYLAND_INTERFACE_SHM, &global)) {
+    if (shm_global == NULL) {
         return callbacks->init(client->data, NULL);
     }
 
@@ -173,7 +162,16 @@ fj_err_t softer_canvas_init(
 
     client->softer->callbacks = *callbacks;
 
-    FJ_TRY(softer_canvas_init_global_data(client, global)) {
+    FJ_TRY(fj_wayland_bind_global(
+        client,
+        FJ_WAYLAND_INTERFACE_SHM,
+        shm_global,
+        (void *) &client->softer->shm
+    )) {
+        return FJ_RESULT;
+    }
+
+    FJ_TRY(softer_canvas_init_global_data(client)) {
         FJ_FREE(&client->softer);
         return FJ_RESULT;
     }
@@ -182,19 +180,15 @@ fj_err_t softer_canvas_init(
 }
 
 
-fj_err_t fj_wayland_softer_canvas_cleanup(struct fj_wayland_client * client)
+fj_err_t softer_canvas_deinit(fj_client_t * _client)
 {
-    if (client->softer == NULL) {
-        return FJ_OK;
+    struct fj_wayland_client * client = (void *) _client;
+
+    if (fj_vec_has_allocated(&client->softer->pixel_formats)) {
+        fj_vec_deinit(&client->softer->pixel_formats);
     }
 
-    if (client->softer != NULL) {
-        if (fj_vec_has_allocated(&client->softer->pixel_formats)) {
-            fj_vec_deinit(&client->softer->pixel_formats);
-        }
-
-        FJ_FREE(&client->softer);
-    }
+    FJ_FREE(&client->softer);
 
     return FJ_OK;
 }
@@ -238,6 +232,7 @@ fj_err_t softer_canvas_present(fj_client_t * client, fj_softer_canvas_t * canvas
 
 struct fj_softer_canvas_iface const fj_wayland_softer_canvas_iface = {
     .init = softer_canvas_init,
+    .deinit = softer_canvas_deinit,
     .create = softer_canvas_create,
     .destroy = softer_canvas_destroy,
     .update = softer_canvas_update,

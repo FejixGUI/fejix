@@ -3,7 +3,7 @@
 
 
 #include <fejix/interface/client.h>
-#include <fejix/interface/layer.h>
+#include <fejix/interface/presentation.h>
 
 #include <src/unixpoller/unixpoller.h>
 
@@ -66,7 +66,7 @@ struct fj_wayland_client {
     struct fj_client_callbacks const * callbacks;
 
     /** User data */
-    void * data;
+    void */*?*/ data;
 
     char const */*[]*/ name;
 
@@ -81,7 +81,7 @@ struct fj_wayland_client {
         To check if event recording succeeded, check if the vector has allocated. */
     struct fj_vec recorded_events;
 
-    struct fj_wayland_layer_global_data */*?*/ layer;
+    struct fj_wayland_presentation_global_data */*?*/ presentation;
 
 #ifdef FJ_OPT_FEATURE_SOFTER_CANVAS
     struct fj_wayland_softer_canvas_global_data */*?*/ softer;
@@ -109,18 +109,17 @@ struct fj_wayland_event_wrapper {
 fj_wayland_interface_type_t fj_wayland_get_interface_type(fj_wayland_interface_id_t interface_id);
 
 /** interface_id returns FJ_WAYLAND_INTERFACE_MAX on failure. */
-void fj_wayland_get_global(
+void fj_wayland_get_global_by_id(
     struct fj_wayland_client * client,
     uint32_t object_id,
     fj_wayland_interface_id_t /*out*/ * interface_id,
     struct fj_wayland_global const */*? out*/ * global
 );
 
-/** Returns true if the global is present, false otherwise. */
-fj_bool32_t fj_wayland_get_static_global(
+/** Returns NULL if the global does not exist. */
+struct fj_wayland_global const */*?*/ fj_wayland_get_static_global(
     struct fj_wayland_client * client,
-    fj_wayland_interface_id_t interface_id,
-    struct fj_wayland_global const */*? out*/ * global
+    fj_wayland_interface_id_t interface_id
 );
 
 fj_err_t fj_wayland_bind_global(
@@ -161,17 +160,6 @@ fj_err_t fj_wayland_handle_events(
     void */*?*/ filter_callback_data,
     fj_wayland_event_filter_fn_t * event_filter
 );
-
-/** Waits until all issued requests are processed and handles the filtered events,
-    which may or may not be a response to a recently issued request. */
-fj_err_t fj_wayland_roundtrip_and_handle_events(
-    struct fj_wayland_client * client,
-    void */*?*/ filter_callback_data,
-    fj_wayland_event_filter_fn_t * event_filter
-);
-
-/** Such a function must at first check if its interface was intialised. */
-typedef fj_err_t (fj_wayland_interface_cleanup_fn_t)(struct fj_wayland_client * client);
 
 
 #endif

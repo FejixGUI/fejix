@@ -116,26 +116,6 @@ Here are some consistency guidelines.
     }
     ```
 
-* Annotate unused args with a preceding underscore and `FJ_ARG_UNSUED` macro:
-    ```c
-    void f(int _unused_arg)
-    {
-        FJ_ARG_UNSUED(unused_arg)
-    }
-    ```
-
-* Annotate opaque pointer args with a following underscore and convert them with
-    `FJ_ARG_FROM_OPAQUE` macro:
-    ```c
-    FJ_DEFINE_OPAQUE_TYPE(number_t)
-
-    void f(number_t * number_)
-    {
-        FJ_ARG_FROM_OPAQUE(number, int *)
-        *number = 123;
-    }
-    ```
-
 ## Naming
 
 You can use the following common structure name suffixes:

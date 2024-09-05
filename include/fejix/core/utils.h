@@ -14,10 +14,6 @@
 
 #define FJ_FILEPOS __FILE__ ":" FJ_STRINGIFY(__LINE__)
 
-#define FJ_ARG_UNUSED(ARG) (void) _##ARG;
-
-#define FJ_ARG_FROM_OPAQUE(ARG, TRANSPARENT_TYPE) TRANSPARENT_TYPE ARG = (void *) ARG##_;
-
 /** Get length of a fixed-length array. */
 #define FJ_ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 

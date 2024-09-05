@@ -13,15 +13,17 @@ char const */*[]*/const error_descriptions[] = {
     [FJ_OK] = "success",
 
     [FJ_ERR_UNKNOWN] = "unknown error",
-    [FJ_ERR_OUT_OF_MEMORY] = "out of memory",
-    [FJ_ERR_INVALID_ALLOCATION] = "invalid memory allocation",
-    [FJ_ERR_IO_ERROR] = "IO error",
-    [FJ_ERR_MESSAGE_READ_ERROR] = "message read error",
-    [FJ_ERR_MESSAGE_SEND_ERROR] = "message send error",
-    [FJ_ERR_SHELL_CONNECTION_ERROR] = "shell connection error",
+    [FJ_ERR_ALLOCATION_FAILED] = "allocation failed (out of memory)",
+    [FJ_ERR_INVALID_ALLOCATION] = "invalid allocation",
+    [FJ_ERR_CONNECTION_FAILED] = "connection failed",
+    [FJ_ERR_REQUEST_SENDING_FAILED] = "request sending failed",
     [FJ_ERR_REQUEST_FAILED] = "request failed",
+    [FJ_ERR_EVENT_WAITING_FAILED] = "event waiting failed",
+    [FJ_ERR_EVENT_READING_FAILED] = "event reading failed",
     [FJ_ERR_INVALID_TEXT_ENCODING] = "invalid text encoding",
-    [FJ_ERR_INTERFACE_INIT_ERROR] = "interface init error",
+    [FJ_ERR_INTERFACE_INIT_FAILED] = "interface initialisation failed",
+    [FJ_ERR_TEMP_FILE_CREATION_FAILED] = "temporary file creation failed",
+    [FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED] = "shared memory allocation failed",
 };
 
 static

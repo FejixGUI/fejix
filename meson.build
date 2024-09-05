@@ -40,6 +40,11 @@ if host_machine.system() in ['windows', 'cygwin']
     add_project_arguments(['-D_CRT_SECURE_NO_WARNINGS', '-DUNICODE', '-D_UNICODE'], language: ['c', 'cpp'])
 endif
 
+if host_machine.system() in ['linux', 'freebsd']
+    add_project_arguments(['-D_GNU_SOURCE'], language: ['c', 'cpp'])
+endif
+
+
 # SOURCES
 
 public_includes = ['include']
@@ -71,13 +76,15 @@ if 'wayland' in implementations
     sources += [
         'src/wayland/implementation.c',
         'src/wayland/client/client.c',
-        'src/wayland/layer/layer.c',
+        'src/wayland/presentation/presentation.c',
     ]
 
     if 'softer_canvas' in features
         sources += [
             'src/wayland/softer_canvas/softer_canvas.c'
         ]
+
+        shared_modules += ['unixshm_buffer']
     endif
 endif
 
@@ -85,6 +92,12 @@ endif
 if 'unixpoller' in shared_modules
     sources += [
         'src/unixpoller/unixpoller.c'
+    ]
+endif
+
+if 'unixshm_buffer' in shared_modules
+    sources += [
+        'src/unixshm_buffer/unixshm_buffer.c'
     ]
 endif
 
@@ -127,4 +140,15 @@ if get_option('build_tests')
             dependencies: fejix_internal_dep
         )
     )
+
+    if 'unixshm_buffer' in shared_modules
+        test(
+            'test_unixshm_buffer',
+            executable(
+                'test_unixshm_buffer',
+                sources: ['tests/unixshm_buffer.c'],
+                dependencies: fejix_internal_dep
+            )
+        )
+    endif
 endif

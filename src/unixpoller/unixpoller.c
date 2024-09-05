@@ -33,15 +33,15 @@ fj_err_t process_events(struct fj_unixpoller * this)
 
 static
 fj_err_t handle_wakeup(
-    void * _callback_data,
+    void * callback_data,
     fj_unixpoller_fd_t fd,
     fj_unixpoller_event_mask_t events
 )
 {
-    FJ_ARG_UNUSED(callback_data)
+    (void) callback_data;
 
     if (events & (POLLERR|POLLHUP|POLLNVAL)) {
-        return FJ_ERR_IO_ERROR;
+        return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
     uint8_t buffer[1];
@@ -64,7 +64,7 @@ fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
     int pipe_result = pipe((int32_t *) this->wakeup_pipe);
 
     if (pipe_result < 0) {
-        return FJ_ERR_IO_ERROR;
+        return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
     FJ_TRY(fj_unixpoller_add(this, this->wakeup_pipe[0], POLLIN, handle_wakeup)) {
@@ -176,7 +176,7 @@ fj_err_t fj_unixpoller_poll(struct fj_unixpoller * this)
     );
 
     if (result < 0) {
-        return FJ_ERR_IO_ERROR;
+        return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
     if (result == 0) {
@@ -199,7 +199,7 @@ fj_err_t fj_unixpoller_wakeup(struct fj_unixpoller * this)
     ssize_t written_count = write(this->wakeup_pipe[1], buffer, 1);
 
     if (written_count < 0) {
-        return FJ_ERR_IO_ERROR;
+        return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
     return FJ_OK;

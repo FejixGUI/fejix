@@ -26,7 +26,7 @@ typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id {
     FJ_INTERFACE_CLIENT,
-    FJ_INTERFACE_LAYER,
+    FJ_INTERFACE_PRESENTATION,
     FJ_INTERFACE_SOFTER_CANVAS,
 };
 

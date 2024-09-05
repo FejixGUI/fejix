@@ -16,7 +16,7 @@ fj_err_t fj_alloc_uninit(void */*? out*/ * ptr, size_t size)
     *ptr = malloc(size);
 
     if (*ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERR_ALLOCATION_FAILED;
     }
 
     return FJ_OK;
@@ -33,7 +33,7 @@ fj_err_t fj_alloc_zeroed(void */*? out*/ * ptr, size_t size)
     *ptr = calloc(1, size);
 
     if (*ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERR_ALLOCATION_FAILED;
     }
 
     return FJ_OK;
@@ -81,7 +81,7 @@ fj_err_t fj_realloc_uninit(void */*[]?*/ * ptr, uint32_t item_count, size_t item
     void * new_ptr = realloc(*ptr, size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERR_ALLOCATION_FAILED;
     }
 
     *ptr = new_ptr;
@@ -116,7 +116,7 @@ fj_err_t fj_realloc_zeroed(
     void * new_ptr = realloc(old_ptr, new_size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERR_ALLOCATION_FAILED;
     }
 
     if (new_size > old_size) {
