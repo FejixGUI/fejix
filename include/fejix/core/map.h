@@ -2,13 +2,15 @@
 #define FEJIX_CORE_MAP_H_
 
 
-#include <fejix/core/any.h>
 #include <fejix/core/base.h>
 
 
+/** */
 struct fj_map_element {
-    union fj_any key;
-    union fj_any value;
+    /** */
+    union fj_tag key;
+    /** */
+    union fj_tag value;
 };
 
 struct fj_map_node {
@@ -17,10 +19,10 @@ struct fj_map_node {
     struct fj_map_element element;
 };
 
-/** Map of any -> any. */
+/** Map of tag -> tag. */
 struct fj_map {
-    fj_any_type_t key_type;
-    fj_any_type_t value_type;
+    fj_tag_type_t key_type;
+    fj_tag_type_t value_type;
 
     /** Number of stored elements. */
     uint32_t element_count;
@@ -43,7 +45,7 @@ struct fj_map_iter {
 
 
 /** Initialises the map, never allocates. */
-void fj_map_init(struct fj_map *map, fj_any_type_t key_type, fj_any_type_t value_type);
+void fj_map_init(struct fj_map *map, fj_tag_type_t key_type, fj_tag_type_t value_type);
 
 /** Frees the allocated memory. */
 void fj_map_deinit(struct fj_map *map);
@@ -55,13 +57,13 @@ fj_bool32_t fj_map_is_empty(struct fj_map const *map);
 fj_bool32_t fj_map_has_allocated(struct fj_map const *map);
 
 /** */
-fj_err_t fj_map_set(struct fj_map *map, union fj_any key, union fj_any value);
+fj_err_t fj_map_set(struct fj_map *map, union fj_tag key, union fj_tag value);
 
 /** Returns the pointer to value. Returns NULL if the key was not found. */
-void *fj_map_get(struct fj_map const *map, union fj_any key);
+void *fj_map_get(struct fj_map const *map, union fj_tag key);
 
 /** */
-fj_err_t fj_map_remove(struct fj_map *map, union fj_any key);
+fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key);
 
 /** */
 void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map);

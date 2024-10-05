@@ -35,14 +35,18 @@ struct fj_implementation_iface {
     fj_implementation_id_t id;
     fj_version_t version;
 
-    void const * (* get)(fj_interface_id_t iface_id);
+    void const *(*get)(fj_interface_id_t iface_id);
 };
 
 
-/** The returned array is sorted by implementation IDs. */
+/**
+:param implementations: Returns a nullable array of implementation pointers, sorted by
+implementation ID.
+:param implementation_count: Returns the implementation count.
+*/
 void fj_get_builtin_implementations(
-    struct fj_implementation_iface const *const */*[]? out*/ * implementations,
-    uint32_t /*out*/ * implementation_count
+    struct fj_implementation_iface const *const **implementations,
+    uint32_t *implementation_count
 );
 
 

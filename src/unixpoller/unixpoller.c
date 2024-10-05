@@ -2,23 +2,22 @@
 
 #include <fejix/core/utils.h>
 
-#include <math.h>
 #include <unistd.h>
 
+#include <math.h>
 
-static
-fj_err_t process_events(struct fj_unixpoller * this)
+
+static fj_err_t process_events(struct fj_unixpoller *this)
 {
-    struct pollfd * pollfds = this->pollfds.items;
-    fj_unixpoller_callback_fn_t * * callbacks = this->callbacks.items;
+    struct pollfd *pollfds = this->pollfds.items;
+    fj_unixpoller_callback_fn_t **callbacks = this->callbacks.items;
 
     for (size_t i = 0; i < this->pollfds.length; i++) {
-
         if (pollfds[i].revents == 0) {
             continue;
         }
 
-        FJ_TRY(callbacks[i](this->callback_data, pollfds[i].fd, pollfds[i].revents)) {
+        FJ_TRY (callbacks[i](this->callback_data, pollfds[i].fd, pollfds[i].revents)) {
             return fj_result;
         }
 
@@ -29,16 +28,15 @@ fj_err_t process_events(struct fj_unixpoller * this)
 }
 
 
-static
-fj_err_t handle_wakeup(
-    void * callback_data,
+static fj_err_t handle_wakeup(
+    void *callback_data,
     fj_unixpoller_fd_t fd,
     fj_unixpoller_event_mask_t events
 )
 {
     (void) callback_data;
 
-    if (events & (POLLERR|POLLHUP|POLLNVAL)) {
+    if (events & (POLLERR | POLLHUP | POLLNVAL)) {
         return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
@@ -49,7 +47,7 @@ fj_err_t handle_wakeup(
 }
 
 
-fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
+fj_err_t fj_unixpoller_init(struct fj_unixpoller *this, void *callback_data)
 {
     fj_vec_init(&this->pollfds, sizeof(struct pollfd));
     fj_vec_init(&this->callbacks, sizeof(fj_unixpoller_callback_fn_t *));
@@ -63,7 +61,7 @@ fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
         return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
-    FJ_TRY(fj_unixpoller_add(this, this->wakeup_pipe[0], POLLIN, handle_wakeup)) {
+    FJ_TRY (fj_unixpoller_add(this, this->wakeup_pipe[0], POLLIN, handle_wakeup)) {
         fj_unixpoller_deinit(this);
         return fj_result;
     }
@@ -72,7 +70,7 @@ fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
 }
 
 
-void fj_unixpoller_deinit(struct fj_unixpoller * this)
+void fj_unixpoller_deinit(struct fj_unixpoller *this)
 {
     if (this->wakeup_pipe[0] != 0) {
         close(this->wakeup_pipe[0]);
@@ -85,10 +83,10 @@ void fj_unixpoller_deinit(struct fj_unixpoller * this)
 
 
 fj_err_t fj_unixpoller_add(
-    struct fj_unixpoller * this,
+    struct fj_unixpoller *this,
     fj_unixpoller_fd_t file_descriptor,
     fj_unixpoller_event_mask_t events_to_watch,
-    fj_unixpoller_callback_fn_t * callback
+    fj_unixpoller_callback_fn_t *callback
 )
 {
     struct pollfd pollfd = {
@@ -97,26 +95,11 @@ fj_err_t fj_unixpoller_add(
         .revents = 0,
     };
 
-    FJ_TRY(fj_vec_push(&this->pollfds, &pollfd)) {
+    FJ_TRY (fj_vec_push(&this->pollfds, &pollfd)) {
         return fj_result;
     }
 
-    FJ_TRY(fj_vec_push(&this->callbacks, &callback)) {
-        return fj_result;
-    }
-
-    return FJ_OK;
-}
-
-
-static
-fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
-{
-    FJ_TRY(fj_vec_remove(&this->pollfds, index, 1)) {
-        return fj_result;
-    }
-
-    FJ_TRY(fj_vec_remove(&this->callbacks, index, 1)) {
+    FJ_TRY (fj_vec_push(&this->callbacks, &callback)) {
         return fj_result;
     }
 
@@ -124,13 +107,27 @@ fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 }
 
 
-fj_err_t fj_unixpoller_remove(struct fj_unixpoller * this, fj_unixpoller_fd_t file_descriptor)
+static fj_err_t remove_index(struct fj_unixpoller *this, uint32_t index)
 {
-    struct pollfd * pollfds = this->pollfds.items;
+    FJ_TRY (fj_vec_remove(&this->pollfds, index, 1)) {
+        return fj_result;
+    }
 
-    for (size_t i=0; i<this->pollfds.length; i++) {
+    FJ_TRY (fj_vec_remove(&this->callbacks, index, 1)) {
+        return fj_result;
+    }
+
+    return FJ_OK;
+}
+
+
+fj_err_t fj_unixpoller_remove(struct fj_unixpoller *this, fj_unixpoller_fd_t file_descriptor)
+{
+    struct pollfd *pollfds = this->pollfds.items;
+
+    for (size_t i = 0; i < this->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
-            FJ_TRY(remove_index(this, i)) {
+            FJ_TRY (remove_index(this, i)) {
                 return fj_result;
             }
 
@@ -142,8 +139,7 @@ fj_err_t fj_unixpoller_remove(struct fj_unixpoller * this, fj_unixpoller_fd_t fi
 }
 
 
-static
-int32_t to_poll_timeout(fj_seconds_t timeout)
+static int32_t to_poll_timeout(fj_seconds_t timeout)
 {
     if (isinf(timeout)) {
         return -1;
@@ -157,12 +153,10 @@ int32_t to_poll_timeout(fj_seconds_t timeout)
     return (int32_t) (timeout * 1000.0);
 }
 
-fj_err_t fj_unixpoller_poll(struct fj_unixpoller * this)
+fj_err_t fj_unixpoller_poll(struct fj_unixpoller *this)
 {
     int32_t result = poll(
-        this->pollfds.items,
-        this->pollfds.length,
-        to_poll_timeout(this->timeout)
+        this->pollfds.items, this->pollfds.length, to_poll_timeout(this->timeout)
     );
 
     if (result < 0) {
@@ -177,13 +171,13 @@ fj_err_t fj_unixpoller_poll(struct fj_unixpoller * this)
 }
 
 
-void fj_unixpoller_set_timeout(struct fj_unixpoller * this, fj_seconds_t timeout)
+void fj_unixpoller_set_timeout(struct fj_unixpoller *this, fj_seconds_t timeout)
 {
     this->timeout = timeout;
 }
 
 
-fj_err_t fj_unixpoller_wakeup(struct fj_unixpoller * this)
+fj_err_t fj_unixpoller_wakeup(struct fj_unixpoller *this)
 {
     uint8_t buffer[1] = { 42 };
     ssize_t written_count = write(this->wakeup_pipe[1], buffer, 1);
@@ -196,7 +190,7 @@ fj_err_t fj_unixpoller_wakeup(struct fj_unixpoller * this)
 }
 
 
-fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller * this)
+fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller *this)
 {
     return isnan(this->timeout);
 }

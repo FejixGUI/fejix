@@ -25,10 +25,14 @@
 #define FJ_CLAMP(X, MIN, MAX) FJ_MAX(FJ_MIN((X), (MAX)), (MIN))
 
 
-fj_bool32_t fj_str_eq(char const */*[]*/ a, char const */*[]*/ b);
+fj_bool32_t fj_str_eq(char const *a, char const *b);
 
-/** The returned string must be freed manually. */
-fj_err_t fj_str_dup(char const */*[]*/ str, char const */*[]? out*/ * clone);
+/**
+The returned string must be freed manually.
+
+:param clone: Returns the clones string or NULL on failure.
+*/
+fj_err_t fj_str_dup(char const *str, char const **clone);
 
 /** If x >= 2^31, then returns UINT32_MAX */
 uint32_t fj_u32_next_power_of_two(uint32_t x);
@@ -36,8 +40,10 @@ uint32_t fj_u32_next_power_of_two(uint32_t x);
 /** If x = 0, then returns 1. */
 uint32_t fj_u32_prev_power_of_two(uint32_t x);
 
-/** If x is greater or equal to the highest power of two representable by size_t,
-    then returns SIZE_MAX */
+/**
+If x is greater than or equal to the highest power of two representable by size_t, then returns
+SIZE_MAX.
+*/
 size_t fj_size_next_power_of_two(size_t x);
 
 /** If x = 0, then returns 1. */

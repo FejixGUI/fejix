@@ -1,20 +1,20 @@
-#include <fejix/core/utils.h>
 #include <fejix/core/alloc.h>
+#include <fejix/core/utils.h>
 
 #include <string.h>
 
 
-fj_bool32_t fj_str_eq(char const */*[]*/ a, char const */*[]*/ b)
+fj_bool32_t fj_str_eq(char const * /*[]*/ a, char const * /*[]*/ b)
 {
     return strcmp(a, b) == 0;
 }
 
 
-fj_err_t fj_str_dup(char const */*[]*/ str, char const */*[]? out*/ * clone)
+fj_err_t fj_str_dup(char const * /*[]*/ str, char const * /*[]? out*/ *clone)
 {
     size_t length = strlen(str);
 
-    FJ_TRY(FJ_ARRALLOC_UNINIT(clone, length)) {
+    FJ_TRY (FJ_REALLOC_UNINIT(clone, length)) {
         return fj_result;
     }
 
@@ -26,7 +26,7 @@ fj_err_t fj_str_dup(char const */*[]*/ str, char const */*[]? out*/ * clone)
 
 uint32_t fj_u32_next_power_of_two(uint32_t x)
 {
-    if (x >= UINT32_C(1)<<31) {
+    if (x >= UINT32_C(1) << 31) {
         return UINT32_MAX;
     }
 
@@ -58,7 +58,7 @@ uint32_t fj_u32_prev_power_of_two(uint32_t x)
 
 size_t fj_size_next_power_of_two(size_t x)
 {
-    if (x >= ~(SIZE_MAX>>1)) {
+    if (x >= ~(SIZE_MAX >> 1)) {
         return SIZE_MAX;
     }
 
@@ -86,4 +86,3 @@ size_t fj_size_prev_power_of_two(size_t x)
 
     return y;
 }
-
