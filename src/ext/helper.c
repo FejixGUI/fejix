@@ -27,7 +27,7 @@ char const */*[]*/const error_descriptions[] = {
 };
 
 static
-char const */*[]*/ impl_names[] = {
+char const */*[]*/const impl_names[] = {
     [FJ_IMPLEMENTATION_MAX] = "...max implementation ID...",
 
     [FJ_IMPLEMENTATION_ANDK] = "andk",
@@ -109,7 +109,7 @@ struct fj_implementation_iface const */*?*/ fj_ext_choose_implementation(
     for (uint32_t i=0; i<impl_count; i++) {
         char const * impl_name = fj_ext_get_implementation_name(impls[i]->id);
 
-        if (fj_streq(impl_name, impl_hint)) {
+        if (fj_str_eq(impl_name, impl_hint)) {
             return impls[i];
         }
     }

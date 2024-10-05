@@ -1,0 +1,107 @@
+# Requires clang-format v18
+
+BasedOnStyle: Chromium
+
+ColumnLimit: 100
+IndentWidth: 4
+
+# Leave macros as they are
+SkipMacroDefinitionBody: true
+
+# #ifdef something
+# #    include <something>
+# #endif
+IndentPPDirectives: AfterHash
+
+# int x() { }
+#          ^
+SpaceInEmptyBlock: true
+
+# (int) x
+#      ^
+SpaceAfterCStyleCast: true
+
+# static inline void a(int const *const *a);
+QualifierAlignment: Custom
+QualifierOrder: ['static', 'inline', 'type', 'const', 'volatile', 'restrict']
+PointerAlignment: Right
+SpaceAroundPointerQualifiers: After
+
+# myvar = somethinglong
+#   + somethinglong;
+AlignOperands: DontAlign
+BreakBeforeBinaryOperators: NonAssignment
+PenaltyBreakAssignment: 100
+
+# (struct x) {
+#     .s = (struct s) {
+#         .x = 1,
+#         .y = 2,       <- put trailing commas everywhere for the magic to work
+#     },                <- put trailing commas everywhere for the magic to work
+# }
+SpaceBeforeCpp11BracedList: true
+Cpp11BracedListStyle: false
+
+# int x(
+#     somethinglong,
+#     somethinglong
+# )
+BinPackArguments: false
+AlignAfterOpenBracket: BlockIndent
+PenaltyReturnTypeOnItsOwnLine: 1000
+
+# int x()
+# {                 <-
+#     if (x) {      <-
+#        ...
+#     }
+#
+#     FJ_TRY (x) {  <-
+#        ...
+#     }
+# }
+BreakBeforeBraces: Linux
+IfMacros: ['FJ_TRY']
+
+# int x()
+# {
+#     ...
+# }
+#               <- allows us to separate functions with 2 spaces
+#               <- separate function definitions with 2 spaces
+# int y() {
+#     ...
+# }
+SeparateDefinitionBlocks: Leave
+MaxEmptyLinesToKeep: 2
+
+# Sort includes
+IncludeBlocks: Regroup
+IncludeCategories:
+    # Private headers
+    -   Regex: '^<src/'
+        Priority: 0
+        CaseSensitive: true
+
+    # Public interface headers
+    -   Regex: '^<fejix/interface/'
+        Priority: 1
+        CaseSensitive: true
+
+    # Public core headers
+    -   Regex: '^<fejix/core/'
+        Priority: 2
+        CaseSensitive: true
+
+    # Dependency headers
+    -   Regex: '^<(wayland|X11|xcb|win|imm|shellapi|ole|dx|d3d|dcomp)'
+        Priority: 3
+        CaseSensitive: true
+
+    # Standard includes (at the bottom)
+    -   Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|malloc|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype).h>'
+        Priority: 100
+
+    # Other platform-specific headers (matched if all regexes above did not match)
+    -   Regex: '^.*'
+        Priority: 10

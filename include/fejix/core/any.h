@@ -28,20 +28,22 @@ enum fj_any_type {
 
 
 union fj_any {
-    uint32_t  u32;
-    int32_t   i32;
-    uint64_t  u64;
-    int64_t   i64;
+    uint32_t u32;
+    int32_t i32;
+    uint64_t u64;
+    int64_t i64;
     uintptr_t uptr;
-    intptr_t  iptr;
-    void *    ptr;
+    intptr_t iptr;
+    void *ptr;
 };
 
 
 fj_bool32_t fj_any_eq(union fj_any a, union fj_any b, fj_any_type_t type);
 
-/** Do not hash pointers. When hashing pointers, this converts them to uintptr_t.
-    Using the result is undefined behavior. */
+/**
+Do not hash pointers. When hashing pointers, this converts them to uintptr_t.
+Using the result is undefined behavior.
+*/
 uint32_t fj_any_hash32(union fj_any x, fj_any_type_t type);
 
 

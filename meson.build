@@ -40,7 +40,7 @@ if host_machine.system() in ['windows', 'cygwin']
     add_project_arguments(['-D_CRT_SECURE_NO_WARNINGS', '-DUNICODE', '-D_UNICODE'], language: ['c', 'cpp'])
 endif
 
-if host_machine.system() in ['linux', 'freebsd']
+if host_machine.system() in ['linux']
     add_project_arguments(['-D_GNU_SOURCE'], language: ['c', 'cpp'])
 endif
 
@@ -54,8 +54,6 @@ dependencies = []
 shared_modules = []
 
 sources = [
-    'src/builtin_implementations.c',
-
     'src/core/alloc.c',
     'src/core/any.c',
     'src/core/map.c',
@@ -64,6 +62,7 @@ sources = [
 
     'src/ext/helper.c',
 
+    'src/generic/implementation.c',
     'src/generic/softer.c',
 ]
 
@@ -76,15 +75,15 @@ if 'wayland' in implementations
     sources += [
         'src/wayland/implementation.c',
         'src/wayland/client/client.c',
-        'src/wayland/presentation/presentation.c',
+        'src/wayland/output/output.c',
     ]
 
     if 'softer_canvas' in features
         sources += [
-            'src/wayland/softer_canvas/softer_canvas.c'
+            'src/wayland/softer/softer.c'
         ]
 
-        shared_modules += ['unixshm_buffer']
+        shared_modules += ['unixshm']
     endif
 endif
 
@@ -95,9 +94,9 @@ if 'unixpoller' in shared_modules
     ]
 endif
 
-if 'unixshm_buffer' in shared_modules
+if 'unixshm' in shared_modules
     sources += [
-        'src/unixshm_buffer/unixshm_buffer.c'
+        'src/unixshm/unixshm.c'
     ]
 endif
 

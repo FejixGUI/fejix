@@ -1,4 +1,4 @@
-#include <fejix/builtin_implementations.h>
+#include <fejix/interface/implementation.h>
 
 #include <fejix/core/utils.h>
 

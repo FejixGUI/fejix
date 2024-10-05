@@ -8,8 +8,6 @@
 
 int main(void)
 {
-    FJ_INIT_TRY
-
     // TODO better tests
 
     int _1 = 1;

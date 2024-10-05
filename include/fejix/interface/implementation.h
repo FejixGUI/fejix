@@ -1,5 +1,5 @@
-#ifndef FEJIX_IMPLEMENTATION_H_
-#define FEJIX_IMPLEMENTATION_H_
+#ifndef FEJIX_INTERFACE_IMPLEMENTATION_H_
+#define FEJIX_INTERFACE_IMPLEMENTATION_H_
 
 
 #include <fejix/core/base.h>
@@ -26,17 +26,24 @@ typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id {
     FJ_INTERFACE_CLIENT,
-    FJ_INTERFACE_PRESENTATION,
+    FJ_INTERFACE_OUTPUT,
     FJ_INTERFACE_SOFTER_CANVAS,
 };
 
 
 struct fj_implementation_iface {
-    void const * (* get)(fj_interface_id_t iface_id);
-
     fj_implementation_id_t id;
     fj_version_t version;
+
+    void const * (* get)(fj_interface_id_t iface_id);
 };
+
+
+/** The returned array is sorted by implementation IDs. */
+void fj_get_builtin_implementations(
+    struct fj_implementation_iface const *const */*[]? out*/ * implementations,
+    uint32_t /*out*/ * implementation_count
+);
 
 
 #endif

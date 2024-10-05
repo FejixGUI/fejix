@@ -84,7 +84,7 @@ fj_err_t client_dispatch_messages(struct fj_winapi_client * client)
 
 static
 fj_err_t client_create(
-    fj_client_t */*? out*/ * client_,
+    struct fj_client */*? out*/ * client_,
     struct fj_client_callbacks const * callbacks,
     void * callback_data,
     struct fj_client_info const * _info
@@ -93,10 +93,8 @@ fj_err_t client_create(
     FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client */*? out*/ *)
     FJ_ARG_UNUSED(info)
 
-    FJ_INIT_TRY
-
-    FJ_TRY(FJ_ALLOC_ZEROED(client)) {
-        return FJ_RESULT;
+        FJ_TRY(FJ_ALLOC_ZEROED(client)) {
+        return fj_result;
     }
 
     (*client)->callbacks = callbacks;
@@ -111,7 +109,7 @@ fj_err_t client_create(
 
 
 static
-fj_err_t client_destroy(fj_client_t * client)
+fj_err_t client_destroy(struct fj_client * client)
 {
     FJ_FREE(&client);
 
@@ -123,35 +121,33 @@ fj_err_t client_destroy(fj_client_t * client)
 
 
 static
-fj_err_t client_run(fj_client_t * client_, fj_client_run_type_t run_type, void * _run_data)
+fj_err_t client_run(struct fj_client * client_, fj_client_run_type_t run_type, void * _run_data)
 {
     FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client *)
     FJ_ARG_UNUSED(run_data)
 
-    FJ_INIT_TRY
-
-    if (run_type != FJ_CLIENT_RUN_MAIN) {
+        if (run_type != FJ_CLIENT_RUN_MAIN) {
         return FJ_OK;
     }
 
     FJ_TRY(client->callbacks->idle(client->data)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     while (!isnan(client->timeout)) {
         DWORD wait_result;
         FJ_TRY(client_wait_message_or_timeout(client, &wait_result)) {
-            return FJ_RESULT;
+            return fj_result;
         }
 
         if (wait_result == WAIT_OBJECT_0) {
             FJ_TRY(client_dispatch_messages(client)) {
-                return FJ_RESULT;
+                return fj_result;
             }
         }
 
         FJ_TRY(client->callbacks->idle(client->data)) {
-            return FJ_RESULT;
+            return fj_result;
         }
     }
 
@@ -160,7 +156,7 @@ fj_err_t client_run(fj_client_t * client_, fj_client_run_type_t run_type, void *
 
 
 static
-void client_set_timeout(fj_client_t * client_, fj_seconds_t timeout)
+void client_set_timeout(struct fj_client * client_, fj_seconds_t timeout)
 {
     FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client *)
 
@@ -169,7 +165,7 @@ void client_set_timeout(fj_client_t * client_, fj_seconds_t timeout)
 
 
 static
-fj_err_t client_wakeup(fj_client_t * client_)
+fj_err_t client_wakeup(struct fj_client * client_)
 {
     FJ_ARG_FROM_OPAQUE(client, struct fj_winapi_client *)
 

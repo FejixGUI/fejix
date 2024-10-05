@@ -9,8 +9,6 @@
 static
 fj_err_t process_events(struct fj_unixpoller * this)
 {
-    FJ_INIT_TRY
-
     struct pollfd * pollfds = this->pollfds.items;
     fj_unixpoller_callback_fn_t * * callbacks = this->callbacks.items;
 
@@ -21,7 +19,7 @@ fj_err_t process_events(struct fj_unixpoller * this)
         }
 
         FJ_TRY(callbacks[i](this->callback_data, pollfds[i].fd, pollfds[i].revents)) {
-            return FJ_RESULT;
+            return fj_result;
         }
 
         pollfds[i].revents = 0;
@@ -53,8 +51,6 @@ fj_err_t handle_wakeup(
 
 fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
 {
-    FJ_INIT_TRY
-
     fj_vec_init(&this->pollfds, sizeof(struct pollfd));
     fj_vec_init(&this->callbacks, sizeof(fj_unixpoller_callback_fn_t *));
 
@@ -69,7 +65,7 @@ fj_err_t fj_unixpoller_init(struct fj_unixpoller * this, void * callback_data)
 
     FJ_TRY(fj_unixpoller_add(this, this->wakeup_pipe[0], POLLIN, handle_wakeup)) {
         fj_unixpoller_deinit(this);
-        return FJ_RESULT;
+        return fj_result;
     }
 
     return FJ_OK;
@@ -95,8 +91,6 @@ fj_err_t fj_unixpoller_add(
     fj_unixpoller_callback_fn_t * callback
 )
 {
-    FJ_INIT_TRY
-
     struct pollfd pollfd = {
         .fd = file_descriptor,
         .events = events_to_watch,
@@ -104,11 +98,11 @@ fj_err_t fj_unixpoller_add(
     };
 
     FJ_TRY(fj_vec_push(&this->pollfds, &pollfd)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     FJ_TRY(fj_vec_push(&this->callbacks, &callback)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     return FJ_OK;
@@ -118,14 +112,12 @@ fj_err_t fj_unixpoller_add(
 static
 fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 {
-    FJ_INIT_TRY
-
     FJ_TRY(fj_vec_remove(&this->pollfds, index, 1)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     FJ_TRY(fj_vec_remove(&this->callbacks, index, 1)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     return FJ_OK;
@@ -134,14 +126,12 @@ fj_err_t remove_index(struct fj_unixpoller * this, uint32_t index)
 
 fj_err_t fj_unixpoller_remove(struct fj_unixpoller * this, fj_unixpoller_fd_t file_descriptor)
 {
-    FJ_INIT_TRY
-
     struct pollfd * pollfds = this->pollfds.items;
 
     for (size_t i=0; i<this->pollfds.length; i++) {
         if (pollfds->fd == file_descriptor) {
             FJ_TRY(remove_index(this, i)) {
-                return FJ_RESULT;
+                return fj_result;
             }
 
             break;

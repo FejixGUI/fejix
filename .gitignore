@@ -1,7 +1,9 @@
 build*/
+_build*/
 
 .*
 !.gitignore
 !.editorconfig
-!.clangd
+!.clang-format
 !.clang-tidy
+!.clangd

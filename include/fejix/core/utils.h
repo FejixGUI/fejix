@@ -5,9 +5,7 @@
 #include <fejix/core/base.h>
 
 
-#define FJ_INIT_TRY fj_err_t _fj_err = FJ_OK;
-#define FJ_TRY(EXPR) _fj_err = (EXPR); if (_fj_err != FJ_OK)
-#define FJ_RESULT (_fj_err)
+#define FJ_TRY(EXPR) for (fj_err_t fj_result=(EXPR), i=1; i; i=0) if (fj_result != FJ_OK)
 
 #define FJ_STRINGIFY(X) FJ_STRINGIFY_IMPL(X)
 #define FJ_STRINGIFY_IMPL(X) #X
@@ -27,10 +25,10 @@
 #define FJ_CLAMP(X, MIN, MAX) FJ_MAX(FJ_MIN((X), (MAX)), (MIN))
 
 
-fj_bool32_t fj_streq(char const */*[]*/ a, char const */*[]*/ b);
+fj_bool32_t fj_str_eq(char const */*[]*/ a, char const */*[]*/ b);
 
 /** The returned string must be freed manually. */
-fj_err_t fj_strdup(char const */*[]*/ str, char const */*[]? out*/ * clone);
+fj_err_t fj_str_dup(char const */*[]*/ str, char const */*[]? out*/ * clone);
 
 /** If x >= 2^31, then returns UINT32_MAX */
 uint32_t fj_u32_next_power_of_two(uint32_t x);

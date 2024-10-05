@@ -42,10 +42,8 @@ fj_err_t fj_alloc_zeroed(void */*? out*/ * ptr, size_t size)
 
 fj_err_t fj_alloc_copied(void */*? out*/ * ptr, void const * source, size_t size)
 {
-    FJ_INIT_TRY
-
     FJ_TRY(fj_alloc_uninit(ptr, size)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     memcpy(*ptr, source, size);
@@ -54,7 +52,7 @@ fj_err_t fj_alloc_copied(void */*? out*/ * ptr, void const * source, size_t size
 }
 
 
-void fj_free(void ** ptr)
+void fj_free(void * * ptr)
 {
     free(*ptr);
     *ptr = NULL;

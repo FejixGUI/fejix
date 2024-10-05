@@ -4,16 +4,13 @@
 
 
 extern struct fj_client_iface const fj_wayland_client_iface;
-extern struct fj_presentation_iface const fj_wayland_presentation_iface;
-
-#ifdef FJ_OPT_FEATURE_SOFTER_CANVAS
+extern struct fj_output_iface const fj_wayland_output_iface;
 extern struct fj_softer_canvas_iface const fj_wayland_softer_canvas_iface;
-#endif
 
 static
 void const * ifaces[] = {
     [FJ_INTERFACE_CLIENT] = &fj_wayland_client_iface,
-    [FJ_INTERFACE_PRESENTATION] = &fj_wayland_presentation_iface,
+    [FJ_INTERFACE_OUTPUT] = &fj_wayland_output_iface,
 
 #ifdef FJ_OPT_FEATURE_SOFTER_CANVAS
     [FJ_INTERFACE_SOFTER_CANVAS] = &fj_wayland_softer_canvas_iface,

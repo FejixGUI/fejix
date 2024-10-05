@@ -37,14 +37,12 @@ uint32_t vec_get_capacity_to_shrink(struct fj_vec * vec)
 
 fj_err_t fj_vec_resize(struct fj_vec * vec, uint32_t capacity)
 {
-    FJ_INIT_TRY
-
     if (vec->capacity == capacity) {
         return FJ_OK;
     }
 
     FJ_TRY(fj_realloc_uninit(&vec->items, capacity, vec->item_size)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     vec->capacity = capacity;
@@ -135,10 +133,8 @@ void fj_vec_replace(
 
 fj_err_t fj_vec_insert_uninit(struct fj_vec * vec, uint32_t destination_index, uint32_t item_count)
 {
-    FJ_INIT_TRY
-
     FJ_TRY(fj_vec_resize_to_reserve(vec, item_count)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     if (!fj_vec_is_empty(vec) && destination_index != fj_vec_get_push_index(vec)) {
@@ -158,10 +154,8 @@ fj_err_t fj_vec_insert(
     uint32_t item_count
 )
 {
-    FJ_INIT_TRY
-
     FJ_TRY(fj_vec_insert_uninit(vec, destination_index, item_count)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     fj_vec_replace(vec, items, destination_index, item_count);

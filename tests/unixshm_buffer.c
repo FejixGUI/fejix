@@ -5,7 +5,7 @@
 
 int main(void)
 {
-    struct fj_unixshm_buffer buffer;
+    struct fj_unixshm buffer;
 
     assert(fj_unixshm_buffer_create(&buffer, (size_t) 640 * 480 * 4) == FJ_OK);
 
@@ -16,7 +16,7 @@ int main(void)
     size_t size2 = buffer.size;
     assert(!(size2 < size1));
 
-    struct fj_unixshm_buffer buffer2;
+    struct fj_unixshm buffer2;
     assert(fj_unixshm_buffer_create(&buffer2, (size_t) 640 * 480 * 4) == FJ_OK);
     assert(fj_unixshm_buffer_destroy(&buffer2) == FJ_OK);
 

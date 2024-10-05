@@ -2,14 +2,14 @@
 #define FEJIX_CORE_BASE_H_
 
 
-#include <stdint.h>
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 
 #define FJ_DEFINE_OPAQUE_TYPE(TYPE) typedef struct TYPE TYPE;
 
-/** Semantic version of MAJOR.MINOR.PATCH, min 0.0.0, max 4096.1024.1024 */
+/** Semantic version of MAJOR.MINOR.PATCH, from 0.0.0 to 4096.1024.1024 */
 #define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR)<<20) | ((MINOR)<<10) | (PATCH))
 #define FJ_VERSION_MAJOR(VERSION) (((VERSION) >> 20) & 0xFFF)
 #define FJ_VERSION_MINOR(VERSION) (((VERSION) >> 10) & 0x3FF)
@@ -21,6 +21,7 @@
 /** Error code. */
 typedef uint32_t fj_err_t;
 
+/** Error codes. */
 enum fj_err {
     FJ_OK,
 

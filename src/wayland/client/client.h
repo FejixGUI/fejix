@@ -3,7 +3,7 @@
 
 
 #include <fejix/interface/client.h>
-#include <fejix/interface/presentation.h>
+#include <fejix/interface/output.h>
 
 #include <src/unixpoller/unixpoller.h>
 
@@ -63,7 +63,7 @@ union fj_wayland_interface_desc {
 
 
 struct fj_wayland_client {
-    struct fj_client_callbacks const * callbacks;
+    struct fj_client_callbacks callbacks;
 
     /** User data */
     void */*?*/ data;
@@ -81,7 +81,7 @@ struct fj_wayland_client {
         To check if event recording succeeded, check if the vector has allocated. */
     struct fj_vec recorded_events;
 
-    struct fj_wayland_presentation_global_data */*?*/ presentation;
+    struct fj_wayland_output_global_data */*?*/ output;
 
 #ifdef FJ_OPT_FEATURE_SOFTER_CANVAS
     struct fj_wayland_softer_canvas_global_data */*?*/ softer;
@@ -145,8 +145,11 @@ void fj_wayland_record_fail(struct fj_wayland_client * client);
 
 fj_bool32_t fj_wayland_record_failed(struct fj_wayland_client * client);
 
-/** Waits until all issued requests are processed. */
+/** Waits until all issued requests are processed and dispatches the queue. */
 fj_err_t fj_wayland_roundtrip(struct fj_wayland_client * client);
+
+/** Waits for the next event and dispatches the queue. */
+fj_err_t fj_wayland_wait_for_events(struct fj_wayland_client * client);
 
 /** This filter is called once for every event in a single pass. */
 typedef fj_bool32_t (fj_wayland_event_filter_fn_t)(

@@ -7,8 +7,6 @@
 
 int main(void)
 {
-    FJ_INIT_TRY
-
     struct fj_map m;
 
     fj_map_init(&m, FJ_ANY_U32, FJ_ANY_U32);

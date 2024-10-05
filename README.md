@@ -15,8 +15,24 @@ input and more.
 
 ## Build
 
+### The library
+
 ```sh
 meson setup build
 meson configure build -D implementations=impl1,impl2,impl3 -D features=feat1,feat2,feat3
 meson compile -C build
+```
+
+### Documentation
+
+Prerequisites:
+* Python 3
+* [Sphinx](https://www.sphinx-doc.org/en/master/) - documentation generator
+* [Hawkmoth](https://github.com/jnikula/hawkmoth) - Sphinx C extension
+* [Furo](https://github.com/pradyunsg/furo) - Sphinx theme
+
+Run:
+```sh
+cd docs
+make html
 ```

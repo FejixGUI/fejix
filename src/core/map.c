@@ -245,10 +245,8 @@ fj_bool32_t map_is_validated(float load_factor)
 static
 fj_err_t resize_buckets(struct fj_map * map, uint32_t bucket_count)
 {
-    FJ_INIT_TRY
-
     FJ_TRY(FJ_REALLOC_ZEROED(&map->buckets, map->bucket_count, bucket_count)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     map->bucket_count = bucket_count;
@@ -275,8 +273,6 @@ fj_err_t resize_map(struct fj_map * map, fj_bool32_t grow)
 static
 fj_err_t rehash(struct fj_map * map, fj_bool32_t grow)
 {
-    FJ_INIT_TRY
-
     struct fj_map_node * list_head = extract_nodes(map);
 
     FJ_TRY(resize_map(map, grow)) {
@@ -284,7 +280,7 @@ fj_err_t rehash(struct fj_map * map, fj_bool32_t grow)
         FJ_FREE(&map->buckets);
         FJ_FREE(&map);
 
-        return FJ_RESULT;
+        return fj_result;
     }
 
     reinsert_nodes(map, list_head);
@@ -359,12 +355,10 @@ fj_bool32_t map_update(struct fj_map * map, union fj_any key, union fj_any value
 static
 fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    FJ_INIT_TRY
-
     struct fj_map_node * node = NULL;
 
     FJ_TRY(FJ_ALLOC_ZEROED(&node)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     node->element.key = key;
@@ -380,10 +374,8 @@ fj_err_t map_insert(struct fj_map * map, union fj_any key, union fj_any value)
 static
 fj_err_t map_allocate(struct fj_map * map)
 {
-    FJ_INIT_TRY
-
     FJ_TRY(FJ_REALLOC_ZEROED(&map->buckets, 0, 1)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     map->bucket_count = 1;
@@ -445,11 +437,9 @@ void fj_map_deinit(struct fj_map * map)
 
 fj_err_t fj_map_set(struct fj_map * map, union fj_any key, union fj_any value)
 {
-    FJ_INIT_TRY
-
     if (!fj_map_has_allocated(map)) {
         FJ_TRY(map_allocate(map)) {
-            return FJ_RESULT;
+            return fj_result;
         }
     }
 

@@ -8,8 +8,6 @@
 
 fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf16_string)
 {
-    FJ_INIT_TRY
-
     int32_t output_char_count = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
@@ -20,7 +18,7 @@ fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf1
     );
 
     FJ_TRY(FJ_ARRALLOC_UNINIT(utf16_string, output_char_count)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     uint32_t result = MultiByteToWideChar(
@@ -43,8 +41,6 @@ fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf1
 
 fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const */*[] out*/ * string)
 {
-    FJ_INIT_TRY
-
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,
         0, /* flags */
@@ -57,7 +53,7 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const */*[] out*/ * stri
     );
 
     FJ_TRY(FJ_ARRALLOC_UNINIT(string, output_size)) {
-        return FJ_RESULT;
+        return fj_result;
     }
 
     uint32_t result = WideCharToMultiByte(

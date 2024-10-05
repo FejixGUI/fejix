@@ -7,8 +7,4 @@ indent_size = 4
 max_line_length = 100
 end_of_line = lf
 trim_trailing_whitespace = true
-insert_final_newline = false
-
-# C, C++, Objective-C files
-[*.{c,h,cpp,m}]
 insert_final_newline = true
