@@ -190,7 +190,7 @@ fj_err_t fj_unixpoller_wakeup(struct fj_unixpoller *this)
 }
 
 
-fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller *this)
+fj_bool8_t fj_unixpoller_should_finish(struct fj_unixpoller *this)
 {
     return isnan(this->timeout);
 }

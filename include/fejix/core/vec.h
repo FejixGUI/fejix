@@ -56,12 +56,12 @@ static inline uint32_t fj_vec_get_push_index(struct fj_vec const *vec)
     return vec->length;
 }
 
-static inline fj_bool32_t fj_vec_is_empty(struct fj_vec const *vec)
+static inline fj_bool8_t fj_vec_is_empty(struct fj_vec const *vec)
 {
     return vec->length == 0;
 }
 
-static inline fj_bool32_t fj_vec_has_allocated(struct fj_vec const *vec)
+static inline fj_bool8_t fj_vec_has_allocated(struct fj_vec const *vec)
 {
     return vec->items != NULL;
 }

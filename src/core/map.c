@@ -9,12 +9,12 @@
 #define MIN_LOAD_FACTOR (MAX_LOAD_FACTOR/4.0f)
 
 
-fj_bool32_t fj_map_is_empty(struct fj_map const *map)
+fj_bool8_t fj_map_is_empty(struct fj_map const *map)
 {
     return map->element_count == 0;
 }
 
-fj_bool32_t fj_map_has_allocated(struct fj_map const *map)
+fj_bool8_t fj_map_has_allocated(struct fj_map const *map)
 {
     return map->buckets != NULL;
 }
@@ -26,11 +26,7 @@ static union fj_tag get_key(struct fj_map_node const *node)
 }
 
 
-static fj_bool32_t key_eq(
-    struct fj_map const *map,
-    struct fj_map_node const *node,
-    union fj_tag key
-)
+static fj_bool8_t key_eq(struct fj_map const *map, struct fj_map_node const *node, union fj_tag key)
 {
     return fj_tag_eq(get_key(node), key, map->key_type);
 }
@@ -213,19 +209,19 @@ static float get_load_factor(struct fj_map *map)
 }
 
 
-static fj_bool32_t map_needs_to_grow(float load_factor)
+static fj_bool8_t map_needs_to_grow(float load_factor)
 {
     return load_factor > MAX_LOAD_FACTOR;
 }
 
 
-static fj_bool32_t map_needs_to_shrink(float load_factor)
+static fj_bool8_t map_needs_to_shrink(float load_factor)
 {
     return load_factor < MIN_LOAD_FACTOR;
 }
 
 
-static fj_bool32_t map_is_validated(float load_factor)
+static fj_bool8_t map_is_validated(float load_factor)
 {
     return !map_needs_to_grow(load_factor) && !map_needs_to_shrink(load_factor);
 }
@@ -243,7 +239,7 @@ static fj_err_t resize_buckets(struct fj_map *map, uint32_t bucket_count)
 }
 
 
-static fj_err_t resize_map(struct fj_map *map, fj_bool32_t grow)
+static fj_err_t resize_map(struct fj_map *map, fj_bool8_t grow)
 {
     uint32_t bucket_count = 0;
 
@@ -257,7 +253,7 @@ static fj_err_t resize_map(struct fj_map *map, fj_bool32_t grow)
 }
 
 
-static fj_err_t rehash(struct fj_map *map, fj_bool32_t grow)
+static fj_err_t rehash(struct fj_map *map, fj_bool8_t grow)
 {
     struct fj_map_node *list_head = extract_nodes(map);
 
@@ -320,7 +316,7 @@ static struct fj_map_element *map_find(struct fj_map const *map, union fj_tag ke
 
 
 /** Returns true if the value was updated, false if the record does not exist in the map. */
-static fj_bool32_t map_update(struct fj_map *map, union fj_tag key, union fj_tag value)
+static fj_bool8_t map_update(struct fj_map *map, union fj_tag key, union fj_tag value)
 {
     struct fj_map_element *element = map_find(map, key);
 
@@ -451,13 +447,13 @@ void fj_map_iter_init(struct fj_map_iter /*out*/ *iter, struct fj_map const *map
 }
 
 
-fj_bool32_t fj_map_iter_finished(struct fj_map_iter const *iter)
+fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter)
 {
     return iter->bucket_index >= iter->map->bucket_count;
 }
 
 
-static fj_bool32_t iter_process_result(
+static fj_bool8_t iter_process_result(
     struct fj_map_iter *iter,
     struct fj_map_element * /*out*/ *element
 )
@@ -471,7 +467,7 @@ static fj_bool32_t iter_process_result(
     return true;
 }
 
-static fj_bool32_t iter_can_walk_nodes(struct fj_map_iter const *iter)
+static fj_bool8_t iter_can_walk_nodes(struct fj_map_iter const *iter)
 {
     return iter->current_node != NULL && iter->current_node->next != NULL;
 }
@@ -481,12 +477,12 @@ static void iter_walk_nodes(struct fj_map_iter *iter)
     iter->current_node = iter->current_node->next;
 }
 
-static fj_bool32_t iter_started_bucket(struct fj_map_iter const *iter)
+static fj_bool8_t iter_started_bucket(struct fj_map_iter const *iter)
 {
     return iter->current_node != NULL;
 }
 
-static fj_bool32_t iter_can_start_bucket(struct fj_map_iter const *iter)
+static fj_bool8_t iter_can_start_bucket(struct fj_map_iter const *iter)
 {
     return iter->map->buckets[iter->bucket_index] != NULL;
 }
@@ -515,7 +511,7 @@ static void iter_walk_buckets(struct fj_map_iter *iter)
 }
 
 
-fj_bool32_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element * /*? out*/ *element)
+fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element * /*? out*/ *element)
 {
     if (iter_can_walk_nodes(iter)) {
         iter_walk_nodes(iter);

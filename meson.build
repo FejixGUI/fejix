@@ -45,8 +45,6 @@ if host_machine.system() in ['linux']
 endif
 
 
-# SOURCES
-
 public_includes = ['include']
 private_includes = ['include', '.']
 
@@ -55,7 +53,7 @@ shared_modules = []
 
 sources = [
     'src/core/alloc.c',
-    'src/core/any.c',
+    'src/core/base.c',
     'src/core/map.c',
     'src/core/vec.c',
     'src/core/utils.c',
@@ -106,6 +104,7 @@ fejix = library(
     sources: sources,
     dependencies: dependencies,
     include_directories: private_includes,
+    c_args: ['-DFJ_OPT_INTERNAL']
 )
 
 fejix_dep = declare_dependency(

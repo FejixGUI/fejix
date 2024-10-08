@@ -1,12 +1,12 @@
-#include <fejix/ext/helper.h>
-
 #include <fejix/core/utils.h>
+
+#include <fejix/ext/helper.h>
 
 #include <stdlib.h>
 
 
-static
-char const */*[]*/const error_descriptions[] = {
+/** Contains strings and NULLs for unimplemented descriptions. */
+static char const *const error_descriptions[] = {
     /* Ensures that this array contains enough elements (uninitialised elements will be NULL) */
     [FJ_ERR_MAX] = "...max error ID...",
 
@@ -26,8 +26,7 @@ char const */*[]*/const error_descriptions[] = {
     [FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED] = "shared memory allocation failed",
 };
 
-static
-char const */*[]*/const impl_names[] = {
+static char const *const impl_names[] = {
     [FJ_IMPLEMENTATION_MAX] = "...max implementation ID...",
 
     [FJ_IMPLEMENTATION_ANDK] = "andk",
@@ -38,7 +37,7 @@ char const */*[]*/const impl_names[] = {
 };
 
 
-char const */*[]*/ fj_ext_get_error_description(fj_err_t error)
+char const *fj_ext_get_error_description(fj_err_t error)
 {
     if (error >= FJ_ERR_USER) {
         return "user-defined error";
@@ -56,7 +55,7 @@ char const */*[]*/ fj_ext_get_error_description(fj_err_t error)
 }
 
 
-char const */*[]?*/ fj_ext_get_implementation_name(fj_implementation_id_t impl_id)
+char const *fj_ext_get_implementation_name(fj_implementation_id_t impl_id)
 {
     if (impl_id >= FJ_IMPLEMENTATION_MAX) {
         return NULL;
@@ -70,9 +69,9 @@ char const */*[]?*/ fj_ext_get_implementation_name(fj_implementation_id_t impl_i
 }
 
 
-char const */*[]?*/ fj_ext_get_implementation_hint(void)
+char const *fj_ext_get_implementation_hint(void)
 {
-    char const */*[]*/ hint;
+    char const *hint;
 
     hint = getenv("FEJIX_IMPLEMENTATION");
 
@@ -80,10 +79,10 @@ char const */*[]?*/ fj_ext_get_implementation_hint(void)
         return hint;
     }
 
-#if defined(FJ_OPT_WAYLAND) || defined(FJ_OPT_X11)
+#if defined(FJ_OPT_IMPLEMENTATION_WAYLAND) || defined(FJ_OPT_IMPLEMENTATION_X11)
     hint = getenv("XDG_SESSION_TYPE");
 
-    if (fj_streq(hint, "wayland") || fj_streq(hint, "x11")) {
+    if (fj_str_eq(hint, "wayland") || fj_str_eq(hint, "x11")) {
         return hint;
     }
 #endif
@@ -92,10 +91,10 @@ char const */*[]?*/ fj_ext_get_implementation_hint(void)
 }
 
 
-struct fj_implementation_iface const */*?*/ fj_ext_choose_implementation(
-    struct fj_implementation_iface const *const */*[]?*/ impls,
+struct fj_implementation_iface const *fj_ext_choose_implementation(
+    struct fj_implementation_iface const *const *impls,
     uint32_t impl_count,
-    char const */*[]?*/ impl_hint
+    char const *impl_hint
 )
 {
     if (impl_count == 0) {
@@ -106,8 +105,8 @@ struct fj_implementation_iface const */*?*/ fj_ext_choose_implementation(
         return impls[0];
     }
 
-    for (uint32_t i=0; i<impl_count; i++) {
-        char const * impl_name = fj_ext_get_implementation_name(impls[i]->id);
+    for (uint32_t i = 0; i < impl_count; i++) {
+        char const *impl_name = fj_ext_get_implementation_name(impls[i]->id);
 
         if (fj_str_eq(impl_name, impl_hint)) {
             return impls[i];
@@ -115,4 +114,14 @@ struct fj_implementation_iface const */*?*/ fj_ext_choose_implementation(
     }
 
     return NULL;
+}
+
+
+struct fj_implementation_iface const *fj_ext_auto_choose_builtin_implementation(void)
+{
+    struct fj_implementation_iface const *const *impls;
+    uint32_t impl_count;
+    fj_get_builtin_implementations(&impls, &impl_count);
+
+    return fj_ext_choose_implementation(impls, impl_count, fj_ext_get_implementation_hint());
 }

@@ -4,7 +4,7 @@
 
 
 extern struct fj_implementation_iface const fj_andk_implementation_iface;
-extern struct fj_implementation_iface const fj_appkit_implementation_iface;
+extern struct fj_implementation_iface const fj_cocoa_implementation_iface;
 extern struct fj_implementation_iface const fj_wayland_implementation_iface;
 extern struct fj_implementation_iface const fj_winapi_implementation_iface;
 extern struct fj_implementation_iface const fj_x11_implementation_iface;
@@ -16,8 +16,8 @@ static struct fj_implementation_iface const *const implementation_list[] = {
 #    ifdef FJ_OPT_IMPLEMENTATION_ANDK
     &fj_andk_implementation_iface,
 #    endif
-#    ifdef FJ_OPT_IMPLEMENTATION_APPKIT
-    &fj_appkit_implementation_iface,
+#    ifdef FJ_OPT_IMPLEMENTATION_COCOA
+    &fj_cocoa_implementation_iface,
 #    endif
 #    ifdef FJ_OPT_IMPLEMENTATION_WAYLAND
     &fj_wayland_implementation_iface,

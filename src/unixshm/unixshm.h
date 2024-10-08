@@ -1,5 +1,5 @@
-#ifndef FEJIX_INTERNAL_UNIXSHM_H_
-#define FEJIX_INTERNAL_UNIXSHM_H_
+#ifndef FEJIX_UNIXSHM_H_
+#define FEJIX_UNIXSHM_H_
 
 
 #include <fejix/core/base.h>

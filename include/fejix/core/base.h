@@ -8,7 +8,15 @@
 
 
 /** Makes a tag. :see: :c:union:`fj_tag` */
-#define FJ_TAG(TYPE, VALUE) ((union fj_tag) { .TYPE = (VALUE), })
+#define FJ_TAG(TYPE, VALUE) ((union fj_tag) { .TYPE = (VALUE) })
+
+#ifndef FJ_OPT_INTERNAL
+#    define FJ_PUBLICLY(X) X
+#    define FJ_INTERNALLY(X)
+#else
+#    define FJ_PUBLICLY(X)
+#    define FJ_INTERNALLY(X) X
+#endif
 
 /** Semantic version of MAJOR.MINOR.PATCH, from 0.0.0 to 4096.1024.1024 */
 #define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR)<<20) | ((MINOR)<<10) | (PATCH))
@@ -92,17 +100,17 @@ enum fj_err {
     FJ_ERR_MAX,
 
     /** User-defined errors should begin with this number */
-    FJ_ERR_USER = 10000,
+    FJ_ERR_USER = 0x10000,
 };
 
 
 /** :see: :c:macro:`FJ_VERSION` */
 typedef uint32_t fj_version_t;
 
-/** Use standard true/false for this. */
-typedef uint32_t fj_bool32_t;
+/** Use standard ``true``/``false`` for this. */
+typedef uint8_t fj_bool8_t;
 
-/** Amount of seconds, accepts INFINITY as "forever" and negatives as "invalid". */
+/** Amount of seconds, may accept INFINITY as "forever". */
 typedef double fj_seconds_t;
 
 struct fj_position2d {
@@ -132,7 +140,7 @@ struct fj_viewport2d {
 
 
 /** */
-fj_bool32_t fj_tag_eq(union fj_tag a, union fj_tag b, fj_tag_type_t type);
+fj_bool8_t fj_tag_eq(union fj_tag a, union fj_tag b, fj_tag_type_t type);
 
 /**
 Do not hash pointers. When hashing pointers, this converts them to uintptr_t.

@@ -35,7 +35,7 @@ struct fj_implementation_iface {
     fj_implementation_id_t id;
     fj_version_t version;
 
-    void const *(*get)(fj_interface_id_t iface_id);
+    void const *(*get_interface)(fj_interface_id_t interface_id);
 };
 
 

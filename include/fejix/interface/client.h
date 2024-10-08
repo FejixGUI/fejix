@@ -5,6 +5,14 @@
 #include <fejix/core/base.h>
 
 
+typedef uint32_t fj_client_schedule_type_t;
+
+enum fj_client_schedule_type {
+    FJ_CLIENT_SCHEDULE_WAIT,
+    FJ_CLIENT_SCHEDULE_QUIT,
+};
+
+
 typedef uint32_t fj_client_run_type_t;
 
 enum fj_client_run_type {
@@ -13,13 +21,26 @@ enum fj_client_run_type {
 };
 
 
-struct fj_client {
-    union fj_tag tag;
+struct fj_client FJ_PUBLICLY({ union fj_tag tag; });
+
+
+struct fj_client_schedule {
+    /**
+    Used when type is ``FJ_CLIENT_SCHEDULE_WAIT``.
+    Accepts infinity for infinite waiting. Default is 0.
+    */
+    fj_seconds_t timeout;
+
+    /** Default is ``FJ_CLIENT_SCHEDULE_WAIT``. */
+    fj_client_schedule_type_t type;
 };
 
 
 struct fj_client_info {
     union fj_tag tag;
+
+    /** Implementation-dependent extra creation information. Set to NULL if unused. */
+    void *extra_info;
 
     /** String that should uniquely identify the app to the shell. */
     char const *name;
@@ -33,29 +54,26 @@ struct fj_client_callbacks {
 
 
 struct fj_client_iface {
-    /** Callbacks and info are deep-copied. */
+    /**
+    Callbacks and info are deep-copied where applicable.
+
+    :param client: Returns the client or NULL on failure.
+    */
     fj_err_t (*create)(
-        struct fj_client * /*? out*/ *client,
+        struct fj_client **client,
         struct fj_client_callbacks const *callbacks,
         struct fj_client_info const *info
     );
 
     fj_err_t (*destroy)(struct fj_client *client);
 
-    /** :param run_data: Can be NULL if unused. */
-    fj_err_t (*run)(struct fj_client *client, fj_client_run_type_t run_type, void *run_data);
-
     /**
-    Possible timeout values:
-    * 0.0 - read a message if available
-    * >0.0 - wait for a message for the specified timeout
-    * INF - wait for a message forever
-    * NAN - exit as soon as possible (some messages may be processed before that)
-    * other - undefined behavior
-
-    If the timeout expires and no messages are available, the idle callback is called.
+    Runs a message polling loop.
+    At the startup and at the end of each polling iteration calls ``idle``.
     */
-    void (*set_sleep_timeout)(struct fj_client *client, fj_seconds_t timeout);
+    fj_err_t (*run)(struct fj_client *client);
+
+    void (*set_schedule)(struct fj_client *client, struct fj_client_schedule const *schedule);
 
     /** This method is thread-safe provided that the client is not being destroyed. */
     fj_err_t (*wakeup)(struct fj_client *client);

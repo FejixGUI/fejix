@@ -51,10 +51,10 @@ void fj_map_init(struct fj_map *map, fj_tag_type_t key_type, fj_tag_type_t value
 void fj_map_deinit(struct fj_map *map);
 
 /**  */
-fj_bool32_t fj_map_is_empty(struct fj_map const *map);
+fj_bool8_t fj_map_is_empty(struct fj_map const *map);
 
 /** */
-fj_bool32_t fj_map_has_allocated(struct fj_map const *map);
+fj_bool8_t fj_map_has_allocated(struct fj_map const *map);
 
 /** */
 fj_err_t fj_map_set(struct fj_map *map, union fj_tag key, union fj_tag value);
@@ -69,14 +69,14 @@ fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key);
 void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map);
 
 /** */
-fj_bool32_t fj_map_iter_finished(struct fj_map_iter const *iter);
+fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter);
 
 /**
 Returns true if the next element was successfully found.
 
 :param element: Returns the next element or NULL.
 */
-fj_bool32_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element);
+fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element);
 
 
 #endif

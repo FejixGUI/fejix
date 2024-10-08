@@ -52,7 +52,7 @@ void fj_unixpoller_set_timeout(struct fj_unixpoller *this, fj_seconds_t timeout)
 
 fj_err_t fj_unixpoller_wakeup(struct fj_unixpoller *this);
 
-fj_bool32_t fj_unixpoller_should_finish(struct fj_unixpoller *this);
+fj_bool8_t fj_unixpoller_should_finish(struct fj_unixpoller *this);
 
 
 #endif
