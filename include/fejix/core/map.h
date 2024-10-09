@@ -60,7 +60,7 @@ fj_bool8_t fj_map_has_allocated(struct fj_map const *map);
 fj_err_t fj_map_set(struct fj_map *map, union fj_tag key, union fj_tag value);
 
 /** Returns the pointer to value. Returns NULL if the key was not found. */
-void *fj_map_get(struct fj_map const *map, union fj_tag key);
+union fj_tag *fj_map_get(struct fj_map const *map, union fj_tag key);
 
 /** */
 fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key);

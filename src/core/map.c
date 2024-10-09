@@ -371,7 +371,7 @@ static fj_err_t map_set(struct fj_map *map, union fj_tag key, union fj_tag value
 
 
 /* Returns NULL if the key was not found. */
-static void *map_get(struct fj_map const *map, union fj_tag key)
+static union fj_tag *map_get(struct fj_map const *map, union fj_tag key)
 {
     struct fj_map_element *element = map_find(map, key);
 
@@ -419,7 +419,7 @@ fj_err_t fj_map_set(struct fj_map *map, union fj_tag key, union fj_tag value)
 }
 
 
-void * /*?*/ fj_map_get(struct fj_map const *map, union fj_tag key)
+union fj_tag *fj_map_get(struct fj_map const *map, union fj_tag key)
 {
     if (!fj_map_has_allocated(map)) {
         return NULL;
@@ -439,7 +439,7 @@ fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key)
 }
 
 
-void fj_map_iter_init(struct fj_map_iter /*out*/ *iter, struct fj_map const *map)
+void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map)
 {
     iter->map = map;
     iter->bucket_index = 0;
@@ -453,10 +453,7 @@ fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter)
 }
 
 
-static fj_bool8_t iter_process_result(
-    struct fj_map_iter *iter,
-    struct fj_map_element * /*out*/ *element
-)
+static fj_bool8_t iter_process_result(struct fj_map_iter *iter, struct fj_map_element **element)
 {
     if (iter->current_node == NULL) {
         *element = NULL;
@@ -511,7 +508,7 @@ static void iter_walk_buckets(struct fj_map_iter *iter)
 }
 
 
-fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element * /*? out*/ *element)
+fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element)
 {
     if (iter_can_walk_nodes(iter)) {
         iter_walk_nodes(iter);

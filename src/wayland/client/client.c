@@ -788,7 +788,7 @@ static fj_err_t client_wakeup(struct fj_client *_client)
 }
 
 
-struct fj_client_iface const fj_client_iface = {
+struct fj_client_iface const fj_wayland_client_iface = {
     .create = client_create,
     .destroy = client_destroy,
     .run = client_run,
