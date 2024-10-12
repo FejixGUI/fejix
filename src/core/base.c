@@ -41,7 +41,7 @@ static uint32_t ptr_hash32(void *x)
 }
 
 
-fj_bool32_t fj_tag_eq(union fj_tag a, union fj_tag b, fj_tag_type_t type)
+fj_bool8_t fj_tag_eq(union fj_tag a, union fj_tag b, fj_tag_type_t type)
 {
     switch (type) {
         case FJ_TAG_U32:

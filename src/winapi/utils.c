@@ -6,18 +6,18 @@
 #include <string.h>
 
 
-fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf16_string)
+fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 {
     int32_t output_char_count = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
         string,
-        -1, /* convert the entire string */
+        -1,   /* convert the entire string */
         NULL, /* output string */
-        0 /* output chars count (unknown, asking for it) */
+        0     /* output chars count (unknown, asking for it) */
     );
 
-    FJ_TRY(FJ_ARRALLOC_UNINIT(utf16_string, output_char_count)) {
+    FJ_TRY (FJ_REALLOC_UNINIT(utf16_string, output_char_count)) {
         return fj_result;
     }
 
@@ -39,20 +39,20 @@ fj_err_t fj_winapi_into_utf16(char const */*[]*/ string, LPWSTR /*? out*/ * utf1
 }
 
 
-fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const */*[] out*/ * string)
+fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 {
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,
         0, /* flags */
         utf16_string,
-        -1, /* convert the entire string */
+        -1,   /* convert the entire string */
         NULL, /* output string */
-        0, /* output chars count (unknown, asking for it) */
+        0,    /* output chars count (unknown, asking for it) */
         NULL,
         NULL
     );
 
-    FJ_TRY(FJ_ARRALLOC_UNINIT(string, output_size)) {
+    FJ_TRY (FJ_REALLOC_UNINIT(string, output_size)) {
         return fj_result;
     }
 
@@ -73,4 +73,16 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const */*[] out*/ * stri
     }
 
     return FJ_OK;
+}
+
+
+void fj_winapi_set_window_data(HWND window, void *data)
+{
+    SetWindowLongPtr(window, GWLP_USERDATA, (LONG_PTR) data);
+}
+
+
+void *fj_winapi_get_window_data(HWND window)
+{
+    return (void *) GetWindowLongPtr(window, GWLP_USERDATA);
 }

@@ -25,6 +25,9 @@
 #define FJ_CLAMP(X, MIN, MAX) FJ_MAX(FJ_MIN((X), (MAX)), (MIN))
 
 
+FJ_EXTERN_C_BEGIN
+
+
 fj_bool8_t fj_str_eq(char const *a, char const *b);
 
 /**
@@ -49,5 +52,7 @@ size_t fj_size_next_power_of_two(size_t x);
 /** If x = 0, then returns 1. */
 size_t fj_size_prev_power_of_two(size_t x);
 
+
+FJ_EXTERN_C_BEGIN
 
 #endif

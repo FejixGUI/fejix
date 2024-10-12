@@ -63,6 +63,8 @@ Usage examples:
 #define FJ_FREE(OBJECT_PTR_REF) (fj_free((void *)(OBJECT_PTR_REF)))
 
 
+FJ_EXTERN_C_BEGIN
+
 /**
 Allocates an uninitialized block of memory.
 Works like ``malloc``, but allocating 0 bytes is always an error.
@@ -117,5 +119,7 @@ fj_err_t fj_realloc_zeroed(
     size_t item_size
 );
 
+
+FJ_EXTERN_C_END
 
 #endif

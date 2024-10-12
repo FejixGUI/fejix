@@ -1,33 +1,51 @@
+#ifndef FEJIX_WINAPI_CLIENT_H_
+#define FEJIX_WINAPI_CLIENT_H_
+
+
+#include <src/winapi/scheduler/scheduler.h>
+
 #include <fejix/interface/client.h>
 
 #include <windows.h>
 
 
-typedef uint32_t fj_winapi_event_handling_flags_t;
-
-enum fj_winapi_event_handling_flags {
-    FJ_WINAPI_INSIDE_DEFWINDOWPROC = (1<<0),
-    FJ_WINAPI_POSTED_QUIT_MESSAGE = (1<<1),
+enum fj_winapi_user_message_id {
+    FJ_WINAPI_USER_MESSAGE_SLEEP = WM_USER,
+    FJ_WINAPI_USER_MESSAGE_WAKEUP,
 };
 
 
-// TODO Add message-only window for global events
-// TODO Add timer for message-only window to handle defwindowhandle
-// TODO Add timer event handling state (TIMER_SET, unset timer if got a message earlier than it
-// signals)
-// TODO Add regular idle scheduling (to emulate how unixpoller-based systems work - they do not
-// know about new messages until they read from display FD)
+struct fj_winapi_window_data_base {
+    struct fj_client *client;
+};
 
 
-struct fj_winapi_client {
-    struct fj_client_callbacks const * callbacks;
-    void * data;
+struct fj_winapi_message {
+    HWND window;
+    UINT message_type;
+    WPARAM wparam;
+    LPARAM lparam;
+};
 
-    fj_seconds_t timeout;
-    fj_err_t event_handling_error;
-    fj_winapi_event_handling_flags_t event_handling_flags;
+
+struct fj_client {
+    union fj_tag tag;
 
     HINSTANCE instance;
-    DWORD main_thread_id;
+    HWND message_window;
+    struct fj_winapi_window_data_base message_window_data;
+    fj_err_t message_processing_error;
 
+    struct fj_scheduler_common scheduler_common;
 };
+
+
+LRESULT CALLBACK fj_winapi_window_procedure(
+    HWND window,
+    UINT message,
+    WPARAM wparam,
+    LPARAM lparam
+);
+
+
+#endif

@@ -26,6 +26,7 @@ QualifierAlignment: Custom
 QualifierOrder: ['static', 'inline', 'type', 'const', 'volatile', 'restrict']
 PointerAlignment: Right
 SpaceAroundPointerQualifiers: After
+AttributeMacros: ['CALLBACK']
 
 # myvar = somethinglong
 #   + somethinglong;

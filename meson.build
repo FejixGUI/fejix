@@ -141,10 +141,10 @@ if get_option('build_tests')
 
     if 'unixshm_buffer' in shared_modules
         test(
-            'test_unixshm_buffer',
+            'test_unixshm',
             executable(
-                'test_unixshm_buffer',
-                sources: ['tests/unixshm_buffer.c'],
+                'test_unixshm',
+                sources: ['tests/unixshm/test.c'],
                 dependencies: fejix_internal_dep
             )
         )

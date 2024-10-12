@@ -5,6 +5,9 @@
 #include <fejix/core/base.h>
 
 
+FJ_EXTERN_C_BEGIN
+
+
 typedef uint32_t fj_implementation_id_t;
 
 enum fj_implementation_id {
@@ -26,6 +29,7 @@ typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id {
     FJ_INTERFACE_CLIENT,
+    FJ_INTERFACE_SCHEDULER,
     FJ_INTERFACE_OUTPUT,
     FJ_INTERFACE_SOFTER_CANVAS,
 };
@@ -49,5 +53,7 @@ void fj_get_builtin_implementations(
     uint32_t *implementation_count
 );
 
+
+FJ_EXTERN_C_END
 
 #endif

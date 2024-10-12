@@ -20,6 +20,9 @@ struct fj_vec {
 };
 
 
+FJ_EXTERN_C_BEGIN
+
+
 /** The vector does not allocate any memory until any items get inserted. */
 void fj_vec_init(struct fj_vec *vec, size_t item_size);
 
@@ -66,7 +69,7 @@ static inline fj_bool8_t fj_vec_has_allocated(struct fj_vec const *vec)
     return vec->items != NULL;
 }
 
-static inline void * /*[]?*/ fj_vec_offset(struct fj_vec const *vec, uint32_t offset_index)
+static inline void *fj_vec_offset(struct fj_vec const *vec, uint32_t offset_index)
 {
     if (offset_index >= vec->capacity) {
         return NULL;
@@ -113,5 +116,7 @@ fj_err_t fj_vec_push_front(struct fj_vec *vec, void const *item);
 /** Pops an item from the front (beginning) of the vector. */
 fj_err_t fj_vec_pop_front(struct fj_vec *vec);
 
+
+FJ_EXTERN_C_END
 
 #endif

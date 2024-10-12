@@ -44,6 +44,8 @@ struct fj_map_iter {
 };
 
 
+FJ_EXTERN_C_BEGIN
+
 /** Initialises the map, never allocates. */
 void fj_map_init(struct fj_map *map, fj_tag_type_t key_type, fj_tag_type_t value_type);
 
@@ -78,5 +80,7 @@ Returns true if the next element was successfully found.
 */
 fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element);
 
+
+FJ_EXTERN_C_END
 
 #endif

@@ -1,27 +1,29 @@
 #include <fejix/interface/implementation.h>
 
+#include <fejix/core/utils.h>
 
-#define CASE(IFACE_UPPERCASE, IFACE_LOWERCASE) \
-    case FJ_INTERFACE_##IFACE_UPPERCASE: { \
-        extern struct fj_##IFACE_LOWERCASE##_iface fj_wayland_##IFACE_LOWERCASE##_impl; \
-        return &fj_wayland_##IFACE_LOWERCASE##_impl; \
-    }
 
-static
-void const * get(fj_interface_id_t id)
+extern struct fj_client_iface fj_winapi_client_iface;
+extern struct fj_scheduler_iface fj_winapi_scheduler_iface;
+
+static void const *interfaces[] = {
+    [FJ_INTERFACE_CLIENT] = &fj_winapi_client_iface,
+    [FJ_INTERFACE_SCHEDULER] = &fj_winapi_scheduler_iface,
+};
+
+
+static void const *get_interface(fj_interface_id_t id)
 {
-    switch (id) {
-        default: return NULL;
-        CASE(CLIENT, client)
-        // CASE(LAYER, layer)
+    if (id >= FJ_ARRAY_LEN(interfaces) || interfaces[id] == NULL) {
+        return NULL;
     }
+
+    return interfaces[id];
 }
 
-#undef CASE
 
-
-struct fj_implementation_iface const fj_winapi_implementation_impl = {
-    .get = get,
+struct fj_implementation_iface const fj_winapi_implementation_iface = {
+    .get_interface = get_interface,
 
     .id = FJ_IMPLEMENTATION_WINAPI,
     .version = FJ_VERSION(0, 0, 1),
