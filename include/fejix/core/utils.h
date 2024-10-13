@@ -54,6 +54,12 @@ size_t fj_size_next_power_of_two(size_t x);
 /** If x = 0, then returns 1. */
 size_t fj_size_prev_power_of_two(size_t x);
 
+/** Returns the previous multiple of the divisor. */
+uint32_t fj_u32_prev_multiple(uint32_t x, uint32_t divisor);
+
+/** Returns the previous multiple of the divisor. */
+uint64_t fj_u64_prev_multiple(uint64_t x, uint64_t divisor);
+
 
 FJ_EXTERN_C_BEGIN
 

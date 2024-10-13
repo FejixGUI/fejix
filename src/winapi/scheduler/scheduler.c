@@ -4,14 +4,35 @@
 #include <fejix/core/utils.h>
 
 
+static fj_timeout_t guess_timeout_resolution(void)
+{
+    DWORD time_adjustment, adjustment_period;
+    BOOL adjustment_disabled = FALSE;
+    if (!GetSystemTimeAdjustment(&time_adjustment, &adjustment_period, &adjustment_disabled)) {
+        return FJ_TIMEOUT_FROM_MILLIS(1);
+    }
+
+    return FJ_TIMEOUT_FROM_MICROS(adjustment_period / 10);
+}
+
+
 static DWORD get_timeout(struct fj_client *client)
 {
     switch (client->scheduler_common.schedule.type) {
         case FJ_SCHEDULE_SLEEP_FOREVER:
             return INFINITE;
 
-        case FJ_SCHEDULE_SLEEP_TIMEOUT:
-            return (DWORD) FJ_TIMEOUT_MILLIS(client->scheduler_common.schedule.timeout);
+        case FJ_SCHEDULE_SLEEP_TIMEOUT: {
+            fj_timeout_t timeout = client->scheduler_common.schedule.timeout;
+            fj_timeout_t resolution = client->scheduler_common.timeout_resolution;
+            timeout = fj_u64_prev_multiple(timeout, resolution);
+            timeout = FJ_MAX(timeout, resolution / 3);
+            if (timeout > resolution / 3) {
+                timeout -= resolution / 4;
+            }
+
+            return (DWORD) FJ_TIMEOUT_MILLIS(timeout);
+        }
     }
 
     return 0;
@@ -55,7 +76,7 @@ fj_err_t fj_winapi_scheduler_sleep(struct fj_client *client)
     }
 
     DWORD result = MsgWaitForMultipleObjectsEx(
-        0, NULL, get_timeout(client), QS_ALLINPUT, MWMO_INPUTAVAILABLE
+        0, NULL, get_timeout(client), QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE
     );
 
     if (result == WAIT_FAILED) {
@@ -80,10 +101,11 @@ static fj_err_t scheduler_create_common(
     *common = &client->scheduler_common;
 
     (*common)->callbacks = *callbacks;
+    (*common)->timeout_resolution = guess_timeout_resolution();
 
-    caps->timeout_min = FJ_TIMEOUT_FROM_MILLIS(1);
+    caps->timeout_resolution = (*common)->timeout_resolution;
+    caps->timeout_min = (*common)->timeout_resolution;
     caps->timeout_max = FJ_TIMEOUT_FROM_MILLIS(INFINITE - 1);
-    caps->timeout_max = FJ_TIMEOUT_FROM_MILLIS(1);
 
     return FJ_OK;
 }

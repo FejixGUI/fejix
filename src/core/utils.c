@@ -86,3 +86,15 @@ size_t fj_size_prev_power_of_two(size_t x)
 
     return y;
 }
+
+
+uint32_t fj_u32_prev_multiple(uint32_t x, uint32_t divisor)
+{
+    return x - x % divisor;
+}
+
+
+uint64_t fj_u64_prev_multiple(uint64_t x, uint64_t divisor)
+{
+    return x - x % divisor;
+}

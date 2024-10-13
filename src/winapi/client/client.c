@@ -5,6 +5,12 @@
 #include <fejix/core/utils.h>
 
 
+static fj_bool8_t client_needs_quit(struct fj_client *client)
+{
+    return fj_winapi_scheduler_needs_quit(client) || client->message_processing_error != FJ_OK;
+}
+
+
 static fj_err_t client_handle_global_message(
     struct fj_client *client,
     MSG const *message,
@@ -84,7 +90,7 @@ static fj_err_t client_handle_message(struct fj_client *client, MSG const *messa
 
 static LRESULT client_handle_message_safely(struct fj_client *client, MSG const *message)
 {
-    if (client->message_processing_error != FJ_OK || fj_winapi_scheduler_needs_quit(client)) {
+    if (client_needs_quit(client)) {
         return 0;
     }
 
@@ -186,7 +192,7 @@ static fj_err_t client_run(struct fj_client *client)
         return fj_result;
     }
 
-    while (!fj_winapi_scheduler_needs_quit(client) || client->message_processing_error != FJ_OK) {
+    while (!client_needs_quit(client)) {
         MSG msg;
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             if (msg.message == WM_QUIT) {

@@ -33,7 +33,7 @@ struct fj_schedule {
 struct fj_scheduler_caps {
     fj_timeout_t timeout_min;
     fj_timeout_t timeout_max;
-    fj_timeout_t timeout_precision;
+    fj_timeout_t timeout_resolution;
 };
 
 
@@ -56,6 +56,7 @@ struct fj_scheduler_iface {
 
     fj_err_t (*destroy_common)(struct fj_client *client, struct fj_scheduler_common *common);
 
+    /** Timeout is rounded down to the nearest multiple of precision. */
     void (*set_schedule)(
         struct fj_client *client,
         struct fj_scheduler_common *common,

@@ -8,6 +8,7 @@
 struct fj_scheduler_common {
     struct fj_scheduler_callbacks callbacks;
     struct fj_schedule schedule;
+    fj_timeout_t timeout_resolution;
 };
 
 
