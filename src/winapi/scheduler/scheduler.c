@@ -11,7 +11,7 @@ static DWORD get_timeout(struct fj_client *client)
             return INFINITE;
 
         case FJ_SCHEDULE_SLEEP_TIMEOUT:
-            return FJ_TIMEOUT_MILLIS(client->scheduler_common.schedule.timeout);
+            return (DWORD) FJ_TIMEOUT_MILLIS(client->scheduler_common.schedule.timeout);
     }
 
     return 0;
@@ -24,9 +24,16 @@ fj_bool8_t fj_winapi_scheduler_needs_quit(struct fj_client *client)
 }
 
 
+void fj_winapi_scheduler_schedule_quit(struct fj_client *client)
+{
+    client->scheduler_common.schedule.type = FJ_SCHEDULE_QUIT;
+    PostQuitMessage(0);
+}
+
+
 fj_err_t fj_winapi_scheduler_schedule_sleep(struct fj_client *client)
 {
-    if (SendNotifyMessage(client->message_window, FJ_WINAPI_USER_MESSAGE_SLEEP, 0, NULL) == FALSE) {
+    if (SendNotifyMessage(client->message_window, FJ_WINAPI_USER_MESSAGE_SLEEP, 0, 0) == FALSE) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
@@ -43,11 +50,12 @@ fj_err_t fj_winapi_scheduler_sleep(struct fj_client *client)
     }
 
     if (client->scheduler_common.schedule.type == FJ_SCHEDULE_QUIT) {
+        fj_winapi_scheduler_schedule_quit(client);
         return FJ_OK;
     }
 
     DWORD result = MsgWaitForMultipleObjectsEx(
-        0, NULL, get_timeout(client), MWMO_INPUTAVAILABLE, QS_ALLINPUT
+        0, NULL, get_timeout(client), QS_ALLINPUT, MWMO_INPUTAVAILABLE
     );
 
     if (result == WAIT_FAILED) {
@@ -89,6 +97,8 @@ static fj_err_t scheduler_destroy_common(
     (void) client;
 
     common->callbacks = (struct fj_scheduler_callbacks) { NULL };
+
+    return FJ_OK;
 }
 
 static void scheduler_set_schedule(
@@ -107,8 +117,7 @@ static fj_err_t scheduler_wakeup(struct fj_client *client, struct fj_scheduler_c
 {
     (void) common;
 
-    if (SendNotifyMessage(client->message_window, FJ_WINAPI_USER_MESSAGE_WAKEUP, 0, NULL)
-        == FALSE) {
+    if (!SendNotifyMessage(client->message_window, FJ_WINAPI_USER_MESSAGE_WAKEUP, 0, 0)) {
         return FJ_ERR_REQUEST_SENDING_FAILED;
     }
 

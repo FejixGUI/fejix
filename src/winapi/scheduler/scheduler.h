@@ -15,6 +15,8 @@ fj_bool8_t fj_winapi_scheduler_needs_quit(struct fj_client *client);
 
 fj_err_t fj_winapi_scheduler_schedule_sleep(struct fj_client *client);
 
+void fj_winapi_scheduler_schedule_quit(struct fj_client *client);
+
 fj_err_t fj_winapi_scheduler_sleep(struct fj_client *client);
 
 

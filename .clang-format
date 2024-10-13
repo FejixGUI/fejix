@@ -5,8 +5,11 @@ BasedOnStyle: Chromium
 ColumnLimit: 100
 IndentWidth: 4
 
-# Leave macros as they are
-SkipMacroDefinitionBody: true
+# #define A         \
+#     something     \
+#     and           \
+#     somethingelse \
+AlignEscapedNewlines: Left
 
 # #ifdef something
 # #    include <something>

@@ -86,6 +86,16 @@ if 'wayland' in implementations
 endif
 
 
+if 'winapi' in implementations
+    sources += [
+        'src/winapi/implementation.c',
+        'src/winapi/utils.c',
+        'src/winapi/client/client.c',
+        'src/winapi/scheduler/scheduler.c',
+    ]
+endif
+
+
 if 'unixpoller' in shared_modules
     sources += [
         'src/unixpoller/unixpoller.c'

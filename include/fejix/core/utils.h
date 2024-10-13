@@ -5,7 +5,9 @@
 #include <fejix/core/base.h>
 
 
-#define FJ_TRY(EXPR) for (fj_err_t fj_result=(EXPR), i=1; i; i=0) if (fj_result != FJ_OK)
+#define FJ_TRY(EXPR)                                   \
+    for (fj_err_t fj_result = (EXPR), i = 1; i; i = 0) \
+        if (fj_result != FJ_OK)
 
 #define FJ_STRINGIFY(X) FJ_STRINGIFY_IMPL(X)
 #define FJ_STRINGIFY_IMPL(X) #X

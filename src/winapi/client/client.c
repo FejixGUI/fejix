@@ -7,14 +7,14 @@
 
 static fj_err_t client_handle_global_message(
     struct fj_client *client,
-    struct fj_winapi_message const *message,
+    MSG const *message,
     LRESULT *result,
     fj_bool8_t *handled
 )
 {
     *handled = true;
 
-    switch (message->message_type) {
+    switch (message->message) {
         case FJ_WINAPI_USER_MESSAGE_SLEEP: {
             *result = 0;
 
@@ -37,12 +37,12 @@ static fj_err_t client_handle_global_message(
 
 static fj_err_t client_handle_known_message(
     struct fj_client *client,
-    struct fj_winapi_message const *message,
+    MSG const *message,
     LRESULT *result,
     fj_bool8_t *handled
 )
 {
-    if (message->window == client->message_window) {
+    if (message->hwnd == client->message_window) {
         return client_handle_global_message(client, message, result, handled);
     }
 
@@ -52,7 +52,7 @@ static fj_err_t client_handle_known_message(
 
 static fj_err_t client_handle_unknown_message(
     struct fj_client *client,
-    struct fj_winapi_message const *message,
+    MSG const *message,
     LRESULT *result
 )
 {
@@ -60,19 +60,13 @@ static fj_err_t client_handle_unknown_message(
         return fj_result;
     }
 
-    *result = DefWindowProc(
-        message->window, message->message_type, message->wparam, message->lparam
-    );
+    *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
 
     return FJ_OK;
 }
 
 
-static fj_err_t client_handle_message(
-    struct fj_client *client,
-    struct fj_winapi_message const *message,
-    LRESULT *result
-)
+static fj_err_t client_handle_message(struct fj_client *client, MSG const *message, LRESULT *result)
 {
     fj_bool8_t handled = false;
 
@@ -88,46 +82,39 @@ static fj_err_t client_handle_message(
 }
 
 
-static LRESULT client_handle_message_safely(
-    struct fj_client *client,
-    struct fj_winapi_message const *message
-)
+static LRESULT client_handle_message_safely(struct fj_client *client, MSG const *message)
 {
-    if (client->message_processing_error != FJ_OK) {
+    if (client->message_processing_error != FJ_OK || fj_winapi_scheduler_needs_quit(client)) {
         return 0;
     }
 
     LRESULT result = 0;
     FJ_TRY (client_handle_message(client, message, &result)) {
         client->message_processing_error = fj_result;
-        PostQuitMessage(0);
+        fj_winapi_scheduler_schedule_quit(client);
+        return result;
     }
 
     return result;
 }
 
 
-LRESULT CALLBACK fj_winapi_window_procedure(
-    HWND window,
-    UINT message_type,
-    WPARAM wparam,
-    LPARAM lparam
-)
+LRESULT CALLBACK fj_winapi_window_procedure(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
 {
     struct fj_winapi_window_data_base *window_data = fj_winapi_get_window_data(window);
 
     if (window_data == NULL) {
-        return DefWindowProc(window, message_type, wparam, lparam);
+        return DefWindowProc(window, message, wParam, lParam);
     }
 
-    struct fj_winapi_message message = {
-        .window = window,
-        .message_type = message_type,
-        .wparam = wparam,
-        .lparam = lparam,
+    MSG msg = {
+        .hwnd = window,
+        .message = message,
+        .wParam = wParam,
+        .lParam = lParam,
     };
 
-    return client_handle_message_safely(window_data->client, &message);
+    return client_handle_message_safely(window_data->client, &msg);
 }
 
 
@@ -199,21 +186,19 @@ static fj_err_t client_run(struct fj_client *client)
         return fj_result;
     }
 
-    MSG msg;
-    while (PeekMessage(&msg, NULL, 0, -1, PM_REMOVE)) {
-        if (msg.message == WM_QUIT) {
-            break;
-        }
+    while (!fj_winapi_scheduler_needs_quit(client) || client->message_processing_error != FJ_OK) {
+        MSG msg;
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) {
+                return client->message_processing_error;
+            }
 
-        TranslateMessage(&msg);
-
-        DispatchMessage(&msg);
-        if (client->message_processing_error != FJ_OK) {
-            return client->message_processing_error;
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
     }
 
-    return FJ_OK;
+    return client->message_processing_error;
 }
 
 

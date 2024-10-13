@@ -41,26 +41,31 @@ Usage examples:
 
 /** :see: :c:func:`fj_alloc_uninit` */
 #define FJ_ALLOC_UNINIT(OBJECT_PTR_REF) \
-    (fj_alloc_uninit((void *)(OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF))))
+    (fj_alloc_uninit((void *) (OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF))))
 
 /** :see: :c:func:`fj_alloc_zeroed` */
 #define FJ_ALLOC_ZEROED(OBJECT_PTR_REF) \
-    (fj_alloc_zeroed((void *)(OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF))))
+    (fj_alloc_zeroed((void *) (OBJECT_PTR_REF), sizeof(**(OBJECT_PTR_REF))))
 
 /** :see: :c:func:`fj_alloc_copied` */
 #define FJ_ALLOC_COPIED(OBJECT_PTR_REF, SOURCE) \
-    (fj_alloc_copied((void *)(OBJECT_PTR_REF), (void *)(SOURCE), sizeof(**(OBJECT_PTR_REF))))
+    (fj_alloc_copied((void *) (OBJECT_PTR_REF), (void *) (SOURCE), sizeof(**(OBJECT_PTR_REF))))
 
 /** :see: :c:func:`fj_realloc_uninit` */
 #define FJ_REALLOC_UNINIT(ARRAY_PTR_REF, NEW_COUNT) \
-    (fj_realloc_uninit((void *)(ARRAY_PTR_REF), NEW_COUNT, sizeof(**(ARRAY_PTR_REF))))
+    (fj_realloc_uninit((void *) (ARRAY_PTR_REF), (uint32_t) NEW_COUNT, sizeof(**(ARRAY_PTR_REF))))
 
 /** :see: :c:func:`fj_realloc_zeroed` */
 #define FJ_REALLOC_ZEROED(ARRAY_PTR_REF, OLD_COUNT, NEW_COUNT) \
-    (fj_realloc_zeroed((void *)(ARRAY_PTR_REF), OLD_COUNT, NEW_COUNT, sizeof(**(ARRAY_PTR_REF))))
+    (fj_realloc_zeroed(                                        \
+        (void *) (ARRAY_PTR_REF),                              \
+        (uint32_t) (OLD_COUNT),                                \
+        (uint32_t) (NEW_COUNT),                                \
+        sizeof(**(ARRAY_PTR_REF))                              \
+    ))
 
 /** :see: :c:func:`fj_free` */
-#define FJ_FREE(OBJECT_PTR_REF) (fj_free((void *)(OBJECT_PTR_REF)))
+#define FJ_FREE(OBJECT_PTR_REF) (fj_free((void *) (OBJECT_PTR_REF)))
 
 
 FJ_EXTERN_C_BEGIN

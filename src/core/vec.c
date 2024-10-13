@@ -68,26 +68,34 @@ fj_err_t fj_vec_resize_to_fit(struct fj_vec *vec)
 
 static fj_err_t vec_maybe_shrink(struct fj_vec *vec)
 {
-    size_t new_capacity = vec_get_capacity_to_shrink(vec);
+    uint32_t new_capacity = vec_get_capacity_to_shrink(vec);
     return fj_vec_resize(vec, new_capacity);
 }
 
 
-static void shift_items_for_insert(struct fj_vec *vec, size_t source_index, size_t item_distance)
+static void shift_items_for_insert(
+    struct fj_vec *vec,
+    uint32_t source_index,
+    uint32_t item_distance
+)
 {
     uint8_t *src = fj_vec_offset(vec, source_index);
     uint8_t *dst = src + item_distance * vec->item_size;
-    size_t item_move_count = vec->length - source_index;
-    memmove(dst, src, item_move_count * vec->item_size);
+    uint32_t item_move_count = vec->length - source_index;
+    memmove(dst, src, vec->item_size * item_move_count);
 }
 
 
-static void shift_items_for_remove(struct fj_vec *vec, size_t source_index, size_t item_distance)
+static void shift_items_for_remove(
+    struct fj_vec *vec,
+    uint32_t source_index,
+    uint32_t item_distance
+)
 {
     uint8_t *src = fj_vec_offset(vec, source_index);
     uint8_t *dst = src - item_distance * vec->item_size;
-    size_t item_move_count = vec->length - source_index;
-    memmove(dst, src, item_move_count * vec->item_size);
+    uint32_t item_move_count = vec->length - source_index;
+    memmove(dst, src, vec->item_size * item_move_count);
 }
 
 
@@ -116,7 +124,7 @@ void fj_vec_replace(
 )
 {
     uint8_t *destination = fj_vec_offset(vec, destination_index);
-    uint32_t copy_size = item_count * vec->item_size;
+    size_t copy_size = vec->item_size * item_count;
     memcpy(destination, items, copy_size);
 }
 

@@ -20,14 +20,6 @@ struct fj_winapi_window_data_base {
 };
 
 
-struct fj_winapi_message {
-    HWND window;
-    UINT message_type;
-    WPARAM wparam;
-    LPARAM lparam;
-};
-
-
 struct fj_client {
     union fj_tag tag;
 
