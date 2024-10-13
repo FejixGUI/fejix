@@ -26,12 +26,14 @@ static DWORD get_timeout(struct fj_client *client)
             fj_timeout_t timeout = client->scheduler_common.schedule.timeout;
             fj_timeout_t resolution = client->scheduler_common.timeout_resolution;
             timeout = fj_u64_prev_multiple(timeout, resolution);
-            timeout = FJ_MAX(timeout, resolution / 3);
+
+            // WinAPI rounds timeouts up inconsistently over time.
+            // Make the timeout a little smaller so that it does not randomly jump.
             if (timeout > resolution / 3) {
                 timeout -= resolution / 4;
             }
 
-            return (DWORD) FJ_TIMEOUT_MILLIS(timeout);
+            return FJ_MAX(1, (DWORD) FJ_TIMEOUT_MILLIS(timeout));
         }
     }
 
