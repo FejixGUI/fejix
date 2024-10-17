@@ -27,10 +27,10 @@
 /** Makes a tag. :see: :c:union:`fj_tag` */
 #define FJ_TAG(VARIANT, VALUE) ((union fj_tag) { .VARIANT = (VALUE) })
 
-/** Semantic version of MAJOR.MINOR.PATCH, from 0.0.0 to 4096.1024.1024 */
+/** Semantic version of MAJOR.MINOR.PATCH, from 0.0.0 to 2048.1024.1024 (uses 31 bits) */
 #define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR) << 20) | ((MINOR) << 10) | (PATCH))
 /** Gets the major part of the version. */
-#define FJ_VERSION_MAJOR(VERSION) (((VERSION) >> 20) & 0xFFF)
+#define FJ_VERSION_MAJOR(VERSION) (((VERSION) >> 20) & 0x7FF)
 /** Gets the minor part of the version. */
 #define FJ_VERSION_MINOR(VERSION) (((VERSION) >> 10) & 0x3FF)
 /** Gets the patch part of the version. */
@@ -39,25 +39,25 @@
 #define FJ_VERSION_SIGNIFICANT(VERSION) (FJ_VERSION_MAJOR(VERSION) | FJ_VERSION_MINOR(VERSION))
 /** Makes the next major version. */
 #define FJ_VERSION_NEXT_SIGNIFICANT(VERSION) (FJ_VERSION(FJ_VERSION_MAJOR(BASE_VERSION) + 1, 0, 0))
-/** Checks if ``base_major.base_minor.0 <= version <= (base_major+1).0.0`` */
+/** Checks if ``base_major.base_minor.0 <= version < (base_major+1).0.0`` */
 #define FJ_VERSION_COMPATIBLE(VERSION, BASE_VERSION)   \
     (FJ_VERSION_SIGNIFICANT(BASE_VERSION) <= (VERSION) \
-     && (VERSION) <= FJ_VERSION_NEXT_SIGNIFICANT(BASE_VERSION))
+     && (VERSION) < FJ_VERSION_NEXT_SIGNIFICANT(BASE_VERSION))
 
 #define FJ_TIMEOUT_FROM_SECS(SECONDS) ((fj_timeout_t) (SECONDS) * UINT64_C(1000000000))
 #define FJ_TIMEOUT_FROM_MILLIS(MILLISECONDS) ((fj_timeout_t) (MILLISECONDS) * UINT64_C(1000000))
 #define FJ_TIMEOUT_FROM_MICROS(MICROSECONDS) ((fj_timeout_t) (MICROSECONDS) * UINT64_C(1000))
 #define FJ_TIMEOUT_FROM_NANOS(NANOSECONDS) ((fj_timeout_t) (NANOSECONDS))
 
-#define FJ_TIMEOUT_FROM_FLOAT_SECS(SECONDS) ((fj_timeout_t) ((SECONDS) * 1e+9))
-#define FJ_TIMEOUT_FROM_FLOAT_MILLIS(MILLISECONDS) ((fj_timeout_t) ((MILLISECONDS) * 1e+6))
-#define FJ_TIMEOUT_FROM_FLOAT_MICROS(MICROSECONDS) ((fj_timeout_t) ((MICROSECONDS) * 1e+3))
-#define FJ_TIMEOUT_FROM_FLOAT_NANOS(NANOSECONDS) ((fj_timeout_t) (NANOSECONDS))
+#define FJ_TIMEOUT_FROM_SECS_F(SECONDS) ((fj_timeout_t) ((SECONDS) * 1e+9))
+#define FJ_TIMEOUT_FROM_MILLIS_F(MILLISECONDS) ((fj_timeout_t) ((MILLISECONDS) * 1e+6))
+#define FJ_TIMEOUT_FROM_MICROS_F(MICROSECONDS) ((fj_timeout_t) ((MICROSECONDS) * 1e+3))
+#define FJ_TIMEOUT_FROM_NANOS_F(NANOSECONDS) ((fj_timeout_t) (NANOSECONDS))
 
-#define FJ_TIMEOUT_SECS(TIMEOUT) ((TIMEOUT) / 1000000000LL)
-#define FJ_TIMEOUT_MILLIS(TIMEOUT) ((TIMEOUT) / 1000000LL)
-#define FJ_TIMEOUT_MICROS(TIMEOUT) ((TIMEOUT) / 1000LL)
-#define FJ_TIMEOUT_NANOS(TIMEOUT) (TIMEOUT)
+#define FJ_TIMEOUT_INTO_SECS(TIMEOUT) ((TIMEOUT) / UINT64_C(1000000000))
+#define FJ_TIMEOUT_INTO_MILLIS(TIMEOUT) ((TIMEOUT) / UINT64_C(1000000))
+#define FJ_TIMEOUT_INTO_MICROS(TIMEOUT) ((TIMEOUT) / UINT64_C(1000))
+#define FJ_TIMEOUT_INTO_NANOS(TIMEOUT) (TIMEOUT)
 
 
 /** */
@@ -82,6 +82,7 @@ enum fj_tag_type {
 enum fj_err {
     FJ_OK,
     FJ_ERR_UNKNOWN,
+    FJ_ERR_UNSUPPORTED,
     FJ_ERR_ALLOCATION_FAILED,
     FJ_ERR_INVALID_ALLOCATION,
     FJ_ERR_CONNECTION_FAILED,

@@ -29,7 +29,7 @@ typedef uint32_t fj_interface_id_t;
 
 enum fj_interface_id {
     FJ_INTERFACE_CLIENT,
-    FJ_INTERFACE_SCHEDULER,
+    FJ_INTERFACE_SLEEP_TIMER,
     FJ_INTERFACE_OUTPUT,
     FJ_INTERFACE_SOFTER_CANVAS,
 };

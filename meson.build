@@ -91,7 +91,7 @@ if 'winapi' in implementations
         'src/winapi/implementation.c',
         'src/winapi/utils.c',
         'src/winapi/client/client.c',
-        'src/winapi/scheduler/scheduler.c',
+        'src/winapi/sleep_timer/sleep_timer.c',
     ]
 endif
 

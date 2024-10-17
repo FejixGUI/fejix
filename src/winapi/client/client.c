@@ -7,7 +7,83 @@
 
 static fj_bool8_t client_needs_quit(struct fj_client *client)
 {
-    return fj_winapi_scheduler_needs_quit(client) || client->message_processing_error != FJ_OK;
+    return client->client_impl.is_quit_requested
+        || client->client_impl.message_processing_result != FJ_OK;
+}
+
+
+static DWORD client_get_sleep_timeout(struct fj_client *client)
+{
+    if (client->client_impl.is_idle_requested) {
+        return 0;
+    }
+
+    fj_timeout_t timeout = fj_winapi_sleep_timer_get_timeout(client);
+
+    if (timeout == 0) {
+        return INFINITE;
+    }
+
+    DWORD timeout_ms = FJ_TIMEOUT_INTO_MILLIS(timeout);
+
+    return FJ_MAX(1, timeout_ms);
+}
+
+
+static fj_err_t client_schedule_sleep(struct fj_client *client)
+{
+    if (SendNotifyMessage(client->client_impl.message_window, FJ_WINAPI_USER_MESSAGE_SLEEP, 0, 0)
+        == FALSE) {
+        return FJ_ERR_REQUEST_FAILED;
+    }
+
+    return FJ_OK;
+}
+
+
+static void client_schedule_quit(struct fj_client *client)
+{
+    client->client_impl.is_quit_requested = true;
+    PostQuitMessage(0);
+}
+
+
+static fj_err_t client_sleep(struct fj_client *client)
+{
+    FJ_TRY (client->client_impl.callbacks.idle(client)) {
+        return fj_result;
+    }
+
+    if (client->client_impl.is_quit_requested) {
+        client_schedule_quit(client);
+        return FJ_OK;
+    }
+
+    DWORD result = MsgWaitForMultipleObjectsEx(
+        0, NULL, client_get_sleep_timeout(client), QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE
+    );
+
+    if (result == WAIT_FAILED) {
+        return FJ_ERR_EVENT_WAITING_FAILED;
+    }
+
+    FJ_TRY (client_schedule_sleep(client)) {
+        return fj_result;
+    }
+
+    return FJ_OK;
+}
+
+
+static fj_err_t client_wakeup(struct fj_client *client)
+{
+    if (!SendNotifyMessage(
+            client->client_impl.message_window, FJ_WINAPI_USER_MESSAGE_WAKEUP, 0, 0
+        )) {
+        return FJ_ERR_REQUEST_SENDING_FAILED;
+    }
+
+    return FJ_OK;
 }
 
 
@@ -24,7 +100,7 @@ static fj_err_t client_handle_global_message(
         case FJ_WINAPI_USER_MESSAGE_SLEEP: {
             *result = 0;
 
-            FJ_TRY (fj_winapi_scheduler_sleep(client)) {
+            FJ_TRY (client_sleep(client)) {
                 return fj_result;
             }
         }
@@ -48,7 +124,7 @@ static fj_err_t client_handle_known_message(
     fj_bool8_t *handled
 )
 {
-    if (message->hwnd == client->message_window) {
+    if (message->hwnd == client->client_impl.message_window) {
         return client_handle_global_message(client, message, result, handled);
     }
 
@@ -62,7 +138,7 @@ static fj_err_t client_handle_unknown_message(
     LRESULT *result
 )
 {
-    FJ_TRY (fj_winapi_scheduler_schedule_sleep(client)) {
+    FJ_TRY (client_schedule_sleep(client)) {
         return fj_result;
     }
 
@@ -96,8 +172,8 @@ static LRESULT client_handle_message_safely(struct fj_client *client, MSG const 
 
     LRESULT result = 0;
     FJ_TRY (client_handle_message(client, message, &result)) {
-        client->message_processing_error = fj_result;
-        fj_winapi_scheduler_schedule_quit(client);
+        client->client_impl.message_processing_result = fj_result;
+        client_schedule_quit(client);
         return result;
     }
 
@@ -126,10 +202,12 @@ LRESULT CALLBACK fj_winapi_window_procedure(HWND window, UINT message, WPARAM wP
 
 static fj_err_t create_message_window(struct fj_client *client)
 {
+    HINSTANCE instance = client->client_impl.instance;
+
     WNDCLASSEX window_class = {
         .cbSize = sizeof(window_class),
         .lpszClassName = TEXT("fejix_message_window"),
-        .hInstance = client->instance,
+        .hInstance = instance,
         .lpfnWndProc = fj_winapi_window_procedure,
     };
 
@@ -139,15 +217,18 @@ static fj_err_t create_message_window(struct fj_client *client)
         return FJ_ERR_REQUEST_FAILED;
     }
 
-    client->message_window = CreateWindow(
-        (void *) (uintptr_t) atom, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, client->instance, NULL
+    HWND message_window = CreateWindow(
+        (void *) (uintptr_t) atom, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, instance, NULL
     );
 
-    if (client->message_window == NULL) {
+    if (message_window == NULL) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
-    fj_winapi_set_window_data(client->message_window, &client->message_window_data);
+    client->client_impl.message_window_data.client = client;
+    fj_winapi_set_window_data(message_window, &client->client_impl.message_window_data);
+
+    client->client_impl.message_window = message_window;
 
     return FJ_OK;
 }
@@ -155,8 +236,8 @@ static fj_err_t create_message_window(struct fj_client *client)
 
 static fj_err_t client_destroy(struct fj_client *client)
 {
-    if (client->message_window != NULL) {
-        DestroyWindow(client->message_window);
+    if (client->client_impl.message_window != NULL) {
+        DestroyWindow(client->client_impl.message_window);
     }
 
     FJ_FREE(&client);
@@ -165,7 +246,11 @@ static fj_err_t client_destroy(struct fj_client *client)
 }
 
 
-static fj_err_t client_create(struct fj_client **client, struct fj_client_info const *info)
+static fj_err_t client_create(
+    struct fj_client **client,
+    struct fj_client_callbacks const *callbacks,
+    struct fj_client_info const *info
+)
 {
     FJ_TRY (FJ_ALLOC_ZEROED(client)) {
         return fj_result;
@@ -173,8 +258,10 @@ static fj_err_t client_create(struct fj_client **client, struct fj_client_info c
 
     **client = (struct fj_client) {
         .tag = info->tag,
-        .instance = GetModuleHandle(NULL),
-        .message_window_data.client = *client,
+        .client_impl = {
+            .callbacks = *callbacks,
+            .instance = GetModuleHandle(NULL),
+        },
     };
 
     FJ_TRY (create_message_window(*client)) {
@@ -188,23 +275,36 @@ static fj_err_t client_create(struct fj_client **client, struct fj_client_info c
 
 static fj_err_t client_run(struct fj_client *client)
 {
-    FJ_TRY (fj_winapi_scheduler_schedule_sleep(client)) {
+    FJ_TRY (client_schedule_sleep(client)) {
         return fj_result;
     }
 
     while (!client_needs_quit(client)) {
         MSG msg;
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            if (msg.message == WM_QUIT) {
-                return client->message_processing_error;
-            }
-
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
+        if (!PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            continue;
         }
+
+        if (msg.message == WM_QUIT) {
+            return client->client_impl.message_processing_result;
+        }
+
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
     }
 
-    return client->message_processing_error;
+    return client->client_impl.message_processing_result;
+}
+
+
+static void client_request_quit(struct fj_client *client)
+{
+    client->client_impl.is_quit_requested = true;
+}
+
+static void client_request_idle(struct fj_client *client)
+{
+    client->client_impl.is_idle_requested = true;
 }
 
 
@@ -212,4 +312,7 @@ struct fj_client_iface const fj_winapi_client_iface = {
     .create = client_create,
     .destroy = client_destroy,
     .run = client_run,
+    .request_quit = client_request_quit,
+    .request_idle = client_request_idle,
+    .wakeup = client_wakeup,
 };

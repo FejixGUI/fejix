@@ -36,6 +36,7 @@ You can use the following common structure name suffixes:
 | Suffix | Meaning | Usage | Description |
 | ------ | ------- | ----- | ----------- |
 | `_iface` | interface | library -> user | interface methods |
+| `_impl` | implementation | library -> user | interface data |
 | `_callbacks` | callbacks | user -> library | interface callbacks |
 | `_caps` | capabilities | library -> user | supported features for some interface |
 | `_info` | information | user -> library | any information to create/update objects |

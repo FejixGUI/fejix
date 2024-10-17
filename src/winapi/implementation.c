@@ -4,11 +4,11 @@
 
 
 extern struct fj_client_iface fj_winapi_client_iface;
-extern struct fj_scheduler_iface fj_winapi_scheduler_iface;
+extern struct fj_sleep_timer_iface fj_winapi_sleep_timer_iface;
 
 static void const *interfaces[] = {
     [FJ_INTERFACE_CLIENT] = &fj_winapi_client_iface,
-    [FJ_INTERFACE_SCHEDULER] = &fj_winapi_scheduler_iface,
+    [FJ_INTERFACE_SLEEP_TIMER] = &fj_winapi_sleep_timer_iface,
 };
 
 
