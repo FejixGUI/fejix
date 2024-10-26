@@ -13,8 +13,8 @@ typedef uint32_t fj_implementation_id_t;
 enum fj_implementation_id {
     /** Android Native Development Kit */
     FJ_IMPLEMENTATION_ANDK,
-    /** Apple AppKit */
-    FJ_IMPLEMENTATION_APPKIT,
+    /** Apple Cocoa */
+    FJ_IMPLEMENTATION_COCOA,
     /** Wayland protocol */
     FJ_IMPLEMENTATION_WAYLAND,
     /** Windows API */
@@ -30,16 +30,16 @@ typedef uint32_t fj_interface_id_t;
 enum fj_interface_id {
     FJ_INTERFACE_CLIENT,
     FJ_INTERFACE_SLEEP_TIMER,
-    FJ_INTERFACE_OUTPUT,
-    FJ_INTERFACE_SOFTER_CANVAS,
+    FJ_INTERFACE_WINDOW,
+    FJ_INTERFACE_SOFTER,
 };
 
 
-struct fj_implementation_iface {
+struct fj_implementation {
     fj_implementation_id_t id;
     fj_version_t version;
 
-    void const *(*get_interface)(fj_interface_id_t interface_id);
+    void const *(*get_interface_funcs)(fj_interface_id_t interface_id);
 };
 
 
@@ -49,7 +49,7 @@ implementation ID.
 :param implementation_count: Returns the implementation count.
 */
 void fj_get_builtin_implementations(
-    struct fj_implementation_iface const *const **implementations,
+    struct fj_implementation const *const **implementations,
     uint32_t *implementation_count
 );
 

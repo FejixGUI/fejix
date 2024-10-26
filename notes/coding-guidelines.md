@@ -33,14 +33,13 @@ Use `.clang-format` with these few quirks:
 
 You can use the following common structure name suffixes:
 
-| Suffix | Meaning | Usage | Description |
-| ------ | ------- | ----- | ----------- |
-| `_iface` | interface | library -> user | interface methods |
-| `_impl` | implementation | library -> user | interface data |
-| `_callbacks` | callbacks | user -> library | interface callbacks |
-| `_caps` | capabilities | library -> user | supported features for some interface |
-| `_info` | information | user -> library | any information to create/update objects |
-| `_desc` | description | library -> user | any information about objects that have been created/updated |
+| Suffix | Meaning |
+| ------ | ------- |
+| `_funcs` | Interface functions (provided by the library) |
+| `_callbacks` | Interface callbacks (provided by the user) |
+| `_manager` | Interface manager (the global data belonging to the singleton/factory) |
+| `_info` | Object creation parameters or other information provided by the user |
+| `_desc` | Interface or object description provided by the library to the user |
 
 ## Errors
 

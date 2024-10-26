@@ -5,35 +5,31 @@
 #include <fejix/interface/client.h>
 
 
-struct fj_sleep_timer_impl;
+struct fj_sleep_timer_manager;
 
 
-struct fj_sleep_timer_caps {
+struct fj_sleep_timer_manger_desc {
     fj_timeout_t timeout_min;
     fj_timeout_t timeout_max;
 };
 
 
-struct fj_sleep_timer_iface {
+struct fj_sleep_timer_funcs {
     /**
-    :param impl: Returns the timer implementation or NULL on failure or if unsupported.
+    :param manager: Returns a timer manager, NULL on failure or if unsupported.
     :param caps: Returns the timer capabilities.
     */
-    fj_err_t (*create_impl)(
-        struct fj_client *client,
-        struct fj_sleep_timer_impl **impl,
-        struct fj_sleep_timer_caps *caps
+    fj_err_t (*create_manager)(
+        struct fj_sleep_timer_manager **manager,
+        struct fj_sleep_timer_manger_desc *caps,
+        struct fj_client *client
     );
 
-    fj_err_t (*destroy_impl)(struct fj_client *client, struct fj_sleep_timer_impl *impl);
+    fj_err_t (*destroy_manager)(struct fj_sleep_timer_manager *manager);
 
-    void (*set_timeout)(
-        struct fj_client *client,
-        struct fj_sleep_timer_impl *impl,
-        fj_timeout_t timeout
-    );
+    void (*set_timeout)(struct fj_sleep_timer_manager *manager, fj_timeout_t timeout);
 
-    void (*unset_timeout)(struct fj_client *client, struct fj_sleep_timer_impl *impl);
+    void (*unset_timeout)(struct fj_sleep_timer_manager *manager);
 };
 
 

@@ -1,7 +1,9 @@
-# Fejix window management library
+# Fejix graphical client library
 
-Fejix is a cross-platform C99 library that abstracts graphical compositor
-protocols (Windows API, Wayland or X11 are examples of such protocols).
+Fejix is a cross-platform C99 base library for clients of graphical shells.
+Its goal is to wrap graphical shell protocols (Windows API, Wayland, X11 etc.) to provide a common
+base for GUI toolkits.
+
 Fejix can perform tasks like window management, graphical API initialisation,
 input and more.
 
@@ -15,12 +17,11 @@ input and more.
 
 ## Build
 
-### The library
+### Library
 
 ```sh
-meson setup build
-meson configure build -D implementations=impl1,impl2,impl3 -D features=feat1,feat2,feat3
-meson compile -C build
+cmake -S . -B build -D FEJIX_FEATURES="feature1;feature2;feature3"
+cmkake --build build
 ```
 
 ### Documentation

@@ -19,7 +19,9 @@ struct fj_winapi_window_data_base {
     struct fj_client *client;
 };
 
-struct fj_winapi_client_impl {
+
+struct fj_client {
+    union fj_tag tag;
     struct fj_client_callbacks callbacks;
 
     HINSTANCE instance;
@@ -30,15 +32,8 @@ struct fj_winapi_client_impl {
 
     fj_bool8_t is_idle_requested;
     fj_bool8_t is_quit_requested;
-};
 
-
-struct fj_client {
-    union fj_tag tag;
-
-    struct fj_winapi_client_impl client_impl;
-
-    struct fj_sleep_timer_impl sleep_timer_impl;
+    struct fj_sleep_timer_manager sleep_timer_manager;
 };
 
 

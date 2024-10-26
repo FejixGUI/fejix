@@ -26,7 +26,7 @@ struct fj_client_info {
 FJ_EXTERN_C_BEGIN
 
 
-struct fj_client_iface {
+struct fj_client_funcs {
     /**
     Callbacks and info are deep-copied where applicable.
 

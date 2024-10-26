@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(fejix
     VERSION 0.0.1
-    DESCRIPTION "Window management library"
+    DESCRIPTION "Graphical client library"
     HOMEPAGE_URL "https://github.com/FejixGUI/fejix"
     LANGUAGES "C"
 )
@@ -44,13 +44,13 @@ include_directories(".")
 target_include_directories(fejix PUBLIC "include")
 
 target_sources(fejix PRIVATE
+    "src/implementation.c"
+
     "src/core/alloc.c"
     "src/core/base.c"
     "src/core/map.c"
     "src/core/utils.c"
     "src/core/vec.c"
-
-    "src/generic/implementation.c"
 )
 
 if("winapi" IN_LIST FEJIX_FEATURES)

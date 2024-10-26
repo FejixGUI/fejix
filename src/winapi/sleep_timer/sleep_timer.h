@@ -5,7 +5,7 @@
 #include <fejix/interface/sleep_timer.h>
 
 
-struct fj_sleep_timer_impl {
+struct fj_sleep_timer_manager {
     /** 0 means unset. */
     fj_timeout_t timeout;
 };

@@ -9,30 +9,30 @@
 #endif
 
 
-extern struct fj_implementation_iface const fj_andk_implementation_iface;
-extern struct fj_implementation_iface const fj_cocoa_implementation_iface;
-extern struct fj_implementation_iface const fj_wayland_implementation_iface;
-extern struct fj_implementation_iface const fj_winapi_implementation_iface;
-extern struct fj_implementation_iface const fj_x11_implementation_iface;
+extern struct fj_implementation const fj_andk_implementation;
+extern struct fj_implementation const fj_cocoa_implementation;
+extern struct fj_implementation const fj_wayland_implementation;
+extern struct fj_implementation const fj_winapi_implementation;
+extern struct fj_implementation const fj_x11_implementation;
 
 #ifdef ANY_IMPLEMENTATION
 
-static struct fj_implementation_iface const *const implementation_list[] = {
+static struct fj_implementation const *const implementation_list[] = {
 
 #    ifdef FJ_OPT_ANDK
-    &fj_andk_implementation_iface,
+    &fj_andk_implementation,
 #    endif
 #    ifdef FJ_OPT_COCOA
-    &fj_cocoa_implementation_iface,
+    &fj_cocoa_implementation,
 #    endif
 #    ifdef FJ_OPT_WAYLAND
-    &fj_wayland_implementation_iface,
+    &fj_wayland_implementation,
 #    endif
 #    ifdef FJ_OPT_WINAPI
-    &fj_winapi_implementation_iface,
+    &fj_winapi_implementation,
 #    endif
 #    ifdef FJ_OPT_X11
-    &fj_x11_implementation_iface,
+    &fj_x11_implementation,
 #    endif
 
 };
@@ -41,7 +41,7 @@ static struct fj_implementation_iface const *const implementation_list[] = {
 
 
 void fj_get_builtin_implementations(
-    struct fj_implementation_iface const *const **implementations,
+    struct fj_implementation const *const **implementations,
     uint32_t *implementation_count
 )
 {

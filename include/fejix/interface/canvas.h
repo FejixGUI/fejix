@@ -7,9 +7,7 @@
 
 struct fj_canvas FJ_PUBLICLY({ union fj_tag tag; });
 
+struct fj_canvas_funcs;
 
-struct fj_canvas_iface {
-    uint8_t dummy;
-};
 
 #endif

@@ -5,18 +5,18 @@
 
 fj_timeout_t fj_winapi_sleep_timer_get_timeout(struct fj_client *client)
 {
-    return client->sleep_timer_impl.timeout;
+    return client->sleep_timer_manager.timeout;
 }
 
 
-static fj_err_t create_impl(
-    struct fj_client *client,
-    struct fj_sleep_timer_impl **impl,
-    struct fj_sleep_timer_caps *caps
+static fj_err_t create_manager(
+    struct fj_sleep_timer_manager **manager,
+    struct fj_sleep_timer_manger_desc *caps,
+    struct fj_client *client
 )
 {
-    *impl = &client->sleep_timer_impl;
-    *caps = (struct fj_sleep_timer_caps) {
+    *manager = &client->sleep_timer_manager;
+    *caps = (struct fj_sleep_timer_manger_desc) {
         .timeout_min = FJ_TIMEOUT_FROM_MILLIS(1),
         .timeout_max = FJ_TIMEOUT_FROM_MILLIS(INFINITE - 1),
     };
@@ -25,34 +25,28 @@ static fj_err_t create_impl(
 }
 
 
-static fj_err_t destroy_impl(struct fj_client *client, struct fj_sleep_timer_impl *impl)
+static fj_err_t destroy_manager(struct fj_sleep_timer_manager *manager)
 {
-    (void) client;
-    impl->timeout = 0;
+    manager->timeout = 0;
     return FJ_OK;
 }
 
 
-static void set_timeout(
-    struct fj_client *client,
-    struct fj_sleep_timer_impl *impl,
-    fj_timeout_t timeout
-)
+static void set_timeout(struct fj_sleep_timer_manager *manager, fj_timeout_t timeout)
 {
-    (void) client;
-    impl->timeout = timeout;
-}
-
-static void unset_timeout(struct fj_client *client, struct fj_sleep_timer_impl *impl)
-{
-    (void) client;
-    impl->timeout = 0;
+    manager->timeout = timeout;
 }
 
 
-struct fj_sleep_timer_iface const fj_winapi_sleep_timer_iface = {
-    .create_impl = create_impl,
-    .destroy_impl = destroy_impl,
+static void unset_timeout(struct fj_sleep_timer_manager *manager)
+{
+    manager->timeout = 0;
+}
+
+
+struct fj_sleep_timer_funcs const fj_winapi_sleep_timer_funcs = {
+    .create_manager = create_manager,
+    .destroy_manager = destroy_manager,
     .set_timeout = set_timeout,
     .unset_timeout = unset_timeout,
 };
