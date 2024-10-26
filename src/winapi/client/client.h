@@ -42,11 +42,11 @@ struct fj_client {
 };
 
 
-LRESULT CALLBACK fj_winapi_window_procedure(
+LONG_PTR __stdcall fj_winapi_window_procedure(
     HWND window,
     UINT message,
-    WPARAM wparam,
-    LPARAM lparam
+    UINT_PTR wparam,
+    LONG_PTR lparam
 );
 
 

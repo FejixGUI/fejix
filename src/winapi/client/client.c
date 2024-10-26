@@ -33,7 +33,8 @@ static DWORD client_get_sleep_timeout(struct fj_client *client)
 static fj_err_t client_schedule_sleep(struct fj_client *client)
 {
     if (SendNotifyMessage(client->client_impl.message_window, FJ_WINAPI_USER_MESSAGE_SLEEP, 0, 0)
-        == FALSE) {
+        == FALSE)
+    {
         return FJ_ERR_REQUEST_FAILED;
     }
 
@@ -59,11 +60,11 @@ static fj_err_t client_sleep(struct fj_client *client)
         return FJ_OK;
     }
 
-    DWORD result = MsgWaitForMultipleObjectsEx(
+    DWORD wait_result = MsgWaitForMultipleObjectsEx(
         0, NULL, client_get_sleep_timeout(client), QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE
     );
 
-    if (result == WAIT_FAILED) {
+    if (wait_result == WAIT_FAILED) {
         return FJ_ERR_EVENT_WAITING_FAILED;
     }
 
@@ -77,9 +78,8 @@ static fj_err_t client_sleep(struct fj_client *client)
 
 static fj_err_t client_wakeup(struct fj_client *client)
 {
-    if (!SendNotifyMessage(
-            client->client_impl.message_window, FJ_WINAPI_USER_MESSAGE_WAKEUP, 0, 0
-        )) {
+    if (!SendNotifyMessage(client->client_impl.message_window, FJ_WINAPI_USER_MESSAGE_WAKEUP, 0, 0))
+    {
         return FJ_ERR_REQUEST_SENDING_FAILED;
     }
 
@@ -90,7 +90,7 @@ static fj_err_t client_wakeup(struct fj_client *client)
 static fj_err_t client_handle_global_message(
     struct fj_client *client,
     MSG const *message,
-    LRESULT *result,
+    LONG_PTR *result,
     fj_bool8_t *handled
 )
 {
@@ -120,7 +120,7 @@ static fj_err_t client_handle_global_message(
 static fj_err_t client_handle_known_message(
     struct fj_client *client,
     MSG const *message,
-    LRESULT *result,
+    LONG_PTR *result,
     fj_bool8_t *handled
 )
 {
@@ -135,7 +135,7 @@ static fj_err_t client_handle_known_message(
 static fj_err_t client_handle_unknown_message(
     struct fj_client *client,
     MSG const *message,
-    LRESULT *result
+    LONG_PTR *result
 )
 {
     FJ_TRY (client_schedule_sleep(client)) {
@@ -148,7 +148,11 @@ static fj_err_t client_handle_unknown_message(
 }
 
 
-static fj_err_t client_handle_message(struct fj_client *client, MSG const *message, LRESULT *result)
+static fj_err_t client_handle_message(
+    struct fj_client *client,
+    MSG const *message,
+    LONG_PTR *result
+)
 {
     fj_bool8_t handled = false;
 
@@ -164,13 +168,13 @@ static fj_err_t client_handle_message(struct fj_client *client, MSG const *messa
 }
 
 
-static LRESULT client_handle_message_safely(struct fj_client *client, MSG const *message)
+static LONG_PTR client_handle_message_safely(struct fj_client *client, MSG const *message)
 {
     if (client_needs_quit(client)) {
         return 0;
     }
 
-    LRESULT result = 0;
+    LONG_PTR result = 0;
     FJ_TRY (client_handle_message(client, message, &result)) {
         client->client_impl.message_processing_result = fj_result;
         client_schedule_quit(client);
@@ -181,19 +185,24 @@ static LRESULT client_handle_message_safely(struct fj_client *client, MSG const 
 }
 
 
-LRESULT CALLBACK fj_winapi_window_procedure(HWND window, UINT message, WPARAM wParam, LPARAM lParam)
+LONG_PTR __stdcall fj_winapi_window_procedure(
+    HWND window,
+    UINT message,
+    UINT_PTR wparam,
+    LONG_PTR lparam
+)
 {
     struct fj_winapi_window_data_base *window_data = fj_winapi_get_window_data(window);
 
     if (window_data == NULL) {
-        return DefWindowProc(window, message, wParam, lParam);
+        return DefWindowProc(window, message, wparam, lparam);
     }
 
     MSG msg = {
         .hwnd = window,
         .message = message,
-        .wParam = wParam,
-        .lParam = lParam,
+        .wParam = wparam,
+        .lParam = lparam,
     };
 
     return client_handle_message_safely(window_data->client, &msg);

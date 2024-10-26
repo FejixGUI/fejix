@@ -91,34 +91,29 @@ AlignEscapedNewlines: Left
 IndentPPDirectives: AfterHash
 
 IfMacros: ['FJ_TRY']
-AttributeMacros: ['CALLBACK', 'WINAPI']
+AttributeMacros: ['CALLBACK', 'WINAPI', 'WINUSERAPI']
 
 # Sort includes
 IncludeBlocks: Regroup
 IncludeCategories:
-    # The header for the file
-    -   Regex: '^"[^.]'
-        Priority: 1
-        CaseSensitive: true
-
     # Private headers
-    -   Regex: '^"'
-        Priority: 5
+    -   Regex: '^<src/'
+        Priority: 1
         CaseSensitive: true
 
     # Public interface headers
     -   Regex: '^<fejix/interface/'
-        Priority: 10
+        Priority: 5
         CaseSensitive: true
 
     # Public ext headers
     -   Regex: '^<fejix/ext/'
-        Priority: 15
+        Priority: 10
         CaseSensitive: true
 
     # Public core headers
     -   Regex: '^<fejix/core/'
-        Priority: 16
+        Priority: 15
         CaseSensitive: true
 
     # Dependency headers
@@ -129,6 +124,7 @@ IncludeCategories:
     # Standard includes (at the bottom)
     -   Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|malloc|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype).h>'
         Priority: 100
+        CaseSensitive: true
 
     # Other platform-specific headers (matched if all regexes above did not match)
     -   Regex: '^.*'
