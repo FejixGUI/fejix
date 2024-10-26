@@ -2,8 +2,82 @@
 
 BasedOnStyle: Chromium
 
+LineEnding: LF
 ColumnLimit: 100
 IndentWidth: 4
+InsertNewlineAtEOF: true
+
+MaxEmptyLinesToKeep: 2
+
+# int x()
+# {
+#     ...
+# }
+#               <- allows us to separate functions with 2 spaces
+#               <- separate function definitions with 2 spaces
+# int y()
+# {
+#     ...
+# }
+SeparateDefinitionBlocks: Leave
+
+# int x()
+# {                             <-
+#     if (x) {                  <-
+#        ...
+#     }
+#
+#     for (somethinglonglonglonglong;
+#          somethinglonglonglonglong;
+#          somethinglonglonglonglong)
+#     {                         <-
+#         ...
+#     }
+# }
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterControlStatement: MultiLine
+    AfterFunction: true
+    AfterClass: true
+    AfterNamespace: true
+
+# int x(
+#     somethinglonglonglonglong,
+#     somethinglonglonglonglong
+# )
+BinPackArguments: false
+AlignAfterOpenBracket: BlockIndent
+PenaltyReturnTypeOnItsOwnLine: 1000
+
+# (struct x) {
+#     .s = (struct s) {
+#         .x = 1,
+#         .y = 2,       <- put trailing commas everywhere for the magic to work
+#     },                <- put trailing commas everywhere for the magic to work
+# }
+SpaceBeforeCpp11BracedList: true
+Cpp11BracedListStyle: false
+
+# myvar = somethinglonglonglonglong
+#   + somethinglonglonglonglong
+#   + somethinglonglonglonglong;
+AlignOperands: DontAlign
+BreakBeforeBinaryOperators: NonAssignment
+PenaltyBreakAssignment: 100
+
+# int x() { }
+#          ^
+SpaceInEmptyBlock: true
+
+# (int) x
+#      ^
+SpaceAfterCStyleCast: true
+
+# static inline int *f(struct X const *const *x);
+QualifierAlignment: Custom
+QualifierOrder: ['static', 'inline', 'type', 'const', 'volatile', 'restrict']
+PointerAlignment: Right
+SpaceAroundPointerQualifiers: After
 
 # #define A         \
 #     something     \
@@ -16,90 +90,40 @@ AlignEscapedNewlines: Left
 # #endif
 IndentPPDirectives: AfterHash
 
-# int x() { }
-#          ^
-SpaceInEmptyBlock: true
-
-# (int) x
-#      ^
-SpaceAfterCStyleCast: true
-
-# static inline void a(int const *const *a);
-QualifierAlignment: Custom
-QualifierOrder: ['static', 'inline', 'type', 'const', 'volatile', 'restrict']
-PointerAlignment: Right
-SpaceAroundPointerQualifiers: After
-AttributeMacros: ['CALLBACK']
-
-# myvar = somethinglong
-#   + somethinglong;
-AlignOperands: DontAlign
-BreakBeforeBinaryOperators: NonAssignment
-PenaltyBreakAssignment: 100
-
-# (struct x) {
-#     .s = (struct s) {
-#         .x = 1,
-#         .y = 2,       <- put trailing commas everywhere for the magic to work
-#     },                <- put trailing commas everywhere for the magic to work
-# }
-SpaceBeforeCpp11BracedList: true
-Cpp11BracedListStyle: false
-
-# int x(
-#     somethinglong,
-#     somethinglong
-# )
-BinPackArguments: false
-AlignAfterOpenBracket: BlockIndent
-PenaltyReturnTypeOnItsOwnLine: 1000
-
-# int x()
-# {                 <-
-#     if (x) {      <-
-#        ...
-#     }
-#
-#     FJ_TRY (x) {  <-
-#        ...
-#     }
-# }
-BreakBeforeBraces: Linux
 IfMacros: ['FJ_TRY']
-
-# int x()
-# {
-#     ...
-# }
-#               <- allows us to separate functions with 2 spaces
-#               <- separate function definitions with 2 spaces
-# int y() {
-#     ...
-# }
-SeparateDefinitionBlocks: Leave
-MaxEmptyLinesToKeep: 2
+AttributeMacros: ['CALLBACK', 'WINAPI']
 
 # Sort includes
 IncludeBlocks: Regroup
 IncludeCategories:
+    # The header for the file
+    -   Regex: '^"[^.]'
+        Priority: 1
+        CaseSensitive: true
+
     # Private headers
-    -   Regex: '^<src/'
-        Priority: 0
+    -   Regex: '^"'
+        Priority: 5
         CaseSensitive: true
 
     # Public interface headers
     -   Regex: '^<fejix/interface/'
-        Priority: 1
+        Priority: 10
+        CaseSensitive: true
+
+    # Public ext headers
+    -   Regex: '^<fejix/ext/'
+        Priority: 15
         CaseSensitive: true
 
     # Public core headers
     -   Regex: '^<fejix/core/'
-        Priority: 2
+        Priority: 16
         CaseSensitive: true
 
     # Dependency headers
     -   Regex: '^<(wayland|X11|xcb|win|imm|shellapi|ole|dx|d3d|dcomp)'
-        Priority: 3
+        Priority: 20
         CaseSensitive: true
 
     # Standard includes (at the bottom)
@@ -108,4 +132,4 @@ IncludeCategories:
 
     # Other platform-specific headers (matched if all regexes above did not match)
     -   Regex: '^.*'
-        Priority: 10
+        Priority: 50
