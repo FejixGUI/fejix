@@ -11,12 +11,12 @@ fj_timeout_t fj_winapi_sleep_timer_get_timeout(struct fj_client *client)
 
 static fj_err_t create_manager(
     struct fj_sleep_timer_manager **manager,
-    struct fj_sleep_timer_manger_desc *caps,
+    struct fj_sleep_timer_manger_info *manager_info,
     struct fj_client *client
 )
 {
     *manager = &client->sleep_timer_manager;
-    *caps = (struct fj_sleep_timer_manger_desc) {
+    *manager_info = (struct fj_sleep_timer_manger_info) {
         .timeout_min = FJ_TIMEOUT_FROM_MILLIS(1),
         .timeout_max = FJ_TIMEOUT_FROM_MILLIS(INFINITE - 1),
     };

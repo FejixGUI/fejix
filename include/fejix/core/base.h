@@ -24,9 +24,6 @@
 #endif
 
 
-/** Makes a tag. :see: :c:union:`fj_tag` */
-#define FJ_TAG(VARIANT, VALUE) ((union fj_tag) { .VARIANT = (VALUE) })
-
 /** Semantic version of MAJOR.MINOR.PATCH, from 0.0.0 to 2048.1024.1024 (uses 31 bits) */
 #define FJ_VERSION(MAJOR, MINOR, PATCH) ((fj_version_t) ((MAJOR) << 20) | ((MINOR) << 10) | (PATCH))
 /** Gets the major part of the version. */
@@ -60,24 +57,6 @@
 #define FJ_TIMEOUT_INTO_NANOS(TIMEOUT) (TIMEOUT)
 
 
-/** */
-enum fj_tag_type {
-    /** */
-    FJ_TAG_U32,
-    /** */
-    FJ_TAG_I32,
-    /** */
-    FJ_TAG_U64,
-    /** */
-    FJ_TAG_I64,
-    /** */
-    FJ_TAG_UPTR,
-    /** */
-    FJ_TAG_IPTR,
-    /** */
-    FJ_TAG_PTR,
-};
-
 /** Error codes. */
 enum fj_err {
     FJ_OK,
@@ -98,7 +77,41 @@ enum fj_err {
     FJ_ERR_MAX,
 
     /** User-defined errors should begin with this number */
-    FJ_ERR_USER = 0x10000,
+    FJ_ERR_USER = 0x1000,
+};
+
+/** */
+enum fj_tag_type {
+    /** */
+    FJ_TAG_U32,
+    /** */
+    FJ_TAG_I32,
+    /** */
+    FJ_TAG_U64,
+    /** */
+    FJ_TAG_I64,
+    /** */
+    FJ_TAG_UPTR,
+    /** */
+    FJ_TAG_IPTR,
+    /** */
+    FJ_TAG_PTR,
+};
+
+enum fj_orientation_type {
+    FJ_ORIENTATION_NORMAL = 0,
+    /** Vertical flip (along the Y axis). */
+    FJ_ORIENTATION_VFLIP = (1 << 0),
+    /** Horizontal flip (along the X axis). */
+    FJ_ORIENTATION_HFLIP = (1 << 1),
+    /** Clock-wise 90 degree rotation. */
+    FJ_ORIENTATION_ROTATE90 = (1 << 2),
+
+    FJ_ORIENTATION_ROTATE180 = FJ_ORIENTATION_HFLIP ^ FJ_ORIENTATION_VFLIP,
+    FJ_ORIENTATION_ROTATE270 = FJ_ORIENTATION_ROTATE180 ^ FJ_ORIENTATION_ROTATE90,
+    FJ_ORIENTATION_ROTATE90_VFLIP = FJ_ORIENTATION_ROTATE90 ^ FJ_ORIENTATION_VFLIP,
+    FJ_ORIENTATION_ROTATE180_VFLIP = FJ_ORIENTATION_ROTATE180 ^ FJ_ORIENTATION_VFLIP,
+    FJ_ORIENTATION_ROTATE270_VFLIP = FJ_ORIENTATION_ROTATE270 ^ FJ_ORIENTATION_VFLIP,
 };
 
 
@@ -107,6 +120,8 @@ typedef uint32_t fj_err_t;
 
 /** */
 typedef uint32_t fj_tag_type_t;
+
+typedef uint32_t fj_orientation_type_t;
 
 /** :see: :c:macro:`FJ_VERSION` */
 typedef uint32_t fj_version_t;
@@ -153,6 +168,16 @@ struct fj_offset2d {
 struct fj_size2d {
     uint32_t width;
     uint32_t height;
+};
+
+struct fj_density2d {
+    /** Number of pixels per ``unit_length``. */
+    uint32_t vertical;
+    /** Number of pixels per ``unit_length``. */
+    uint32_t horizontal;
+
+    /** The length of the unit in metres. */
+    uint32_t unit_length;
 };
 
 struct fj_rect2d {

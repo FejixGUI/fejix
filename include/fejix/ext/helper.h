@@ -7,7 +7,6 @@
 
 FJ_EXTERN_C_BEGIN
 
-
 char const *fj_ext_get_error_description(fj_err_t error);
 
 /**
@@ -40,7 +39,6 @@ Chooses from builtin implementations based on the default hint.
 :returns: The implementation iface or NULL if no implementation can be chosen.
 */
 struct fj_implementation_iface const *fj_ext_auto_choose_builtin_implementation(void);
-
 
 FJ_EXTERN_C_END
 

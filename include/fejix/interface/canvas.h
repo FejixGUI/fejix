@@ -7,7 +7,5 @@
 
 struct fj_canvas FJ_PUBLICLY({ union fj_tag tag; });
 
-struct fj_canvas_funcs;
-
 
 #endif

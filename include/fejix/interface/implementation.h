@@ -5,9 +5,6 @@
 #include <fejix/core/base.h>
 
 
-FJ_EXTERN_C_BEGIN
-
-
 typedef uint32_t fj_implementation_id_t;
 
 enum fj_implementation_id {
@@ -43,6 +40,8 @@ struct fj_implementation {
 };
 
 
+FJ_EXTERN_C_BEGIN
+
 /**
 :param implementations: Returns a nullable array of implementation pointers, sorted by
 implementation ID.
@@ -52,7 +51,6 @@ void fj_get_builtin_implementations(
     struct fj_implementation const *const **implementations,
     uint32_t *implementation_count
 );
-
 
 FJ_EXTERN_C_END
 

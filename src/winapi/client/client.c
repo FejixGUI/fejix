@@ -83,95 +83,24 @@ static fj_err_t client_wakeup(struct fj_client *client)
 }
 
 
-static fj_err_t client_handle_global_message(
-    struct fj_client *client,
-    MSG const *message,
-    LONG_PTR *result,
-    fj_bool8_t *handled
-)
+void fj_winapi_handle_unknown_message(MSG const *message, LONG_PTR *result)
 {
-    *handled = true;
-
-    switch (message->message) {
-        case FJ_WINAPI_USER_MESSAGE_SLEEP: {
-            *result = 0;
-
-            FJ_TRY (client_sleep(client)) {
-                return fj_result;
-            }
-        }
-
-        case FJ_WINAPI_USER_MESSAGE_WAKEUP: {
-            *result = 0;
-        }
-
-        default:
-            *handled = false;
-    }
-
-    return FJ_OK;
-}
-
-
-static fj_err_t client_handle_known_message(
-    struct fj_client *client,
-    MSG const *message,
-    LONG_PTR *result,
-    fj_bool8_t *handled
-)
-{
-    if (message->hwnd == client->message_window) {
-        return client_handle_global_message(client, message, result, handled);
-    }
-
-    return FJ_OK;
-}
-
-
-static fj_err_t client_handle_unknown_message(
-    struct fj_client *client,
-    MSG const *message,
-    LONG_PTR *result
-)
-{
-    FJ_TRY (client_schedule_sleep(client)) {
-        return fj_result;
-    }
-
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
-
-    return FJ_OK;
 }
 
 
-static fj_err_t client_handle_message(
+LONG_PTR fj_winapi_handle_message_safely(
     struct fj_client *client,
     MSG const *message,
-    LONG_PTR *result
+    fj_err_t (*handle_message)(struct fj_client *client, MSG const *message, LONG_PTR *result)
 )
-{
-    fj_bool8_t handled = false;
-
-    FJ_TRY (client_handle_known_message(client, message, result, &handled)) {
-        return fj_result;
-    }
-
-    if (!handled) {
-        return client_handle_unknown_message(client, message, result);
-    }
-
-    return FJ_OK;
-}
-
-
-static LONG_PTR client_handle_message_safely(struct fj_client *client, MSG const *message)
 {
     if (client_needs_quit(client)) {
         return 0;
     }
 
     LONG_PTR result = 0;
-    FJ_TRY (client_handle_message(client, message, &result)) {
+    FJ_TRY (handle_message(client, message, &result)) {
         client->message_processing_result = fj_result;
         client_schedule_quit(client);
         return result;
@@ -181,59 +110,72 @@ static LONG_PTR client_handle_message_safely(struct fj_client *client, MSG const
 }
 
 
-LONG_PTR __stdcall fj_winapi_window_procedure(
-    HWND window,
+static fj_err_t message_window_handle_message(
+    struct fj_client *client,
+    MSG const *message,
+    LONG_PTR *result
+)
+{
+    switch (message->message) {
+        case FJ_WINAPI_USER_MESSAGE_SLEEP: {
+            *result = 0;
+
+            FJ_TRY (client_sleep(client)) {
+                return fj_result;
+            }
+            break;
+        }
+
+        case FJ_WINAPI_USER_MESSAGE_WAKEUP: {
+            *result = 0;
+            break;
+        }
+
+        default: {
+            fj_winapi_handle_unknown_message(message, result);
+            break;
+        }
+    }
+
+    return FJ_OK;
+}
+
+
+static LONG_PTR __stdcall message_window_procedure(
+    HWND window_handle,
     UINT message,
     UINT_PTR wparam,
     LONG_PTR lparam
 )
 {
-    struct fj_winapi_window_data_base *window_data = fj_winapi_get_window_data(window);
-
-    if (window_data == NULL) {
-        return DefWindowProc(window, message, wparam, lparam);
-    }
-
-    MSG msg = {
-        .hwnd = window,
-        .message = message,
-        .wParam = wparam,
-        .lParam = lparam,
-    };
-
-    return client_handle_message_safely(window_data->client, &msg);
+    struct fj_client *client = fj_winapi_get_window_data(window_handle);
+    MSG msg = { window_handle, message, wparam, lparam };
+    return fj_winapi_handle_message_safely(client, &msg, message_window_handle_message);
 }
 
 
 static fj_err_t create_message_window(struct fj_client *client)
 {
-    HINSTANCE instance = client->instance;
-
     WNDCLASSEX window_class = {
         .cbSize = sizeof(window_class),
-        .lpszClassName = TEXT("fejix_message_window"),
-        .hInstance = instance,
-        .lpfnWndProc = fj_winapi_window_procedure,
+        .hInstance = client->instance,
+        .lpszClassName = TEXT("fejix_message_window_class"),
+        .lpfnWndProc = message_window_procedure,
     };
 
-    ATOM atom = RegisterClassEx(&window_class);
-
-    if (atom == 0) {
+    if (RegisterClassEx(&window_class) == 0) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
-    HWND message_window = CreateWindow(
-        (void *) (uintptr_t) atom, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, instance, NULL
+    client->message_window = CreateWindow(
+        window_class.lpszClassName, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, client->instance, NULL
     );
 
-    if (message_window == NULL) {
+    if (client->message_window == NULL) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
-    client->message_window_data.client = client;
-    fj_winapi_set_window_data(message_window, &client->message_window_data);
-
-    client->message_window = message_window;
+    fj_winapi_set_window_data(client->message_window, client);
 
     return FJ_OK;
 }
@@ -254,7 +196,7 @@ static fj_err_t client_destroy(struct fj_client *client)
 static fj_err_t client_create(
     struct fj_client **client,
     struct fj_client_callbacks const *callbacks,
-    struct fj_client_info const *info
+    struct fj_client_create_info const *create_info
 )
 {
     FJ_TRY (FJ_ALLOC_ZEROED(client)) {
@@ -262,7 +204,7 @@ static fj_err_t client_create(
     }
 
     **client = (struct fj_client) {
-        .tag = info->tag,
+        .tag = create_info->tag,
         .callbacks = *callbacks,
         .instance = GetModuleHandle(NULL),
     };

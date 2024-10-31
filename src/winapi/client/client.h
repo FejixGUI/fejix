@@ -15,11 +15,6 @@ enum fj_winapi_user_message_id {
 };
 
 
-struct fj_winapi_window_data_base {
-    struct fj_client *client;
-};
-
-
 struct fj_client {
     union fj_tag tag;
     struct fj_client_callbacks callbacks;
@@ -27,7 +22,6 @@ struct fj_client {
     HINSTANCE instance;
 
     HWND message_window;
-    struct fj_winapi_window_data_base message_window_data;
     fj_err_t message_processing_result;
 
     fj_bool8_t is_idle_requested;
@@ -37,11 +31,12 @@ struct fj_client {
 };
 
 
-LONG_PTR __stdcall fj_winapi_window_procedure(
-    HWND window,
-    UINT message,
-    UINT_PTR wparam,
-    LONG_PTR lparam
+void fj_winapi_handle_unknown_message(MSG const *message, LONG_PTR *result);
+
+LONG_PTR fj_winapi_handle_message_safely(
+    struct fj_client *client,
+    MSG const *message,
+    fj_err_t (*handle_message)(struct fj_client *client, MSG const *message, LONG_PTR *result)
 );
 
 

@@ -8,7 +8,7 @@
 struct fj_sleep_timer_manager;
 
 
-struct fj_sleep_timer_manger_desc {
+struct fj_sleep_timer_manger_info {
     fj_timeout_t timeout_min;
     fj_timeout_t timeout_max;
 };
@@ -21,7 +21,7 @@ struct fj_sleep_timer_funcs {
     */
     fj_err_t (*create_manager)(
         struct fj_sleep_timer_manager **manager,
-        struct fj_sleep_timer_manger_desc *caps,
+        struct fj_sleep_timer_manger_info *manager_info,
         struct fj_client *client
     );
 

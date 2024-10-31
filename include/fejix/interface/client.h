@@ -12,7 +12,7 @@ struct fj_client_callbacks {
     fj_err_t (*idle)(struct fj_client *client);
 };
 
-struct fj_client_info {
+struct fj_client_create_info {
     union fj_tag tag;
 
     /** Implementation-dependent extra creation information. Set to NULL if unused. */
@@ -21,10 +21,6 @@ struct fj_client_info {
     /** String that should uniquely identify the app to the shell. */
     char const *name;
 };
-
-
-FJ_EXTERN_C_BEGIN
-
 
 struct fj_client_funcs {
     /**
@@ -35,7 +31,7 @@ struct fj_client_funcs {
     fj_err_t (*create)(
         struct fj_client **client,
         struct fj_client_callbacks const *callbacks,
-        struct fj_client_info const *info
+        struct fj_client_create_info const *info
     );
 
     fj_err_t (*destroy)(struct fj_client *client);
@@ -53,8 +49,5 @@ struct fj_client_funcs {
 
     void (*request_idle)(struct fj_client *client);
 };
-
-
-FJ_EXTERN_C_END
 
 #endif

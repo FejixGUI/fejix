@@ -7,7 +7,7 @@ size_t fj_softer_get_pixel_size(fj_softer_pixel_format_t format)
 
     if (format >= FJ_SOFTER_PIXEL_FORMAT_COLOR_MAX)
         return 0;
-    if (format >= FJ_SOFTER_PIXEL_FORMAT_XRGB32)
+    if (format >= FJ_SOFTER_PIXEL_FORMAT_ZRGB32)
         return 4;
     return 3;
 }

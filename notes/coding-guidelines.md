@@ -38,8 +38,7 @@ You can use the following common structure name suffixes:
 | `_funcs` | Interface functions (provided by the library) |
 | `_callbacks` | Interface callbacks (provided by the user) |
 | `_manager` | Interface manager (the global data belonging to the singleton/factory) |
-| `_info` | Object creation parameters or other information provided by the user |
-| `_desc` | Interface or object description provided by the library to the user |
+| `_info` | Any information provided by the user or by the library to the user |
 
 ## Errors
 

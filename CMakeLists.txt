@@ -25,9 +25,7 @@ endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows" OR CMAKE_SYSTEM_NAME STREQUAL "MSYS")
     add_compile_definitions("_CRT_SECURE_NO_WARNINGS" "_UNICODE" "UNICODE")
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_compile_definitions("_GNU_SOURCE")
 endif()
 
@@ -59,6 +57,7 @@ if("winapi" IN_LIST FEJIX_FEATURES)
         "src/winapi/utils.c"
         "src/winapi/client/client.c"
         "src/winapi/sleep_timer/sleep_timer.c"
+        "src/winapi/window/window.c"
     )
 endif()
 
