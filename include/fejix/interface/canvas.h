@@ -7,5 +7,7 @@
 
 struct fj_canvas FJ_PUBLICLY({ union fj_tag tag; });
 
+/** All canvas functions are internal to implementations. */
+struct fj_canvas_funcs;
 
 #endif

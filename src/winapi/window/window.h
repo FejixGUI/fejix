@@ -2,9 +2,9 @@
 #define FEJIX_WINAPI_WINDOW_H_
 
 
-#include <src/winapi/client/client.h>
-
 #include <fejix/interface/window.h>
+
+#include <windows.h>
 
 
 struct fj_window_manager {
@@ -17,7 +17,12 @@ struct fj_window {
 
     struct fj_window_manager *manager;
 
+    struct fj_canvas *canvas;
+
+    /** Can be NULL when the window is uninitialized. */
     HWND handle;
+
+    /** Can be 0 when the window is uninitialized. */
     ATOM class_atom;
 };
 

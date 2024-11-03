@@ -83,13 +83,7 @@ static fj_err_t client_wakeup(struct fj_client *client)
 }
 
 
-void fj_winapi_handle_unknown_message(MSG const *message, LONG_PTR *result)
-{
-    *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
-}
-
-
-LONG_PTR fj_winapi_handle_message_safely(
+LONG_PTR fj_winapi_client_handle_message_safely(
     struct fj_client *client,
     MSG const *message,
     fj_err_t (*handle_message)(struct fj_client *client, MSG const *message, LONG_PTR *result)
@@ -150,7 +144,7 @@ static LONG_PTR __stdcall message_window_procedure(
 {
     struct fj_client *client = fj_winapi_get_window_data(window_handle);
     MSG msg = { window_handle, message, wparam, lparam };
-    return fj_winapi_handle_message_safely(client, &msg, message_window_handle_message);
+    return fj_winapi_client_handle_message_safely(client, &msg, message_window_handle_message);
 }
 
 

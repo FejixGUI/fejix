@@ -25,5 +25,7 @@ void fj_winapi_set_window_data(HWND window, void *data);
 
 void *fj_winapi_get_window_data(HWND window);
 
+void fj_winapi_handle_unknown_message(MSG const *message, LONG_PTR *result);
+
 
 #endif

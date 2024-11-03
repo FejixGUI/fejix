@@ -4,11 +4,13 @@
 
 
 extern struct fj_client_funcs fj_winapi_client_funcs;
-extern struct fj_sleep_timer_iface fj_winapi_sleep_timer_funcs;
+extern struct fj_sleep_timer_funcs fj_winapi_sleep_timer_funcs;
+extern struct fj_window_funcs fj_winapi_window_funcs;
 
 static void const *interface_funcs[] = {
     [FJ_INTERFACE_CLIENT] = &fj_winapi_client_funcs,
     [FJ_INTERFACE_SLEEP_TIMER] = &fj_winapi_sleep_timer_funcs,
+    [FJ_INTERFACE_WINDOW] = &fj_winapi_window_funcs,
 };
 
 

@@ -31,9 +31,7 @@ struct fj_client {
 };
 
 
-void fj_winapi_handle_unknown_message(MSG const *message, LONG_PTR *result);
-
-LONG_PTR fj_winapi_handle_message_safely(
+LONG_PTR fj_winapi_client_handle_message_safely(
     struct fj_client *client,
     MSG const *message,
     fj_err_t (*handle_message)(struct fj_client *client, MSG const *message, LONG_PTR *result)
