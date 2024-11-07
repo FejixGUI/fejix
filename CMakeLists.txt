@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
 
-
 project(fejix
     VERSION 0.0.1
     DESCRIPTION "Graphical client library"
@@ -8,16 +7,29 @@ project(fejix
     LANGUAGES "C"
 )
 
-add_library(fejix)
+set(FEJIX_KNOWN_FEATURES
+    "winapi" "wayland" "x11"
+    "softer" "opengl"
+)
 
-set(FEJIX_FEATURES "" CACHE STRING "Semi-colon-separated list of Fejix features (see docs)")
+set(FEJIX_FEATURES "" CACHE STRING "Semi-colon-separated list of features to enable (possible values are ${FEJIX_KNOWN_FEATURES})")
 set(FEJIX_BUILD_TESTS OFF CACHE BOOL "Build tests")
+
+foreach(FEATURE IN LISTS FEJIX_FEATURES)
+    if(NOT FEATURE IN_LIST FEJIX_KNOWN_FEATURES)
+        message(WARNING "[fejix] unknown library feature in FEJIX_FEATURES: \"${FEATURE}\" (expected ${FEJIX_KNOWN_FEATURES})")
+        continue()
+    endif()
+
+    string(TOUPPER FEATURE FEATURE)
+    add_compile_definitions("FJ_OPT_${FEATURE}")
+endforeach()
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 
-if(CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GCC")
+if(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
     add_compile_options("-Wall" "-Wextra" "-Wpedantic" "-Wunused" "-Werror=vla")
 elseif(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     add_compile_options("/W4" "/WX")
@@ -29,17 +41,15 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_compile_definitions("_GNU_SOURCE")
 endif()
 
-foreach(OPTION IN LISTS FEJIX_FEATURES)
-    string(TOUPPER OPTION OPTION)
-    add_compile_definitions("FJ_OPT_${OPTION}")
-endforeach()
-
-add_compile_definitions("FJ_OPT_INTERNAL")
-
 include_directories(".")
 
 
+# Main target
+add_library(fejix)
+
 target_include_directories(fejix PUBLIC "include")
+
+target_compile_definitions(fejix PRIVATE "FJ_OPT_INTERNAL")
 
 target_sources(fejix PRIVATE
     "src/implementation.c"
