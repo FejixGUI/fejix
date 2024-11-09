@@ -17,7 +17,7 @@ struct fj_sleep_timer_manger_info {
 struct fj_sleep_timer_funcs {
     /**
     :param manager: Returns a timer manager, NULL on failure or if unsupported.
-    :param caps: Returns the timer capabilities.
+    :param manager_info: Returns the timer limits.
     */
     fj_err_t (*create_manager)(
         struct fj_sleep_timer_manager **manager,

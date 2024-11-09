@@ -1,5 +1,5 @@
 /**
-Contains convenient memory allocations functions and macros.
+Contains convenient memory allocation functions and macros.
 
 Usage examples:
 
@@ -112,7 +112,7 @@ If reallocation fails, this does not change the given pointer and does not free 
 
 :param ptr: Returns a new pointer on success, does not change the pointer on failure.
 */
-fj_err_t fj_realloc_uninit(void * /*out*/ /*[]?*/ *ptr, uint32_t item_count, size_t item_size);
+fj_err_t fj_realloc_uninit(void **ptr, uint32_t item_count, size_t item_size);
 
 /**
 Similar to :c:func:`fj_realloc_uninit`, but all new items of the array are initialised to zeroes.

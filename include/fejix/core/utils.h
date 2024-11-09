@@ -61,6 +61,6 @@ uint32_t fj_u32_prev_multiple(uint32_t x, uint32_t divisor);
 uint64_t fj_u64_prev_multiple(uint64_t x, uint64_t divisor);
 
 
-FJ_EXTERN_C_BEGIN
+FJ_EXTERN_C_END
 
 #endif
