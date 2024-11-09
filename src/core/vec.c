@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-/** Small optimization to reduce the amount of allocations. */
+/** Small optimization to reduce the amount of allocations for small vector sizes. */
 static uint32_t vec_get_min_capacity(struct fj_vec *vec)
 {
     if (vec->item_size == 1) {
@@ -73,28 +73,11 @@ static fj_err_t vec_maybe_shrink(struct fj_vec *vec)
 }
 
 
-static void shift_items_for_insert(
-    struct fj_vec *vec,
-    uint32_t source_index,
-    uint32_t item_distance
-)
+static void vec_shift_tail(struct fj_vec *vec, uint32_t start_index, int32_t shift_item_distance)
 {
-    uint8_t *src = fj_vec_offset(vec, source_index);
-    uint8_t *dst = src + item_distance * vec->item_size;
-    uint32_t item_move_count = vec->length - source_index;
-    memmove(dst, src, vec->item_size * item_move_count);
-}
-
-
-static void shift_items_for_remove(
-    struct fj_vec *vec,
-    uint32_t source_index,
-    uint32_t item_distance
-)
-{
-    uint8_t *src = fj_vec_offset(vec, source_index);
-    uint8_t *dst = src - item_distance * vec->item_size;
-    uint32_t item_move_count = vec->length - source_index;
+    uint8_t *src = fj_vec_offset(vec, start_index);
+    uint8_t *dst = src + shift_item_distance * vec->item_size;
+    uint32_t item_move_count = vec->length - start_index;
     memmove(dst, src, vec->item_size * item_move_count);
 }
 
@@ -136,7 +119,7 @@ fj_err_t fj_vec_insert_uninit(struct fj_vec *vec, uint32_t destination_index, ui
     }
 
     if (!fj_vec_is_empty(vec) && destination_index != fj_vec_get_push_index(vec)) {
-        shift_items_for_insert(vec, destination_index, item_count);
+        vec_shift_tail(vec, destination_index, (int32_t) item_count);
     }
 
     vec->length += item_count;
@@ -165,7 +148,7 @@ fj_err_t fj_vec_insert(
 fj_err_t fj_vec_remove(struct fj_vec *vec, uint32_t start_index, uint32_t item_count)
 {
     if (start_index + item_count <= fj_vec_get_last_index(vec)) {
-        shift_items_for_remove(vec, start_index + item_count, item_count);
+        vec_shift_tail(vec, start_index + item_count, (int32_t) -item_count);
     }
 
     vec->length -= item_count;

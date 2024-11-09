@@ -4,13 +4,13 @@
 #include <string.h>
 
 
-fj_bool8_t fj_str_eq(char const * /*[]*/ a, char const * /*[]*/ b)
+fj_bool8_t fj_str_eq(char const *a, char const *b)
 {
     return strcmp(a, b) == 0;
 }
 
 
-fj_err_t fj_str_clone(char const * /*[]*/ str, char const * /*[]? out*/ *clone)
+fj_err_t fj_str_clone(char const *str, char const **clone)
 {
     size_t length = strlen(str);
 

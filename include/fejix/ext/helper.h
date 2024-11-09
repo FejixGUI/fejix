@@ -2,7 +2,7 @@
 #define FEJIX_EXT_HELPER_H_
 
 
-#include <fejix/interface/implementation.h>
+#include <fejix/implementation.h>
 
 
 FJ_EXTERN_C_BEGIN
@@ -27,10 +27,10 @@ One implementation => returns it
 Many implementations + hint => finds the implementation (or NULL if not found).
 Many implementations + no hint => returns NULL.
 */
-struct fj_implementation_iface const *fj_ext_choose_implementation(
-    struct fj_implementation_iface const *const *implementations,
-    uint32_t implementation_count,
-    char const *implementation_hint
+struct fj_implementation const *fj_ext_choose_implementation(
+    struct fj_implementation const *const *impls,
+    uint32_t impl_count,
+    char const *impl_hint
 );
 
 /**
@@ -38,7 +38,7 @@ Chooses from builtin implementations based on the default hint.
 
 :returns: The implementation iface or NULL if no implementation can be chosen.
 */
-struct fj_implementation_iface const *fj_ext_auto_choose_builtin_implementation(void);
+struct fj_implementation const *fj_ext_auto_choose_builtin_implementation(void);
 
 FJ_EXTERN_C_END
 

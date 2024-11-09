@@ -1,6 +1,6 @@
-#include <fejix/core/utils.h>
-
 #include <fejix/ext/helper.h>
+
+#include <fejix/core/utils.h>
 
 #include <stdlib.h>
 
@@ -30,7 +30,7 @@ static char const *const impl_names[] = {
     [FJ_IMPLEMENTATION_MAX] = "...max implementation ID...",
 
     [FJ_IMPLEMENTATION_ANDK] = "andk",
-    [FJ_IMPLEMENTATION_APPKIT] = "appkit",
+    [FJ_IMPLEMENTATION_COCOA] = "cocoa",
     [FJ_IMPLEMENTATION_WAYLAND] = "wayland",
     [FJ_IMPLEMENTATION_WINAPI] = "winapi",
     [FJ_IMPLEMENTATION_X11] = "x11",
@@ -91,8 +91,8 @@ char const *fj_ext_get_implementation_hint(void)
 }
 
 
-struct fj_implementation_iface const *fj_ext_choose_implementation(
-    struct fj_implementation_iface const *const *impls,
+struct fj_implementation const *fj_ext_choose_implementation(
+    struct fj_implementation const *const *impls,
     uint32_t impl_count,
     char const *impl_hint
 )
@@ -117,9 +117,9 @@ struct fj_implementation_iface const *fj_ext_choose_implementation(
 }
 
 
-struct fj_implementation_iface const *fj_ext_auto_choose_builtin_implementation(void)
+struct fj_implementation const *fj_ext_auto_choose_builtin_implementation(void)
 {
-    struct fj_implementation_iface const *const *impls;
+    struct fj_implementation const *const *impls;
     uint32_t impl_count;
     fj_get_builtin_implementations(&impls, &impl_count);
 

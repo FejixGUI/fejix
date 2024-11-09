@@ -8,25 +8,29 @@ Use `.clang-format` with these few quirks:
 
 * Put trailing commas wherever possible.
 * Separate function difinitions with 2 empty lines.
+
+## Documenting
+
 * Use any doc comments (even empty ones, `/** */`) for any objects you want to appear in the docs.
-* Embrace doc comments with `/** `..` */` or `/**`*\<newline\>*..*\<newline\>*`*/` with no additional formatting:
+* Wrap doc comments with `/** `..` */` or `/**`*\<newline\>*..*\<newline\>*`*/`
+  with every intermediate line starting with a `*`:
     ```c
     /** One-line comment. */
     void foo(void);
 
     /**
-    Multi-line comment.
-    Multi-line comment.
-    */
+     * Multi-line comment.
+     * Multi-line comment.
+     */
     void foo(void);
     ```
-* Embrace file-level doc comments with `/**`*\<newline\>*..*\<newline\>*`*///` with no additional formatting:
+* Wrap file-level doc comments with `/**`*\<newline\>*..*\<newline\>*`*///`
+  with every intermediate line starting with a `*`:
     ```c
     /**
-    Multi-line comment.
-    Multi-line comment.
-    *///
-    void foo(void);
+     * This file does foo.
+     * It also does bar.
+     *///
     ```
 
 ## Naming
@@ -37,7 +41,7 @@ You can use the following common structure name suffixes:
 | ------ | ------- |
 | `_funcs` | Interface functions (provided by the library) |
 | `_callbacks` | Interface callbacks (provided by the user) |
-| `_manager` | Interface manager (the global data belonging to the singleton/factory) |
+| `_manager` | Interface manager (global interface data) |
 | `_info` | Any information provided by the user or by the library to the user |
 
 ## Errors

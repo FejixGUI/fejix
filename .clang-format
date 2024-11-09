@@ -13,8 +13,8 @@ MaxEmptyLinesToKeep: 2
 # {
 #     ...
 # }
-#               <- allows us to separate functions with 2 spaces
-#               <- separate function definitions with 2 spaces
+#               <- allows us to separate functions with 2 empty lines
+#               <- separate function definitions with 2 empty lines
 # int y()
 # {
 #     ...
@@ -114,6 +114,11 @@ IncludeCategories:
     # Public core headers
     -   Regex: '^<fejix/core/'
         Priority: 15
+        CaseSensitive: true
+
+    # Toplevel headers (matched if all regexes above did not match)
+    -   Regex: '^<fejix/'
+        Priority: 2
         CaseSensitive: true
 
     # Dependency headers
