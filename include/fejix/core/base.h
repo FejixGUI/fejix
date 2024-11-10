@@ -134,8 +134,8 @@ typedef uint64_t fj_timeout_t;
 
 
 /**
-Tag is something that can identify an object, e.g. a pointer to the object, an ID of the object
-or any other pointer or numeric value.
+    Tag is something that can identify an object, e.g. a pointer to the object, an ID of the object
+    or any other pointer or numeric value.
 */
 union fj_tag {
     /** */
@@ -198,8 +198,8 @@ FJ_EXTERN_C_BEGIN
 fj_bool8_t fj_tag_eq(union fj_tag a, union fj_tag b, fj_tag_type_t type);
 
 /**
-Do not hash pointers. When hashing pointers, this converts them to uintptr_t.
-Using the result is undefined behavior.
+    Do not hash pointers. When hashing pointers, this converts them to uintptr_t.
+    Using the result is undefined behavior.
 */
 uint32_t fj_tag_hash32(union fj_tag x, fj_tag_type_t type);
 

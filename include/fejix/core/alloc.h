@@ -1,35 +1,35 @@
 /**
-Contains convenient memory allocation functions and macros.
+    Contains convenient memory allocation functions and macros.
 
-Usage examples:
+    Usage examples:
 
-.. code-block:: c
+    .. code-block:: c
 
-    int *x;
+        int *x;
 
-    FJ_ALLOC_UNINIT(&x);
-    *x = 123;
-    FJ_FREE(&x); // safely frees and nulls x
-    assert(x == NULL);
+        FJ_ALLOC_UNINIT(&x);
+        *x = 123;
+        FJ_FREE(&x); // safely frees and nulls x
+        assert(x == NULL);
 
-    FJ_ALLOC_ZEROED(&x);
-    assert(*x == 0);
-    FJ_FREE(&x);
+        FJ_ALLOC_ZEROED(&x);
+        assert(*x == 0);
+        FJ_FREE(&x);
 
-    int num = 123;
-    FJ_ALLOC_COPIED(&x, &num);
-    assert(*x == num);
-    FJ_FREE(&x);
+        int num = 123;
+        FJ_ALLOC_COPIED(&x, &num);
+        assert(*x == num);
+        FJ_FREE(&x);
 
-    FJ_REALLOC_UNINIT(&x, 10); // new size
-    for (int i=0; i<10; i++) x[i] = 123;
-    FJ_FREE(&x);
+        FJ_REALLOC_UNINIT(&x, 10); // new size
+        for (int i=0; i<10; i++) x[i] = 123;
+        FJ_FREE(&x);
 
-    FJ_REALLOC_ZEROED(&x, 0, 10); // old size, new size
-    for (int i=0; i<10; i++) assert(x[i] == 0);
-    FJ_REALLOC_ZEROED(&x, 10, 20);
-    for (int i=10; i<20; i++) assert(x[i] == 0);
-    FJ_FREE(&x);
+        FJ_REALLOC_ZEROED(&x, 0, 10); // old size, new size
+        for (int i=0; i<10; i++) assert(x[i] == 0);
+        FJ_REALLOC_ZEROED(&x, 10, 20);
+        for (int i=10; i<20; i++) assert(x[i] == 0);
+        FJ_FREE(&x);
 *///
 
 #ifndef FEJIX_CORE_ALLOC_H_
@@ -71,51 +71,52 @@ Usage examples:
 FJ_EXTERN_C_BEGIN
 
 /**
-Allocates an uninitialized block of memory.
-Works like ``malloc``, but allocating 0 bytes is always an error.
+    Allocates an uninitialized block of memory.
+    Works like ``malloc``, but allocating 0 bytes is always an error.
 
-:param ptr: Returns a new pointer or NULL on failure.
+    :param ptr: Returns a new pointer or NULL on failure.
 */
 fj_err_t fj_alloc_uninit(void **ptr, size_t size);
 
 /**
-Allocates a block of memory initialized with zeros.
-Works like ``calloc(1,)``, but allocating 0 bytes is always an error.
+    Allocates a block of memory initialized with zeros.
+    Works like ``calloc(1,)``, but allocating 0 bytes is always an error.
 
-:param ptr: Returns a new pointer or NULL on failure.
+    :param ptr: Returns a new pointer or NULL on failure.
 */
 fj_err_t fj_alloc_zeroed(void **ptr, size_t size);
 
 /**
-Allocates a block of memory initialised with bytes from ``source``.
+    Allocates a block of memory initialised with bytes from ``source``.
 
-:param ptr: Returns a new pointer or NULL on failure.
+    :param ptr: Returns a new pointer or NULL on failure.
 */
 fj_err_t fj_alloc_copied(void **ptr, void const *source, size_t size);
 
 /**
-Frees a block of memory.
+    Frees a block of memory.
 
-:param ptr: References the pointer to be freed, always returns NULL.
+    :param ptr: References the pointer to be freed, always returns NULL.
 */
 void fj_free(void **ptr);
 
 /**
-Reallocates a block of memory for an array of items.
+    Reallocates a block of memory for an array of items.
 
-If reallocation fails, this does not change the given pointer and does not free the old block.
+    If reallocation fails, this does not change the given pointer and does not free the old block.
 
-* ``fj_realloc_uninit(NULL, 0, y) = nothing``
-* ``fj_realloc_uninit(NULL, x, y) = alloc_uninit(x*y)``
-* ``fj_realloc_uninit(ptr,  0, y) = free(ptr)``
-* ``fj_realloc_uninit(ptr,  x, y) = realloc_uninit(ptr, x*y)``
+    * ``fj_realloc_uninit(NULL, 0, y) = nothing``
+    * ``fj_realloc_uninit(NULL, x, y) = alloc_uninit(x*y)``
+    * ``fj_realloc_uninit(ptr,  0, y) = free(ptr)``
+    * ``fj_realloc_uninit(ptr,  x, y) = realloc_uninit(ptr, x*y)``
 
-:param ptr: Returns a new pointer on success, does not change the pointer on failure.
+    :param ptr: Returns a new pointer on success, does not change the pointer on failure.
 */
 fj_err_t fj_realloc_uninit(void **ptr, uint32_t item_count, size_t item_size);
 
 /**
-Similar to :c:func:`fj_realloc_uninit`, but all new items of the array are initialised to zeroes.
+    Similar to :c:func:`fj_realloc_uninit`, but all new items of the array are initialised to
+    zeroes.
 */
 fj_err_t fj_realloc_zeroed(
     void **ptr,

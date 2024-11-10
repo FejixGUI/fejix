@@ -25,7 +25,7 @@ static void const *get_interface_funcs(fj_interface_id_t id)
 
 
 struct fj_implementation fj_wayland_implementation = {
-    .get_interface_funcs = get_interface_funcs,
     .id = FJ_IMPLEMENTATION_WAYLAND,
     .version = FJ_VERSION(0, 0, 0),
+    .get_interface_funcs = get_interface_funcs,
 };

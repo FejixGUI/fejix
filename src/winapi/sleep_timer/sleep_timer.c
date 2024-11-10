@@ -10,7 +10,7 @@ fj_timeout_t fj_winapi_sleep_timer_get_timeout(struct fj_client *client)
 
 
 static fj_err_t create_manager(
-    struct fj_sleep_timer_manager **manager,
+    struct fj_client_wait_timeout_manager **manager,
     struct fj_sleep_timer_manger_info *manager_info,
     struct fj_client *client
 )
@@ -25,26 +25,26 @@ static fj_err_t create_manager(
 }
 
 
-static fj_err_t destroy_manager(struct fj_sleep_timer_manager *manager)
+static fj_err_t destroy_manager(struct fj_client_wait_timeout_manager *manager)
 {
     manager->timeout = 0;
     return FJ_OK;
 }
 
 
-static void set_timeout(struct fj_sleep_timer_manager *manager, fj_timeout_t timeout)
+static void set_timeout(struct fj_client_wait_timeout_manager *manager, fj_timeout_t timeout)
 {
     manager->timeout = timeout;
 }
 
 
-static void unset_timeout(struct fj_sleep_timer_manager *manager)
+static void unset_timeout(struct fj_client_wait_timeout_manager *manager)
 {
     manager->timeout = 0;
 }
 
 
-struct fj_sleep_timer_funcs const fj_winapi_sleep_timer_funcs = {
+struct fj_client_wait_timeout_funcs const fj_winapi_client_wait_timeout_funcs = {
     .create_manager = create_manager,
     .destroy_manager = destroy_manager,
     .set_timeout = set_timeout,

@@ -45,9 +45,9 @@ struct fj_window_funcs {
     );
 
     /**
-     * May result into undefined behavior if there are still other builders referencing this
-     * builder.
-     */
+        May result into undefined behavior if there are still other builders referencing this
+        builder.
+    */
     fj_err_t (*destroy_builder)(
         struct fj_window_manager *manager,
         struct fj_window_builder *builder

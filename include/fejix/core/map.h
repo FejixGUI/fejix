@@ -29,8 +29,10 @@ struct fj_map {
 
     uint32_t bucket_count;
 
-    /* Nullable array of buckets (NULL if the map has not allocated).
-    A bucket is a head node pointer (if it is occupied) or NULL (if it is empty). */
+    /*
+        Nullable array of buckets (NULL if the map has not allocated).
+        A bucket is a head node pointer (if it is occupied) or NULL (if it is empty).
+    */
     struct fj_map_node **buckets;
 };
 
@@ -74,9 +76,9 @@ void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map);
 fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter);
 
 /**
-Returns true if the next element was successfully found.
+    Returns true if the next element was successfully found.
 
-:param element: Returns the next element or NULL.
+    :param element: Returns the next element or NULL.
 */
 fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element);
 

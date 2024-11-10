@@ -24,9 +24,9 @@ struct fj_client_create_info {
 
 struct fj_client_funcs {
     /**
-    Callbacks and info are deep-copied where applicable.
+        Callbacks and info are deep-copied where applicable.
 
-    :param client: Returns the client or NULL on failure.
+        :param client: Returns the client or NULL on failure.
     */
     fj_err_t (*create)(
         struct fj_client **client,
@@ -37,8 +37,8 @@ struct fj_client_funcs {
     fj_err_t (*destroy)(struct fj_client *client);
 
     /**
-    Runs a message polling loop.
-    At the startup and at the end of each polling iteration calls ``idle``.
+        Runs a message polling loop.
+        At the startup and at the end of each polling iteration calls ``idle``.
     */
     fj_err_t (*run)(struct fj_client *client);
 

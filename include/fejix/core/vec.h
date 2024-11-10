@@ -33,12 +33,16 @@ void fj_vec_deinit(struct fj_vec *vec);
 /** Ensures that the vector's capacity is at least 1. */
 fj_err_t fj_vec_allocate(struct fj_vec *vec);
 
-/** Resizes the vector to exactly the given capacity.
-    If the new capacity is smaller that the current length, the length is trancated. */
+/**
+    Resizes the vector to exactly the given capacity.
+    If the new capacity is smaller that the current length, the length is trancated.
+*/
 fj_err_t fj_vec_resize(struct fj_vec *vec, uint32_t capacity);
 
-/** Ensures that the vector has at least the reserved elements.
-    That is, the capacity is at least `length + reserved_items` */
+/**
+    Ensures that the vector has at least the reserved elements.
+    That is, the capacity is at least ``length + reserved_items``
+*/
 fj_err_t fj_vec_resize_to_reserve(struct fj_vec *vec, uint32_t reserved_items);
 
 /** Sets the capacity to the vector length. */

@@ -43,9 +43,9 @@ struct fj_implementation {
 FJ_EXTERN_C_BEGIN
 
 /**
-:param implementations: Returns a nullable array of implementation pointers, sorted by
-implementation ID.
-:param implementation_count: Returns the implementation count.
+    :param implementations: Returns a nullable array of implementation pointers, sorted by
+        implementation ID.
+    :param implementation_count: Returns the implementation count.
 */
 void fj_get_builtin_implementations(
     struct fj_implementation const *const **implementations,

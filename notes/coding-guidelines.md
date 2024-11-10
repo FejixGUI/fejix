@@ -13,24 +13,24 @@ Use `.clang-format` with these few quirks:
 
 * Use any doc comments (even empty ones, `/** */`) for any objects you want to appear in the docs.
 * Wrap doc comments with `/** `..` */` or `/**`*\<newline\>*..*\<newline\>*`*/`
-  with every intermediate line starting with a `*`:
+  and indent every line inside the comment:
     ```c
     /** One-line comment. */
     void foo(void);
 
     /**
-     * Multi-line comment.
-     * Multi-line comment.
-     */
+        Multi-line comment.
+        Multi-line comment.
+    */
     void foo(void);
     ```
 * Wrap file-level doc comments with `/**`*\<newline\>*..*\<newline\>*`*///`
-  with every intermediate line starting with a `*`:
+  and indent every line inside the comment:
     ```c
     /**
-     * This file does foo.
-     * It also does bar.
-     *///
+        This file does foo.
+        It also does bar.
+    *///
     ```
 
 ## Naming
@@ -43,22 +43,23 @@ You can use the following common structure name suffixes:
 | `_callbacks` | Interface callbacks (provided by the user) |
 | `_manager` | Interface manager (global interface data) |
 | `_info` | Any information provided by the user or by the library to the user |
+| `_create_info` | Information to create some object |
 
 ## Errors
 
 Fallible function example:
 
 ```c
-fj_err_t func(void)
+fj_err_t do_something_or_return_error(void)
 {
-    initialise_something();
+    create_x();
 
-    FJ_TRY (do_something_fallible()) {
-        terminate_something();
+    FJ_TRY (do_something_with_x_or_return_error()) {
+        destroy_x();
         return fj_result; // defined implicitly by FJ_TRY
     }
 
-    proceed_normally();
+    do_something_else_with_x();
 
     return FJ_OK;
 }
@@ -70,7 +71,7 @@ Use Fejix base types, memory allocation and utils.
 
 See:
 * [fejix/core/base.h](../../include/fejix/core/base.h)
-* [fejix/core/malloc.h](../../include/fejix/core/malloc.h)
+* [fejix/core/alloc.h](../../include/fejix/core/alloc.h)
 * [fejix/core/utils.h](../../include/fejix/core/utils.h)
 
 **TODO: Finish docs.**
