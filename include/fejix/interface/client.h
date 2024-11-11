@@ -9,6 +9,8 @@ struct fj_client FJ_PUBLICLY({ union fj_tag tag; });
 
 
 struct fj_client_callbacks {
+    fj_err_t (*quit)(struct fj_client *client);
+
     fj_err_t (*idle)(struct fj_client *client);
 };
 
@@ -38,7 +40,7 @@ struct fj_client_funcs {
 
     /**
         Runs a message polling loop.
-        At the startup and at the end of each polling iteration calls ``idle``.
+        Calls ``idle`` before every polling iteration .
     */
     fj_err_t (*run)(struct fj_client *client);
 
