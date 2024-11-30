@@ -5,14 +5,9 @@
 #include <fejix/core/base.h>
 
 
-#define FJ_TRY(EXPR)                                   \
-    for (fj_err_t fj_result = (EXPR), i = 1; i; i = 0) \
+#define FJ_TRY(EXPR)                                                                       \
+    for (fj_err_t fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard; _fj_try_guard = 0) \
         if (fj_result != FJ_OK)
-
-#define FJ_STRINGIFY(X) FJ_STRINGIFY_IMPL(X)
-#define FJ_STRINGIFY_IMPL(X) #X
-
-#define FJ_FILEPOS __FILE__ ":" FJ_STRINGIFY(__LINE__)
 
 /** Get length of a fixed-length array. */
 #define FJ_ARRAY_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))

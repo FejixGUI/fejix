@@ -1,2 +1,26 @@
 Diagnostics:
     UnusedIncludes: None
+
+    ClangTidy:
+        Add:
+            - bugprone-*
+            - llvm-header-guard
+            - readability-identifier-naming
+
+        Remove:
+            - bugprone-sizeof-expression
+            - bugprone-easily-swappable-parameters
+
+        CheckOptions:
+            readability-identifier-naming.StructCase: lower_case
+            readability-identifier-naming.EnumCase: lower_case
+            readability-identifier-naming.UnionCase: lower_case
+            readability-identifier-naming.TypedefCase: lower_case
+            readability-identifier-naming.VariableCase: lower_case
+            readability-identifier-naming.MemberCase: lower_case
+            readability-identifier-naming.ParameterCase: lower_case
+            readability-identifier-naming.FunctionCase: lower_case
+            readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+            readability-identifier-naming.EnumConstantCase: UPPER_CASE
+            readability-identifier-naming.TypedefSuffix: _t
+

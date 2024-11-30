@@ -1,2 +1,0 @@
-Checks: 'bugprone-*,-bugprone-sizeof-expression,-bugprone-easily-swappable-parameters'
-FormatStyle: file
