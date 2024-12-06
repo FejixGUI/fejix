@@ -69,7 +69,7 @@ static fj_err_t update_windows(
 }
 
 
-struct fj_window_funcs fj_winapi_window_funcs = {
+struct fj_window_interface fj_winapi_window_interface = {
     .create_manager = create_manager,
     .destroy_manager = destroy_manager,
     .create_window = create_window,

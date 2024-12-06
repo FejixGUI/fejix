@@ -2,17 +2,10 @@
 #define FEJIX_WINAPI_CLIENT_H_
 
 
-#include <src/winapi/sleep_timer/sleep_timer.h>
-
 #include <fejix/interface/client.h>
+#include <fejix/interface/client_wait_timeout.h>
 
 #include <windows.h>
-
-
-enum fj_winapi_user_message_id {
-    FJ_WINAPI_USER_MESSAGE_SLEEP = WM_USER,
-    FJ_WINAPI_USER_MESSAGE_WAKEUP,
-};
 
 
 struct fj_client {
@@ -21,13 +14,13 @@ struct fj_client {
 
     HINSTANCE instance;
 
+    /** 0 means unset */
+    fj_timeout_t wait_timeout;
+
     HWND message_window;
-    fj_err_t message_processing_result;
 
     fj_bool8_t is_idle_requested;
     fj_bool8_t is_quit_requested;
-
-    struct fj_sleep_timer_manager sleep_timer_manager;
 };
 
 

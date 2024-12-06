@@ -86,9 +86,3 @@ void *fj_winapi_get_window_data(HWND window)
 {
     return (void *) GetWindowLongPtr(window, GWLP_USERDATA);
 }
-
-
-void fj_winapi_handle_unknown_message(MSG const *message, LONG_PTR *result)
-{
-    *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
-}

@@ -30,7 +30,7 @@ enum fj_softer_pixel_format {
 
 
 struct fj_softer_manager;
-struct fj_softer_builder;
+struct fj_softer_canvas_builder;
 struct fj_softer_canvas;
 
 
@@ -53,35 +53,39 @@ struct fj_softer_canvas_info {
 };
 
 
-struct fj_softer_funcs {
+struct fj_softer_interface {
     fj_err_t (*create_manager)(
         struct fj_softer_manager **manager,
-        struct fj_softer_manager_info *manager_info,
-        struct fj_client *client
+        struct fj_client *client,
+        struct fj_softer_manager_info *manager_info
     );
 
     fj_err_t (*destroy_manager)(struct fj_softer_manager *manager);
 
-    fj_err_t (*create_builder)(
+    fj_err_t (*create_canvas_builder)(
         struct fj_softer_manager *manager,
-        struct fj_softer_builder **builder,
+        struct fj_softer_canvas_builder **canvas_builder,
         struct fj_window_builder *window_builder,
         struct fj_softer_canvas_create_info const *create_info
     );
 
     fj_err_t (*destroy_builder)(
         struct fj_softer_manager *manager,
-        struct fj_softer_builder *builder
+        struct fj_softer_canvas_builder *canvas_builder
     );
 
     fj_err_t (*create_canvas)(
         struct fj_softer_manager *manager,
         struct fj_softer_canvas **canvas,
-        struct fj_softer_builder *builder,
+        struct fj_softer_canvas_builder *canvas_builder,
         struct fj_window *window
     );
 
-    fj_err_t (*destroy_canvas)(struct fj_softer_manager *manager, struct fj_canvas *canvas);
+    fj_err_t (*destroy_canvas)(
+        struct fj_softer_manager *manager,
+        struct fj_softer_canvas *canvas,
+        struct fj_window *window
+    );
 
     fj_err_t (*get_canvas_info)(
         struct fj_softer_manager *manager,

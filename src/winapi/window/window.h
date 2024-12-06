@@ -11,18 +11,22 @@ struct fj_window_manager {
     struct fj_client *client;
 };
 
+struct fj_window_builder {
+    WNDCLASSEX window_class;
+    DWORD style;
+    DWORD exstyle;
+
+    /** NULL until the window gets created. */
+    struct fj_window *window;
+};
 
 struct fj_window {
     union fj_tag tag;
 
     struct fj_window_manager *manager;
 
-    struct fj_canvas *canvas;
-
-    /** Can be NULL when the window is uninitialized. */
     HWND handle;
 
-    /** Can be 0 when the window is uninitialized. */
     ATOM class_atom;
 };
 

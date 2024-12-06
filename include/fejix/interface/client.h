@@ -24,7 +24,7 @@ struct fj_client_create_info {
     char const *name;
 };
 
-struct fj_client_funcs {
+struct fj_client_interface {
     /**
         Callbacks and info are deep-copied where applicable.
 
@@ -40,11 +40,11 @@ struct fj_client_funcs {
 
     /**
         Runs a message polling loop.
-        Calls ``idle`` before every polling iteration .
+        Calls ``idle`` before every polling iteration.
     */
     fj_err_t (*run)(struct fj_client *client);
 
-    /** Thread-safe provided that the client is not being destructed. */
+    /** Thread-safe provided that the client is not being destroyed. */
     fj_err_t (*wakeup)(struct fj_client *client);
 
     void (*request_quit)(struct fj_client *client);

@@ -5,7 +5,7 @@
 #include <fejix/interface/client.h>
 
 
-struct fj_client_wait_timeout_funcs {
+struct fj_client_wait_timeout_interface {
     /**
         Sets the preferred amount of time that the client should be allowed to wait for incoming
         messages.

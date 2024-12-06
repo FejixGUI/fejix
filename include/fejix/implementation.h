@@ -29,6 +29,7 @@ enum fj_interface_id {
     FJ_INTERFACE_CLIENT_WAIT_TIMEOUT,
     FJ_INTERFACE_WINDOW,
     FJ_INTERFACE_SOFTER,
+    FJ_INTERFACE_OPENGL,
 };
 
 
@@ -36,7 +37,7 @@ struct fj_implementation {
     fj_implementation_id_t id;
     fj_version_t version;
 
-    void const *(*get_interface_funcs)(fj_interface_id_t interface_id);
+    void const *(*get_interface)(fj_interface_id_t interface_id);
 };
 
 

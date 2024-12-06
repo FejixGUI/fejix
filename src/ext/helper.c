@@ -6,12 +6,8 @@
 
 
 /** Contains strings and NULLs for unimplemented descriptions. */
-static char const *const error_descriptions[] = {
-    /* Ensures that this array contains enough elements (uninitialised elements will be NULL) */
-    [FJ_ERR_MAX] = "...max error ID...",
-
+static char const *const error_descriptions[FJ_ERR_MAX] = {
     [FJ_OK] = "success",
-
     [FJ_ERR_UNKNOWN] = "unknown error",
     [FJ_ERR_ALLOCATION_FAILED] = "allocation failed (out of memory)",
     [FJ_ERR_INVALID_ALLOCATION] = "invalid allocation",
@@ -26,13 +22,10 @@ static char const *const error_descriptions[] = {
     [FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED] = "shared memory allocation failed",
 };
 
-static char const *const impl_names[] = {
-    [FJ_IMPLEMENTATION_MAX] = "...max implementation ID...",
-
-    [FJ_IMPLEMENTATION_ANDK] = "andk",
-    [FJ_IMPLEMENTATION_COCOA] = "cocoa",
-    [FJ_IMPLEMENTATION_WAYLAND] = "wayland",
-    [FJ_IMPLEMENTATION_WINAPI] = "winapi",
+/** Contains strings and NULLs for unimplemented names. */
+static char const *const impl_names[FJ_IMPLEMENTATION_MAX] = {
+    [FJ_IMPLEMENTATION_ANDK] = "andk",       [FJ_IMPLEMENTATION_COCOA] = "cocoa",
+    [FJ_IMPLEMENTATION_WAYLAND] = "wayland", [FJ_IMPLEMENTATION_WINAPI] = "winapi",
     [FJ_IMPLEMENTATION_X11] = "x11",
 };
 
@@ -79,7 +72,7 @@ char const *fj_ext_get_implementation_hint(void)
         return hint;
     }
 
-#if defined(FJ_OPT_IMPLEMENTATION_WAYLAND) || defined(FJ_OPT_IMPLEMENTATION_X11)
+#if defined(FJ_OPT_WAYLAND) || defined(FJ_OPT_X11)
     hint = getenv("XDG_SESSION_TYPE");
 
     if (fj_str_eq(hint, "wayland") || fj_str_eq(hint, "x11")) {

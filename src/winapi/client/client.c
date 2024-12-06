@@ -5,10 +5,10 @@
 #include <fejix/core/utils.h>
 
 
-static fj_bool8_t client_needs_quit(struct fj_client *client)
-{
-    return client->is_quit_requested || client->message_processing_result != FJ_OK;
-}
+enum fj_winapi_message_window_message_id {
+    FJ_WINAPI_MESSAGE_WINDOW_MESSAGE_SLEEP = WM_USER,
+    FJ_WINAPI_MESSAGE_WINDOW_MESSAGE_WAKEUP,
+};
 
 
 static DWORD client_get_sleep_timeout(struct fj_client *client)
@@ -17,13 +17,11 @@ static DWORD client_get_sleep_timeout(struct fj_client *client)
         return 0;
     }
 
-    fj_timeout_t timeout = fj_winapi_sleep_timer_get_timeout(client);
-
-    if (timeout == 0) {
+    if (client->wait_timeout == 0) {
         return INFINITE;
     }
 
-    DWORD timeout_ms = FJ_TIMEOUT_INTO_MILLIS(timeout);
+    DWORD timeout_ms = FJ_TIMEOUT_INTO_MILLIS(client->wait_timeout);
 
     return FJ_MAX(1, timeout_ms);
 }
@@ -31,18 +29,13 @@ static DWORD client_get_sleep_timeout(struct fj_client *client)
 
 static fj_err_t client_schedule_sleep(struct fj_client *client)
 {
-    if (SendNotifyMessage(client->message_window, FJ_WINAPI_USER_MESSAGE_SLEEP, 0, 0) == FALSE) {
+    if (SendNotifyMessage(client->message_window, FJ_WINAPI_MESSAGE_WINDOW_MESSAGE_SLEEP, 0, 0)
+        == FALSE)
+    {
         return FJ_ERR_REQUEST_FAILED;
     }
 
     return FJ_OK;
-}
-
-
-static void client_schedule_quit(struct fj_client *client)
-{
-    client->is_quit_requested = true;
-    PostQuitMessage(0);
 }
 
 
@@ -53,7 +46,7 @@ static fj_err_t client_sleep(struct fj_client *client)
     }
 
     if (client->is_quit_requested) {
-        client_schedule_quit(client);
+        PostQuitMessage(0);
         return FJ_OK;
     }
 
@@ -75,60 +68,8 @@ static fj_err_t client_sleep(struct fj_client *client)
 
 static fj_err_t client_wakeup(struct fj_client *client)
 {
-    if (!SendNotifyMessage(client->message_window, FJ_WINAPI_USER_MESSAGE_WAKEUP, 0, 0)) {
+    if (!SendNotifyMessage(client->message_window, FJ_WINAPI_MESSAGE_WINDOW_MESSAGE_WAKEUP, 0, 0)) {
         return FJ_ERR_REQUEST_SENDING_FAILED;
-    }
-
-    return FJ_OK;
-}
-
-
-LONG_PTR fj_winapi_client_handle_message_safely(
-    struct fj_client *client,
-    MSG const *message,
-    fj_err_t (*handle_message)(struct fj_client *client, MSG const *message, LONG_PTR *result)
-)
-{
-    if (client_needs_quit(client)) {
-        return 0;
-    }
-
-    LONG_PTR result = 0;
-    FJ_TRY (handle_message(client, message, &result)) {
-        client->message_processing_result = fj_result;
-        client_schedule_quit(client);
-        return result;
-    }
-
-    return result;
-}
-
-
-static fj_err_t message_window_handle_message(
-    struct fj_client *client,
-    MSG const *message,
-    LONG_PTR *result
-)
-{
-    switch (message->message) {
-        case FJ_WINAPI_USER_MESSAGE_SLEEP: {
-            *result = 0;
-
-            FJ_TRY (client_sleep(client)) {
-                return fj_result;
-            }
-            break;
-        }
-
-        case FJ_WINAPI_USER_MESSAGE_WAKEUP: {
-            *result = 0;
-            break;
-        }
-
-        default: {
-            fj_winapi_handle_unknown_message(message, result);
-            break;
-        }
     }
 
     return FJ_OK;
@@ -143,8 +84,27 @@ static LONG_PTR __stdcall message_window_procedure(
 )
 {
     struct fj_client *client = fj_winapi_get_window_data(window_handle);
-    MSG msg = { window_handle, message, wparam, lparam };
-    return fj_winapi_client_handle_message_safely(client, &msg, message_window_handle_message);
+
+    if (client->is_quit_requested) {
+        return 0;
+    }
+
+    switch (message) {
+        case FJ_WINAPI_MESSAGE_WINDOW_MESSAGE_SLEEP: {
+            FJ_TRY (client_sleep(client)) {
+                PostQuitMessage(0);
+                return 0;
+            }
+
+            return 0;
+        }
+
+        case FJ_WINAPI_MESSAGE_WINDOW_MESSAGE_WAKEUP:
+            return 0;
+
+        default:
+            return DefWindowProc(window_handle, message, wparam, lparam);
+    }
 }
 
 
@@ -218,21 +178,21 @@ static fj_err_t client_run(struct fj_client *client)
         return fj_result;
     }
 
-    while (!client_needs_quit(client)) {
+    while (!client->is_quit_requested) {
         MSG msg;
         if (!PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
             continue;
         }
 
         if (msg.message == WM_QUIT) {
-            return client->message_processing_result;
+            return FJ_OK;
         }
 
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
 
-    return client->message_processing_result;
+    return FJ_OK;
 }
 
 
@@ -247,11 +207,29 @@ static void client_request_idle(struct fj_client *client)
 }
 
 
-struct fj_client_funcs const fj_winapi_client_funcs = {
+static void client_wait_timeout_set_timeout(struct fj_client *client, fj_timeout_t timeout)
+{
+    client->wait_timeout = FJ_CLAMP(
+        timeout, FJ_TIMEOUT_FROM_MILLIS(1), FJ_TIMEOUT_FROM_MILLIS(INFINITE - 1)
+    );
+}
+
+static void client_wait_timeout_unset_timeout(struct fj_client *client)
+{
+    client->wait_timeout = 0;
+}
+
+
+struct fj_client_interface const fj_winapi_client_interface = {
     .create = client_create,
     .destroy = client_destroy,
     .run = client_run,
     .request_quit = client_request_quit,
     .request_idle = client_request_idle,
     .wakeup = client_wakeup,
+};
+
+struct fj_client_wait_timeout_interface const fj_winapi_client_wait_timeout_interface = {
+    .set_timeout = client_wait_timeout_set_timeout,
+    .unset_timeout = client_wait_timeout_unset_timeout,
 };

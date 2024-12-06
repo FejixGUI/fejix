@@ -4,7 +4,6 @@ Diagnostics:
     ClangTidy:
         Add:
             - bugprone-*
-            - llvm-header-guard
             - readability-identifier-naming
 
         Remove:
