@@ -13,11 +13,10 @@ struct fj_window_manager {
 
 struct fj_window_builder {
     WNDCLASSEX window_class;
-    DWORD style;
-    DWORD exstyle;
-
-    /** NULL until the window gets created. */
-    struct fj_window *window;
+    ATOM window_class_atom;
+    DWORD window_style;
+    DWORD window_exstyle;
+    union fj_tag window_tag;
 };
 
 struct fj_window {
@@ -26,7 +25,6 @@ struct fj_window {
     struct fj_window_manager *manager;
 
     HWND handle;
-
     ATOM class_atom;
 };
 

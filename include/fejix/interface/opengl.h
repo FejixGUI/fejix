@@ -36,7 +36,7 @@ struct fj_opengl_manager_create_info {
     void const *extra_display;
 };
 
-struct fj_opengl_canvas_builder_create_info {
+struct fj_opengl_canvas_create_info {
     /**
         Must be EGLConfig* (surface_config) for EGL.
         Must be uint32_t* (pixel_format) for WGL.
@@ -82,7 +82,7 @@ struct fj_opengl_implementation {
         struct fj_opengl_manager *manager,
         struct fj_opengl_canvas_builder **canvas_builder,
         struct fj_window_builder *window_builder,
-        struct fj_opengl_canvas_builder_create_info const *create_info
+        struct fj_opengl_canvas_create_info const *create_info
     );
 
     fj_err_t (*destroy_canvas_builder)(

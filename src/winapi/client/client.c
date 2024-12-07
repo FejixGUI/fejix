@@ -11,6 +11,14 @@ enum fj_winapi_message_window_message_id {
 };
 
 
+static void client_enable_high_dpi_for_process(void)
+{
+    // Using per-process awareness because some GPU drivers have bugs with per-thread awareness.
+    // Using Set..DpiAwarenessContext because Set..DpiAwareness is buggy and inconsistent.
+    SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+}
+
+
 static DWORD client_get_sleep_timeout(struct fj_client *client)
 {
     if (client->is_idle_requested) {
@@ -153,6 +161,8 @@ static fj_err_t client_create(
     struct fj_client_create_info const *create_info
 )
 {
+    client_enable_high_dpi_for_process();
+
     FJ_TRY (FJ_ALLOC_ZEROED(client)) {
         return fj_result;
     }

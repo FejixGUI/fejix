@@ -28,20 +28,39 @@ static fj_err_t destroy_manager(struct fj_window_manager *manager)
 }
 
 
+static fj_err_t create_window_builder(
+    struct fj_window_manager *manager,
+    struct fj_window_builder **window_builder,
+    struct fj_window_create_info const *window_info
+)
+{
+    return FJ_OK;
+}
+
+static fj_err_t destroy_window_builder(
+    struct fj_window_manager *manager,
+    struct fj_window_builder *window_builder
+)
+{
+    return FJ_OK;
+}
+
+
 static fj_err_t create_window(
     struct fj_window_manager *manager,
     struct fj_window **window,
-    struct fj_window_create_info const *create_info
+    struct fj_window_builder *window_builder
 )
 {
-    struct fj_window window_value = {
-        .tag = create_info->tag,
-        .manager = manager,
-    };
-
-    FJ_TRY (FJ_ALLOC_COPIED(window, &window_value)) {
+    FJ_TRY (FJ_ALLOC_ZEROED(window)) {
         return fj_result;
     }
+
+    **window = (struct fj_window) {
+        .tag = window_builder->window_tag,
+        .manager = manager,
+        .class_atom = window_builder->window_class_atom,
+    };
 
     return FJ_OK;
 }
@@ -72,6 +91,8 @@ static fj_err_t update_windows(
 struct fj_window_interface fj_winapi_window_interface = {
     .create_manager = create_manager,
     .destroy_manager = destroy_manager,
+    .create_window_builder = create_window_builder,
+    .destroy_window_builder = destroy_window_builder,
     .create_window = create_window,
     .destroy_window = destroy_window,
     .update_windows = update_windows,
