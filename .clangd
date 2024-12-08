@@ -22,4 +22,5 @@ Diagnostics:
             readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
             readability-identifier-naming.EnumConstantCase: UPPER_CASE
             readability-identifier-naming.TypedefSuffix: _t
+            readability-identifier-naming.MemberIgnoredRegexp: '^_[_a-z]*$'
 

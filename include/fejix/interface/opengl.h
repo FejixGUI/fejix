@@ -19,33 +19,57 @@ enum fj_opengl_implementation_id {
     FJ_OPENGL_IMPLEMENTATION_GLX,
 };
 
-typedef int32_t fj_opengl_constant_t;
 
-enum fj_opengl_constant {
-    FJ_OPENGL_ATTRIBUTE_LIST_END,
-    FJ_OPENGL_CONTEXT_API_OPENGL_DESKTOP,
-    FJ_OPENGL_CONTEXT_API_OPENGL_ES,
-    FJ_OPENGL_CONTEXT_API_VERSION_MAJOR,
-    FJ_OPENGL_CONTEXT_API_VERSION_MINOR,
-    FJ_OPENGL_CONTEXT_API_BACKWARD_COMPATIBLE,
-    FJ_OPENGL_CONTEXT_API_FOREWARD_COMPATIBLE,
-    FJ_OPENGL_CONTEXT_PROTECTED,
-    FJ_OPENGL_CANVAS_PROTECTED,
-    FJ_OPENGL_CANVAS_BUFFER_COUNT,
-    FJ_OPENGL_CANVAS_BUFFER_STEREO,
-    FJ_OPENGL_CANVAS_MULTISAMPLING_BUFFER_COUNT,
-    FJ_OPENGL_CANVAS_MULTISAMPLING_SAMPLE_COUNT,
-    FJ_OPENGL_CANVAS_RED_BITS,
-    FJ_OPENGL_CANVAS_GREEN_BITS,
-    FJ_OPENGL_CANVAS_BLUE_BITS,
-    FJ_OPENGL_CANVAS_ALPHA_BITS,
-    FJ_OPENGL_CANVAS_ACCUMULATION_RED_BITS,
-    FJ_OPENGL_CANVAS_ACCUMULATION_GREEN_BITS,
-    FJ_OPENGL_CANVAS_ACCUMULATION_BLUE_BITS,
-    FJ_OPENGL_CANVAS_ACCUMULATION_ALPHA_BITS,
-    FJ_OPENGL_CANVAS_DEPTH_BITS,
-    FJ_OPENGL_CANVAS_STENCIL_BITS,
-    FJ_OPENGL_CANVAS_COLORSPACE_SRGB,
+typedef uint32_t fj_opengl_feature_id_t;
+
+enum fj_opengl_feature_id {
+    FJ_OPENGL_FEATURE_GLOBAL_SAME_FUNCTION_GETTER,
+    FJ_OPENGL_FEATURE_GLOBAL_PROTECTED_MODE,
+    FJ_OPENGL_FEATURE_MANAGER_SAME_FUNCTION_GETTER,
+    FJ_OPENGL_FEATURE_CONTEXT_SAME_FUNCTION_GETTER,
+    FJ_OPENGL_FEATURE_CONTEXT_API_OPENGL_DESKTOP,
+    FJ_OPENGL_FEATURE_CONTEXT_API_OPENGL_ES,
+    FJ_OPENGL_FEATURE_CONTEXT_SHARING,
+    FJ_OPENGL_FEATURE_CONTEXT_SEPARATE_READ_WRITE,
+    FJ_OPENGL_FEATURE_CANVAS_COLORSPACE_SRGB,
+    FJ_OPENGL_FEATURE_CANVAS_MULTISAMPLING,
+};
+
+
+typedef int32_t fj_opengl_int_t;
+
+enum fj_opengl_canvas_attribute_id {
+    FJ_OPENGL_CANVAS_ATTRIBUTE_END,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_BUFFER_WIDTH,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_BUFFER_HEIGHT,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_BUFFER_COUNT,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_BUFFER_STEREO,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_MULTISAMPLING_BUFFER_COUNT,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_MULTISAMPLING_SAMPLE_COUNT,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_RED_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_GREEN_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_BLUE_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_ALPHA_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_ACCUM_RED_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_ACCUM_GREEN_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_ACCUM_BLUE_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_ACCUM_ALPHA_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_DEPTH_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_STENCIL_BITS,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_COLORSPACE_SRGB,
+    FJ_OPENGL_CANVAS_ATTRIBUTE_PROTECTED,
+    // TODO
+};
+
+enum fj_opengl_context_attribute_id {
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_END,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_API_OPENGL_DESKTOP,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_API_OPENGL_ES,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_API_VERSION_MAJOR,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_API_VERSION_MINOR,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_API_BACKWARD_COMPATIBLE,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_API_FOREWARD_COMPATIBLE,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_PROTECTED,
     // TODO
 };
 
@@ -60,24 +84,32 @@ struct fj_opengl_canvas_builder;
 struct fj_opengl_canvas;
 struct fj_opengl_context;
 
+struct fj_opengl_state {
+    void *_context;
+    void *_read_surface;
+    void *_write_surface;
+};
 
 struct fj_opengl_manager_create_info {
     /** If NULL, the default function getter will be used. */
-    fj_opengl_function_getter_t function_getter;
+    fj_opengl_function_getter_t import_function_getter;
 
     /**
-        Can be EGLDisplay* for EGL.
-        Must be NULL if unused.
+        If not NULL, imports the native manager from this field.
+
+        Accepts EGLDisplay* for EGL.
     */
-    void const *extra_info;
+    void const *import_native_manager;
 };
 
 struct fj_opengl_canvas_create_info {
-    fj_opengl_constant_t *attributes;
+    /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
+    fj_opengl_int_t *attributes;
 };
 
 struct fj_opengl_context_create_info {
-    fj_opengl_constant_t *attributes;
+    /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
+    fj_opengl_int_t *attributes;
 
     /** Specifies the context with which the new context will share some object IDs. */
     struct fj_opengl_context *share_context;
@@ -96,35 +128,23 @@ struct fj_opengl_implementation {
     fj_err_t (*destroy_manager)(struct fj_opengl_manager *manager);
 
     /**
-        Fejix virtual extensions:
-        * FEJIX_global_function_getter
-        * FEJIX_global_same_function_getter
-        * FEJIX_global_protected_mode
-        * FEJIX_manager_same_function_getter
-        * FEJIX_context_same_function_getter
-        * FEJIX_context_api_opengl_desktop
-        * FEJIX_context_api_opengl_es
-        * FEJIX_context_sharing
-        * FEJIX_context_separate_read_write
-        * FEJIX_canvas_colorspace_srgb
-        * FEJIX_canvas_multisampling
+        Returns EGLDisplay* for EGL.
+        Returns Display* for GLX.
+        Returns NULL for other implementations.
     */
+    void (*export_manager)(struct fj_opengl_manager *manager, void **native_manager);
+
+    fj_bool8_t (*get_manager_feature_supported)(
+        struct fj_opengl_manager *manager,
+        fj_opengl_feature_id_t feature
+    );
+
     fj_bool8_t (*get_manager_extension_supported)(
         struct fj_opengl_manager *manager,
         char const *extension_name
     );
 
-    fj_opengl_function_t (*get_manager_function)(
-        struct fj_opengl_manager *manager,
-        char const *function_name
-    );
-
-    /**
-        Returns EGLDisplay* for EGL.
-        Returns Display* for GLX.
-        Returns NULL for other implementations.
-    */
-    void *(*export_manager)(struct fj_opengl_manager *manager);
+    fj_opengl_function_getter_t (*get_manager_function_getter)(struct fj_opengl_manager *manager);
 
     /**
         :param window_builder: Can be NULL.
@@ -141,20 +161,6 @@ struct fj_opengl_implementation {
         struct fj_opengl_canvas_builder *canvas_builder
     );
 
-    fj_err_t (*get_canvas_builder_attribute)(
-        struct fj_opengl_manager *manager,
-        struct fj_opengl_canvas_builder *canvas_builder,
-        fj_opengl_constant_t attribute,
-        fj_opengl_constant_t *value
-    );
-
-    /**
-        Returns EGLConfig* for EGL.
-        Returns uint32_t* (pixel format) for WGL.
-        Returns GLXFBConfig* for GLX.
-    */
-    void *(*export_canvas_builder)(struct fj_opengl_canvas_builder *canvas_builder);
-
     /**
         :param window: Can be NULL.
     */
@@ -165,7 +171,6 @@ struct fj_opengl_implementation {
         struct fj_window *window
     );
 
-    // TODO do we need window when destroying canvas?
     /**
         :param window: Can be NULL.
     */
@@ -175,14 +180,24 @@ struct fj_opengl_implementation {
         struct fj_window *window
     );
 
-    fj_err_t (*present_canvas)(struct fj_opengl_manager *manager, struct fj_opengl_canvas *canvas);
-
     /**
-        Returns EGLSurface* for EGL.
-        Returns HDC* for WGL.
-        Returns GLXWindow* for GLX.
+        :param native_canvas:
+            * returns EGLSurface* for EGL.
+            * returns HDC* for WGL.
+            * returns GLXDrawable* for GLX.
+
+        :param native_canvas_config:
+            * returns EGLConfig* for EGL.
+            * returns int32_t* for WGL.
+            * returns GLXFBConfig* for GLX.
     */
-    void *(*export_canvas)(struct fj_opengl_canvas *canvas);
+    void (*export_canvas)(
+        struct fj_opengl_canvas *canvas,
+        void **native_canvas,
+        void **native_canvas_config
+    );
+
+    fj_err_t (*present_canvas)(struct fj_opengl_manager *manager, struct fj_opengl_canvas *canvas);
 
     fj_err_t (*create_context)(
         struct fj_opengl_manager *manager,
@@ -196,22 +211,36 @@ struct fj_opengl_implementation {
         struct fj_opengl_context *context
     );
 
+    /**
+        :param native_context:
+            * returns EGLContext* for EGL.
+            * returns HGLRC* for WGL.
+            * returns GLXContext* for GLX.
+    */
+    void (*export_context)(struct fj_opengl_context *context, void **native_context);
+
+    fj_opengl_function_getter_t (*get_context_function_getter)(
+        struct fj_opengl_manager *manager,
+        struct fj_opengl_context *context
+    );
+
     /** :param context: Set to NULL to make no context current. */
-    fj_err_t (*set_context_current)(
+    fj_err_t (*set_current_state)(
         struct fj_opengl_manager *manager,
         struct fj_opengl_context *context,
         struct fj_opengl_canvas *read_canvas,
         struct fj_opengl_canvas *write_canvas
     );
 
-    fj_opengl_function_getter_t (*get_context_function_getter)(struct fj_opengl_manager *manager);
+    fj_err_t (*save_current_state)(
+        struct fj_opengl_manager *manager,
+        struct fj_opengl_state *state
+    );
 
-    /**
-        Returns EGLContext* for EGL.
-        Returns HGLRC* for WGL.
-        Returns GLXContext* for GLX.
-    */
-    void *(*export_context)(struct fj_opengl_context *context);
+    fj_err_t (*restore_current_state)(
+        struct fj_opengl_manager *manager,
+        struct fj_opengl_state *state
+    );
 };
 
 struct fj_opengl_interface {
