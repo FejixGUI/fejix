@@ -1,4 +1,5 @@
-/build*
+build*/
+_build*/
 /out*
 
 compile_commands.json
