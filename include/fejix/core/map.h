@@ -27,13 +27,13 @@ struct fj_map {
     /** Number of stored elements. */
     uint32_t element_count;
 
-    uint32_t bucket_count;
+    uint32_t _bucket_count;
 
     /*
         Nullable array of buckets (NULL if the map has not allocated).
         A bucket is a head node pointer (if it is occupied) or NULL (if it is empty).
     */
-    struct fj_map_node **buckets;
+    struct fj_map_node **_buckets;
 };
 
 /** Iterator over map. */

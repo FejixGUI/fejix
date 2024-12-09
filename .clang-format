@@ -90,8 +90,19 @@ AlignEscapedNewlines: Left
 # #endif
 IndentPPDirectives: AfterHash
 
-IfMacros: ['FJ_TRY']
-AttributeMacros: ['CALLBACK', 'WINAPI', 'WINUSERAPI']
+Macros:
+    # FIXME clang-format v18 bug, this workaround is fine-tuned to work on a specific line in
+    # <root>/include/fejix/interface/opengl.h
+    # The right non-workaround solution would be to define it as an empty macro.
+    - 'FJ_OPENGL_ABI_CALL=*const*const*const'
+
+IfMacros:
+    - 'FJ_TRY'
+
+AttributeMacros:
+    - 'CALLBACK'
+    - 'WINAPI'
+    - 'WINUSERAPI'
 
 # Sort includes
 IncludeBlocks: Regroup

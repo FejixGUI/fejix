@@ -6,7 +6,7 @@
 
 
 #define MAX_LOAD_FACTOR (0.618f)
-#define MIN_LOAD_FACTOR (MAX_LOAD_FACTOR/4.0f)
+#define MIN_LOAD_FACTOR (MAX_LOAD_FACTOR / 4.0f)
 
 
 fj_bool8_t fj_map_is_empty(struct fj_map const *map)
@@ -16,7 +16,7 @@ fj_bool8_t fj_map_is_empty(struct fj_map const *map)
 
 fj_bool8_t fj_map_has_allocated(struct fj_map const *map)
 {
-    return map->buckets != NULL;
+    return map->_buckets != NULL;
 }
 
 
@@ -34,14 +34,14 @@ static fj_bool8_t key_eq(struct fj_map const *map, struct fj_map_node const *nod
 
 static uint32_t get_bucket_index(struct fj_map const *map, union fj_tag key)
 {
-    return fj_tag_hash32(key, map->key_type) % map->bucket_count;
+    return fj_tag_hash32(key, map->key_type) % map->_bucket_count;
 }
 
 
 static struct fj_map_node **get_bucket(struct fj_map const *map, union fj_tag key)
 {
     uint32_t index = get_bucket_index(map, key);
-    return &map->buckets[index];
+    return &map->_buckets[index];
 }
 
 
@@ -83,7 +83,7 @@ static void remove_node_from_bucket(
 
 static void clear_buckets(struct fj_map *map)
 {
-    memset(map->buckets, 0, sizeof(*map->buckets) * map->bucket_count);
+    memset(map->_buckets, 0, sizeof(*map->_buckets) * map->_bucket_count);
 }
 
 
@@ -148,15 +148,15 @@ static struct fj_map_node *raw_remove(struct fj_map *map, union fj_tag key)
 
 static struct fj_map_node *extract_nodes(struct fj_map *map)
 {
-    if (map->buckets == NULL) {
+    if (map->_buckets == NULL) {
         return NULL;
     }
 
     struct fj_map_node *head_node = NULL;
     struct fj_map_node *tail_node = NULL;
 
-    for (uint32_t i = 0; i < map->bucket_count; i++) {
-        struct fj_map_node *node = map->buckets[i];
+    for (uint32_t i = 0; i < map->_bucket_count; i++) {
+        struct fj_map_node *node = map->_buckets[i];
 
         if (node == NULL) {
             continue;
@@ -205,7 +205,7 @@ static void free_nodes(struct fj_map_node *list_head)
 
 static float get_load_factor(struct fj_map *map)
 {
-    return (float) map->element_count / (float) map->bucket_count;
+    return (float) map->element_count / (float) map->_bucket_count;
 }
 
 
@@ -229,11 +229,11 @@ static fj_bool8_t map_is_validated(float load_factor)
 
 static fj_err_t resize_buckets(struct fj_map *map, uint32_t bucket_count)
 {
-    FJ_TRY (FJ_REALLOC_ZEROED(&map->buckets, map->bucket_count, bucket_count)) {
+    FJ_TRY (FJ_REALLOC_ZEROED(&map->_buckets, map->_bucket_count, bucket_count)) {
         return fj_result;
     }
 
-    map->bucket_count = bucket_count;
+    map->_bucket_count = bucket_count;
 
     return FJ_OK;
 }
@@ -244,9 +244,9 @@ static fj_err_t resize_map(struct fj_map *map, fj_bool8_t grow)
     uint32_t bucket_count = 0;
 
     if (grow) {
-        bucket_count = map->bucket_count * 2;
+        bucket_count = map->_bucket_count * 2;
     } else {
-        bucket_count = FJ_MAX(1, map->bucket_count / 2);
+        bucket_count = FJ_MAX(1, map->_bucket_count / 2);
     }
 
     return resize_buckets(map, bucket_count);
@@ -259,7 +259,7 @@ static fj_err_t rehash(struct fj_map *map, fj_bool8_t grow)
 
     FJ_TRY (resize_map(map, grow)) {
         free_nodes(list_head);
-        FJ_FREE(&map->buckets);
+        FJ_FREE(&map->_buckets);
         FJ_FREE(&map);
 
         return fj_result;
@@ -350,11 +350,11 @@ static fj_err_t map_insert(struct fj_map *map, union fj_tag key, union fj_tag va
 
 static fj_err_t map_allocate(struct fj_map *map)
 {
-    FJ_TRY (FJ_REALLOC_ZEROED(&map->buckets, 0, 1)) {
+    FJ_TRY (FJ_REALLOC_ZEROED(&map->_buckets, 0, 1)) {
         return fj_result;
     }
 
-    map->bucket_count = 1;
+    map->_bucket_count = 1;
 
     return FJ_OK;
 }
@@ -401,8 +401,8 @@ void fj_map_deinit(struct fj_map *map)
         free_nodes(list_head);
     }
 
-    if (map->buckets != NULL) {
-        FJ_FREE(&map->buckets);
+    if (map->_buckets != NULL) {
+        FJ_FREE(&map->_buckets);
     }
 }
 
@@ -449,7 +449,7 @@ void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map)
 
 fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter)
 {
-    return iter->bucket_index >= iter->map->bucket_count;
+    return iter->bucket_index >= iter->map->_bucket_count;
 }
 
 
@@ -481,12 +481,12 @@ static fj_bool8_t iter_started_bucket(struct fj_map_iter const *iter)
 
 static fj_bool8_t iter_can_start_bucket(struct fj_map_iter const *iter)
 {
-    return iter->map->buckets[iter->bucket_index] != NULL;
+    return iter->map->_buckets[iter->bucket_index] != NULL;
 }
 
 static void iter_start_bucket(struct fj_map_iter *iter)
 {
-    iter->current_node = iter->map->buckets[iter->bucket_index];
+    iter->current_node = iter->map->_buckets[iter->bucket_index];
 }
 
 static void iter_next_bucket(struct fj_map_iter *iter)

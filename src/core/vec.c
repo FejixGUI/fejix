@@ -8,9 +8,9 @@
 /** Small optimization to reduce the amount of allocations for small vector sizes. */
 static uint32_t vec_get_min_capacity(struct fj_vec *vec)
 {
-    if (vec->item_size == 1) {
+    if (vec->_item_size == 1) {
         return 8;
-    } else if (vec->item_size < 256) {
+    } else if (vec->_item_size < 256) {
         return 4;
     } else {
         return 1;
@@ -32,16 +32,16 @@ static uint32_t vec_get_capacity_to_shrink(struct fj_vec *vec)
 
 fj_err_t fj_vec_resize(struct fj_vec *vec, uint32_t capacity)
 {
-    if (vec->capacity == capacity) {
+    if (vec->_capacity == capacity) {
         return FJ_OK;
     }
 
-    FJ_TRY (fj_realloc_uninit(&vec->items, capacity, vec->item_size)) {
+    FJ_TRY (fj_realloc_uninit(&vec->items, capacity, vec->_item_size)) {
         return fj_result;
     }
 
-    vec->capacity = capacity;
-    vec->length = FJ_MIN(vec->length, vec->capacity);
+    vec->_capacity = capacity;
+    vec->length = FJ_MIN(vec->length, vec->_capacity);
 
     return FJ_OK;
 }
@@ -76,15 +76,15 @@ static fj_err_t vec_maybe_shrink(struct fj_vec *vec)
 static void vec_shift_tail(struct fj_vec *vec, uint32_t start_index, int32_t shift_item_distance)
 {
     uint8_t *src = fj_vec_offset(vec, start_index);
-    uint8_t *dst = src + shift_item_distance * vec->item_size;
+    uint8_t *dst = src + shift_item_distance * vec->_item_size;
     uint32_t item_move_count = vec->length - start_index;
-    memmove(dst, src, vec->item_size * item_move_count);
+    memmove(dst, src, vec->_item_size * item_move_count);
 }
 
 
 void fj_vec_init(struct fj_vec *vec, size_t item_size)
 {
-    *vec = (struct fj_vec) { .item_size = item_size };
+    *vec = (struct fj_vec) { ._item_size = item_size };
 }
 
 
@@ -95,7 +95,7 @@ void fj_vec_deinit(struct fj_vec *vec)
     }
 
     vec->length = 0;
-    vec->capacity = 0;
+    vec->_capacity = 0;
 }
 
 
@@ -107,7 +107,7 @@ void fj_vec_replace(
 )
 {
     uint8_t *destination = fj_vec_offset(vec, destination_index);
-    size_t copy_size = vec->item_size * item_count;
+    size_t copy_size = vec->_item_size * item_count;
     memcpy(destination, items, copy_size);
 }
 

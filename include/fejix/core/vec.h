@@ -13,10 +13,10 @@ struct fj_vec {
     /** Number of currently stored elements */
     uint32_t length;
 
-    /** Number of currently allocated elements */
-    uint32_t capacity;
+    /* Number of currently allocated elements */
+    uint32_t _capacity;
 
-    size_t item_size;
+    size_t _item_size;
 };
 
 
@@ -75,11 +75,11 @@ static inline fj_bool8_t fj_vec_has_allocated(struct fj_vec const *vec)
 
 static inline void *fj_vec_offset(struct fj_vec const *vec, uint32_t offset_index)
 {
-    if (offset_index >= vec->capacity) {
+    if (offset_index >= vec->_capacity) {
         return NULL;
     }
 
-    return (uint8_t *) vec->items + vec->item_size * (size_t) offset_index;
+    return (uint8_t *) vec->items + vec->_item_size * (size_t) offset_index;
 }
 
 static inline void *fj_vec_last_item(struct fj_vec const *vec)
