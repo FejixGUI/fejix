@@ -96,10 +96,10 @@ struct fj_opengl_canvas_builder;
 struct fj_opengl_canvas;
 struct fj_opengl_context;
 
-struct fj_opengl_state {
-    void *_context;
-    void *_read_surface;
-    void *_write_surface;
+struct fj_opengl_native_state {
+    void *native_context;
+    void *native_read_canvas;
+    void *native_write_canvas;
 };
 
 struct fj_opengl_manager_create_info {
@@ -114,14 +114,14 @@ struct fj_opengl_manager_create_info {
     void const *import_native_manager;
 };
 
-struct fj_opengl_canvas_create_info {
+struct fj_opengl_canvas_builder_create_info {
     /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
-    fj_opengl_int_t *attributes;
+    fj_opengl_int_t const *attributes;
 };
 
 struct fj_opengl_context_create_info {
     /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
-    fj_opengl_int_t *attributes;
+    fj_opengl_int_t const *attributes;
 
     /** Specifies the context with which the new context will share some object IDs. */
     struct fj_opengl_context *share_context;
@@ -132,8 +132,8 @@ struct fj_opengl_implementation {
     fj_opengl_implementation_id_t id;
 
     fj_err_t (*create_manager)(
-        struct fj_opengl_manager **manager,
         struct fj_client *client,
+        struct fj_opengl_manager **manager,
         struct fj_opengl_manager_create_info const *create_info
     );
 
@@ -164,8 +164,8 @@ struct fj_opengl_implementation {
     fj_err_t (*create_canvas_builder)(
         struct fj_opengl_manager *manager,
         struct fj_opengl_canvas_builder **canvas_builder,
-        struct fj_window_builder *window_builder,
-        struct fj_opengl_canvas_create_info const *create_info
+        struct fj_opengl_canvas_builder_create_info const *create_info,
+        struct fj_window_builder *window_builder
     );
 
     fj_err_t (*destroy_canvas_builder)(
@@ -214,8 +214,8 @@ struct fj_opengl_implementation {
     fj_err_t (*create_context)(
         struct fj_opengl_manager *manager,
         struct fj_opengl_context **context,
-        struct fj_opengl_canvas *canvas,
-        struct fj_opengl_context_create_info const *create_info
+        struct fj_opengl_context_create_info const *create_info,
+        struct fj_opengl_canvas *canvas
     );
 
     fj_err_t (*destroy_context)(
@@ -244,14 +244,14 @@ struct fj_opengl_implementation {
         struct fj_opengl_canvas *write_canvas
     );
 
-    fj_err_t (*save_current_state)(
+    fj_err_t (*export_current_state)(
         struct fj_opengl_manager *manager,
-        struct fj_opengl_state *state
+        struct fj_opengl_native_state *state
     );
 
-    fj_err_t (*restore_current_state)(
+    fj_err_t (*import_current_state)(
         struct fj_opengl_manager *manager,
-        struct fj_opengl_state *state
+        struct fj_opengl_native_state const *state
     );
 };
 

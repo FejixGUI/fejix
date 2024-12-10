@@ -40,7 +40,7 @@ struct fj_softer_manager_info {
     uint32_t pixel_format_count;
 };
 
-struct fj_softer_canvas_create_info {
+struct fj_softer_canvas_builder_create_info {
     union fj_tag tag;
     struct fj_size2d size;
     fj_softer_pixel_format_t pixel_format;
@@ -65,8 +65,8 @@ struct fj_softer_interface {
     fj_err_t (*create_canvas_builder)(
         struct fj_softer_manager *manager,
         struct fj_softer_canvas_builder **canvas_builder,
-        struct fj_window_builder *window_builder,
-        struct fj_softer_canvas_create_info const *create_info
+        struct fj_softer_canvas_builder_create_info const *create_info,
+        struct fj_window_builder *window_builder
     );
 
     fj_err_t (*destroy_builder)(

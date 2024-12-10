@@ -10,7 +10,7 @@ struct fj_window_builder;
 struct fj_window FJ_PUBLICLY({ union fj_tag tag; });
 
 
-struct fj_window_create_info {
+struct fj_window_builder_create_info {
     union fj_tag tag;
 };
 
@@ -40,7 +40,7 @@ struct fj_window_interface {
     fj_err_t (*create_window_builder)(
         struct fj_window_manager *manager,
         struct fj_window_builder **window_builder,
-        struct fj_window_create_info const *window_info
+        struct fj_window_builder_create_info const *window_info
     );
 
     fj_err_t (*destroy_window_builder)(
