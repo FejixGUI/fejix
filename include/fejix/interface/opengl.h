@@ -80,6 +80,7 @@ enum fj_opengl_context_attribute_id {
     FJ_OPENGL_CONTEXT_ATTRIBUTE_API_FOREWARD_COMPATIBLE,
     FJ_OPENGL_CONTEXT_ATTRIBUTE_DEBUG,
     FJ_OPENGL_CONTEXT_ATTRIBUTE_PROTECTED,
+    FJ_OPENGL_CONTEXT_ATTRIBUTE_INDIRECT,
     // TODO
 };
 
@@ -104,14 +105,14 @@ struct fj_opengl_native_state {
 
 struct fj_opengl_manager_create_info {
     /** If NULL, the default function getter will be used. */
-    fj_opengl_function_getter_t import_function_getter;
+    fj_opengl_function_getter_t imported_function_getter;
 
     /**
         If not NULL, imports the native manager from this field.
 
         Accepts EGLDisplay* for EGL.
     */
-    void const *import_native_manager;
+    void const *imported_native_manager;
 };
 
 struct fj_opengl_canvas_builder_create_info {
