@@ -16,21 +16,23 @@ enum fj_softer_manager_flags {
 typedef uint32_t fj_softer_pixel_format_t;
 
 enum fj_softer_pixel_format {
-    /** (Red:8,Green:8,Blue:8), endianness applicable */
     FJ_SOFTER_PIXEL_FORMAT_RGB24,
+    FJ_SOFTER_PIXEL_FORMAT_BGR24,
 
-    /** (Alpha:8,Red:8,Green:8,Blue:8), endianness applicable, alpha may be premultiplied. */
+    FJ_SOFTER_PIXEL_FORMAT_SIZE24_MAX = FJ_SOFTER_PIXEL_FORMAT_BGR24,
+
+    FJ_SOFTER_PIXEL_FORMAT_XRGB32,
+    FJ_SOFTER_PIXEL_FORMAT_BGRX32,
     FJ_SOFTER_PIXEL_FORMAT_ARGB32,
-    /** (Red:8,Green:8,Blue:8,Alpha:8), endianness applicable, alpha may be premultiplied. */
+    FJ_SOFTER_PIXEL_FORMAT_BGRA32,
+    FJ_SOFTER_PIXEL_FORMAT_RGBX32,
+    FJ_SOFTER_PIXEL_FORMAT_XBGR32,
     FJ_SOFTER_PIXEL_FORMAT_RGBA32,
+    FJ_SOFTER_PIXEL_FORMAT_ABGR32,
 
-    FJ_SOFTER_PIXEL_FORMAT_COLOR_MAX,
+    FJ_SOFTER_PIXEL_FORMAT_SIZE32_MAX = FJ_SOFTER_PIXEL_FORMAT_ABGR32,
 
-    FJ_SOFTER_PIXEL_FORMAT_COLOR_MASK = 0x0FFF,
-
-    FJ_SOFTER_PIXEL_FORMAT_LITTLE_ENDIAN = 0x1000,
-    FJ_SOFTER_PIXEL_FORMAT_ALPHA_UNUSED = 0x1000 << 1,
-    FJ_SOFTER_PIXEL_FORMAT_ALPHA_PREMULTIPLIED = 0x1000 << 2,
+    FJ_SOFTER_PIXEL_FORMAT_MAX = FJ_SOFTER_PIXEL_FORMAT_SIZE32_MAX,
 };
 
 
@@ -125,11 +127,9 @@ struct fj_softer_interface {
 };
 
 
-FJ_EXTERN_C_BEGIN
-
 /** Returns 0 for unknown formats. */
+FJ_API
 size_t fj_softer_get_pixel_size(fj_softer_pixel_format_t pixel_format);
 
-FJ_EXTERN_C_END
 
 #endif

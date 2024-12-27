@@ -164,7 +164,8 @@ static fj_err_t softer_canvas_init(
 
     FJ_TRY (fj_wayland_bind_global(
                 client, FJ_WAYLAND_INTERFACE_SHM, shm_global, (void *) &client->softer->shm
-            )) {
+            ))
+    {
         return fj_result;
     }
 
@@ -360,7 +361,7 @@ static fj_bool32_t filter_canvas_buffer_release_events(
 
     struct fj_wayland_softer_canvas *canvas = (void *) _canvas;
 
-    for (uint32_t i = 0; i < FJ_ARRAY_LEN(canvas->buffers); i++) {
+    for (uint32_t i = 0; i < FJ_LEN(canvas->buffers); i++) {
         if (wrapper->event_source == (struct wl_proxy *) canvas->buffers[i].buffer) {
             return true;
         }

@@ -7,21 +7,25 @@ project(fejix
     LANGUAGES "C"
 )
 
-set(FEJIX_KNOWN_FEATURES
+set(KNOWN_FEATURES
     "wayland" "winapi" "x11"
     "softer" "opengl"
 )
 
 set(FEJIX_FEATURES "" CACHE STRING
-    ";-separated list of features to enable (any of ${FEJIX_KNOWN_FEATURES})")
+    ";-separated list of features to enable (any of ${KNOWN_FEATURES})"
+)
 
-set(FEJIX_BUILD_TESTS OFF CACHE BOOL "Build tests")
+# This variable automatically tells CMake to build all libraries as shared
+set(BUILD_SHARED_LIBS ON CACHE BOOL "Build a shared (dynamic) library instead of a static library")
+
+set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 
 foreach(FEATURE IN LISTS FEJIX_FEATURES)
-    if(NOT FEATURE IN_LIST FEJIX_KNOWN_FEATURES)
+    if(NOT FEATURE IN_LIST KNOWN_FEATURES)
         message(WARNING
             "[fejix] unknown library feature in FEJIX_FEATURES ignored: \"${FEATURE}\""
-            " (expected any of ${FEJIX_KNOWN_FEATURES})"
+            " (expected any of ${KNOWN_FEATURES})"
         )
         continue()
     endif()
@@ -42,7 +46,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_OBJC_EXTENSIONS OFF)
 
 add_compile_options(
-    "$<$<AND:$<COMPILE_LANGUAGE:C,CXX,OBJC>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Wall;-Wextra;-Wpedantic;-Wunused;>"
+    "$<$<AND:$<COMPILE_LANGUAGE:C,CXX,OBJC>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Wall;-Wextra;-Wpedantic;-Wunused>"
     "$<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Werror=vla>"
     "$<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<C_COMPILER_ID:MSVC>>:/W4;/WX>"
 )
@@ -57,6 +61,11 @@ include_directories(".")
 
 # Main target
 add_library(fejix)
+
+set_target_properties(fejix PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
 
 target_include_directories(fejix PUBLIC "include")
 
@@ -83,13 +92,13 @@ endif()
 
 
 target_sources(fejix PRIVATE
-    "src/implementation.c"
-
+    "src/builtin_providers.c"
     "src/core/alloc.c"
-    "src/core/base.c"
     "src/core/map.c"
     "src/core/utils.c"
     "src/core/vec.c"
+    "src/ext/helpers/error.c"
+    "src/ext/helpers/provider.c"
 )
 
 if(FEJIX_BUILD_WINAPI)
@@ -109,26 +118,26 @@ if(FEJIX_BUILD_UNIXSHM)
 endif()
 
 
-if(FEJIX_BUILD_TESTS)
+if(BUILD_TESTS)
     enable_testing()
 
-    add_executable(core_vec_test "tests/core/vec.c")
-    target_link_libraries(core_vec_test fejix)
-    add_test(NAME core_vec_test COMMAND core_vec_test)
+    add_executable(test_core_vec "tests/core/vec.c")
+    target_link_libraries(test_core_vec fejix)
+    add_test(NAME test_core_vec COMMAND core_vec_test)
 
-    add_executable(core_map_test "tests/core/map.c")
-    target_link_libraries(core_map_test fejix)
-    add_test(NAME core_map_test COMMAND core_map_test)
+    add_executable(test_core_map "tests/core/map.c")
+    target_link_libraries(test_core_map fejix)
+    add_test(NAME test_core_map COMMAND core_map_test)
 
     if(FEJIX_BUILD_UNIXSHM)
-        add_executable(unixshm_test "tests/unixshm/test.c")
-        target_link_libraries(unixshm_test fejix)
-        add_test(NAME unixshm_test COMMAND unixshm_test)
+        add_executable(test_unixshm "tests/unixshm/test.c")
+        target_link_libraries(test_unixshm fejix)
+        add_test(NAME test_unixshm COMMAND unixshm_test)
     endif()
 
     if(FEJIX_BUILD_WINAPI)
-        add_executable(winapi_utils_test "tests/winapi/utils.c")
-        target_link_libraries(winapi_utils_test fejix)
-        add_test(NAME winapi_utils_test COMMAND winapi_utils_test)
+        add_executable(test_winapi_utils "tests/winapi/utils.c")
+        target_link_libraries(test_winapi_utils fejix)
+        add_test(NAME test_winapi_utils COMMAND winapi_utils_test)
     endif()
 endif()

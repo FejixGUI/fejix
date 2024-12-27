@@ -20,5 +20,4 @@ fejix_root = os.path.abspath('..')
 hawkmoth_root = fejix_root
 hawkmoth_clang = compiler.get_include_args()
 hawkmoth_clang += ['-std=c99']
-hawkmoth_clang += ['-DFJ_OPT_DOCS']
 hawkmoth_clang += ['-I' + os.path.join(fejix_root, 'include')]

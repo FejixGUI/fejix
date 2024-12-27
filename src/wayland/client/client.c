@@ -50,7 +50,7 @@ static struct wl_interface const *const wayland_interfaces[] = {
 /** Returns FJ_WAYLAND_INTERFACE_MAX if the global is not found in the list. */
 static uint32_t wayland_get_interface_id(char const * /*[]*/ interface_name)
 {
-    for (uint32_t i = 0; i < FJ_ARRAY_LEN(wayland_interface_names); i++) {
+    for (uint32_t i = 0; i < FJ_LEN(wayland_interface_names); i++) {
         if (wayland_interface_names[i] == NULL) {
             continue;
         }
@@ -86,7 +86,7 @@ void fj_wayland_get_global_by_id(
     *out_interface_id = FJ_WAYLAND_INTERFACE_MAX;
     *out_global = NULL;
 
-    for (uint32_t i = 0; i < FJ_ARRAY_LEN(client->interfaces); i++) {
+    for (uint32_t i = 0; i < FJ_LEN(client->interfaces); i++) {
         switch (fj_wayland_get_interface_type(i)) {
             case FJ_WAYLAND_INTERFACE_STATIC:
                 if (client->interfaces[i].global.id == object_id) {
@@ -511,9 +511,8 @@ fj_err_t fj_wayland_record_event(
     struct fj_wayland_event_wrapper new_wrapper = *wrapper;
 
     if (wrapper->event_size != 0) {
-        FJ_TRY (fj_alloc_copied(
-                    (void **) &new_wrapper.event, wrapper->event, wrapper->event_size
-                )) {
+        FJ_TRY (fj_alloc_copied((void **) &new_wrapper.event, wrapper->event, wrapper->event_size))
+        {
             return fj_result;
         }
     }
@@ -553,7 +552,8 @@ static fj_err_t wayland_connect(struct fj_client *client)
                 wl_display_get_fd(client->display),
                 POLLIN,
                 wayland_handle_poll_event
-            )) {
+            ))
+    {
         wl_display_disconnect(client->display);
         return fj_result;
     }
@@ -582,7 +582,7 @@ static fj_err_t wayland_init_registry(struct fj_client *client)
 
 static void wayland_init_global_lists(struct fj_client *client)
 {
-    for (uint32_t i = 0; i < FJ_ARRAY_LEN(client->interfaces); i++) {
+    for (uint32_t i = 0; i < FJ_LEN(client->interfaces); i++) {
         if (fj_wayland_get_interface_type(i) == FJ_WAYLAND_INTERFACE_DYNAMIC) {
             fj_vec_init(&client->interfaces[i].global_list, sizeof(struct fj_wayland_global));
         }
@@ -592,7 +592,7 @@ static void wayland_init_global_lists(struct fj_client *client)
 
 static void wayland_deinit_global_lists(struct fj_client *client)
 {
-    for (uint32_t i = 0; i < FJ_ARRAY_LEN(client->interfaces); i++) {
+    for (uint32_t i = 0; i < FJ_LEN(client->interfaces); i++) {
         if (fj_wayland_get_interface_type(i) == FJ_WAYLAND_INTERFACE_DYNAMIC) {
             fj_vec_deinit(&client->interfaces[i].global_list);
         }

@@ -4,66 +4,39 @@
 
 #include <fejix/interface/client.h>
 
-
-struct fj_window_manager;
-struct fj_window_builder;
-struct fj_window FJ_PUBLICLY({ union fj_tag tag; });
+#include <fejix/core/geometry.h>
 
 
-struct fj_window_builder_create_info {
-    union fj_tag tag;
+enum fj_window_manager_request_id {
+    FJ_WINDOW_MANAGER_ALLOC,
+    FJ_WINDOW_MANAGER_DEALLOC,
+    FJ_WINDOW_MANAGER_INIT,
+    FJ_WINDOW_MANAGER_DEINIT,
+
+    FJ_WINDOW_MANAGER_UPDATE_WINDOWS,
 };
 
-struct fj_window_redraw_info {
+enum fj_window_request_id {
+    FJ_WINDOW_ALLOC,
+    FJ_WINDOW_DEALLOC,
+    FJ_WINDOW_INIT,
+    FJ_WINDOW_INIT_CANVAS,
+    FJ_WINDOW_INIT_INPUT,
+    FJ_WINDOW_INIT_LAYOUT,
+    FJ_WINDOW_DEINIT,
+
+    FJ_WINDOW_UPDATE,
+    FJ_WINDOW_HINT_UPDATE,
+};
+
+
+FJ_DECLARE_ABSTRACT_OBJECT(fj_window_manager)
+FJ_DECLARE_ABSTRACT_OBJECT(fj_window)
+
+struct fj_window_info {
     struct fj_density2d density;
     struct fj_size2d size;
     fj_orientation_type_t orientation;
-};
-
-struct fj_window_callbacks {
-    // TODO an error-indicating result may be used to e.g. not show/redraw a window
-    fj_err_t (*update_content)(
-        struct fj_client *client,
-        struct fj_window *window,
-        struct fj_window_redraw_info const *redraw_info
-    );
-};
-
-struct fj_window_interface {
-    fj_err_t (*create_manager)(
-        struct fj_client *client,
-        struct fj_window_manager **manager,
-        struct fj_window_callbacks const *callbacks
-    );
-
-    fj_err_t (*destroy_manager)(struct fj_window_manager *manager);
-
-    fj_err_t (*create_window_builder)(
-        struct fj_window_manager *manager,
-        struct fj_window_builder **window_builder,
-        struct fj_window_builder_create_info const *create_info
-    );
-
-    fj_err_t (*destroy_window_builder)(
-        struct fj_window_manager *manager,
-        struct fj_window_builder *window_builder
-    );
-
-    fj_err_t (*create_window)(
-        struct fj_window_manager *manager,
-        struct fj_window_builder *window_builder,
-        struct fj_window **window
-    );
-
-    fj_err_t (*destroy_window)(struct fj_window_manager *manager, struct fj_window *window);
-
-    void (*hint_window_content_update)(struct fj_window_manager *manager, struct fj_window *window);
-
-    fj_err_t (*update_windows)(
-        struct fj_window_manager *manager,
-        struct fj_window *const *windows,
-        uint32_t window_count
-    );
 };
 
 

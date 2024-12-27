@@ -66,6 +66,45 @@ fj_err_t fj_vec_resize_to_fit(struct fj_vec *vec)
 }
 
 
+uint32_t fj_vec_get_last_index(struct fj_vec const *vec)
+{
+    if (vec->length == 0) {
+        return 0;
+    }
+
+    return vec->length - 1;
+}
+
+uint32_t fj_vec_get_push_index(struct fj_vec const *vec)
+{
+    return vec->length;
+}
+
+fj_bool8_t fj_vec_is_empty(struct fj_vec const *vec)
+{
+    return vec->length == 0;
+}
+
+fj_bool8_t fj_vec_has_allocated(struct fj_vec const *vec)
+{
+    return vec->items != NULL;
+}
+
+void *fj_vec_offset(struct fj_vec const *vec, uint32_t offset_index)
+{
+    if (offset_index >= vec->_capacity) {
+        return NULL;
+    }
+
+    return (uint8_t *) vec->items + vec->_item_size * (size_t) offset_index;
+}
+
+void *fj_vec_last_item(struct fj_vec const *vec)
+{
+    return fj_vec_offset(vec, fj_vec_get_last_index(vec));
+}
+
+
 static fj_err_t vec_maybe_shrink(struct fj_vec *vec)
 {
     uint32_t new_capacity = vec_get_capacity_to_shrink(vec);

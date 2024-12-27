@@ -5,51 +5,41 @@
 #include <fejix/core/base.h>
 
 
-struct fj_client FJ_PUBLICLY({ union fj_tag tag; });
+enum fj_client_request_id {
+    FJ_CLIENT_ALLOC,
+    FJ_CLIENT_DEALLOC,
+    FJ_CLIENT_INIT,
+    FJ_CLIENT_INIT_NAME,
+    FJ_CLIENT_DEINIT,
 
+    FJ_CLIENT_LAUNCH,
+    FJ_CLIENT_QUIT,
+    FJ_CLIENT_IDLE,
+    FJ_CLIENT_SET_SLEEP_TIMEOUT,
+    FJ_CLIENT_BLOCK_FOR_EVENTS,
+    FJ_CLIENT_WAKEUP,
 
-struct fj_client_callbacks {
-    fj_err_t (*quit)(struct fj_client *client);
+    /** Received on launching. */
+    FJ_CLIENT_FORCED_ETERNAL,
 
-    fj_err_t (*idle)(struct fj_client *client);
-};
-
-struct fj_client_create_info {
-    union fj_tag tag;
-
-    /** Implementation-dependent extra creation information. Set to NULL if unused. */
-    void *extra_info;
-
-    /** String that should uniquely identify the app to the shell. */
-    char const *name;
-};
-
-struct fj_client_interface {
-    /**
-        Callbacks and info are deep-copied where applicable.
-
-        :param client: Returns the client or NULL on failure.
-    */
-    fj_err_t (*create)(
-        struct fj_client **client,
-        struct fj_client_callbacks const *callbacks,
-        struct fj_client_create_info const *info
-    );
-
-    fj_err_t (*destroy)(struct fj_client *client);
+    /** Received on launching. */
+    FJ_CLIENT_FORCED_NONBLOCKING,
 
     /**
-        Runs a message polling loop.
-        Calls ``idle`` before every polling iteration.
+        The client looses input focus, so the next sleep may not return in a while.
+        Analogous to UIApplicationDelegate/applicationWillResignActive.
     */
-    fj_err_t (*run)(struct fj_client *client);
+    FJ_CLIENT_FORCED_SLEEP,
 
-    /** Thread-safe provided that the client is not being destroyed. */
-    fj_err_t (*wakeup)(struct fj_client *client);
-
-    void (*request_quit)(struct fj_client *client);
-
-    void (*request_idle)(struct fj_client *client);
+    /**
+        The client entered background.
+        Analogous to UIApplicationDelegate/applicationDidEnterBackground.
+    */
+    FJ_CLIENT_FORCED_HIBERNATE,
 };
+
+
+FJ_DECLARE_ABSTRACT_OBJECT(fj_client)
+
 
 #endif

@@ -15,25 +15,12 @@ input and more.
 >
 > Yay.
 
+
 ## Build
 
-### Library
+Run:
 
 ```sh
 cmake -S . -B build -D FEJIX_FEATURES="feature1;feature2;feature3"
 cmkake --build build
-```
-
-### Documentation
-
-Prerequisites:
-* Python 3
-* [Sphinx](https://www.sphinx-doc.org/en/master/) - documentation generator
-* [Hawkmoth](https://github.com/jnikula/hawkmoth) - Sphinx C extension
-* [Furo](https://github.com/pradyunsg/furo) - Sphinx theme
-
-Run:
-```sh
-cd docs
-make html
 ```

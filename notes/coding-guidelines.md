@@ -4,10 +4,10 @@ Here are some consistency guidelines.
 
 ## Formatting
 
-Use `.clang-format` with these few quirks:
+Use `.clang-format` and note a few things:
 
 * Put trailing commas wherever possible.
-* Separate function difinitions with 2 empty lines.
+* Separate separate function difinitions or any types of definition blocks with 2 empty lines.
 
 ## Documenting
 
@@ -35,15 +35,17 @@ Use `.clang-format` with these few quirks:
 
 ## Naming
 
-You can use the following common structure name suffixes:
+| Prefix | Meaning                   |
+| ------ | ------------------------- |
+| `out_` | Output function parameter |
 
-| Suffix | Meaning |
-| ------ | ------- |
-| `_interface` | Interface functions (provided by the library) |
-| `_callbacks` | Interface callbacks (provided by the user) |
-| `_manager` | Interface manager (global interface data) |
-| `_info` | Any information provided by the user or by the library to the user |
-| `_create_info` | Information to create some object |
+| Suffix         | Meaning                                                            |
+| -------------- | ------------------------------------------------------------------ |
+| `_interface`   | Interface functions (provided by the library)                      |
+| `_callbacks`   | Interface callbacks (provided by the user)                         |
+| `_manager`     | Interface manager (global interface data)                          |
+| `_info`        | Any information provided by the user or by the library to the user |
+| `_create_info` | Information to create some object                                  |
 
 ## Errors
 

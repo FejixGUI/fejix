@@ -7,12 +7,14 @@
 
 
 /* Based on khrplatform.h from Khronos. */
-#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__) && !defined(FJ_OPT_DOCS)
-#    define FJ_OPENGL_ABI_CALL __stdcall
+#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
+#    define FJ_OPENGL_ABI_IMPL __stdcall
 #else
-/** OpenGL ABI calling convention native to the target OS. */
-#    define FJ_OPENGL_ABI_CALL
+#    define FJ_OPENGL_ABI_IMPL
 #endif
+
+/** OpenGL ABI calling convention native to the target OS. */
+#define FJ_OPENGL_ABI FJ_OPENGL_ABI_IMPL
 
 
 typedef uint32_t fj_opengl_implementation_id_t;
@@ -85,11 +87,9 @@ enum fj_opengl_context_attribute_id {
 };
 
 
-typedef void (FJ_OPENGL_ABI_CALL *fj_opengl_function_pointer_t)(void);
+typedef void(FJ_OPENGL_ABI *fj_opengl_function_t)(void);
 
-typedef fj_opengl_function_pointer_t (FJ_OPENGL_ABI_CALL *fj_opengl_function_getter_t)(
-    char const *function_name
-);
+typedef fj_opengl_function_t(FJ_OPENGL_ABI *fj_opengl_function_getter_t)(char const *function_name);
 
 
 struct fj_opengl_manager;

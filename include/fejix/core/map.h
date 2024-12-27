@@ -46,33 +46,40 @@ struct fj_map_iter {
 };
 
 
-FJ_EXTERN_C_BEGIN
-
 /** Initialises the map, never allocates. */
+FJ_API
 void fj_map_init(struct fj_map *map, fj_tag_type_t key_type, fj_tag_type_t value_type);
 
 /** Frees the allocated memory. */
+FJ_API
 void fj_map_deinit(struct fj_map *map);
 
 /**  */
+FJ_API
 fj_bool8_t fj_map_is_empty(struct fj_map const *map);
 
 /** */
+FJ_API
 fj_bool8_t fj_map_has_allocated(struct fj_map const *map);
 
 /** */
+FJ_API
 fj_err_t fj_map_set(struct fj_map *map, union fj_tag key, union fj_tag value);
 
 /** Returns the pointer to value. Returns NULL if the key was not found. */
+FJ_API
 union fj_tag *fj_map_get(struct fj_map const *map, union fj_tag key);
 
 /** */
+FJ_API
 fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key);
 
 /** */
+FJ_API
 void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map);
 
 /** */
+FJ_API
 fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter);
 
 /**
@@ -80,9 +87,8 @@ fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter);
 
     :param element: Returns the next element or NULL.
 */
+FJ_API
 fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element);
 
-
-FJ_EXTERN_C_END
 
 #endif

@@ -7,8 +7,6 @@ ColumnLimit: 100
 IndentWidth: 4
 InsertNewlineAtEOF: true
 
-MaxEmptyLinesToKeep: 2
-
 # int x()
 # {
 #     ...
@@ -19,7 +17,32 @@ MaxEmptyLinesToKeep: 2
 # {
 #     ...
 # }
+MaxEmptyLinesToKeep: 2
 SeparateDefinitionBlocks: Leave
+
+# int x() { }
+#          ^
+SpaceInEmptyBlock: true
+
+# (int) x
+#      ^
+SpaceAfterCStyleCast: true
+
+# (struct x) {
+#     .s = (struct s) {
+#         .x = 1,
+#         .y = 2,       <- put trailing commas everywhere for the magic to work
+#     },                <- put trailing commas everywhere for the magic to work
+# }
+SpaceBeforeCpp11BracedList: true
+Cpp11BracedListStyle: false
+
+# myvar = somethinglonglonglonglong
+#   + somethinglonglonglonglong
+#   + somethinglonglonglonglong;
+AlignOperands: DontAlign
+BreakBeforeBinaryOperators: NonAssignment
+PenaltyBreakAssignment: 100
 
 # int x()
 # {                             <-
@@ -41,37 +64,15 @@ BraceWrapping:
     AfterClass: true
     AfterNamespace: true
 
-# int x(
+# [[attribute]]
+# somethinglonglonglonglong x(
 #     somethinglonglonglonglong,
 #     somethinglonglonglonglong
 # )
+BreakAfterAttributes: Always
 BinPackArguments: false
 AlignAfterOpenBracket: BlockIndent
 PenaltyReturnTypeOnItsOwnLine: 1000
-
-# (struct x) {
-#     .s = (struct s) {
-#         .x = 1,
-#         .y = 2,       <- put trailing commas everywhere for the magic to work
-#     },                <- put trailing commas everywhere for the magic to work
-# }
-SpaceBeforeCpp11BracedList: true
-Cpp11BracedListStyle: false
-
-# myvar = somethinglonglonglonglong
-#   + somethinglonglonglonglong
-#   + somethinglonglonglonglong;
-AlignOperands: DontAlign
-BreakBeforeBinaryOperators: NonAssignment
-PenaltyBreakAssignment: 100
-
-# int x() { }
-#          ^
-SpaceInEmptyBlock: true
-
-# (int) x
-#      ^
-SpaceAfterCStyleCast: true
 
 # static inline int *f(struct X const *const *x);
 QualifierAlignment: Custom
@@ -91,10 +92,11 @@ AlignEscapedNewlines: Left
 IndentPPDirectives: AfterHash
 
 Macros:
-    # FIXME clang-format v18 bug, this workaround is fine-tuned to work on a specific line in
-    # <root>/include/fejix/interface/opengl.h
+    # FIXME clang-format v18 bug: bad function typedef recognition, incorrect macro formatting
+    # As a workaround we make the expansion text roughly the same length as the macro name.
     # The right non-workaround solution would be to define it as an empty macro.
     - 'FJ_OPENGL_ABI_CALL=*const*const*const'
+    - 'FJ_API=[[unused]]'
 
 IfMacros:
     - 'FJ_TRY'
