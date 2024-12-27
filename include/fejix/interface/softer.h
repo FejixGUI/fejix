@@ -128,7 +128,7 @@ struct fj_softer_interface {
 
 
 /** Returns 0 for unknown formats. */
-FJ_API
+FJ_PUBLIC
 size_t fj_softer_get_pixel_size(fj_softer_pixel_format_t pixel_format);
 
 

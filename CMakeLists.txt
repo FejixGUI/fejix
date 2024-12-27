@@ -8,8 +8,11 @@ project(fejix
 )
 
 set(KNOWN_FEATURES
-    "wayland" "winapi" "x11"
-    "softer" "opengl"
+    "wayland"
+    "winapi"
+    "x11"
+    "softer"
+    "opengl"
 )
 
 set(FEJIX_FEATURES "" CACHE STRING
@@ -46,8 +49,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_OBJC_EXTENSIONS OFF)
 
 add_compile_options(
-    "$<$<AND:$<COMPILE_LANGUAGE:C,CXX,OBJC>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Wall;-Wextra;-Wpedantic;-Wunused>"
-    "$<$<AND:$<COMPILE_LANGUAGE:C>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Werror=vla>"
+    "$<$<AND:$<COMPILE_LANGUAGE:C,CXX,OBJC>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Wall;-Wextra;-Wpedantic;-Wunused;-Werror=vla>"
     "$<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<C_COMPILER_ID:MSVC>>:/W4;/WX>"
 )
 
@@ -72,36 +74,35 @@ target_include_directories(fejix PUBLIC "include")
 target_compile_definitions(fejix PRIVATE "FJ_OPT_INTERNAL")
 
 # These flags specify what modules to build
-set(FEJIX_BUILD_WAYLAND OFF)
-set(FEJIX_BUILD_WAYLAND_SOFTER OFF)
-set(FEJIX_BUILD_WINAPI OFF)
-set(FEJIX_BUILD_UNIXSHM OFF)
+set(BUILD_WAYLAND OFF)
+set(BUILD_WAYLAND_SOFTER OFF)
+set(BUILD_WINAPI OFF)
+set(BUILD_UNIXSHM OFF)
 
 if("wayland" IN_LIST FEJIX_FEATURES)
-    set(FEJIX_BUILD_WAYLAND ON)
+    set(BUILD_WAYLAND ON)
 
     if("softer" IN_LIST FEJIX_FEATURES)
-        set(FEJIX_BUILD_WAYLAND_SOFTER ON)
-        set(FEJIX_BUILD_UNIXSHM ON)
+        set(BUILD_WAYLAND_SOFTER ON)
+        set(BUILD_UNIXSHM ON)
     endif()
 endif()
 
 if("winapi" IN_LIST FEJIX_FEATURES)
-    set(FEJIX_BUILD_WINAPI ON)
+    set(BUILD_WINAPI ON)
 endif()
 
 
 target_sources(fejix PRIVATE
-    "src/builtin_providers.c"
     "src/core/alloc.c"
     "src/core/map.c"
     "src/core/utils.c"
     "src/core/vec.c"
-    "src/ext/helpers/error.c"
-    "src/ext/helpers/provider.c"
+    "src/generic/client.c"
+    "src/generic/softer.c"
 )
 
-if(FEJIX_BUILD_WINAPI)
+if(BUILD_WINAPI)
     target_sources(fejix PRIVATE
         "src/winapi/implementation.c"
         "src/winapi/utils.c"
@@ -111,7 +112,7 @@ if(FEJIX_BUILD_WINAPI)
     )
 endif()
 
-if(FEJIX_BUILD_UNIXSHM)
+if(BUILD_UNIXSHM)
     target_sources(fejix PRIVATE
         "src/unixshm/unixshm.c"
     )
@@ -129,13 +130,13 @@ if(BUILD_TESTS)
     target_link_libraries(test_core_map fejix)
     add_test(NAME test_core_map COMMAND core_map_test)
 
-    if(FEJIX_BUILD_UNIXSHM)
+    if(BUILD_UNIXSHM)
         add_executable(test_unixshm "tests/unixshm/test.c")
         target_link_libraries(test_unixshm fejix)
         add_test(NAME test_unixshm COMMAND unixshm_test)
     endif()
 
-    if(FEJIX_BUILD_WINAPI)
+    if(BUILD_WINAPI)
         add_executable(test_winapi_utils "tests/winapi/utils.c")
         target_link_libraries(test_winapi_utils fejix)
         add_test(NAME test_winapi_utils COMMAND winapi_utils_test)

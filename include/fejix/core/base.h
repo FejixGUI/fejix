@@ -8,39 +8,37 @@
 
 
 #ifdef __cplusplus
-#    define FJ_API_LINKAGE extern "C"
+#    define FJ_C_LINKAGE extern "C"
 #else
-#    define FJ_API_LINKAGE
+#    define FJ_C_LINKAGE
 #endif
 
 #if defined(_WIN32) && defined(FJ_OPT_INTERNAL)
-#    define FJ_API_VISIBILITY __declspec(dllexport)
+#    define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-#    define FJ_API_VISIBILITY __attribute__((visibility("default")))
+#    define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
 #else
-#    define FJ_API_VISIBILITY
+#    define FJ_PUBLIC_VISIBILITY
 #endif
 
-#define FJ_API FJ_API_LINKAGE FJ_API_VISIBILITY
+#define FJ_PUBLIC FJ_C_LINKAGE FJ_PUBLIC_VISIBILITY
+
 
 #ifdef FJ_OPT_INTERNAL
 #    define FJ_DECLARE_ABSTRACT_OBJECT(STRUCT_NAME) struct STRUCT_NAME;
-#    define FJ_DEFINE_ABSTRACT_OBJECT struct fj_object object;
+#    define FJ_EXTENDS_ABSTRACT_OBJECT struct fj_object object;
+#    define FJ_OBJECT(OBJECT) ((struct fj_object *) (void *) (OBJECT))
 #else
 #    define FJ_DECLARE_ABSTRACT_OBJECT(STRUCT_NAME) \
         struct STRUCT_NAME {                        \
             struct fj_object object;                \
         };
+#    define FJ_OBJECT(OBJECT) (&(OBJECT)->object)
 #endif
 
 
-#ifdef FJ_OPT_INTERNAL
-#    define FJ_RESPOND(OBJ, REQUEST_ID, REQUEST, RESPONSE) \
-        (((struct fj_object *) (void *) (OBJ))->respond((OBJ), (REQUEST_ID), (REQUEST), (RESPONSE)))
-#else
-#    define FJ_RESPOND(OBJECT, REQUEST_ID, REQUEST, RESPONSE) \
-        ((OBJECT)->object.respond((OBJECT), (REQUEST_ID), (REQUEST), (RESPONSE)))
-#endif
+#define FJ_RESPOND(OBJECT, REQUEST_ID, REQUEST, RESPONSE) \
+    (FJ_OBJECT(OBJECT)->respond((OBJECT), (REQUEST_ID), (REQUEST), (RESPONSE)))
 
 
 /** Error code. */
@@ -51,6 +49,8 @@ enum fj_err {
     FJ_OK,
     FJ_ERR_UNKNOWN,
     FJ_ERR_UNSUPPORTED,
+    FJ_ERR_NOT_FOUND,
+    FJ_ERR_CANNOT_SELECT_IMPLEMENTATION,
     FJ_ERR_ALLOCATION_FAILED,
     FJ_ERR_INVALID_ALLOCATION,
     FJ_ERR_CONNECTION_FAILED,

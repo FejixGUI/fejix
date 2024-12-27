@@ -96,7 +96,8 @@ Macros:
     # As a workaround we make the expansion text roughly the same length as the macro name.
     # The right non-workaround solution would be to define it as an empty macro.
     - 'FJ_OPENGL_ABI_CALL=*const*const*const'
-    - 'FJ_API=[[unused]]'
+
+    - 'FJ_PUBLIC=[[unused]]'
 
 IfMacros:
     - 'FJ_TRY'

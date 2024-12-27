@@ -8,6 +8,8 @@
 
 
 enum fj_window_manager_request_id {
+    FJ_WINDOW_MANAGER_GET_WINDOW,
+
     FJ_WINDOW_MANAGER_ALLOC,
     FJ_WINDOW_MANAGER_DEALLOC,
     FJ_WINDOW_MANAGER_INIT,
