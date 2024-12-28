@@ -1,4 +1,4 @@
-# Fejix graphical client library
+# Fejix - cross-platform graphical client library
 
 Fejix is a cross-platform C99 base library for clients of graphical shells.
 Its goal is to wrap graphical shell protocols (Windows API, Wayland, X11 etc.) to provide a common
@@ -21,6 +21,15 @@ input and more.
 Run:
 
 ```sh
-cmake -S . -B build -D FEJIX_FEATURES="feature1;feature2;feature3"
+# Configure
+cmake -S . -B build \
+    -D FEJIX_FEATURES="feature1;feature2;.." \
+    -D BUILD_SHARED_LIBS=ON # or OFF
+
+# Compile
 cmkake --build build
 ```
+
+## Documentation
+
+See [documentation README](./docs/README.md).

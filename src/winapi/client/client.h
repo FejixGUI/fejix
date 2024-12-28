@@ -3,32 +3,19 @@
 
 
 #include <fejix/interface/client.h>
-#include <fejix/interface/client_wait_timeout.h>
 
 #include <windows.h>
 
 
 struct fj_client {
-    union fj_tag tag;
-    struct fj_client_callbacks callbacks;
+    FJ_EXTENDS_ABSTRACT_OBJECT
 
     HINSTANCE instance;
 
-    /** 0 means unset */
-    fj_timeout_t wait_timeout;
-
-    HWND message_window;
-
-    fj_bool8_t is_idle_requested;
-    fj_bool8_t is_quit_requested;
+    HWND global_window;
+    fj_seconds_t wakeup_timeout;
+    fj_bool8_t is_finished;
 };
-
-
-LONG_PTR fj_winapi_client_handle_message_safely(
-    struct fj_client *client,
-    MSG const *message,
-    fj_err_t (*handle_message)(struct fj_client *client, MSG const *message, LONG_PTR *result)
-);
 
 
 #endif

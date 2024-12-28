@@ -21,6 +21,11 @@
 #    define FJ_PUBLIC_VISIBILITY
 #endif
 
+/**
+    Attribute that marks public library API.
+    This typically means exporting function symbols when building a shared library.
+    This also adds ``extern "C"`` for C++.
+*/
 #define FJ_PUBLIC FJ_C_LINKAGE FJ_PUBLIC_VISIBILITY
 
 
@@ -29,16 +34,21 @@
 #    define FJ_EXTENDS_ABSTRACT_OBJECT struct fj_object object;
 #    define FJ_OBJECT(OBJECT) ((struct fj_object *) (void *) (OBJECT))
 #else
+/**
+    Declares a struct that is publicly usable as an object.
+*/
 #    define FJ_DECLARE_ABSTRACT_OBJECT(STRUCT_NAME) \
         struct STRUCT_NAME {                        \
             struct fj_object object;                \
         };
+/** Type-safe access to a struct that acts like an object. */
 #    define FJ_OBJECT(OBJECT) (&(OBJECT)->object)
 #endif
 
 
-#define FJ_RESPOND(OBJECT, REQUEST_ID, REQUEST, RESPONSE) \
-    (FJ_OBJECT(OBJECT)->respond((OBJECT), (REQUEST_ID), (REQUEST), (RESPONSE)))
+/** A short helper to send a request to an object. */
+#define FJ_RESPOND(OBJECT, REQUEST_ID, REQUEST, OUT_RESPONSE) \
+    (FJ_OBJECT(OBJECT)->respond((OBJECT), (REQUEST_ID), (REQUEST), (OUT_RESPONSE)))
 
 
 /** Error code. */
@@ -46,21 +56,37 @@ typedef uint32_t fj_err_t;
 
 /** Error codes. */
 enum fj_err {
+    /** */
     FJ_OK,
+    /** */
     FJ_ERR_UNKNOWN,
+    /** */
     FJ_ERR_UNSUPPORTED,
+    /** */
     FJ_ERR_NOT_FOUND,
+    /** */
     FJ_ERR_CANNOT_SELECT_IMPLEMENTATION,
+    /** */
     FJ_ERR_ALLOCATION_FAILED,
+    /** */
     FJ_ERR_INVALID_ALLOCATION,
+    /** */
     FJ_ERR_CONNECTION_FAILED,
+    /** */
     FJ_ERR_REQUEST_SENDING_FAILED,
+    /** */
     FJ_ERR_REQUEST_FAILED,
+    /** */
     FJ_ERR_EVENT_WAITING_FAILED,
+    /** */
     FJ_ERR_EVENT_READING_FAILED,
+    /** */
     FJ_ERR_INVALID_TEXT_ENCODING,
+    /** */
     FJ_ERR_INTERFACE_INIT_FAILED,
+    /** */
     FJ_ERR_TEMP_FILE_CREATION_FAILED,
+    /** */
     FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED,
 
     FJ_ERR_MAX = FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED,
@@ -70,10 +96,10 @@ enum fj_err {
 };
 
 
-/** */
+/** Tag type. */
 typedef uint32_t fj_tag_type_t;
 
-/** */
+/** Tag types */
 enum fj_tag_type {
     /** */
     FJ_TAG_U32,
@@ -114,27 +140,47 @@ union fj_tag {
 };
 
 
+/** An ID of a request sent to an object. */
+typedef uint32_t fj_request_id_t;
+
+enum fj_request_id {
+    /** */
+    FJ_REQUEST_PUBLIC_STATIC = 0,
+    /** */
+    FJ_REQUEST_PUBLIC_STATIC_SUBINTERFACING = 0x100,
+    /** */
+    FJ_REQUEST_PUBLIC_INITIALISATION = 0x300,
+    /** */
+    FJ_REQUEST_PUBLIC = 0x400,
+    /** */
+    FJ_REQUEST_PRIVATE = 0x600,
+    /** */
+    FJ_REQUEST_USER = 0x800,
+};
+
 /** Use standard ``true``/``false`` for this. */
 typedef uint8_t fj_bool8_t;
 
+/** Time in seconds. Timeouts typically use value from ``0..+inf``. */
 typedef double fj_seconds_t;
 
 
-typedef uint32_t fj_request_id_t;
-
+/** Object's dispatching method. */
 typedef fj_err_t (*fj_responder_t)(
     void *object,
     fj_request_id_t request_id,
     void const *request,
-    void *response
+    void *out_response
 );
 
+/** Dynamically dispatchable object. */
 struct fj_object {
     union fj_tag tag;
     fj_responder_t respond;
 };
 
 
+/** */
 struct fj_version {
     uint16_t major;
     uint16_t minor;

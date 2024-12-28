@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(fejix
     VERSION 0.0.1
-    DESCRIPTION "Graphical client library"
+    DESCRIPTION "Cross-platform graphical client library"
     HOMEPAGE_URL "https://github.com/FejixGUI/fejix"
     LANGUAGES "C"
 )
@@ -104,10 +104,8 @@ target_sources(fejix PRIVATE
 
 if(BUILD_WINAPI)
     target_sources(fejix PRIVATE
-        "src/winapi/implementation.c"
         "src/winapi/utils.c"
         "src/winapi/client/client.c"
-        "src/winapi/sleep_timer/sleep_timer.c"
         "src/winapi/window/window.c"
     )
 endif()
