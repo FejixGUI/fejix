@@ -39,47 +39,48 @@ struct fj_map {
 /** Iterator over map. */
 struct fj_map_iter {
     struct fj_map const *map;
-    uint32_t bucket_index;
+
+    uint32_t _bucket_index;
 
     /* Can be NULL. */
-    struct fj_map_node *current_node;
+    struct fj_map_node *_current_node;
 };
 
 
 /** Initialises the map, never allocates. */
-FJ_PUBLIC
+FJ_EXPORT
 void fj_map_init(struct fj_map *map, fj_tag_type_t key_type, fj_tag_type_t value_type);
 
 /** Frees the allocated memory. */
-FJ_PUBLIC
+FJ_EXPORT
 void fj_map_deinit(struct fj_map *map);
 
 /**  */
-FJ_PUBLIC
+FJ_EXPORT
 fj_bool8_t fj_map_is_empty(struct fj_map const *map);
 
 /** */
-FJ_PUBLIC
+FJ_EXPORT
 fj_bool8_t fj_map_has_allocated(struct fj_map const *map);
 
 /** */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_map_set(struct fj_map *map, union fj_tag key, union fj_tag value);
 
 /** Returns the pointer to value. Returns NULL if the key was not found. */
-FJ_PUBLIC
+FJ_EXPORT
 union fj_tag *fj_map_get(struct fj_map const *map, union fj_tag key);
 
 /** */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key);
 
 /** */
-FJ_PUBLIC
+FJ_EXPORT
 void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map);
 
 /** */
-FJ_PUBLIC
+FJ_EXPORT
 fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter);
 
 /**
@@ -87,7 +88,7 @@ fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter);
 
     :param element: Returns the next element or NULL.
 */
-FJ_PUBLIC
+FJ_EXPORT
 fj_bool8_t fj_map_iter_next(struct fj_map_iter *iter, struct fj_map_element **element);
 
 

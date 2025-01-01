@@ -8,6 +8,8 @@
 static char const *const error_descriptions[FJ_ERR_MAX + 1] = {
     [FJ_OK] = "success",
     [FJ_ERR_UNKNOWN] = "unknown error",
+    [FJ_ERR_NOT_FOUND] = "not found",
+    [FJ_ERR_CANNOT_SELECT_IMPLEMENTATION] = "cannot select implementation",
     [FJ_ERR_ALLOCATION_FAILED] = "allocation failed (out of memory)",
     [FJ_ERR_INVALID_ALLOCATION] = "invalid allocation",
     [FJ_ERR_CONNECTION_FAILED] = "connection failed",
@@ -22,14 +24,14 @@ static char const *const error_descriptions[FJ_ERR_MAX + 1] = {
 };
 
 
-char const *fj_ext_error_get_description(fj_err_t error)
+char const *fj_error_get_description(fj_err_t error)
 {
     if (error >= FJ_ERR_USER) {
         return "user-defined error";
     }
 
     if (error > FJ_ERR_MAX) {
-        return "invalid error ID";
+        return "unknown future error (external implementation might have used a newer base)";
     }
 
     if (error_descriptions[error] == NULL) {

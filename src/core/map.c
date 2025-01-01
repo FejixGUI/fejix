@@ -442,57 +442,57 @@ fj_err_t fj_map_remove(struct fj_map *map, union fj_tag key)
 void fj_map_iter_init(struct fj_map_iter *iter, struct fj_map const *map)
 {
     iter->map = map;
-    iter->bucket_index = 0;
-    iter->current_node = NULL;
+    iter->_bucket_index = 0;
+    iter->_current_node = NULL;
 }
 
 
 fj_bool8_t fj_map_iter_finished(struct fj_map_iter const *iter)
 {
-    return iter->bucket_index >= iter->map->_bucket_count;
+    return iter->_bucket_index >= iter->map->_bucket_count;
 }
 
 
 static fj_bool8_t iter_process_result(struct fj_map_iter *iter, struct fj_map_element **element)
 {
-    if (iter->current_node == NULL) {
+    if (iter->_current_node == NULL) {
         *element = NULL;
         return false;
     }
 
-    *element = &iter->current_node->element;
+    *element = &iter->_current_node->element;
     return true;
 }
 
 static fj_bool8_t iter_can_walk_nodes(struct fj_map_iter const *iter)
 {
-    return iter->current_node != NULL && iter->current_node->next != NULL;
+    return iter->_current_node != NULL && iter->_current_node->next != NULL;
 }
 
 static void iter_walk_nodes(struct fj_map_iter *iter)
 {
-    iter->current_node = iter->current_node->next;
+    iter->_current_node = iter->_current_node->next;
 }
 
 static fj_bool8_t iter_started_bucket(struct fj_map_iter const *iter)
 {
-    return iter->current_node != NULL;
+    return iter->_current_node != NULL;
 }
 
 static fj_bool8_t iter_can_start_bucket(struct fj_map_iter const *iter)
 {
-    return iter->map->_buckets[iter->bucket_index] != NULL;
+    return iter->map->_buckets[iter->_bucket_index] != NULL;
 }
 
 static void iter_start_bucket(struct fj_map_iter *iter)
 {
-    iter->current_node = iter->map->_buckets[iter->bucket_index];
+    iter->_current_node = iter->map->_buckets[iter->_bucket_index];
 }
 
 static void iter_next_bucket(struct fj_map_iter *iter)
 {
-    iter->bucket_index++;
-    iter->current_node = NULL;
+    iter->_bucket_index++;
+    iter->_current_node = NULL;
 }
 
 static void iter_walk_buckets(struct fj_map_iter *iter)

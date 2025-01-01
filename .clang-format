@@ -97,7 +97,7 @@ Macros:
     # The right non-workaround solution would be to define it as an empty macro.
     - 'FJ_OPENGL_ABI_CALL=*const*const*const'
 
-    - 'FJ_PUBLIC=[[unused]]'
+    - 'FJ_EXPORT=[[unused]]'
 
 IfMacros:
     - 'FJ_TRY'

@@ -74,7 +74,7 @@
 
     :param out_ptr: Returns a new pointer or NULL on failure.
 */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_alloc_uninit(void **out_ptr, size_t size);
 
 /**
@@ -83,7 +83,7 @@ fj_err_t fj_alloc_uninit(void **out_ptr, size_t size);
 
     :param out_ptr: Returns a new pointer or NULL on failure.
 */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_alloc_zeroed(void **out_ptr, size_t size);
 
 /**
@@ -91,7 +91,7 @@ fj_err_t fj_alloc_zeroed(void **out_ptr, size_t size);
 
     :param out_ptr: Returns a new pointer or NULL on failure.
 */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_alloc_copied(void **out_ptr, void const *source, size_t size);
 
 /**
@@ -99,7 +99,7 @@ fj_err_t fj_alloc_copied(void **out_ptr, void const *source, size_t size);
 
     :param out_ptr: References the pointer to be freed, always returns NULL.
 */
-FJ_PUBLIC
+FJ_EXPORT
 void fj_free(void **out_ptr);
 
 /**
@@ -114,14 +114,14 @@ void fj_free(void **out_ptr);
 
     :param out_ptr: Returns a new pointer on success, does not change the pointer on failure.
 */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_realloc_uninit(void **out_ptr, uint32_t item_count, size_t item_size);
 
 /**
     Similar to :c:func:`fj_realloc_uninit`, but all new items of the array are initialised to
     zeroes.
 */
-FJ_PUBLIC
+FJ_EXPORT
 fj_err_t fj_realloc_zeroed(
     void **out_ptr,
     uint32_t old_item_count,

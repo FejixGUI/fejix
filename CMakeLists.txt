@@ -11,7 +11,7 @@ set(KNOWN_FEATURES
     "wayland"
     "winapi"
     "x11"
-    "softer"
+    "ram"
     "opengl"
 )
 

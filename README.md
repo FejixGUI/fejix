@@ -33,3 +33,9 @@ cmkake --build build
 ## Documentation
 
 See [documentation README](./docs/README.md).
+
+
+## License
+
+Copyright 2024-2025 Mark Lagodych.
+Licensed under [Apache-2.0](./LICENSE.txt).

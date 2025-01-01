@@ -24,39 +24,39 @@ enum fj_orientation_type {
 };
 
 
-struct fj_position2d {
+struct fj_position {
     uint32_t x;
     uint32_t y;
 };
 
-struct fj_offset2d {
+struct fj_relative_position {
     int32_t x;
     int32_t y;
 };
 
-struct fj_size2d {
+struct fj_size {
     uint32_t width;
     uint32_t height;
 };
 
-struct fj_density2d {
-    /** Number of pixels per ``unit_length``. */
-    uint32_t vertical;
-    /** Number of pixels per ``unit_length``. */
-    uint32_t horizontal;
+struct fj_density {
+    /** Number of pixels per ``physical_unit_length``. */
+    uint32_t vertical_pixels_per_unit;
+    /** Number of pixels per ``physical_unit_length``. */
+    uint32_t horizontal_pixels_per_unit;
 
     /** The length of the unit in metres. */
-    uint32_t unit_length;
+    uint32_t physical_unit_length;
 };
 
-struct fj_rect2d {
-    struct fj_position2d position;
-    struct fj_size2d size;
+struct fj_rect {
+    struct fj_position position;
+    struct fj_size size;
 };
 
-struct fj_viewport2d {
-    struct fj_offset2d offset;
-    struct fj_size2d size;
+struct fj_relative_rect {
+    struct fj_relative_position relative_position;
+    struct fj_size size;
 };
 
 

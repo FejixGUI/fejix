@@ -7,48 +7,35 @@
 #include <stdint.h>
 
 
-#ifdef __cplusplus
-#    define FJ_C_LINKAGE extern "C"
+#ifdef FJ_OPT_INTERNAL
+#    define FJ_DEFINE_TAGGED_STRUCT(X) struct X;
 #else
-#    define FJ_C_LINKAGE
+#    define FJ_DEFINE_TAGGED_STRUCT(X) \
+        struct X {                     \
+            union fj_tag tag;          \
+        };
+#endif
+
+#ifdef __cplusplus
+#    define FJ_EXPORT_C_LINKAGE extern "C"
+#else
+#    define FJ_EXPORT_C_LINKAGE
 #endif
 
 #if defined(_WIN32) && defined(FJ_OPT_INTERNAL)
-#    define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
+#    define FJ_EXPORT_PUBLIC_VISIBILITY __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-#    define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
+#    define FJ_EXPORT_PUBLIC_VISIBILITY __attribute__((visibility("default")))
 #else
-#    define FJ_PUBLIC_VISIBILITY
+#    define FJ_EXPORT_PUBLIC_VISIBILITY
 #endif
 
 /**
-    Attribute that marks public library API.
+    Attribute that marks exported library functions.
     This typically means exporting function symbols when building a shared library.
     This also adds ``extern "C"`` for C++.
 */
-#define FJ_PUBLIC FJ_C_LINKAGE FJ_PUBLIC_VISIBILITY
-
-
-#ifdef FJ_OPT_INTERNAL
-#    define FJ_DECLARE_ABSTRACT_OBJECT(STRUCT_NAME) struct STRUCT_NAME;
-#    define FJ_EXTENDS_ABSTRACT_OBJECT struct fj_object object;
-#    define FJ_OBJECT(OBJECT) ((struct fj_object *) (void *) (OBJECT))
-#else
-/**
-    Declares a struct that is publicly usable as an object.
-*/
-#    define FJ_DECLARE_ABSTRACT_OBJECT(STRUCT_NAME) \
-        struct STRUCT_NAME {                        \
-            struct fj_object object;                \
-        };
-/** Type-safe access to a struct that acts like an object. */
-#    define FJ_OBJECT(OBJECT) (&(OBJECT)->object)
-#endif
-
-
-/** A short helper to send a request to an object. */
-#define FJ_RESPOND(OBJECT, REQUEST_ID, REQUEST, OUT_RESPONSE) \
-    (FJ_OBJECT(OBJECT)->respond((OBJECT), (REQUEST_ID), (REQUEST), (OUT_RESPONSE)))
+#define FJ_EXPORT FJ_EXPORT_C_LINKAGE FJ_EXPORT_PUBLIC_VISIBILITY
 
 
 /** Error code. */
@@ -120,7 +107,7 @@ enum fj_tag_type {
 
 /**
     Tag is something that can identify an object, e.g. a pointer to the object, an ID of the
-   object or any other pointer or numeric value.
+    object or any other pointer or numeric value.
 */
 union fj_tag {
     /** */
@@ -139,45 +126,11 @@ union fj_tag {
     void *ptr;
 };
 
-
-/** An ID of a request sent to an object. */
-typedef uint32_t fj_request_id_t;
-
-enum fj_request_id {
-    /** */
-    FJ_REQUEST_PUBLIC_STATIC = 0,
-    /** */
-    FJ_REQUEST_PUBLIC_STATIC_SUBINTERFACING = 0x100,
-    /** */
-    FJ_REQUEST_PUBLIC_INITIALISATION = 0x300,
-    /** */
-    FJ_REQUEST_PUBLIC = 0x400,
-    /** */
-    FJ_REQUEST_PRIVATE = 0x600,
-    /** */
-    FJ_REQUEST_USER = 0x800,
-};
-
 /** Use standard ``true``/``false`` for this. */
 typedef uint8_t fj_bool8_t;
 
-/** Time in seconds. Timeouts typically use value from ``0..+inf``. */
+/** Time in seconds. Timeouts typically use values from ``0..+inf``. */
 typedef double fj_seconds_t;
-
-
-/** Object's dispatching method. */
-typedef fj_err_t (*fj_responder_t)(
-    void *object,
-    fj_request_id_t request_id,
-    void const *request,
-    void *out_response
-);
-
-/** Dynamically dispatchable object. */
-struct fj_object {
-    union fj_tag tag;
-    fj_responder_t respond;
-};
 
 
 /** */

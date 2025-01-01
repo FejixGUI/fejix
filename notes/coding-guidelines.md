@@ -38,14 +38,15 @@ Use `.clang-format` and note a few things:
 | Prefix | Meaning                   |
 | ------ | ------------------------- |
 | `out_` | Output function parameter |
+| `on_`  | Event callback function.  |
 
-| Suffix         | Meaning                                                            |
-| -------------- | ------------------------------------------------------------------ |
-| `_interface`   | Interface functions (provided by the library)                      |
-| `_callbacks`   | Interface callbacks (provided by the user)                         |
-| `_manager`     | Interface manager (global interface data)                          |
-| `_info`        | Any information provided by the user or by the library to the user |
-| `_create_info` | Information to create some object                                  |
+| Suffix         | Meaning                                                              |
+| -------------- | -------------------------------------------------------------------- |
+| `_class`       | Class functions (provided by the library)                            |
+| `_callbacks`   | Class callbacks (provided by the user)                               |
+| `_manager`     | Class manager (global class data)                                    |
+| `_info`        | Any information provided by the user or by the library to the user   |
+| `_create_info` | Information to create some object                                    |
 
 ## Errors
 

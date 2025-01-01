@@ -2,8 +2,8 @@
 #define FEJIX_INTERFACE_OPENGL_H_
 
 
-#include <fejix/interface/client.h>
-#include <fejix/interface/window.h>
+#include <fejix/interface/app.h>
+#include <fejix/interface/window_manager.h>
 
 
 /* Based on khrplatform.h from Khronos. */
