@@ -19,7 +19,7 @@ struct fj_window_manager;
 FJ_DEFINE_TAGGED_STRUCT(fj_window)
 
 struct fj_window_create_info {
-    struct fj_image_sharing_info *image_sharing_info;
+    struct fj_image_usage_context *image_usage_context;
     struct fj_image_set *image_set;
 };
 
@@ -37,7 +37,7 @@ struct fj_window_manager_callbacks {
     );
 };
 
-struct fj_window_manager_class {
+struct fj_window_manager_funcs {
     void const *(*get_extension)(fj_window_manager_extension_id_t id);
 
     fj_err_t (*get)(
@@ -48,9 +48,9 @@ struct fj_window_manager_class {
 
     fj_err_t (*release)(struct fj_window_manager *manager);
 
-    fj_err_t (*get_image_sharing_info)(
+    fj_err_t (*get_image_usage_context)(
         struct fj_window_manager *manager,
-        struct fj_image_sharing_info *out_image_sharing_info
+        struct fj_image_usage_context **out_image_usage_context
     );
 
     fj_err_t (*create_window)(

@@ -26,7 +26,11 @@ static union fj_tag get_key(struct fj_map_node const *node)
 }
 
 
-static fj_bool8_t key_eq(struct fj_map const *map, struct fj_map_node const *node, union fj_tag key)
+static fj_bool8_t key_eq(
+    struct fj_map const *map,
+    struct fj_map_node const *node,
+    union fj_tag key
+)
 {
     return fj_tag_eq(get_key(node), key, map->key_type);
 }

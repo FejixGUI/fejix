@@ -42,9 +42,9 @@ Use `.clang-format` and note a few things:
 
 | Suffix         | Meaning                                                              |
 | -------------- | -------------------------------------------------------------------- |
-| `_class`       | Class functions (provided by the library)                            |
-| `_callbacks`   | Class callbacks (provided by the user)                               |
-| `_manager`     | Class manager (global class data)                                    |
+| `_funcs`       | Interface functions (provided by the library)                        |
+| `_callbacks`   | Interface callbacks (provided by the user)                           |
+| `_manager`     | Interface manager (global class data)                                |
 | `_info`        | Any information provided by the user or by the library to the user   |
 | `_create_info` | Information to create some object                                    |
 

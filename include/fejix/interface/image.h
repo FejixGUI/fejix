@@ -23,7 +23,7 @@ struct fj_image;
 struct fj_image_set;
 
 /** This is known to both image-creating and image-consuming interfaces. */
-struct fj_image_sharing_info;
+struct fj_image_usage_context;
 
 
 #endif

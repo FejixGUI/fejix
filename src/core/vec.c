@@ -187,7 +187,7 @@ fj_err_t fj_vec_insert(
 fj_err_t fj_vec_remove(struct fj_vec *vec, uint32_t start_index, uint32_t item_count)
 {
     if (start_index + item_count <= fj_vec_get_last_index(vec)) {
-        vec_shift_tail(vec, start_index + item_count, (int32_t) -item_count);
+        vec_shift_tail(vec, start_index + item_count, -(int32_t) item_count);
     }
 
     vec->length -= item_count;

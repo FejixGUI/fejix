@@ -5,10 +5,28 @@
 #include <fejix/core/base.h>
 
 
+typedef uint32_t fj_app_implementation_id_t;
+
+enum fj_app_implementation_id {
+    /** Android Native Development Kit */
+    FJ_APP_IMPLEMENTATION_ANDK,
+    /** Apple Cocoa */
+    FJ_APP_IMPLEMENTATION_COCOA,
+    /** Wayland protocol */
+    FJ_APP_IMPLEMENTATION_WAYLAND,
+    /** Windows API */
+    FJ_APP_IMPLEMENTATION_WINAPI,
+    /** X11 protocol */
+    FJ_APP_IMPLEMENTATION_X11,
+
+    FJ_APP_IMPLEMENTATION_MAX = FJ_APP_IMPLEMENTATION_X11,
+};
+
+
 typedef uint32_t fj_app_extension_id_t;
 
 enum fj_app_extension_id {
-    FJ_APP_EXTENSION_MANUAL_SLEEP,
+    FJ_APP_EXTENSION_APP_MANUAL_SLEEP,
     FJ_APP_EXTENSION_WINDOW_MANAGER,
     FJ_APP_EXTENSION_OPENGL_MANAGER,
     FJ_APP_EXTENSION_RAM_MANAGER,
@@ -59,7 +77,11 @@ struct fj_app_callbacks {
 };
 
 
-struct fj_app_class {
+struct fj_app_funcs {
+    fj_app_implementation_id_t (*get_implementation_id)(void);
+
+    void (*get_implementation_version)(struct fj_version *out_version);
+
     void const *(*get_extension)(fj_app_extension_id_t id);
 
     fj_err_t (*create)(
@@ -77,9 +99,9 @@ struct fj_app_class {
         * it can ignore when the app marks itself as finished, waiting for the system to decide so
         * it can possibly never return upon app termination
 
-        To handle the program lifecycle in the most cross-platform way, the program entrypoint, from
-        which this function is called, should end on the call.
-        App deinitialisation should happen in response to force commands.
+        To handle the program lifecycle in the most cross-platform way, the program entrypoint,
+        from which this function is called, should end on the call. App deinitialisation should
+        happen in response to force commands.
     */
     fj_err_t (*launch)(struct fj_app *app);
 
@@ -125,6 +147,18 @@ struct fj_app_class {
     */
     void (*set_finished)(struct fj_app *app);
 };
+
+
+/** Returns NULL for unknown IDs. */
+FJ_EXPORT
+char const *fj_app_get_implementation_name(fj_app_implementation_id_t id);
+
+/** Returns NULL if the specified implementation was not built into the library. */
+FJ_EXPORT
+struct fj_app_funcs const *fj_app_get_builtin_implementation(fj_app_implementation_id_t id);
+
+FJ_EXPORT
+fj_err_t fj_app_get_default_implementation_id(fj_app_implementation_id_t *out_id);
 
 
 #endif

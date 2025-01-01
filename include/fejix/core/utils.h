@@ -25,7 +25,9 @@
             assert(fj_result == FJ_ERR_ALLOCATION_FAILED);
         }
 */
-#define FJ_TRY(EXPR) for (fj_err_t fj_result = (EXPR); fj_result != FJ_OK; fj_result = FJ_OK)
+#define FJ_TRY(EXPR)                                                                            \
+    for (fj_err_t fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
+        if (fj_result != FJ_OK)  // Outside of for loop to avoid dead code if the block returns
 
 /** Gets the length of a static array. Note: this double-evaluates the argument. */
 #define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))

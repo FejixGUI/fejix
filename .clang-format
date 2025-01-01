@@ -1,11 +1,25 @@
-# Requires clang-format v18
+# Written for clang-format v18
 
 BasedOnStyle: Chromium
 
 LineEnding: LF
-ColumnLimit: 100
 IndentWidth: 4
 InsertNewlineAtEOF: true
+
+# FIXME clang-format v18 bug: bad column limit obedience.
+# A snippet like this:
+#
+#   long_long_long_long_return_type (*long_long_long_long_method_name)(
+#       long_long_long_long *argument
+#   );
+#
+# with column limit of 100 is sometimes formatted like this:
+#
+#   long_long_long_long_return_type (*long_long_long_long_method_name)(long_long_long_long *argument
+#   );
+#
+# The right non-workaround solution would be to specify a limit of 100, but oh well who cares.
+ColumnLimit: 99
 
 # int x()
 # {
@@ -36,6 +50,13 @@ SpaceAfterCStyleCast: true
 # }
 SpaceBeforeCpp11BracedList: true
 Cpp11BracedListStyle: false
+
+# switch (x) {
+#     case 1:
+# ^^^^    something();
+# ^^^^    break;
+# }
+IndentCaseLabels: true
 
 # myvar = somethinglonglonglonglong
 #   + somethinglonglonglonglong
@@ -93,10 +114,19 @@ IndentPPDirectives: AfterHash
 
 Macros:
     # FIXME clang-format v18 bug: bad function typedef recognition, incorrect macro formatting
+    # A snippet like this:
+    #
+    #   typedef void (__stdcall *func)(void);
+    #
+    # without any guidance from this config is formatted like this:
+    #
+    #   typedef void(__stdcall * func)(void);
+    #
     # As a workaround we make the expansion text roughly the same length as the macro name.
     # The right non-workaround solution would be to define it as an empty macro.
-    - 'FJ_OPENGL_ABI_CALL=*const*const*const'
+    - 'FJ_OPENGL_CALL=*********const'
 
+    # This trick is done on purpose to leave FJ_EXPORT on its own line.
     - 'FJ_EXPORT=[[unused]]'
 
 IfMacros:

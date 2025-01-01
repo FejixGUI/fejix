@@ -86,14 +86,3 @@ static fj_err_t update_windows(
 {
     return FJ_OK;
 }
-
-
-struct fj_window_interface fj_winapi_window_interface = {
-    .create_manager = create_manager,
-    .destroy_manager = destroy_manager,
-    .create_window_builder = create_window_builder,
-    .destroy_window_builder = destroy_window_builder,
-    .create_window = create_window,
-    .destroy_window = destroy_window,
-    .update_windows = update_windows,
-};

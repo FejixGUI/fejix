@@ -5,7 +5,7 @@
 #include <fejix/interface/app.h>
 
 
-struct fj_app_manual_sleep_class {
+struct fj_app_manual_sleep_funcs {
     fj_err_t (*manual_sleep)(struct fj_app *app);
 };
 

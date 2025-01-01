@@ -75,21 +75,26 @@ target_compile_definitions(fejix PRIVATE "FJ_OPT_INTERNAL")
 
 # These flags specify what modules to build
 set(BUILD_WAYLAND OFF)
-set(BUILD_WAYLAND_SOFTER OFF)
+set(BUILD_WAYLAND_RAM OFF)
 set(BUILD_WINAPI OFF)
+set(BUILD_WINAPI_RAM OFF)
 set(BUILD_UNIXSHM OFF)
 
 if("wayland" IN_LIST FEJIX_FEATURES)
     set(BUILD_WAYLAND ON)
 
-    if("softer" IN_LIST FEJIX_FEATURES)
-        set(BUILD_WAYLAND_SOFTER ON)
+    if("ram" IN_LIST FEJIX_FEATURES)
+        set(BUILD_WAYLAND_RAM ON)
         set(BUILD_UNIXSHM ON)
     endif()
 endif()
 
 if("winapi" IN_LIST FEJIX_FEATURES)
     set(BUILD_WINAPI ON)
+
+    if("ram" IN_LIST FEJIX_FEATURES)
+        set(BUILD_WINAPI_RAM ON)
+    endif()
 endif()
 
 
@@ -98,14 +103,14 @@ target_sources(fejix PRIVATE
     "src/core/map.c"
     "src/core/utils.c"
     "src/core/vec.c"
-    "src/generic/client.c"
-    "src/generic/softer.c"
+    "src/generic/app.c"
+    "src/generic/ram.c"
 )
 
 if(BUILD_WINAPI)
     target_sources(fejix PRIVATE
         "src/winapi/utils.c"
-        "src/winapi/client/client.c"
+        "src/winapi/app/app.c"
         "src/winapi/window/window.c"
     )
 endif()

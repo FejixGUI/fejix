@@ -1,15 +1,18 @@
 #include <src/winapi/app/app.h>
 #include <src/winapi/utils.h>
 
+#include <fejix/interface/app.h>
+#include <fejix/interface/app_manual_sleep.h>
+
 #include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 
 #include <math.h>
 
 
-enum fj_winapi_global_message_id {
-    FJ_WINAPI_GLOBAL_MESSAGE_ITERATE = WM_USER,
-    FJ_WINAPI_GLOBAL_MESSAGE_WAKEUP,
+enum global_message_id {
+    GLOBAL_MESSAGE_ITERATE = WM_USER,
+    GLOBAL_MESSAGE_WAKEUP,
 };
 
 
@@ -34,7 +37,7 @@ static DWORD app_get_wakeup_timeout(struct fj_app *app)
 
 static fj_err_t app_post_iteration_message(struct fj_app *app)
 {
-    if (SendNotifyMessage(app->global_window, FJ_WINAPI_GLOBAL_MESSAGE_ITERATE, 0, 0) == FALSE) {
+    if (SendNotifyMessage(app->global_window, GLOBAL_MESSAGE_ITERATE, 0, 0) == FALSE) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
@@ -84,7 +87,7 @@ static fj_err_t app_iterate(struct fj_app *app)
 
 static fj_err_t app_wakeup_immediately(struct fj_app *app)
 {
-    if (!SendNotifyMessage(app->global_window, FJ_WINAPI_GLOBAL_MESSAGE_WAKEUP, 0, 0)) {
+    if (!SendNotifyMessage(app->global_window, GLOBAL_MESSAGE_WAKEUP, 0, 0)) {
         return FJ_ERR_REQUEST_SENDING_FAILED;
     }
 
@@ -106,7 +109,7 @@ static LRESULT WINAPI global_window_procedure(
     }
 
     switch (message) {
-        case FJ_WINAPI_GLOBAL_MESSAGE_ITERATE: {
+        case GLOBAL_MESSAGE_ITERATE: {
             FJ_TRY (app_iterate(app)) {
                 PostQuitMessage((int) fj_result);
                 return 0;
@@ -115,7 +118,7 @@ static LRESULT WINAPI global_window_procedure(
             return 0;
         }
 
-        case FJ_WINAPI_GLOBAL_MESSAGE_WAKEUP:
+        case GLOBAL_MESSAGE_WAKEUP:
             return 0;
 
         default:
@@ -249,14 +252,39 @@ static void app_wakeup_after_timeout(struct fj_app *app, fj_seconds_t timeout)
 }
 
 
+static struct fj_app_manual_sleep_funcs const app_manual_sleep_funcs = {
+    .manual_sleep = app_manual_sleep,
+};
+
+
 static void const *app_get_extenion(fj_app_extension_id_t id)
 {
-    (void) id;
+    switch (id) {
+        case FJ_APP_EXTENSION_APP_MANUAL_SLEEP:
+            return &app_manual_sleep_funcs;
+    }
+
     return NULL;
 }
 
+static fj_app_implementation_id_t app_get_implementation_id(void)
+{
+    return FJ_APP_IMPLEMENTATION_WINAPI;
+}
 
-struct fj_app_class const fj_winapi_app_class = {
+static void app_get_implementation_version(struct fj_version *out_version)
+{
+    *out_version = (struct fj_version) {
+        .major = 0,
+        .minor = 0,
+        .patch = 1,
+    };
+}
+
+
+static struct fj_app_funcs const fj_winapi_app_funcs = {
+    .get_implementation_id = app_get_implementation_id,
+    .get_implementation_version = app_get_implementation_version,
     .get_extension = app_get_extenion,
     .create = app_create,
     .destroy = app_destroy,
