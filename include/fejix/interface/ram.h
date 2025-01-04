@@ -2,7 +2,7 @@
 #define FEJIX_INTERFACE_RAM_H_
 
 
-#include <fejix/interface/window.h>
+#include <fejix/interface/image_scene.h>
 
 
 typedef uint32_t fj_ram_image_get_flags_t;
@@ -34,7 +34,7 @@ enum fj_ram_pixel_format {
 struct fj_ram_manager;
 
 struct fj_ram_image_set_create_info {
-    struct fj_image_usage_context *image_usage_context;
+    struct fj_image_access_context *image_access_context;
     fj_ram_pixel_format_t pixel_format;
     struct fj_size initial_size;
 };
@@ -46,10 +46,10 @@ struct fj_ram_image_info {
 };
 
 
-struct fj_ram_funcs {
-    fj_err_t (*get)(struct fj_app *app, struct fj_ram_manager **out_manager);
+struct fj_ram_manager_funcs {
+    fj_err_t (*create_manager)(struct fj_ram_manager **out_manager, struct fj_app *owner_app);
 
-    fj_err_t (*release)(struct fj_ram_manager *manager);
+    fj_err_t (*destroy_manager)(struct fj_ram_manager *manager);
 
     fj_err_t (*create_image_set)(
         struct fj_ram_manager *manager,
@@ -74,7 +74,7 @@ struct fj_ram_funcs {
 
 
 /** Returns 0 for unknown formats. */
-FJ_EXPORT
+FJ_PUBLIC
 size_t fj_ram_get_pixel_size(fj_ram_pixel_format_t pixel_format);
 
 

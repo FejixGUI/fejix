@@ -1,5 +1,5 @@
-#include <src/winapi/app/app.h>
-#include <src/winapi/utils.h>
+#include <src/app/win/app/app.h>
+#include <src/app/win/utils.h>
 
 #include <fejix/interface/app.h>
 #include <fejix/interface/app_manual_sleep.h>
@@ -102,7 +102,7 @@ static LRESULT WINAPI global_window_procedure(
     LPARAM lparam
 )
 {
-    struct fj_app *app = fj_winapi_get_window_data(window_handle);
+    struct fj_app *app = fj_win_get_window_data(window_handle);
 
     if (app->is_finished) {
         return 0;
@@ -148,7 +148,7 @@ static fj_err_t create_global_window(struct fj_app *app)
         return FJ_ERR_REQUEST_FAILED;
     }
 
-    fj_winapi_set_window_data(app->global_window, app);
+    fj_win_set_window_data(app->global_window, app);
 
     return FJ_OK;
 }
@@ -172,11 +172,7 @@ static fj_err_t app_destroy(struct fj_app *app)
 }
 
 
-static fj_err_t app_create(
-    struct fj_app **out_app,
-    struct fj_app_create_info const *info,
-    struct fj_app_callbacks const *callbacks
-)
+static fj_err_t app_create(struct fj_app **out_app, struct fj_app_create_info const *info)
 {
     FJ_TRY (FJ_ALLOC_ZEROED(out_app)) {
         return fj_result;
@@ -185,7 +181,7 @@ static fj_err_t app_create(
     struct fj_app *app = *out_app;
     *app = (struct fj_app) {
         .tag = info->tag,
-        .callbacks = callbacks,
+        .callbacks = info->callbacks,
         .instance = GetModuleHandle(NULL),
     };
 
@@ -257,10 +253,10 @@ static struct fj_app_manual_sleep_funcs const app_manual_sleep_funcs = {
 };
 
 
-static void const *app_get_extenion(fj_app_extension_id_t id)
+static void const *app_get_interface_funcs(fj_app_interface_id_t id)
 {
     switch (id) {
-        case FJ_APP_EXTENSION_APP_MANUAL_SLEEP:
+        case FJ_APP_INTERFACE_MANUAL_SLEEP:
             return &app_manual_sleep_funcs;
     }
 
@@ -282,10 +278,10 @@ static void app_get_implementation_version(struct fj_version *out_version)
 }
 
 
-static struct fj_app_funcs const fj_winapi_app_funcs = {
+struct fj_app_funcs const fj_winapi_app_funcs = {
     .get_implementation_id = app_get_implementation_id,
     .get_implementation_version = app_get_implementation_version,
-    .get_extension = app_get_extenion,
+    .get_interface_funcs = app_get_interface_funcs,
     .create = app_create,
     .destroy = app_destroy,
     .launch = app_launch,

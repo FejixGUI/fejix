@@ -3,7 +3,7 @@
 
 
 #include <fejix/interface/app.h>
-#include <fejix/interface/window.h>
+#include <fejix/interface/image_scene.h>
 
 
 /* Based on khrplatform.h from Khronos. */
@@ -98,6 +98,7 @@ struct fj_opengl_manager;
 struct fj_opengl_renderer;
 
 struct fj_opengl_manager_internal_info {
+    fj_opengl_implementation_id_t implementation_id;
     void *internal_manager;
     fj_opengl_function_getter_t manager_function_getter;
 };
@@ -132,8 +133,8 @@ struct fj_opengl_renderer_internal_info {
 
 struct fj_opengl_thread_state_internal_info {
     void *internal_renderer;
-    void *internal_read_image_set;
-    void *internal_write_image_set;
+    void *internal_input_image_set;
+    void *internal_output_image_set;
 };
 
 struct fj_opengl_manager_create_info {
@@ -142,7 +143,7 @@ struct fj_opengl_manager_create_info {
 };
 
 struct fj_opengl_image_set_create_info {
-    struct fj_image_usage_context *image_usage_context;
+    struct fj_image_access_context *image_access_context;
 
     /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
     fj_opengl_int_t const *attributes;
@@ -160,17 +161,13 @@ struct fj_opengl_renderer_create_info {
 struct fj_opengl_manager_funcs {
     fj_bool8_t (*get_implementation_supported)(fj_opengl_implementation_id_t id);
 
-    fj_err_t (*get)(
-        struct fj_app *app,
+    fj_err_t (*create_manager)(
         struct fj_opengl_manager **out_manager,
+        struct fj_app *owner_app,
         struct fj_opengl_manager_create_info const *info
     );
 
-    fj_err_t (*release)(struct fj_opengl_manager *manager);
-
-    fj_opengl_implementation_id_t (*get_manager_implementation_id)(
-        struct fj_opengl_manager *manager
-    );
+    fj_err_t (*destroy_manager)(struct fj_opengl_manager *manager);
 
     void (*get_manager_internal_info)(
         struct fj_opengl_manager *manager,
@@ -183,11 +180,17 @@ struct fj_opengl_manager_funcs {
     );
 
     /**
-        The resulting image usage context will indicate internal use for an off-screen image set.
+        The resulting image access context will indicate standalone use for an off-screen image
+        set.
     */
-    fj_err_t (*get_image_usage_context)(
+    fj_err_t (*get_standalone_access_context)(
         struct fj_opengl_manager *manager,
-        struct fj_image_usage_context **out_usage_context
+        struct fj_image_access_context **out_access_context
+    );
+
+    fj_err_t (*release_standalone_access_context)(
+        struct fj_opengl_manager *manager,
+        struct fj_image_access_context *access_context
     );
 
     fj_err_t (*create_image_set)(
@@ -235,8 +238,8 @@ struct fj_opengl_manager_funcs {
     fj_err_t (*set_thread_state)(
         struct fj_opengl_manager *manager,
         struct fj_opengl_renderer *renderer,
-        struct fj_image_set *read_image_set,
-        struct fj_image_set *write_image_set
+        struct fj_image_set *input_image_set,
+        struct fj_image_set *output_image_set
     );
 
     /** Useful for state saving and restoring. */

@@ -1,13 +1,13 @@
-#ifndef FEJIX_WINAPI_WINDOW_H_
-#define FEJIX_WINAPI_WINDOW_H_
+#ifndef FEJIX_APP_WIN_WINDOW_H_
+#define FEJIX_APP_WIN_WINDOW_H_
 
 
-#include <fejix/interface/window.h>
+#include <fejix/interface/image_scene.h>
 
 #include <windows.h>
 
 
-struct fj_window_manager {
+struct fj_image_scene_manager {
     struct fj_client *client;
 };
 
@@ -19,10 +19,10 @@ struct fj_window_builder {
     union fj_tag window_tag;
 };
 
-struct fj_window {
+struct fj_image_scene {
     union fj_tag tag;
 
-    struct fj_window_manager *manager;
+    struct fj_image_scene_manager *manager;
 
     HWND handle;
     ATOM class_atom;

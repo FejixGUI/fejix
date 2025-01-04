@@ -23,13 +23,13 @@ enum fj_app_implementation_id {
 };
 
 
-typedef uint32_t fj_app_extension_id_t;
+typedef uint32_t fj_app_interface_id_t;
 
-enum fj_app_extension_id {
-    FJ_APP_EXTENSION_APP_MANUAL_SLEEP,
-    FJ_APP_EXTENSION_WINDOW_MANAGER,
-    FJ_APP_EXTENSION_OPENGL_MANAGER,
-    FJ_APP_EXTENSION_RAM_MANAGER,
+enum fj_app_interface_id {
+    FJ_APP_INTERFACE_MANUAL_SLEEP,
+    FJ_APP_INTERFACE_IMAGE_SCENE,
+    FJ_APP_INTERFACE_OPENGL,
+    FJ_APP_INTERFACE_RAM,
 };
 
 
@@ -64,16 +64,17 @@ enum fj_app_force_command {
 FJ_DEFINE_TAGGED_STRUCT(fj_app)
 
 
-struct fj_app_create_info {
-    union fj_tag tag;
-    char const *name;
-};
-
-
 struct fj_app_callbacks {
     fj_err_t (*on_idle)(struct fj_app *app);
 
     fj_err_t (*on_force)(struct fj_app *app, fj_app_force_command_t command);
+};
+
+
+struct fj_app_create_info {
+    union fj_tag tag;
+    char const *name;
+    struct fj_app_callbacks const *callbacks;
 };
 
 
@@ -82,13 +83,9 @@ struct fj_app_funcs {
 
     void (*get_implementation_version)(struct fj_version *out_version);
 
-    void const *(*get_extension)(fj_app_extension_id_t id);
+    void const *(*get_interface_funcs)(fj_app_interface_id_t id);
 
-    fj_err_t (*create)(
-        struct fj_app **out_app,
-        struct fj_app_create_info const *info,
-        struct fj_app_callbacks const *callbacks
-    );
+    fj_err_t (*create)(struct fj_app **out_app, struct fj_app_create_info const *info);
 
     fj_err_t (*destroy)(struct fj_app *app);
 
@@ -150,14 +147,14 @@ struct fj_app_funcs {
 
 
 /** Returns NULL for unknown IDs. */
-FJ_EXPORT
+FJ_PUBLIC
 char const *fj_app_get_implementation_name(fj_app_implementation_id_t id);
 
 /** Returns NULL if the specified implementation was not built into the library. */
-FJ_EXPORT
+FJ_PUBLIC
 struct fj_app_funcs const *fj_app_get_builtin_implementation(fj_app_implementation_id_t id);
 
-FJ_EXPORT
+FJ_PUBLIC
 fj_err_t fj_app_get_default_implementation_id(fj_app_implementation_id_t *out_id);
 
 

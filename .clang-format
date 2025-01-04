@@ -126,8 +126,8 @@ Macros:
     # The right non-workaround solution would be to define it as an empty macro.
     - 'FJ_OPENGL_CALL=*********const'
 
-    # This trick is done on purpose to leave FJ_EXPORT on its own line.
-    - 'FJ_EXPORT=[[unused]]'
+    # This trick is done on purpose to leave FJ_PUBLIC on its own line.
+    - 'FJ_PUBLIC=[[unused]]'
 
 IfMacros:
     - 'FJ_TRY'

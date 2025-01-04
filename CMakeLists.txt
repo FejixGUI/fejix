@@ -7,33 +7,30 @@ project(fejix
     LANGUAGES "C"
 )
 
-set(KNOWN_FEATURES
-    "wayland"
-    "winapi"
-    "x11"
+set(KNOWN_OPTIONS
+    "app_way"
+    "app_win"
+    "app_x11"
     "ram"
     "opengl"
 )
 
-set(FEJIX_FEATURES "" CACHE STRING
-    ";-separated list of features to enable (any of ${KNOWN_FEATURES})"
-)
+# Generates project-specific variables of format "BUILD_{uppercase_option_name}"
+set(BUILD_OPTIONS "" CACHE STRING ";-separated list of features to enable (any of ${KNOWN_OPTIONS})")
 
 # This variable automatically tells CMake to build all libraries as shared
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build a shared (dynamic) library instead of a static library")
 
 set(BUILD_TESTS OFF CACHE BOOL "Build tests")
 
-foreach(FEATURE IN LISTS FEJIX_FEATURES)
-    if(NOT FEATURE IN_LIST KNOWN_FEATURES)
-        message(WARNING
-            "[fejix] unknown library feature in FEJIX_FEATURES ignored: \"${FEATURE}\""
-            " (expected any of ${KNOWN_FEATURES})"
-        )
+foreach(OPTION IN LISTS BUILD_OPTIONS)
+    if(NOT OPTION IN_LIST KNOWN_OPTIONS)
+        message(WARNING "fejix: unknown option in BUILD_OPTIONS ignored: '${OPTION}' (expected any of ${KNOWN_OPTIONS})")
         continue()
     endif()
 
-    add_compile_definitions("FJ_OPT_$<UPPER_CASE:${FEATURE}>")
+    set(BUILD_$<UPPER_CASE:${OPTION}> ON)
+    add_compile_definitions("FJ_OPT_$<UPPER_CASE:${OPTION}>")
 endforeach()
 
 set(CMAKE_C_STANDARD 99)
@@ -49,12 +46,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_OBJC_EXTENSIONS OFF)
 
 add_compile_options(
-    "$<$<AND:$<COMPILE_LANGUAGE:C,CXX,OBJC>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Wall;-Wextra;-Wpedantic;-Wunused;-Werror=vla>"
+    "$<$<AND:$<COMPILE_LANGUAGE:C,CXX,OBJC>,$<C_COMPILER_ID:GNU,Clang,AppleClang>>:-Wall;-Wextra;-Wpedantic;-Werror=vla>"
     "$<$<AND:$<COMPILE_LANGUAGE:C,CXX>,$<C_COMPILER_ID:MSVC>>:/W4;/WX>"
 )
 
+# It is the intended way to #undef inappropriate definitions before your #includes
 add_compile_definitions(
-    "$<$<PLATFORM_ID:Windows,MSYS,CYGWIN>:_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE>"
+    "$<$<PLATFORM_ID:Windows,MSYS,CYGWIN>:_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;WIN32_LEAN_AND_MEAN>"
     "$<$<PLATFORM_ID:Linux>:_GNU_SOURCE>"
 )
 
@@ -73,30 +71,6 @@ target_include_directories(fejix PUBLIC "include")
 
 target_compile_definitions(fejix PRIVATE "FJ_OPT_INTERNAL")
 
-# These flags specify what modules to build
-set(BUILD_WAYLAND OFF)
-set(BUILD_WAYLAND_RAM OFF)
-set(BUILD_WINAPI OFF)
-set(BUILD_WINAPI_RAM OFF)
-set(BUILD_UNIXSHM OFF)
-
-if("wayland" IN_LIST FEJIX_FEATURES)
-    set(BUILD_WAYLAND ON)
-
-    if("ram" IN_LIST FEJIX_FEATURES)
-        set(BUILD_WAYLAND_RAM ON)
-        set(BUILD_UNIXSHM ON)
-    endif()
-endif()
-
-if("winapi" IN_LIST FEJIX_FEATURES)
-    set(BUILD_WINAPI ON)
-
-    if("ram" IN_LIST FEJIX_FEATURES)
-        set(BUILD_WINAPI_RAM ON)
-    endif()
-endif()
-
 
 target_sources(fejix PRIVATE
     "src/core/alloc.c"
@@ -107,17 +81,24 @@ target_sources(fejix PRIVATE
     "src/generic/ram.c"
 )
 
-if(BUILD_WINAPI)
+
+if(BUILD_APP_WIN)
     target_sources(fejix PRIVATE
-        "src/winapi/utils.c"
-        "src/winapi/app/app.c"
-        "src/winapi/window/window.c"
+        "src/app/win/utils.c"
+        "src/app/win/app/app.c"
+        "src/app/win/image_scene/image_scene.c"
     )
 endif()
 
-if(BUILD_UNIXSHM)
+
+if(BUILD_APP_WAY)
+    set(BUILD_UTIL_UNIXSHM ON)
+endif()
+
+
+if(BUILD_UTIL_UNIXSHM)
     target_sources(fejix PRIVATE
-        "src/unixshm/unixshm.c"
+        "src/util/unixshm/unixshm.c"
     )
 endif()
 

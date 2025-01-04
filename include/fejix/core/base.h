@@ -17,25 +17,25 @@
 #endif
 
 #ifdef __cplusplus
-#    define FJ_EXPORT_C_LINKAGE extern "C"
+#    define FJ_PUBLIC_C_LINKAGE extern "C"
 #else
-#    define FJ_EXPORT_C_LINKAGE
+#    define FJ_PUBLIC_C_LINKAGE
 #endif
 
 #if defined(_WIN32) && defined(FJ_OPT_INTERNAL)
-#    define FJ_EXPORT_PUBLIC_VISIBILITY __declspec(dllexport)
+#    define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-#    define FJ_EXPORT_PUBLIC_VISIBILITY __attribute__((visibility("default")))
+#    define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
 #else
-#    define FJ_EXPORT_PUBLIC_VISIBILITY
+#    define FJ_PUBLIC_VISIBILITY
 #endif
 
 /**
-    Attribute that marks exported library functions.
+    Attribute that marks public library functions.
     This typically means exporting function symbols when building a shared library.
     This also adds ``extern "C"`` for C++.
 */
-#define FJ_EXPORT FJ_EXPORT_C_LINKAGE FJ_EXPORT_PUBLIC_VISIBILITY
+#define FJ_PUBLIC FJ_PUBLIC_C_LINKAGE FJ_PUBLIC_VISIBILITY
 
 
 /** Error code. */

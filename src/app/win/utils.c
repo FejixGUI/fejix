@@ -1,4 +1,4 @@
-#include <src/winapi/utils.h>
+#include <src/app/win/utils.h>
 
 #include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
+fj_err_t fj_win_into_utf16(char const *string, LPWSTR *utf16_string)
 {
     int32_t output_char_count = MultiByteToWideChar(
         CP_UTF8,
@@ -39,7 +39,7 @@ fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 }
 
 
-fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
+fj_err_t fj_win_from_utf16(LPWSTR utf16_string, char const **string)
 {
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,
@@ -76,13 +76,13 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 }
 
 
-void fj_winapi_set_window_data(HWND window, void *data)
+void fj_win_set_window_data(HWND window, void *data)
 {
     SetWindowLongPtr(window, GWLP_USERDATA, (LONG_PTR) data);
 }
 
 
-void *fj_winapi_get_window_data(HWND window)
+void *fj_win_get_window_data(HWND window)
 {
     return (void *) GetWindowLongPtr(window, GWLP_USERDATA);
 }

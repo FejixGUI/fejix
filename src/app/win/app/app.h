@@ -1,5 +1,5 @@
-#ifndef FEJIX_WINAPI_APP_H_
-#define FEJIX_WINAPI_APP_H_
+#ifndef FEJIX_APP_WIN_APP_H_
+#define FEJIX_APP_WIN_APP_H_
 
 
 #include <fejix/interface/app.h>
