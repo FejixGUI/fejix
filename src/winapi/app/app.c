@@ -1,10 +1,9 @@
-#include <src/app/win/app/app.h>
-#include <src/app/win/utils.h>
+#include <src/winapi/app/app.h>
+#include <src/winapi/utils.h>
 
-#include <fejix/interface/app.h>
-#include <fejix/interface/app_manual_sleep.h>
+#include <fejix/app.h>
+#include <fejix/app_manual_sleep.h>
 
-#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 
 #include <math.h>
@@ -95,14 +94,14 @@ static fj_err_t app_wakeup_immediately(struct fj_app *app)
 }
 
 
-static LRESULT WINAPI global_window_procedure(
+static LRESULT CALLBACK global_window_procedure(
     HWND window_handle,
     UINT message,
     WPARAM wparam,
     LPARAM lparam
 )
 {
-    struct fj_app *app = fj_win_get_window_data(window_handle);
+    struct fj_app *app = fj_winapi_window_get_data(window_handle);
 
     if (app->is_finished) {
         return 0;
@@ -129,28 +128,24 @@ static LRESULT WINAPI global_window_procedure(
 
 static fj_err_t create_global_window(struct fj_app *app)
 {
-    WNDCLASSEX window_class = {
-        .cbSize = sizeof(window_class),
-        .hInstance = app->instance,
-        .lpszClassName = TEXT("fejix_global_window_class"),
-        .lpfnWndProc = global_window_procedure,
+    struct fj_winapi_window_info window_info = {
+        .procedure = global_window_procedure,
+        .parent = HWND_MESSAGE,
     };
 
-    if (RegisterClassEx(&window_class) == 0) {
-        return FJ_ERR_REQUEST_FAILED;
+    FJ_TRY (fj_winapi_window_create_simple(&app->global_window, &window_info)) {
+        return fj_result;
     }
 
-    app->global_window = CreateWindow(
-        window_class.lpszClassName, NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, app->instance, NULL
-    );
-
-    if (app->global_window == NULL) {
-        return FJ_ERR_REQUEST_FAILED;
-    }
-
-    fj_win_set_window_data(app->global_window, app);
+    fj_winapi_window_set_data(app->global_window, app);
 
     return FJ_OK;
+}
+
+
+static fj_err_t destroy_global_window(struct fj_app *app)
+{
+    return fj_winapi_window_destroy_simple(app->global_window);
 }
 
 
@@ -163,7 +158,7 @@ static fj_err_t app_alloc(struct fj_app **out_app)
 static fj_err_t app_destroy(struct fj_app *app)
 {
     if (app->global_window != NULL) {
-        DestroyWindow(app->global_window);
+        destroy_global_window(app);
     }
 
     FJ_FREE(&app);
@@ -182,7 +177,6 @@ static fj_err_t app_create(struct fj_app **out_app, struct fj_app_create_info co
     *app = (struct fj_app) {
         .tag = info->tag,
         .callbacks = info->callbacks,
-        .instance = GetModuleHandle(NULL),
     };
 
     app_enable_high_dpi_for_process();

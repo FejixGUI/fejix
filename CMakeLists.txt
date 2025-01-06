@@ -8,9 +8,9 @@ project(fejix
 )
 
 set(KNOWN_OPTIONS
-    "app_way"
-    "app_win"
-    "app_x11"
+    "wayland"
+    "winapi"
+    "x11"
     "ram"
     "opengl"
 )
@@ -77,21 +77,21 @@ target_sources(fejix PRIVATE
     "src/core/map.c"
     "src/core/utils.c"
     "src/core/vec.c"
-    "src/generic/app.c"
-    "src/generic/ram.c"
+    "src/common/app.c"
+    "src/common/ram.c"
 )
 
 
-if(BUILD_APP_WIN)
+if(BUILD_WINAPI)
     target_sources(fejix PRIVATE
-        "src/app/win/utils.c"
-        "src/app/win/app/app.c"
-        "src/app/win/image_scene/image_scene.c"
+        "src/winapi/utils.c"
+        "src/winapi/app/app.c"
+        "src/winapi/image_scene/image_scene.c"
     )
 endif()
 
 
-if(BUILD_APP_WAY)
+if(BUILD_WAYLAND)
     set(BUILD_UTIL_UNIXSHM ON)
 endif()
 
@@ -106,22 +106,22 @@ endif()
 if(BUILD_TESTS)
     enable_testing()
 
-    add_executable(test_core_vec "tests/core/vec.c")
+    add_executable(test_core_vec "tests/test_core_vec.c")
     target_link_libraries(test_core_vec fejix)
     add_test(NAME test_core_vec COMMAND core_vec_test)
 
-    add_executable(test_core_map "tests/core/map.c")
+    add_executable(test_core_map "tests/test_core_map.c")
     target_link_libraries(test_core_map fejix)
     add_test(NAME test_core_map COMMAND core_map_test)
 
     if(BUILD_UNIXSHM)
-        add_executable(test_unixshm "tests/unixshm/test.c")
+        add_executable(test_unixshm "tests/test_util_unixshm.c")
         target_link_libraries(test_unixshm fejix)
         add_test(NAME test_unixshm COMMAND unixshm_test)
     endif()
 
     if(BUILD_WINAPI)
-        add_executable(test_winapi_utils "tests/winapi/utils.c")
+        add_executable(test_winapi_utils "tests/test_winapi_utils.c")
         target_link_libraries(test_winapi_utils fejix)
         add_test(NAME test_winapi_utils COMMAND winapi_utils_test)
     endif()

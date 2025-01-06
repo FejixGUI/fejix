@@ -145,11 +145,6 @@ IncludeCategories:
         Priority: 1
         CaseSensitive: true
 
-    # Public interface headers
-    -   Regex: '^<fejix/interface/'
-        Priority: 5
-        CaseSensitive: true
-
     # Public ext headers
     -   Regex: '^<fejix/ext/'
         Priority: 10
@@ -160,14 +155,9 @@ IncludeCategories:
         Priority: 15
         CaseSensitive: true
 
-    # Toplevel headers (matched if all regexes above did not match)
+    # Public (matched if all regexes above did not match)
     -   Regex: '^<fejix/'
         Priority: 2
-        CaseSensitive: true
-
-    # Dependency headers
-    -   Regex: '^<(wayland|X11|xcb|win|imm|shellapi|ole|dx|d3d|dcomp)'
-        Priority: 20
         CaseSensitive: true
 
     # Standard includes (at the bottom)
@@ -175,6 +165,6 @@ IncludeCategories:
         Priority: 100
         CaseSensitive: true
 
-    # Other platform-specific headers (matched if all regexes above did not match)
+    # Platform-specific headers (matched if all regexes above did not match)
     -   Regex: '^.*'
         Priority: 50

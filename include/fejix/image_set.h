@@ -1,5 +1,5 @@
-#ifndef FEJIX_INTERFACE_IMAGE_H_
-#define FEJIX_INTERFACE_IMAGE_H_
+#ifndef FEJIX_IMAGE_SET_H_
+#define FEJIX_IMAGE_SET_H_
 
 
 #include <fejix/core/base.h>

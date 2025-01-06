@@ -1,22 +1,24 @@
-#ifndef FEJIX_INTERFACE_IMAGE_SCENE_H_
-#define FEJIX_INTERFACE_IMAGE_SCENE_H_
+#ifndef FEJIX_IMAGE_SCENE_H_
+#define FEJIX_IMAGE_SCENE_H_
 
 
-#include <fejix/interface/app.h>
-#include <fejix/interface/image_set.h>
+#include <fejix/app.h>
+#include <fejix/image_set.h>
 
 #include <fejix/core/geometry.h>
 
 
-typedef uint32_t fj_image_scene_manager_extension_id_t;
+typedef uint32_t fj_image_scene_interface_id_t;
 
-enum fj_image_scene_manager_extension_id {
-    FJ_IMAGE_SCENE_MANAGER_EXTENSION_SYNC_MANAGER,
+enum fj_image_scene_interface_id {
+    FJ_IMAGE_SCENE_INTERFACE_SYNC,
 };
 
 
 struct fj_image_scene_manager;
-FJ_DEFINE_TAGGED_STRUCT(fj_image_scene)
+struct fj_image_scene;
+
+FJ_PUBLICLY_TAGGED(fj_image_scene)
 
 struct fj_image_scene_create_info {
     struct fj_image_access_context *image_access_context;
@@ -41,12 +43,12 @@ struct fj_image_scene_manager_create_info {
     struct fj_image_scene_manager_callbacks const *callbacks;
 };
 
-struct fj_image_scene_manager_funcs {
-    void const *(*get_extension)(fj_image_scene_manager_extension_id_t id);
+struct fj_image_scene_funcs {
+    void const *(*get_interface_funcs)(fj_image_scene_interface_id_t id);
 
     fj_err_t (*create_manager)(
-        struct fj_image_scene_manager **out_manager,
         struct fj_app *owner_app,
+        struct fj_image_scene_manager **out_manager,
         struct fj_image_scene_manager_create_info const *info
     );
 
@@ -62,6 +64,7 @@ struct fj_image_scene_manager_funcs {
         struct fj_image_access_context *image_access_context
     );
 
+    /** Automatically releases the image access context. */
     fj_err_t (*create_image_scene)(
         struct fj_image_scene_manager *manager,
         struct fj_image_scene **out_image_scene,

@@ -1,8 +1,8 @@
-#ifndef FEJIX_INTERFACE_RAM_H_
-#define FEJIX_INTERFACE_RAM_H_
+#ifndef FEJIX_RAM_H_
+#define FEJIX_RAM_H_
 
 
-#include <fejix/interface/image_scene.h>
+#include <fejix/image_scene.h>
 
 
 typedef uint32_t fj_ram_image_get_flags_t;
@@ -33,6 +33,11 @@ enum fj_ram_pixel_format {
 
 struct fj_ram_manager;
 
+struct fj_ram_manager_info {
+    fj_ram_pixel_format_t *supported_formats;
+    uint32_t supported_format_count;
+};
+
 struct fj_ram_image_set_create_info {
     struct fj_image_access_context *image_access_context;
     fj_ram_pixel_format_t pixel_format;
@@ -46,10 +51,12 @@ struct fj_ram_image_info {
 };
 
 
-struct fj_ram_manager_funcs {
-    fj_err_t (*create_manager)(struct fj_ram_manager **out_manager, struct fj_app *owner_app);
+struct fj_ram_funcs {
+    fj_err_t (*create_manager)(struct fj_app *owner_app, struct fj_ram_manager **out_manager);
 
     fj_err_t (*destroy_manager)(struct fj_ram_manager *manager);
+
+    void (*get_manager_info)(struct fj_ram_manager *manager, struct fj_ram_manager_info *out_info);
 
     fj_err_t (*create_image_set)(
         struct fj_ram_manager *manager,
@@ -66,6 +73,8 @@ struct fj_ram_manager_funcs {
         fj_ram_image_get_flags_t flags
     );
 
+    // TODO What about image sets used for e.g. icons that are not presentable? What does this
+    // mean? Can we present to an icon? Can image sets be presentable and non-presentable??
     fj_err_t (*present_current_image)(
         struct fj_ram_manager *manager,
         struct fj_image_set *image_set

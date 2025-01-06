@@ -7,13 +7,13 @@
 #include <stdint.h>
 
 
-#ifdef FJ_OPT_INTERNAL
-#    define FJ_DEFINE_TAGGED_STRUCT(X) struct X;
-#else
-#    define FJ_DEFINE_TAGGED_STRUCT(X) \
-        struct X {                     \
-            union fj_tag tag;          \
+#ifndef FJ_OPT_INTERNAL
+#    define FJ_PUBLICLY_TAGGED(X) \
+        struct X {                \
+            union fj_tag tag;     \
         };
+#else
+#    define FJ_PUBLICLY_TAGGED(X)
 #endif
 
 #ifdef __cplusplus

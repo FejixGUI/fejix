@@ -1,4 +1,4 @@
-#include <fejix/interface/ram.h>
+#include <fejix/ram.h>
 
 
 size_t fj_ram_get_pixel_size(fj_ram_pixel_format_t format)

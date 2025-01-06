@@ -1,5 +1,5 @@
-#ifndef FEJIX_INTERFACE_APP_H_
-#define FEJIX_INTERFACE_APP_H_
+#ifndef FEJIX_APP_H_
+#define FEJIX_APP_H_
 
 
 #include <fejix/core/base.h>
@@ -18,8 +18,6 @@ enum fj_app_implementation_id {
     FJ_APP_IMPLEMENTATION_WINAPI,
     /** X11 protocol */
     FJ_APP_IMPLEMENTATION_X11,
-
-    FJ_APP_IMPLEMENTATION_MAX = FJ_APP_IMPLEMENTATION_X11,
 };
 
 
@@ -61,8 +59,9 @@ enum fj_app_force_command {
 };
 
 
-FJ_DEFINE_TAGGED_STRUCT(fj_app)
+struct fj_app;
 
+FJ_PUBLICLY_TAGGED(fj_app)
 
 struct fj_app_callbacks {
     fj_err_t (*on_idle)(struct fj_app *app);

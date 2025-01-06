@@ -1,4 +1,4 @@
-#include "src/winapi/utils.h"
+#include <src/winapi/utils.h>
 
 #include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
@@ -10,9 +10,8 @@
 int main(void)
 {
     LPWSTR wide_string = NULL;
-
     FJ_TRY (fj_winapi_into_utf16("", &wide_string)) {
-        fprintf(stderr, "Failed to convert empty string: %u\n", fj_result);
+        fprintf(stderr, "Failed: empty string: %s\n", fj_error_get_description(fj_result));
         return 1;
     }
 

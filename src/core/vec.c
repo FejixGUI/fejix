@@ -1,4 +1,3 @@
-#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 #include <fejix/core/vec.h>
 

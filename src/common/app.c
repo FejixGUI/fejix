@@ -1,4 +1,4 @@
-#include <fejix/interface/app.h>
+#include <fejix/app.h>
 
 #include <fejix/core/utils.h>
 
@@ -64,9 +64,15 @@ static fj_err_t find_with_name(fj_app_implementation_id_t *out_id, char const *n
 }
 
 
+static inline bool has_only_one_implementation(void)
+{
+    return FJ_LEN(implementations) == 1;
+}
+
+
 fj_err_t fj_app_get_default_implementation_id(fj_app_implementation_id_t *out_id)
 {
-    if (FJ_LEN(implementations) == 1) {
+    if (has_only_one_implementation()) {
         *out_id = implementations[0]->get_implementation_id();
         return FJ_OK;
     }

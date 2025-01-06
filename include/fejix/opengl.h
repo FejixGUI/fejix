@@ -1,9 +1,9 @@
-#ifndef FEJIX_INTERFACE_OPENGL_H_
-#define FEJIX_INTERFACE_OPENGL_H_
+#ifndef FEJIX_OPENGL_H_
+#define FEJIX_OPENGL_H_
 
 
-#include <fejix/interface/app.h>
-#include <fejix/interface/image_scene.h>
+#include <fejix/app.h>
+#include <fejix/image_scene.h>
 
 
 /* Based on khrplatform.h from Khronos. */
@@ -158,12 +158,12 @@ struct fj_opengl_renderer_create_info {
 };
 
 
-struct fj_opengl_manager_funcs {
+struct fj_opengl_funcs {
     fj_bool8_t (*get_implementation_supported)(fj_opengl_implementation_id_t id);
 
     fj_err_t (*create_manager)(
-        struct fj_opengl_manager **out_manager,
         struct fj_app *owner_app,
+        struct fj_opengl_manager **out_manager,
         struct fj_opengl_manager_create_info const *info
     );
 

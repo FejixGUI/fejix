@@ -2,7 +2,7 @@
 #define FEJIX_CORE_UTILS_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/core/alloc.h>
 
 
 /**
