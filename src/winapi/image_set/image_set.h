@@ -18,7 +18,7 @@ struct fj_image_set {
     HDC device_context;
 };
 
-struct fj_image_access_context {
+struct fj_image_compatibility_context {
     enum fj_winapi_image_access_type access_type;
 };
 

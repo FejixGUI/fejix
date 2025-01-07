@@ -143,7 +143,7 @@ struct fj_opengl_manager_create_info {
 };
 
 struct fj_opengl_image_set_create_info {
-    struct fj_image_access_context *image_access_context;
+    struct fj_image_compatibility_context *image_compatibility_context;
 
     /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
     fj_opengl_int_t const *attributes;
@@ -179,18 +179,10 @@ struct fj_opengl_funcs {
         fj_opengl_feature_id_t feature
     );
 
-    /**
-        The resulting image access context will indicate standalone use for an off-screen image
-        set.
-    */
-    fj_err_t (*get_standalone_access_context)(
+    /** The resulting context will indicate standalone use for an off-screen image set. */
+    fj_err_t (*get_compatibility_context)(
         struct fj_opengl_manager *manager,
-        struct fj_image_access_context **out_access_context
-    );
-
-    fj_err_t (*release_standalone_access_context)(
-        struct fj_opengl_manager *manager,
-        struct fj_image_access_context *access_context
+        struct fj_image_compatibility_context **out_compatibility_context
     );
 
     fj_err_t (*create_image_set)(

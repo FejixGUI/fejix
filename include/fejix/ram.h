@@ -5,13 +5,6 @@
 #include <fejix/image_scene.h>
 
 
-typedef uint32_t fj_ram_image_get_flags_t;
-
-enum fj_ram_image_get_flags {
-    FJ_RAM_IMAGE_GET_IMMEDIATE = 0,
-    FJ_RAM_IMAGE_GET_WAIT_AVAILABLE = 1,
-};
-
 typedef uint32_t fj_ram_pixel_format_t;
 
 enum fj_ram_pixel_format {
@@ -33,18 +26,18 @@ enum fj_ram_pixel_format {
 
 struct fj_ram_manager;
 
-struct fj_ram_manager_info {
+struct fj_ram_image_set_capabilities {
     fj_ram_pixel_format_t *supported_formats;
     uint32_t supported_format_count;
 };
 
 struct fj_ram_image_set_create_info {
-    struct fj_image_access_context *image_access_context;
+    struct fj_image_compatibility_context *image_compatibility_context;
     fj_ram_pixel_format_t pixel_format;
     struct fj_size initial_size;
 };
 
-struct fj_ram_image_info {
+struct fj_ram_image {
     uint8_t *pixels;
     uint32_t stride;
     uint32_t age;
@@ -56,7 +49,11 @@ struct fj_ram_funcs {
 
     fj_err_t (*destroy_manager)(struct fj_ram_manager *manager);
 
-    void (*get_manager_info)(struct fj_ram_manager *manager, struct fj_ram_manager_info *out_info);
+    void (*get_image_set_capacilities)(
+        struct fj_ram_manager *manager,
+        struct fj_image_compatibility_context *compatibility_context,
+        struct fj_ram_image_set_capabilities *out_capabilities
+    );
 
     fj_err_t (*create_image_set)(
         struct fj_ram_manager *manager,
@@ -66,19 +63,24 @@ struct fj_ram_funcs {
 
     fj_err_t (*destroy_image_set)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
 
-    fj_err_t (*get_current_image_info)(
+    /** May fail if previous swap operations are not finished. To synchronize, use ``sync()``. */
+    fj_err_t (*acquire_next_image)(
         struct fj_ram_manager *manager,
         struct fj_image_set *image_set,
-        struct fj_ram_image_info *out_info,
-        fj_ram_image_get_flags_t flags
+        struct fj_ram_image *out_image
     );
 
-    // TODO What about image sets used for e.g. icons that are not presentable? What does this
-    // mean? Can we present to an icon? Can image sets be presentable and non-presentable??
-    fj_err_t (*present_current_image)(
-        struct fj_ram_manager *manager,
-        struct fj_image_set *image_set
-    );
+    /** Blocks until the next image can be acquired. */
+    fj_err_t (*sync)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
+
+    /**
+        This is an asynchronous operation, acquiring the next available image may fail when called
+        after this function.
+        To synchronize, use ``sync()``.
+
+        Has no effect on image sets that have one image (for which this does not make sense).
+    */
+    fj_err_t (*swap_images)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
 };
 
 

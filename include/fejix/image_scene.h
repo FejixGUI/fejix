@@ -21,7 +21,7 @@ struct fj_image_scene;
 FJ_PUBLICLY_TAGGED(fj_image_scene)
 
 struct fj_image_scene_create_info {
-    struct fj_image_access_context *image_access_context;
+    struct fj_image_compatibility_context *image_compatibility_context;
     struct fj_image_set *image_set;
 };
 
@@ -54,17 +54,10 @@ struct fj_image_scene_funcs {
 
     fj_err_t (*destroy_manager)(struct fj_image_scene_manager *manager);
 
-    fj_err_t (*get_image_access_context)(
-        struct fj_image_scene_manager *manager,
-        struct fj_image_access_context **out_image_access_context
+    struct fj_image_compatibility_context const *(*get_image_compatibility_context)(
+        struct fj_image_scene_manager *manager
     );
 
-    fj_err_t (*release_image_access_context)(
-        struct fj_image_scene_manager *manager,
-        struct fj_image_access_context *image_access_context
-    );
-
-    /** Automatically releases the image access context. */
     fj_err_t (*create_image_scene)(
         struct fj_image_scene_manager *manager,
         struct fj_image_scene **out_image_scene,

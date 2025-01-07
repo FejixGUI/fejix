@@ -27,7 +27,7 @@ struct fj_image_set;
     Often serves as an image creation hint from image-consuming interfaces to image-producing
     interfaces.
 */
-struct fj_image_access_context;
+struct fj_image_compatibility_context;
 
 
 #endif
