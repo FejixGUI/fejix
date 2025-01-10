@@ -31,11 +31,16 @@ enum fj_app_interface_id {
 };
 
 
-typedef uint32_t fj_app_force_command_t;
+typedef uint32_t fj_app_command_t;
 
-enum fj_app_force_command {
-    /** The app should finish because of e.g. its own request, a system shutdown etc. */
-    FJ_APP_FORCE_FINISH,
+enum fj_app_command {
+    /**
+        The app should finish because of e.g. its own request, a system shutdown etc.
+
+        Not responding to this command in sane time (e.g. a few seconds) may lead to the operating
+        system killing the process, which may lead to data loss.
+    */
+    FJ_APP_COMMAND_FINISH,
 
     /**
         The app lost primary focus due to interruption by another app.
@@ -66,7 +71,7 @@ FJ_PUBLICLY_TAGGED(fj_app)
 struct fj_app_callbacks {
     fj_err_t (*on_idle)(struct fj_app *app);
 
-    fj_err_t (*on_force)(struct fj_app *app, fj_app_force_command_t command);
+    fj_err_t (*on_command)(struct fj_app *app, fj_app_command_t command);
 };
 
 

@@ -12,6 +12,7 @@ typedef uint32_t fj_image_scene_interface_id_t;
 
 enum fj_image_scene_interface_id {
     FJ_IMAGE_SCENE_INTERFACE_SYNC,
+    FJ_IMAGE_SCENE_INTERFACE_LAYOUT,
 };
 
 
@@ -21,21 +22,20 @@ struct fj_image_scene;
 FJ_PUBLICLY_TAGGED(fj_image_scene)
 
 struct fj_image_scene_create_info {
-    struct fj_image_compatibility_context *image_compatibility_context;
-    struct fj_image_set *image_set;
+    union fj_tag tag;
 };
 
-struct fj_image_scene_update_info {
+struct fj_image_scene_content_update_info {
     struct fj_density density;
     struct fj_size size;
     fj_orientation_type_t orientation;
 };
 
 struct fj_image_scene_manager_callbacks {
-    fj_err_t (*on_update_image_scene)(
+    fj_err_t (*on_content_update)(
         struct fj_app *app,
         struct fj_image_scene *image_scene,
-        struct fj_image_scene_update_info const *info
+        struct fj_image_scene_content_update_info const *info
     );
 };
 
@@ -54,10 +54,6 @@ struct fj_image_scene_funcs {
 
     fj_err_t (*destroy_manager)(struct fj_image_scene_manager *manager);
 
-    struct fj_image_compatibility_context const *(*get_image_compatibility_context)(
-        struct fj_image_scene_manager *manager
-    );
-
     fj_err_t (*create_image_scene)(
         struct fj_image_scene_manager *manager,
         struct fj_image_scene **out_image_scene,
@@ -69,12 +65,18 @@ struct fj_image_scene_funcs {
         struct fj_image_scene *image_scene
     );
 
-    fj_err_t (*set_image_scene_needs_update)(
+    void (*get_image_set)(
+        struct fj_image_scene_manager *manager,
+        struct fj_image_scene *image_scene,
+        struct fj_image_set **out_image_set
+    );
+
+    fj_err_t (*set_needs_content_update)(
         struct fj_image_scene_manager *manager,
         struct fj_image_scene *image_scene
     );
 
-    fj_err_t (*update_image_scenes)(
+    fj_err_t (*update)(
         struct fj_image_scene_manager *manager,
         struct fj_image_scene *const *image_scenes,
         uint32_t image_scene_count

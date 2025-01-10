@@ -76,51 +76,44 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 }
 
 
-static fj_err_t get_class_name(WCHAR out_string[64])
+static fj_err_t get_junk_class_name(WCHAR out_string[32])
 {
-    SYSTEMTIME time;
-    GetSystemTime(&time);
-
     static unsigned int counter = 0;
     counter++;
 
-    swprintf(
-        out_string,
-        64,
-        L"fejix-window-class-%04hx%04hx%04hx%04hx%04hx%04hx%04hx%08x",
-        time.wYear,
-        time.wMonth,
-        time.wDay,
-        time.wHour,
-        time.wMinute,
-        time.wSecond,
-        time.wMilliseconds,
-        counter
-    );
+    swprintf(out_string, 32, L"fejix-junk-window-class%08x", counter);
 
     return FJ_OK;
 }
 
 
-fj_err_t create_window_class(
-    struct fj_winapi_window_info const *window_info,
-    LPWSTR *out_class_name
-)
+static bool is_of_junk_class(HWND window)
 {
-    WCHAR class_name[64];
-    get_class_name(class_name);
+    WCHAR chars[32] = { 0 };
+    GetClassName(window, chars, 32);
+    return wcsstr(chars, L"fejix-junk-window-class") == 0;
+}
 
-    WNDCLASSEX info = {
-        .cbSize = sizeof(info),
-        .lpszClassName = class_name,
-        .hInstance = GetModuleHandle(NULL),
-        .style = window_info->class_style,
-        .lpfnWndProc = window_info->procedure ? window_info->procedure : DefWindowProc,
-    };
 
-    *out_class_name = MAKEINTATOM(RegisterClassEx(&info));
+static fj_err_t create_window_class(WNDCLASSEX *class_info)
+{
+    class_info->cbSize = sizeof(class_info);
 
-    if (*out_class_name == NULL) {
+    WCHAR class_name[32];
+    get_junk_class_name(class_name);
+    class_info->lpszClassName = class_name;
+
+    if (class_info->hInstance == NULL) {
+        class_info->hInstance = GetModuleHandle(NULL);
+    }
+
+    if (class_info->lpfnWndProc == NULL) {
+        class_info->lpfnWndProc = DefWindowProc;
+    }
+
+    class_info->lpszClassName = MAKEINTATOM(RegisterClassEx(class_info));
+
+    if (class_info->lpszClassName == NULL) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
@@ -128,33 +121,72 @@ fj_err_t create_window_class(
 }
 
 
-fj_err_t fj_winapi_window_create_simple(
-    HWND *out_window,
-    struct fj_winapi_window_info const *window_info
+static inline bool window_needs_new_class(
+    WNDCLASSEX const *maybe_class_info,
+    CREATESTRUCT const *maybe_window_info
 )
 {
-    LPWSTR class_name;
-    FJ_TRY (create_window_class(window_info, &class_name)) {
-        return fj_result;
+    return maybe_class_info != NULL || maybe_window_info == NULL
+        || maybe_window_info->lpszClass == NULL;
+}
+
+
+fj_err_t fj_winapi_window_create(
+    HWND *out_window,
+    WNDCLASSEX const *maybe_class_info,
+    CREATESTRUCT const *maybe_window_info
+)
+{
+    WNDCLASSEX class_info = { 0 };
+
+    if (maybe_class_info != NULL) {
+        class_info = *maybe_class_info;
+    }
+
+    CREATESTRUCT window_info = { 0 };
+
+    if (maybe_window_info != NULL) {
+        window_info = *maybe_window_info;
+    }
+
+    if (window_needs_new_class(maybe_class_info, maybe_window_info)) {
+        FJ_TRY (create_window_class(&class_info)) {
+            return fj_result;
+        }
+    }
+
+    if (window_info.hInstance == NULL) {
+        window_info.hInstance = class_info.hInstance;
+    }
+
+    if (window_info.hInstance == NULL) {
+        window_info.hInstance = GetModuleHandle(NULL);
+    }
+
+    if (window_info.lpszClass == NULL) {
+        window_info.lpszClass = class_info.lpszClassName;
     }
 
     *out_window = CreateWindowEx(
-        window_info->exstyle,
-        class_name,
-        NULL,
-        window_info->style,
-        window_info->x,
-        window_info->y,
-        window_info->width,
-        window_info->height,
-        window_info->parent,
-        window_info->menu,
-        GetModuleHandle(NULL),
-        window_info->create_param
+        window_info.dwExStyle,
+        window_info.lpszClass,
+        window_info.lpszName,
+        window_info.style,
+        window_info.x,
+        window_info.y,
+        window_info.cx,
+        window_info.cy,
+        window_info.hwndParent,
+        window_info.hMenu,
+        window_info.hInstance,
+        window_info.lpCreateParams
     );
 
     if (*out_window == NULL) {
-        UnregisterClass(class_name, GetModuleHandle(NULL));
+        if (class_info.lpszClassName != NULL) {
+            UnregisterClass(class_info.lpszClassName, class_info.hInstance);
+        }
+
         return FJ_ERR_REQUEST_FAILED;
     }
 
@@ -162,16 +194,19 @@ fj_err_t fj_winapi_window_create_simple(
 }
 
 
-fj_err_t fj_winapi_window_destroy_simple(HWND window)
+fj_err_t fj_winapi_window_destroy(HWND window)
 {
     LPWSTR class_name = (void *) GetClassLongPtr(window, GCW_ATOM);
+    bool should_destroy_class = is_of_junk_class(window);
 
     if (DestroyWindow(window) == 0) {
         return FJ_ERR_REQUEST_FAILED;
     }
 
-    if (UnregisterClass(class_name, GetModuleHandle(NULL)) == 0) {
-        return FJ_ERR_REQUEST_FAILED;
+    if (should_destroy_class) {
+        if (UnregisterClass(class_name, GetModuleHandle(NULL)) == 0) {
+            return FJ_ERR_REQUEST_FAILED;
+        }
     }
 
     return FJ_OK;

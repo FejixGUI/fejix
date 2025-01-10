@@ -2,9 +2,9 @@
 #define FEJIX_WINAPI_IMAGE_SCENE_H_
 
 
-#include <fejix/image_scene.h>
+#include <src/winapi/image_set/image_set.h>
 
-#include <windows.h>
+#include <fejix/image_scene.h>
 
 
 struct fj_image_scene_manager {
@@ -15,7 +15,7 @@ struct fj_image_scene_manager {
 struct fj_image_scene {
     union fj_tag tag;
 
-    HWND window;
+    struct fj_image_set image_set;
 };
 
 

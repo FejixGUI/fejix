@@ -128,12 +128,15 @@ static LRESULT CALLBACK global_window_procedure(
 
 static fj_err_t create_global_window(struct fj_app *app)
 {
-    struct fj_winapi_window_info window_info = {
-        .procedure = global_window_procedure,
-        .parent = HWND_MESSAGE,
+    WNDCLASSEX class_info = {
+        .lpfnWndProc = global_window_procedure,
     };
 
-    FJ_TRY (fj_winapi_window_create_simple(&app->global_window, &window_info)) {
+    CREATESTRUCT window_info = {
+        .hwndParent = HWND_MESSAGE,
+    };
+
+    FJ_TRY (fj_winapi_window_create(&app->global_window, &class_info, &window_info)) {
         return fj_result;
     }
 
@@ -145,7 +148,7 @@ static fj_err_t create_global_window(struct fj_app *app)
 
 static fj_err_t destroy_global_window(struct fj_app *app)
 {
-    return fj_winapi_window_destroy_simple(app->global_window);
+    return fj_winapi_window_destroy(app->global_window);
 }
 
 
@@ -210,7 +213,7 @@ static fj_err_t app_launch(struct fj_app *app)
         DispatchMessage(&msg);
     }
 
-    return app->callbacks->on_force(app, FJ_APP_FORCE_FINISH);
+    return app->callbacks->on_command(app, FJ_APP_COMMAND_FINISH);
 }
 
 

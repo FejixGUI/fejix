@@ -26,13 +26,12 @@ enum fj_ram_pixel_format {
 
 struct fj_ram_manager;
 
-struct fj_ram_image_set_capabilities {
+struct fj_ram_image_capabilities {
     fj_ram_pixel_format_t *supported_formats;
     uint32_t supported_format_count;
 };
 
-struct fj_ram_image_set_create_info {
-    struct fj_image_compatibility_context *image_compatibility_context;
+struct fj_ram_image_create_info {
     fj_ram_pixel_format_t pixel_format;
     struct fj_size initial_size;
 };
@@ -49,34 +48,50 @@ struct fj_ram_funcs {
 
     fj_err_t (*destroy_manager)(struct fj_ram_manager *manager);
 
-    void (*get_image_set_capacilities)(
+    void (*get_image_capabilities)(
         struct fj_ram_manager *manager,
-        struct fj_image_compatibility_context *compatibility_context,
-        struct fj_ram_image_set_capabilities *out_capabilities
+        struct fj_image_set *image_set,
+        struct fj_ram_image_capabilities *out_capabilities
     );
 
-    fj_err_t (*create_image_set)(
+    fj_err_t (*create_images)(
         struct fj_ram_manager *manager,
-        struct fj_image_set **out_image_set,
-        struct fj_ram_image_set_create_info const *info
+        struct fj_image_set *image_set,
+        struct fj_ram_image_create_info const *info
     );
 
-    fj_err_t (*destroy_image_set)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
+    fj_err_t (*destroy_images)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
 
-    /** May fail if previous swap operations are not finished. To synchronize, use ``sync()``. */
-    fj_err_t (*acquire_next_image)(
+    /**
+        May reallocate images.
+        Any available images in use should be retrieved and redrawn again after this call.
+    */
+    fj_err_t (*resize_images)(
+        struct fj_ram_manager *manager,
+        struct fj_image_set *image_set,
+        struct fj_size const *size
+    );
+
+    /** Blocks until the next image can be acquired. */
+    fj_err_t (*wait_image_available)(
+        struct fj_ram_manager *manager,
+        struct fj_image_set *image_set
+    );
+
+    /**
+        May fail if previous swap operations are not finished. To synchronize, use
+        ``wait_image_available()``.
+    */
+    fj_err_t (*get_available_image)(
         struct fj_ram_manager *manager,
         struct fj_image_set *image_set,
         struct fj_ram_image *out_image
     );
 
-    /** Blocks until the next image can be acquired. */
-    fj_err_t (*sync)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
-
     /**
-        This is an asynchronous operation, acquiring the next available image may fail when called
+        This is an asynchronous operation, getting an available image may fail when called right
         after this function.
-        To synchronize, use ``sync()``.
+        To synchronize, use ``wait_image_available()``.
 
         Has no effect on image sets that have one image (for which this does not make sense).
     */

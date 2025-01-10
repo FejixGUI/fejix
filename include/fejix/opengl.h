@@ -41,13 +41,13 @@ enum fj_opengl_feature_id {
     FJ_OPENGL_FEATURE_RENDERER_API_OPENGL_DESKTOP,
     FJ_OPENGL_FEATURE_RENDERER_API_OPENGL_ES,
     FJ_OPENGL_FEATURE_RENDERER_FRIEND,
-    FJ_OPENGL_FEATURE_RENDERER_SEPARATE_READ_WRITE,
+    FJ_OPENGL_FEATURE_RENDERER_SEPARATE_INPUT_OUTPUT,
     FJ_OPENGL_FEATURE_IMAGE_COLORSPACE_SRGB,
     FJ_OPENGL_FEATURE_IMAGE_MULTISAMPLING,
 };
 
 
-typedef int32_t fj_opengl_int_t;
+typedef int32_t fj_opengl_attribute_t;
 
 enum fj_opengl_image_attribute_id {
     FJ_OPENGL_IMAGE_ATTRIBUTE_END,
@@ -99,8 +99,26 @@ struct fj_opengl_renderer;
 
 struct fj_opengl_manager_internal_info {
     fj_opengl_implementation_id_t implementation_id;
+
+    /**
+        Contains:
+        * ``EGLDisplay*`` for EGL.
+        * ``Display*`` for GLX.
+        * NULL for other implementations.
+    */
     void *internal_manager;
-    fj_opengl_function_getter_t manager_function_getter;
+
+    /**
+        The context which must be current when using the internal manager function getter.
+    */
+    void *internal_manager_rendering_context;
+
+    /**
+        The image set which must be current when using the internal manager function getter.
+    */
+    void *internal_manager_image_set;
+
+    fj_opengl_function_getter_t internal_manager_function_getter;
 };
 
 struct fj_opengl_image_set_internal_info {
@@ -131,7 +149,7 @@ struct fj_opengl_renderer_internal_info {
     void *internal_renderer;
 };
 
-struct fj_opengl_thread_state_internal_info {
+struct fj_opengl_rendering_internal_info {
     void *internal_renderer;
     void *internal_input_image_set;
     void *internal_output_image_set;
@@ -139,19 +157,19 @@ struct fj_opengl_thread_state_internal_info {
 
 struct fj_opengl_manager_create_info {
     fj_opengl_implementation_id_t implementation_id;
-    struct fj_opengl_manager_internal_info const *import_manager;
+
+    /** If NULL, ignored. If any fields are NULL, the default values are used. */
+    struct fj_opengl_manager_internal_info const *import_internal_info;
 };
 
-struct fj_opengl_image_set_create_info {
-    struct fj_image_compatibility_context *image_compatibility_context;
-
+struct fj_opengl_image_create_info {
     /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
-    fj_opengl_int_t const *attributes;
+    fj_opengl_attribute_t const *attributes;
 };
 
 struct fj_opengl_renderer_create_info {
     /** Array of the form { ATTRIBUTE_ID, VALUE, ATTRIBUTE_ID, VALUE, ATTRIBUTE_END } */
-    fj_opengl_int_t const *attributes;
+    fj_opengl_attribute_t const *attributes;
 
     /** Specifies the renderer with which the new renderer will share some object IDs. */
     struct fj_opengl_context *friend_renderer;
@@ -160,6 +178,8 @@ struct fj_opengl_renderer_create_info {
 
 struct fj_opengl_funcs {
     fj_bool8_t (*get_implementation_supported)(fj_opengl_implementation_id_t id);
+
+    fj_opengl_implementation_id_t (*get_default_implementation_id)(void);
 
     fj_err_t (*create_manager)(
         struct fj_app *owner_app,
@@ -179,22 +199,37 @@ struct fj_opengl_funcs {
         fj_opengl_feature_id_t feature
     );
 
-    /** The resulting context will indicate standalone use for an off-screen image set. */
-    fj_err_t (*get_compatibility_context)(
-        struct fj_opengl_manager *manager,
-        struct fj_image_compatibility_context **out_compatibility_context
-    );
-
+    /** Creates a standalone off-screen image set. */
     fj_err_t (*create_image_set)(
         struct fj_opengl_manager *manager,
         struct fj_image_set **out_image_set,
-        struct fj_opengl_image_set_create_info const *info
+        struct fj_size const *image_set_size
     );
 
+    /** Destroys a standalone off-screen image set. */
     fj_err_t (*destroy_image_set)(
         struct fj_opengl_manager *manager,
         struct fj_image_set *image_set
     );
+
+    fj_bool8_t (*get_image_create_capable)(
+        struct fj_opengl_manager *manager,
+        struct fj_image_set *image_set
+    );
+
+    fj_bool8_t (*get_image_create_capable_with_info)(
+        struct fj_opengl_manager *manager,
+        struct fj_image_set *image_set,
+        struct fj_opengl_image_create_info const *image_create_info
+    );
+
+    fj_err_t (*create_images)(
+        struct fj_opengl_manager *manager,
+        struct fj_image_set *image_set,
+        struct fj_opengl_image_create_info const *info
+    );
+
+    fj_err_t (*destroy_images)(struct fj_opengl_manager *manager, struct fj_image_set *image_set);
 
     void (*get_image_set_internal_info)(
         struct fj_opengl_manager *manger,
@@ -226,23 +261,26 @@ struct fj_opengl_funcs {
         struct fj_opengl_renderer *renderer
     );
 
-    /** :param renderer: Set to NULL to make no renderer current. */
-    fj_err_t (*set_thread_state)(
+    /** Sets the thread-local rendering state. */
+    fj_err_t (*begin_rendering)(
         struct fj_opengl_manager *manager,
         struct fj_opengl_renderer *renderer,
         struct fj_image_set *input_image_set,
         struct fj_image_set *output_image_set
     );
 
-    /** Useful for state saving and restoring. */
-    fj_err_t (*get_thread_state_internal_info)(
+    /** Clears the thread-local rendering state. */
+    fj_err_t (*end_rendering)(struct fj_opengl_manager *manager);
+
+    /** Useful for saving and restoring the rendering state. */
+    fj_err_t (*get_rendering_internal_info)(
         struct fj_opengl_manager *manager,
-        struct fj_opengl_thread_state_internal_info *out_info
+        struct fj_opengl_rendering_internal_info *out_info
     );
 
-    fj_err_t (*set_thread_state_internal_info)(
+    fj_err_t (*set_rendering_internal_info)(
         struct fj_opengl_manager *manager,
-        struct fj_opengl_thread_state_internal_info const *info
+        struct fj_opengl_rendering_internal_info const *info
     );
 };
 
