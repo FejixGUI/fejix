@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.19)
 
 project(fejix
     VERSION 0.0.1
-    DESCRIPTION "Cross-platform graphical client library"
+    DESCRIPTION "Cross-platform low-level graphical client library"
     HOMEPAGE_URL "https://github.com/FejixGUI/fejix"
     LANGUAGES "C"
 )

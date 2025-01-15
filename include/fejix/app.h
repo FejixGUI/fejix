@@ -25,9 +25,11 @@ typedef uint32_t fj_app_interface_id_t;
 
 enum fj_app_interface_id {
     FJ_APP_INTERFACE_MANUAL_SLEEP,
+    FJ_APP_INTERFACE_ACTIVITY_HINTS,
     FJ_APP_INTERFACE_IMAGE_SCENE,
     FJ_APP_INTERFACE_OPENGL,
     FJ_APP_INTERFACE_RAM,
+    FJ_APP_INTERFACE_USER = 0x1000,
 };
 
 

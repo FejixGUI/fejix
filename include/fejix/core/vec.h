@@ -74,22 +74,14 @@ void *fj_vec_last_item(struct fj_vec const *vec);
 /** Copies the items into the list. Does not check the index. */
 FJ_PUBLIC
 void fj_vec_replace(
-    struct fj_vec *vec,
-    void const *items,
-    uint32_t destination_index,
-    uint32_t item_count
-);
+    struct fj_vec *vec, void const *items, uint32_t destination_index, uint32_t item_count);
 
 FJ_PUBLIC
 fj_err_t fj_vec_insert_uninit(struct fj_vec *vec, uint32_t destination_index, uint32_t item_count);
 
 FJ_PUBLIC
 fj_err_t fj_vec_insert(
-    struct fj_vec *vec,
-    void const *items,
-    uint32_t destination_index,
-    uint32_t item_count
-);
+    struct fj_vec *vec, void const *items, uint32_t destination_index, uint32_t item_count);
 
 /** Clamps `start_index` and `start_index+item_count` to `0..length`. */
 FJ_PUBLIC

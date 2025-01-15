@@ -70,8 +70,6 @@ enum fj_err {
     /** */
     FJ_ERR_INVALID_TEXT_ENCODING,
     /** */
-    FJ_ERR_INTERFACE_INIT_FAILED,
-    /** */
     FJ_ERR_TEMP_FILE_CREATION_FAILED,
     /** */
     FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED,

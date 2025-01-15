@@ -25,11 +25,7 @@ static union fj_tag get_key(struct fj_map_node const *node)
 }
 
 
-static fj_bool8_t key_eq(
-    struct fj_map const *map,
-    struct fj_map_node const *node,
-    union fj_tag key
-)
+static fj_bool8_t key_eq(struct fj_map const *map, struct fj_map_node const *node, union fj_tag key)
 {
     return fj_tag_eq(get_key(node), key, map->key_type);
 }
@@ -69,10 +65,7 @@ static void insert_node_to_bucket(struct fj_map_node **bucket, struct fj_map_nod
 
 
 static void remove_node_from_bucket(
-    struct fj_map_node **bucket,
-    struct fj_map_node *prev_node,
-    struct fj_map_node *node
-)
+    struct fj_map_node **bucket, struct fj_map_node *prev_node, struct fj_map_node *node)
 {
     if (prev_node == NULL) {
         *bucket = node->next;
@@ -86,7 +79,7 @@ static void remove_node_from_bucket(
 
 static void clear_buckets(struct fj_map *map)
 {
-    memset(map->_buckets, 0, sizeof(*map->_buckets) * map->_bucket_count);
+    memset((void *) map->_buckets, 0, sizeof(*map->_buckets) * map->_bucket_count);
 }
 
 
@@ -106,8 +99,7 @@ static void find_node_in_bucket(
     struct fj_map_node **bucket,
     union fj_tag key,
     struct fj_map_node **found_node,
-    struct fj_map_node **found_previous_node
-)
+    struct fj_map_node **found_previous_node)
 {
     *found_node = NULL;
     *found_previous_node = NULL;

@@ -65,7 +65,7 @@ fj_err_t fj_realloc_uninit(void **out_ptr, uint32_t item_count, size_t item_size
 
     if (item_count == 0 || item_size == 0) {
         if (out_ptr != NULL) {
-            free(out_ptr);
+            free((void *) out_ptr);
         }
 
         *out_ptr = NULL;
@@ -88,11 +88,7 @@ fj_err_t fj_realloc_uninit(void **out_ptr, uint32_t item_count, size_t item_size
 
 
 fj_err_t fj_realloc_zeroed(
-    void **out_ptr,
-    uint32_t old_item_count,
-    uint32_t new_item_count,
-    size_t item_size
-)
+    void **out_ptr, uint32_t old_item_count, uint32_t new_item_count, size_t item_size)
 {
     void *old_ptr = *out_ptr;
     size_t old_size = old_item_count * item_size;
@@ -100,7 +96,7 @@ fj_err_t fj_realloc_zeroed(
 
     if (new_item_count == 0 || item_size == 0) {
         if (out_ptr != NULL) {
-            free(out_ptr);
+            free((void *) out_ptr);
         }
 
         *out_ptr = NULL;

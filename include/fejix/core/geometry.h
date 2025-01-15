@@ -39,16 +39,6 @@ struct fj_size {
     uint32_t height;
 };
 
-struct fj_density {
-    /** Number of pixels per ``physical_unit_length``. */
-    uint32_t vertical_pixels_per_unit;
-    /** Number of pixels per ``physical_unit_length``. */
-    uint32_t horizontal_pixels_per_unit;
-
-    /** The length of the unit in metres. */
-    uint32_t physical_unit_length;
-};
-
 struct fj_rect {
     struct fj_position position;
     struct fj_size size;

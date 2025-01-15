@@ -3,7 +3,7 @@
 
 
 #include <fejix/app.h>
-#include <fejix/image_set.h>
+#include <fejix/image_container.h>
 
 #ifndef FJ_OPT_NO_VULKAN_HEADERS
 #    include <vulkan/vulkan.h>
@@ -24,27 +24,22 @@ struct fj_vulkan_funcs {
     fj_err_t (*create_manager)(
         struct fj_app *owner_app,
         struct fj_vulkan_manager **out_manager,
-        struct fj_vulkan_manager_create_info const *info
-    );
+        struct fj_vulkan_manager_create_info const *info);
 
     fj_err_t (*destroy_manager)(struct fj_vulkan_manager *manager);
 
     fj_bool8_t (*get_image_create_capable)(
-        struct fj_vulkan_manager *manager,
-        struct fj_image_set *image_set
-    );
+        struct fj_vulkan_manager *manager, struct fj_image_container *image_container);
 
-    fj_err_t (*get_image_set_surface)(
+    fj_err_t (*get_image_container_surface)(
         struct fj_vulkan_manager *manager,
-        struct fj_image_set *image_set,
-        VkSurface *out_surface
-    );
+        struct fj_image_container *image_container,
+        VkSurface *out_surface);
 
-    fj_err_t (*release_image_set_surface)(
+    fj_err_t (*release_image_container_surface)(
         struct fj_vulkan_manager *manager,
-        struct fj_image_set *image_set,
-        VkSurface surface
-    );
+        struct fj_image_container *image_container,
+        VkSurface surface);
 };
 
 

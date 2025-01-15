@@ -136,7 +136,7 @@ static fj_err_t wayland_handle_dynamic_global_event(
         }
     }
 
-    // TODO Delegate Wayland dynamic global events to specialised interfaces (if initialised).
+    // TODO: Delegate Wayland dynamic global events to specialised interfaces (if initialised).
 
     if (!event->added) {
         for (uint32_t i = 0; i < global_list->length; i++) {
@@ -225,7 +225,11 @@ static void wayland_registry_add(
 }
 
 
-static void wayland_registry_remove(void *_client, struct wl_registry *registry, uint32_t object_id)
+static void wayland_registry_remove(
+    void *_client,
+    struct wl_registry *registry,
+    uint32_t object_id
+)
 {
     struct fj_client *client = (void *) _client;
     (void) registry;
@@ -375,7 +379,9 @@ fj_err_t fj_wayland_handle_events(
 )
 {
     for (size_t i = 0; i < client->recorded_events.length;) {
-        struct fj_wayland_event_wrapper const *wrapper = fj_vec_offset(&client->recorded_events, i);
+        struct fj_wayland_event_wrapper const *wrapper = fj_vec_offset(
+            &client->recorded_events, i
+        );
 
         if (event_filter(client, filter_callback_data, wrapper)) {
             FJ_TRY (wayland_handle_event(client, i, wrapper)) {

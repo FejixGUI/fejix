@@ -46,10 +46,7 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **out_string);
         * instance: ``GetModulehandle(NULL)``.
 */
 fj_err_t fj_winapi_window_create(
-    HWND *out_window,
-    WNDCLASSEX const *class_info,
-    CREATESTRUCT const *window_info
-);
+    HWND *out_window, WNDCLASSEX const *class_info, CREATESTRUCT const *window_info);
 
 /**
     Destroys the window. If the library created a window class for that specific window with

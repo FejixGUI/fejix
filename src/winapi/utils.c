@@ -27,8 +27,7 @@ fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
         string,
         -1, /* convert the entire string */
         *utf16_string,
-        output_char_count
-    );
+        output_char_count);
 
     if (result == 0) {
         FJ_FREE(utf16_string);
@@ -49,8 +48,7 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
         NULL, /* output string */
         0,    /* output chars count (unknown, asking for it) */
         NULL,
-        NULL
-    );
+        NULL);
 
     FJ_TRY (FJ_REALLOC_UNINIT(string, output_size)) {
         return fj_result;
@@ -64,8 +62,7 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
         (char *) *string,
         output_size,
         NULL,
-        NULL
-    );
+        NULL);
 
     if (result == 0) {
         FJ_FREE(string);
@@ -122,9 +119,7 @@ static fj_err_t create_window_class(WNDCLASSEX *class_info)
 
 
 static inline bool window_needs_new_class(
-    WNDCLASSEX const *maybe_class_info,
-    CREATESTRUCT const *maybe_window_info
-)
+    WNDCLASSEX const *maybe_class_info, CREATESTRUCT const *maybe_window_info)
 {
     return maybe_class_info != NULL || maybe_window_info == NULL
         || maybe_window_info->lpszClass == NULL;
@@ -132,10 +127,7 @@ static inline bool window_needs_new_class(
 
 
 fj_err_t fj_winapi_window_create(
-    HWND *out_window,
-    WNDCLASSEX const *maybe_class_info,
-    CREATESTRUCT const *maybe_window_info
-)
+    HWND *out_window, WNDCLASSEX const *maybe_class_info, CREATESTRUCT const *maybe_window_info)
 {
     WNDCLASSEX class_info = { 0 };
 
@@ -179,8 +171,7 @@ fj_err_t fj_winapi_window_create(
         window_info.hwndParent,
         window_info.hMenu,
         window_info.hInstance,
-        window_info.lpCreateParams
-    );
+        window_info.lpCreateParams);
 
     if (*out_window == NULL) {
         if (class_info.lpszClassName != NULL) {

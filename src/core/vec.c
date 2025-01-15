@@ -138,11 +138,7 @@ void fj_vec_deinit(struct fj_vec *vec)
 
 
 void fj_vec_replace(
-    struct fj_vec *vec,
-    void const *items,
-    uint32_t destination_index,
-    uint32_t item_count
-)
+    struct fj_vec *vec, void const *items, uint32_t destination_index, uint32_t item_count)
 {
     uint8_t *destination = fj_vec_offset(vec, destination_index);
     size_t copy_size = vec->_item_size * item_count;
@@ -167,11 +163,7 @@ fj_err_t fj_vec_insert_uninit(struct fj_vec *vec, uint32_t destination_index, ui
 
 
 fj_err_t fj_vec_insert(
-    struct fj_vec *vec,
-    void const *items,
-    uint32_t destination_index,
-    uint32_t item_count
-)
+    struct fj_vec *vec, void const *items, uint32_t destination_index, uint32_t item_count)
 {
     FJ_TRY (fj_vec_insert_uninit(vec, destination_index, item_count)) {
         return fj_result;

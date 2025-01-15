@@ -14,6 +14,7 @@ struct fj_app {
     HWND global_window;
     fj_seconds_t wakeup_timeout;
     fj_bool8_t is_finished;
+    fj_bool8_t is_critical;
 };
 
 

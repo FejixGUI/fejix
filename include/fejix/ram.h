@@ -50,17 +50,16 @@ struct fj_ram_funcs {
 
     void (*get_image_capabilities)(
         struct fj_ram_manager *manager,
-        struct fj_image_set *image_set,
-        struct fj_ram_image_capabilities *out_capabilities
-    );
+        struct fj_image_container *image_container,
+        struct fj_ram_image_capabilities *out_capabilities);
 
     fj_err_t (*create_images)(
         struct fj_ram_manager *manager,
-        struct fj_image_set *image_set,
-        struct fj_ram_image_create_info const *info
-    );
+        struct fj_image_container *image_container,
+        struct fj_ram_image_create_info const *info);
 
-    fj_err_t (*destroy_images)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
+    fj_err_t (*destroy_images)(
+        struct fj_ram_manager *manager, struct fj_image_container *image_container);
 
     /**
         May reallocate images.
@@ -68,15 +67,12 @@ struct fj_ram_funcs {
     */
     fj_err_t (*resize_images)(
         struct fj_ram_manager *manager,
-        struct fj_image_set *image_set,
-        struct fj_size const *size
-    );
+        struct fj_image_container *image_container,
+        struct fj_size const *size);
 
     /** Blocks until the next image can be acquired. */
     fj_err_t (*wait_image_available)(
-        struct fj_ram_manager *manager,
-        struct fj_image_set *image_set
-    );
+        struct fj_ram_manager *manager, struct fj_image_container *image_container);
 
     /**
         May fail if previous swap operations are not finished. To synchronize, use
@@ -84,9 +80,8 @@ struct fj_ram_funcs {
     */
     fj_err_t (*get_available_image)(
         struct fj_ram_manager *manager,
-        struct fj_image_set *image_set,
-        struct fj_ram_image *out_image
-    );
+        struct fj_image_container *image_container,
+        struct fj_ram_image *out_image);
 
     /**
         This is an asynchronous operation, getting an available image may fail when called right
@@ -95,7 +90,8 @@ struct fj_ram_funcs {
 
         Has no effect on image sets that have one image (for which this does not make sense).
     */
-    fj_err_t (*swap_images)(struct fj_ram_manager *manager, struct fj_image_set *image_set);
+    fj_err_t (*swap_images)(
+        struct fj_ram_manager *manager, struct fj_image_container *image_container);
 };
 
 

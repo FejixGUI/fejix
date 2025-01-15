@@ -41,31 +41,30 @@
 
 /** :see: :c:func:`fj_alloc_uninit` */
 #define FJ_ALLOC_UNINIT(OUT_OBJECT_PTR) \
-    (fj_alloc_uninit((void *) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR))))
+    (fj_alloc_uninit((void **) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR))))
 
 /** :see: :c:func:`fj_alloc_zeroed` */
 #define FJ_ALLOC_ZEROED(OUT_OBJECT_PTR) \
-    (fj_alloc_zeroed((void *) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR))))
+    (fj_alloc_zeroed((void **) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR))))
 
 /** :see: :c:func:`fj_alloc_copied` */
 #define FJ_ALLOC_COPIED(OUT_OBJECT_PTR, SOURCE) \
-    (fj_alloc_copied((void *) (OUT_OBJECT_PTR), (void *) (SOURCE), sizeof(**(OUT_OBJECT_PTR))))
+    (fj_alloc_copied((void **) (OUT_OBJECT_PTR), (void *) (SOURCE), sizeof(**(OUT_OBJECT_PTR))))
 
 /** :see: :c:func:`fj_realloc_uninit` */
 #define FJ_REALLOC_UNINIT(OUT_ARRAY_PTR, NEW_COUNT) \
-    (fj_realloc_uninit((void *) (OUT_ARRAY_PTR), (uint32_t) NEW_COUNT, sizeof(**(OUT_ARRAY_PTR))))
+    (fj_realloc_uninit((void **) (OUT_ARRAY_PTR), (uint32_t) NEW_COUNT, sizeof(**(OUT_ARRAY_PTR))))
 
 /** :see: :c:func:`fj_realloc_zeroed` */
 #define FJ_REALLOC_ZEROED(OUT_ARRAY_PTR, OLD_COUNT, NEW_COUNT) \
     (fj_realloc_zeroed(                                        \
-        (void *) (OUT_ARRAY_PTR),                              \
+        (void **) (OUT_ARRAY_PTR),                             \
         (uint32_t) (OLD_COUNT),                                \
         (uint32_t) (NEW_COUNT),                                \
-        sizeof(**(OUT_ARRAY_PTR))                              \
-    ))
+        sizeof(**(OUT_ARRAY_PTR))))
 
 /** :see: :c:func:`fj_free` */
-#define FJ_FREE(OUT_ARRAY_PTR) (fj_free((void *) (OUT_ARRAY_PTR)))
+#define FJ_FREE(OUT_ARRAY_PTR) (fj_free((void **) (OUT_ARRAY_PTR)))
 
 
 /**
@@ -123,11 +122,7 @@ fj_err_t fj_realloc_uninit(void **out_ptr, uint32_t item_count, size_t item_size
 */
 FJ_PUBLIC
 fj_err_t fj_realloc_zeroed(
-    void **out_ptr,
-    uint32_t old_item_count,
-    uint32_t new_item_count,
-    size_t item_size
-);
+    void **out_ptr, uint32_t old_item_count, uint32_t new_item_count, size_t item_size);
 
 
 #endif

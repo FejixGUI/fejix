@@ -1,8 +1,8 @@
-# Fejix - cross-platform graphical client library
+# Fejix - a graphical client library
 
-Fejix is a cross-platform C99 base library for clients of graphical shells.
+Fejix is a cross-platform low-level C99 library base for clients of graphical shells.
 Its goal is to wrap graphical shell protocols (Windows API, Wayland, X11 etc.) to provide a common
-base for GUI toolkits.
+base for cross-platform GUI toolkits, game engines and other tools.
 
 Fejix can perform tasks like window management, graphical API initialisation,
 input and more.
@@ -23,7 +23,7 @@ Run:
 ```sh
 # Configure
 cmake -S . -B build \
-    -D FEJIX_FEATURES="feature1;feature2;.." \
+    -D FEJIX_FEATURES=feature1;feature2;.. \
     -D BUILD_SHARED_LIBS=ON # or OFF
 
 # Compile
