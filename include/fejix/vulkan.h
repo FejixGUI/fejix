@@ -5,41 +5,40 @@
 #include <fejix/app.h>
 #include <fejix/image_container.h>
 
-#ifndef FJ_OPT_NO_VULKAN_HEADERS
-#    include <vulkan/vulkan.h>
-#endif
 
+struct fj_vulkan_global_info {
+    /** Pointer to a ``vkGetInstanceProcAddr()`` function pointer. */
+    void const *ptr_loader;
 
-struct fj_vulkan_manager_create_info {
-    VkInstance instance;
-    VkAllocationCallbacks const *allocation_callbacks;
-    PFN_vkGetInstanceProcAddr function_getter;
+    /** Pointer to a ``VkAllocationCallbacks`` structure. */
+    void const *ptr_allocator;
+
+    /** Pointer to a ``VkInstance`` handle. */
+    void const *ptr_instance;
 };
 
 
-struct fj_vulkan_manager;
-
-
 struct fj_vulkan_funcs {
-    fj_err_t (*create_manager)(
-        struct fj_app *owner_app,
-        struct fj_vulkan_manager **out_manager,
-        struct fj_vulkan_manager_create_info const *info);
-
-    fj_err_t (*destroy_manager)(struct fj_vulkan_manager *manager);
-
-    fj_bool8_t (*get_image_create_capable)(
-        struct fj_vulkan_manager *manager, struct fj_image_container *image_container);
-
-    fj_err_t (*get_image_container_surface)(
-        struct fj_vulkan_manager *manager,
+    fj_bool8_t (*get_can_create_images)(
+        struct fj_app *app,
         struct fj_image_container *image_container,
-        VkSurface *out_surface);
+        struct fj_vulkan_global_info const *global_info);
 
-    fj_err_t (*release_image_container_surface)(
-        struct fj_vulkan_manager *manager,
+    /**
+        Calls the appropriate function like ``vkCreateWin32SurfaceKHR()``,
+        ``vkCreateXcbSurfaceKHR()`` etc.
+
+        The created surface must be destroyed with ``vkDestroySurfaceKHR()``.
+
+        :param out_surface: Pointer to ``VkSurfaceKHR`` to initialise.
+        :return: If all the required functions are found, the returned ``VkResult`` is translated
+            to a roughly corresponding Fejix error code.
+    */
+    fj_err_t (*create_surface)(
+        struct fj_app *app,
         struct fj_image_container *image_container,
-        VkSurface surface);
+        struct fj_vulkan_global_info const *global_info,
+        void *out_surface);
 };
 
 
