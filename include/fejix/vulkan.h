@@ -3,7 +3,7 @@
 
 
 #include <fejix/app.h>
-#include <fejix/image_container.h>
+#include <fejix/image_consumer.h>
 
 
 struct fj_vulkan_global_info {
@@ -19,14 +19,9 @@ struct fj_vulkan_global_info {
 
 
 struct fj_vulkan_funcs {
-    fj_bool8_t (*get_can_create_images)(
-        struct fj_app *app,
-        struct fj_image_container *image_container,
-        struct fj_vulkan_global_info const *global_info);
-
     /**
         Calls the appropriate function like ``vkCreateWin32SurfaceKHR()``,
-        ``vkCreateXcbSurfaceKHR()`` etc.
+        ``vkCreateWaylandSurfaceKHR()``, ``vkCreateAndroidSurfaceKHR()`` etc.
 
         The created surface must be destroyed with ``vkDestroySurfaceKHR()``.
 
@@ -36,9 +31,9 @@ struct fj_vulkan_funcs {
     */
     fj_err_t (*create_surface)(
         struct fj_app *app,
-        struct fj_image_container *image_container,
-        struct fj_vulkan_global_info const *global_info,
-        void *out_surface);
+        void *out_surface,
+        struct fj_image_consumer *image_consumer,
+        struct fj_vulkan_global_info const *global_info);
 };
 
 

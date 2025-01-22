@@ -51,18 +51,8 @@ fj_err_t fj_vec_resize_to_reserve(struct fj_vec *vec, uint32_t reserved_items);
 FJ_PUBLIC
 fj_err_t fj_vec_resize_to_fit(struct fj_vec *vec);
 
-
 FJ_PUBLIC
 uint32_t fj_vec_get_last_index(struct fj_vec const *vec);
-
-FJ_PUBLIC
-uint32_t fj_vec_get_push_index(struct fj_vec const *vec);
-
-FJ_PUBLIC
-fj_bool8_t fj_vec_is_empty(struct fj_vec const *vec);
-
-FJ_PUBLIC
-fj_bool8_t fj_vec_has_allocated(struct fj_vec const *vec);
 
 FJ_PUBLIC
 void *fj_vec_offset(struct fj_vec const *vec, uint32_t offset_index);
@@ -94,14 +84,6 @@ fj_err_t fj_vec_push(struct fj_vec *vec, void const *item);
 /** Removes the last item of the list. */
 FJ_PUBLIC
 fj_err_t fj_vec_pop(struct fj_vec *vec);
-
-/** Pushed the item into the front (beginning) of the vector. */
-FJ_PUBLIC
-fj_err_t fj_vec_push_front(struct fj_vec *vec, void const *item);
-
-/** Pops an item from the front (beginning) of the vector. */
-FJ_PUBLIC
-fj_err_t fj_vec_pop_front(struct fj_vec *vec);
 
 
 #endif

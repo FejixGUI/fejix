@@ -35,7 +35,8 @@ static LRESULT CALLBACK window_procedure(HWND window, UINT message, WPARAM wpara
             // TODO: image scene startup size via image_scene_layout
 
             // TODO: image scene visibility control with image_scene_layout
-            ShowWindow(window, SW_SHOWNORMAL);
+            // TODO: show windows on image creation
+            // ShowWindow(window, SW_SHOWNORMAL);
 
             return 0;
         }

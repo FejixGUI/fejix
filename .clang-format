@@ -1,9 +1,18 @@
-# Written for clang-format v18
+---
+# Config for clang-format v17+
 #
-# Good practices for using this config:
-# * put 2 empty lines between function blocks for good visual separation
-# * put trailing commas in enums and struct/array initialisers to split them into multiple lines
+# Tips for coding with this config:
+# * put 2 empty lines between function blocks for good visual separation.
+# * put trailing commas in enums/struct/arrays that should be split into multiple lines.
+#
+# Unfortunately, clang-format is reasonably good only at the LLVM style.
+# This config implements a similar style in order to never fight against the tooling
+# that is instead supposed to help us.
 
+Language: Cpp
+Standard: c++17
+
+# Just in case, fall back to a more sensible style than LLVM
 BasedOnStyle: Chromium
 
 IndentWidth: 4
@@ -15,17 +24,22 @@ InsertNewlineAtEOF: true
 # {
 #     ...
 # }
-#               <- keeps these lines
-#               <-
+#                   <- keep empty lines here
+#                   <-
 # int y()
-# {
-#     ...
+# {                 <- do not keep empty lines here
+#     if (...) {    <-
+#         dosth();  <-
+#     }
 # }
-MaxEmptyLinesToKeep: 2
 SeparateDefinitionBlocks: Leave
+MaxEmptyLinesToKeep: 2
+KeepEmptyLinesAtTheStartOfBlocks: false
 
+# template<typename T>
 # [[attribute]]
 # static inline int *foo(struct bar const *const *baz);
+AlwaysBreakTemplateDeclarations: Yes
 BreakAfterAttributes: Always
 QualifierAlignment: Custom
 QualifierOrder: ['static', 'inline', 'type', 'const', 'volatile', 'restrict']
@@ -44,42 +58,80 @@ SpaceAroundPointerQualifiers: After
 PenaltyReturnTypeOnItsOwnLine: 1000
 AlignAfterOpenBracket: AlwaysBreak
 BinPackArguments: false
+BinPackParameters: false
 AllowAllParametersOfDeclarationOnNextLine: true
 
+# class Something
+# {
+#     Something() : something(), something(), something()
+#
+#     Something()
+#         : somethinglong(), somethinglong(), somethinglong()
+#
+#     Something()
+#         : somethingveryverylong(),
+#           somethingveryverylong(),
+#           somethingveryverylong()
+# }
+PackConstructorInitializers: NextLine
+
 # int x()
-# {                             <-
-#     if (x) {                  <-
+# {                                     <-
+#     if (x) {                          <-
 #        ...
 #     }
 #
 #     for (somethinglonglonglonglong;
 #          somethinglonglonglonglong;
 #          somethinglonglonglonglong)
-#     {                         <-
+#     {                                 <-
 #         ...
 #     }
 # }
 BreakBeforeBraces: Custom
 BraceWrapping:
-    AfterControlStatement: MultiLine
-    AfterFunction: true
-    AfterClass: true
     AfterNamespace: true
+    AfterClass: true
+    AfterFunction: true
+    AfterControlStatement: MultiLine
+
+# (struct x) { .s = (struct s) { .x = 1, .y = 2 } }
+#
+# (struct x) {
+#     .s = (struct s) {
+#         .x = 1,
+#         .y = 2,           <- put trailing commas everywhere for the magic to work
+#     },                    <-
+# }
+SpaceBeforeCpp11BracedList: true
+Cpp11BracedListStyle: false
 
 # int x() { }
 #          ^
+AllowShortFunctionsOnASingleLine: Empty
 SpaceInEmptyBlock: true
 
 # (int) x
 #      ^
 SpaceAfterCStyleCast: true
 
+# something();  // something
+#             ^^
+SpacesBeforeTrailingComments: 2
+
 # switch (x) {
-#     case 1:
-# ^^^^    something();
-# ^^^^    break;
+#     case 1:               <-
+#         something();
+#         break;
 # }
 IndentCaseLabels: true
+
+# class X
+# {
+# public:                   <-
+#     void something();
+# }
+AccessModifierOffset: -1
 
 # myvar
 #   = somethinglonglonglonglong
@@ -88,14 +140,15 @@ IndentCaseLabels: true
 BreakBeforeBinaryOperators: All
 AlignOperands: DontAlign
 
-# (struct x) {
-#     .s = (struct s) {
-#         .x = 1,
-#         .y = 2,       <- put trailing commas everywhere for the magic to work
-#     },                <-
-# }
-SpaceBeforeCpp11BracedList: true
-Cpp11BracedListStyle: false
+# myvar = somethingshort(
+#     somethinglong, somethinglong);
+PenaltyBreakAssignment: 2
+PenaltyBreakBeforeFirstCallParameter: 1
+
+# mystring
+#     = "somethinglonglonglonglong"
+#       "somethinglonglonglonglong";
+AlwaysBreakBeforeMultilineStrings: true
 
 # #define A         \
 #     something     \
@@ -111,11 +164,12 @@ IndentPPDirectives: AfterHash
 Macros:
     # This tricks clang-format into correctly formatting calling conventions in function pointer
     # declarations and typedefs.
-    # The problem is that clang-format does not fully understand the code semantics.
+    # The problem is that clang-format does not fully understand the code semantics and poorly
+    # handles macro expansions. The expansion here must match the macro name length.
     - 'FJ_OPENGL_CALL=*********const'
 
     # This tricks clang-format into leaving FJ_PUBLIC on its own line.
-    - 'FJ_PUBLIC=[[unused]]'
+    - 'FJ_PUBLIC=[[xxxxx]]'
 
 IfMacros:
     - 'FJ_TRY'

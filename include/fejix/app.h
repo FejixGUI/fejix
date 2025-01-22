@@ -5,35 +5,6 @@
 #include <fejix/core/base.h>
 
 
-typedef uint32_t fj_app_implementation_id_t;
-
-enum fj_app_implementation_id {
-    /** Android Native Development Kit */
-    FJ_APP_IMPLEMENTATION_ANDK,
-    /** Apple Cocoa */
-    FJ_APP_IMPLEMENTATION_COCOA,
-    /** Wayland protocol */
-    FJ_APP_IMPLEMENTATION_WAYLAND,
-    /** Windows API */
-    FJ_APP_IMPLEMENTATION_WINAPI,
-    /** X11 protocol */
-    FJ_APP_IMPLEMENTATION_X11,
-};
-
-
-typedef uint32_t fj_app_interface_id_t;
-
-enum fj_app_interface_id {
-    FJ_APP_INTERFACE_MANUAL_SLEEP,
-    FJ_APP_INTERFACE_ACTIVITY_HINTS,
-    FJ_APP_INTERFACE_IMAGE_SCENE,
-    FJ_APP_INTERFACE_RAM,
-    FJ_APP_INTERFACE_OPENGL,
-    FJ_APP_INTERFACE_VULKAN,
-    FJ_APP_INTERFACE_USER = 0x1000,
-};
-
-
 typedef uint32_t fj_app_command_t;
 
 enum fj_app_command {
@@ -51,7 +22,7 @@ enum fj_app_command {
 
         The app may not wake up from sleep until it gains focus again.
     */
-    FJ_APP_FORCE_SLEEP,
+    FJ_APP_COMMAND_SLEEP,
 
     /**
         The app was moved to the background and should end its current tasks or start background
@@ -59,19 +30,19 @@ enum fj_app_command {
 
         The app may not wake up until it moves to the foreground.
     */
-    FJ_APP_FORCE_HIBERNATE,
+    FJ_APP_COMMAND_HIBERNATE,
 
 
     /** The app should finish due to low system memory. */
-    FJ_APP_FORCE_DEALLOCATE,
+    FJ_APP_COMMAND_DEALLOCATE,
 };
 
 
 struct fj_app;
 
-FJ_PUBLICLY_TAGGED(fj_app)
 
 struct fj_app_callbacks {
+    /** Called before the app goes to sleep waiting for events. */
     fj_err_t (*on_idle)(struct fj_app *app);
 
     fj_err_t (*on_command)(struct fj_app *app, fj_app_command_t command);
@@ -79,19 +50,12 @@ struct fj_app_callbacks {
 
 
 struct fj_app_create_info {
-    union fj_tag tag;
-    char const *name;
+    void *userdata;
     struct fj_app_callbacks const *callbacks;
 };
 
 
 struct fj_app_funcs {
-    fj_app_implementation_id_t (*get_implementation_id)(void);
-
-    void (*get_implementation_version)(struct fj_version *out_version);
-
-    void const *(*get_interface_funcs)(fj_app_interface_id_t id);
-
     fj_err_t (*create)(struct fj_app **out_app, struct fj_app_create_info const *info);
 
     fj_err_t (*destroy)(struct fj_app *app);
@@ -147,22 +111,10 @@ struct fj_app_funcs {
         Even if the app will finish, it may still process some events before it actually finishes.
 
         To handle the program termination in the most cross-platform way, the program should do its
-        deinitialisation in response to force commands.
+        deinitialisation in response to the app commands.
     */
     void (*set_finished)(struct fj_app *app);
 };
-
-
-/** Returns NULL for unknown IDs. */
-FJ_PUBLIC
-char const *fj_app_get_implementation_name(fj_app_implementation_id_t id);
-
-/** Returns NULL if the specified implementation was not built into the library. */
-FJ_PUBLIC
-struct fj_app_funcs const *fj_app_get_builtin_implementation(fj_app_implementation_id_t id);
-
-FJ_PUBLIC
-fj_err_t fj_app_get_default_implementation_id(fj_app_implementation_id_t *out_id);
 
 
 #endif

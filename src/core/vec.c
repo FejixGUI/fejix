@@ -1,3 +1,4 @@
+#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 #include <fejix/core/vec.h>
 
@@ -74,20 +75,6 @@ uint32_t fj_vec_get_last_index(struct fj_vec const *vec)
     return vec->length - 1;
 }
 
-uint32_t fj_vec_get_push_index(struct fj_vec const *vec)
-{
-    return vec->length;
-}
-
-fj_bool8_t fj_vec_is_empty(struct fj_vec const *vec)
-{
-    return vec->length == 0;
-}
-
-fj_bool8_t fj_vec_has_allocated(struct fj_vec const *vec)
-{
-    return vec->items != NULL;
-}
 
 void *fj_vec_offset(struct fj_vec const *vec, uint32_t offset_index)
 {
@@ -128,7 +115,7 @@ void fj_vec_init(struct fj_vec *vec, size_t item_size)
 
 void fj_vec_deinit(struct fj_vec *vec)
 {
-    if (fj_vec_has_allocated(vec)) {
+    if (vec->items != NULL) {
         FJ_FREE(&vec->items);
     }
 
@@ -152,7 +139,7 @@ fj_err_t fj_vec_insert_uninit(struct fj_vec *vec, uint32_t destination_index, ui
         return fj_result;
     }
 
-    if (!fj_vec_is_empty(vec) && destination_index != fj_vec_get_push_index(vec)) {
+    if (vec->length != 0 && destination_index != vec->length) {
         vec_shift_tail(vec, destination_index, (int32_t) item_count);
     }
 
@@ -189,23 +176,11 @@ fj_err_t fj_vec_remove(struct fj_vec *vec, uint32_t start_index, uint32_t item_c
 
 fj_err_t fj_vec_push(struct fj_vec *vec, void const *item)
 {
-    return fj_vec_insert(vec, item, fj_vec_get_push_index(vec), 1);
+    return fj_vec_insert(vec, item, vec->length, 1);
 }
 
 
 fj_err_t fj_vec_pop(struct fj_vec *vec)
 {
     return fj_vec_remove(vec, fj_vec_get_last_index(vec), 1);
-}
-
-
-fj_err_t fj_vec_push_front(struct fj_vec *vec, void const *item)
-{
-    return fj_vec_insert(vec, item, 0, 1);
-}
-
-
-fj_err_t fj_vec_pop_front(struct fj_vec *vec)
-{
-    return fj_vec_remove(vec, 0, 1);
 }
