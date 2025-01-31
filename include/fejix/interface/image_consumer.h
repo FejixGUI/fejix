@@ -2,7 +2,7 @@
 #define FEJIX_IMAGE_CONSUMER_H_
 
 
-#include <fejix/core/base.h>
+#include <fejix/core/primitives.h>
 
 
 /**
@@ -14,9 +14,8 @@
 struct fj_image_consumer;
 
 
-struct fj_image_consumer_funcs {
-    void (*get_desired_size)(struct fj_image_consumer *image_consumer, struct fj_size *out_size);
-};
+void fj_image_consumer_get_desired_size(
+    struct fj_image_consumer *image_consumer, struct fj_size *out_size);
 
 
 #endif

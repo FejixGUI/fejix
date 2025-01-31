@@ -25,6 +25,7 @@ enum fj_implementation_id {
 
     FJ_IMPLEMENTATION_PREDEFINED_COUNT,
 
+    /** Minimal ID for user-defined implementations. */
     FJ_IMPLEMENTATION_USER = 0x1000,
 };
 
@@ -51,11 +52,21 @@ enum fj_interface_id {
 
 struct fj_implementation {
     fj_implementation_id_t id;
-    struct fj_version version;
+    fj_version_t version;
 
-    void const *(*get_interface_funcs)(fj_interface_id_t interface_id);
+    /** Indexed by interface ID. */
+    void const *const *interfaces;
+
+    uint32_t interface_count;
 };
 
+
+FJ_PUBLIC
+void fj_implementation_set_global(struct fj_implementation const *implementation);
+
+/** :returns: NULL if there is no current implementation set. */
+FJ_PUBLIC
+struct fj_implementation const *fj_implementation_get_global(void);
 
 /** Returns NULL for unknown IDs. */
 FJ_PUBLIC

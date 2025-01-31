@@ -105,7 +105,7 @@ static LRESULT CALLBACK window_procedure(HWND window, UINT message, WPARAM wpara
 }
 
 
-static void const *get_interface_funcs(fj_image_scene_interface_id_t id)
+static void const *get_interface_functions(fj_image_scene_interface_id_t id)
 {
     return NULL;
 }
@@ -220,8 +220,8 @@ static fj_err_t image_scene_update(
 }
 
 
-struct fj_image_scene_funcs const fj_winapi_image_scene_funcs = {
-    .get_interface_funcs = get_interface_funcs,
+struct fj_image_scene_functions const fj_winapi_image_scene_functions = {
+    .get_interface_functions = get_interface_functions,
     .create_manager = create_manager,
     .destroy_manager = destroy_manager,
     .create_image_scene = create_image_scene,

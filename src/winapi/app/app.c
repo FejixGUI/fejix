@@ -281,24 +281,24 @@ static fj_err_t app_set_activity_hint(
 }
 
 
-static struct fj_app_manual_sleep_funcs const app_manual_sleep_funcs = {
+static struct fj_app_manual_sleep_functions const app_manual_sleep_functions = {
     .manual_sleep = app_manual_sleep,
 };
 
-static struct fj_app_activity_hints_funcs const app_activity_hints_funcs = {
+static struct fj_app_activity_hints_functions const app_activity_hints_functions = {
     .get_hint_supported = app_get_activity_hint_supported,
     .set_hint = app_set_activity_hint,
 };
 
 
-static void const *app_get_interface_funcs(fj_app_interface_id_t id)
+static void const *app_get_interface_functions(fj_app_interface_id_t id)
 {
     switch (id) {
         case FJ_APP_INTERFACE_MANUAL_SLEEP:
-            return &app_manual_sleep_funcs;
+            return &app_manual_sleep_functions;
 
         case FJ_APP_INTERFACE_ACTIVITY_HINTS:
-            return &app_activity_hints_funcs;
+            return &app_activity_hints_functions;
 
         default:
             return NULL;
@@ -320,10 +320,10 @@ static void app_get_implementation_version(struct fj_version *out_version)
 }
 
 
-struct fj_app_funcs const fj_winapi_app_funcs = {
+struct fj_app_functions const fj_winapi_app_functions = {
     .get_implementation_id = app_get_implementation_id,
     .get_implementation_version = app_get_implementation_version,
-    .get_interface_funcs = app_get_interface_funcs,
+    .get_interface_functions = app_get_interface_functions,
     .create = app_create,
     .destroy = app_destroy,
     .launch = app_launch,

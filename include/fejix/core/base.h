@@ -2,6 +2,7 @@
 #define FEJIX_CORE_BASE_H_
 
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -36,8 +37,19 @@
 */
 #define FJ_USERDATA(OBJECT) (*(void **) (OBJECT))
 
-/** The length of a metric inch in metres. */
-#define FJ_INCH_LENGTH (0.0025)
+
+#define FJ_VERSION(MAJOR, MINOR, PATCH)                                         \
+    ((fj_version_t) ((((MAJOR) & 0xfffff) << 20) | (((MINOR) & 0xfffff) << 10)) \
+     | ((PATCH) & 0xfffff))
+
+#define FJ_VERSION_MAJOR(VERSION) ((VERSION) >> 20 & 0xfffff)
+#define FJ_VERSION_MINOR(VERSION) ((VERSION) >> 10 & 0xfffff)
+#define FJ_VERSION_PATCH(VERSION) ((VERSION) & 0xfffff)
+#define FJ_VERSION_NEXT(VERSION) (FJ_VERSION(FJ_VERSION_MAJOR(VERSION) + 1, 0, 0))
+#define FJ_VERSION_COMPATIBLE(VERSION, REQUIRED_VERSION) \
+    ((VERSION) >= REQUIRED_VERSION && (VERSION) < FJ_VERSION_NEXT(REQUIRED_VERSION))
+
+typedef uint32_t fj_version_t;
 
 
 /** Error code. */
@@ -77,77 +89,10 @@ enum fj_err {
     FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED,
 
     /** */
-    FJ_ERR_PREDEFEIND_COUNT,
+    FJ_ERR_PREDEFINED_COUNT,
 
     /** User-defined errors should begin with this number */
     FJ_ERR_USER = 0x1000,
-};
-
-
-typedef uint32_t fj_orientation_type_t;
-
-enum fj_orientation_type {
-    FJ_ORIENTATION_NORMAL = 0,
-    /** Vertical flip (along the Y axis). */
-    FJ_ORIENTATION_VFLIP = (1 << 0),
-    /** Horizontal flip (along the X axis). */
-    FJ_ORIENTATION_HFLIP = (1 << 1),
-    /** Clock-wise 90 degree rotation. */
-    FJ_ORIENTATION_ROTATE90 = (1 << 2),
-
-    FJ_ORIENTATION_ROTATE180 = FJ_ORIENTATION_HFLIP ^ FJ_ORIENTATION_VFLIP,
-    FJ_ORIENTATION_ROTATE270 = FJ_ORIENTATION_ROTATE180 ^ FJ_ORIENTATION_ROTATE90,
-    FJ_ORIENTATION_ROTATE90_VFLIP = FJ_ORIENTATION_ROTATE90 ^ FJ_ORIENTATION_VFLIP,
-    FJ_ORIENTATION_ROTATE180_VFLIP = FJ_ORIENTATION_ROTATE180 ^ FJ_ORIENTATION_VFLIP,
-    FJ_ORIENTATION_ROTATE270_VFLIP = FJ_ORIENTATION_ROTATE270 ^ FJ_ORIENTATION_VFLIP,
-};
-
-
-/** Time in seconds. Timeouts typically use values from ``0..+inf``. */
-typedef double fj_seconds_t;
-
-/**
-    Dot density in DPM (dots-per-metre).
-
-    To calculate DPI (dots-per-inch), multiply by ``FJ_INCH_LENGTH``.
-    The legacy basic "normal" DPI is 96 pixels per inch.
-    Concepts like text/interface scaling factor is often derived from the ratio to that value.
-    That is, if the current DPI is 120, the content of the appriate size is considered to be
-    scaled by 120 / 96 = 125% compared to the "unscaled" ("density-unaware") content rendered at
-    96 DPI.
-*/
-typedef double fj_dots_per_metre_t;
-
-
-struct fj_position {
-    uint32_t x;
-    uint32_t y;
-};
-
-struct fj_relative_position {
-    int32_t x;
-    int32_t y;
-};
-
-struct fj_size {
-    uint32_t width;
-    uint32_t height;
-};
-
-struct fj_rect {
-    struct fj_position position;
-    struct fj_size size;
-};
-
-struct fj_relative_rect {
-    struct fj_relative_position relative_position;
-    struct fj_size size;
-};
-
-struct fj_version {
-    uint16_t major;
-    uint16_t minor;
-    uint16_t patch;
 };
 
 

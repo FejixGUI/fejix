@@ -17,11 +17,12 @@ enum fj_app_activity_flags {
 };
 
 
-struct fj_app_activity_flags_funcs {
-    fj_app_activity_flags_t (*get_supported_flags)(struct fj_app *app);
+FJ_PUBLIC
+fj_app_activity_flags_t fj_app_activity_flags_get_supported_flags(struct fj_app *app);
 
-    fj_err_t (*set_flags)(struct fj_app *app, fj_app_activity_flags_t flags);
-};
+
+FJ_PUBLIC
+fj_err_t fj_app_activity_flags_set_flags(struct fj_app *app, fj_app_activity_flags_t flags);
 
 
 #endif

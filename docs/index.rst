@@ -10,7 +10,7 @@ Add your content using ``reStructuredText`` syntax. See the
 `reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
 documentation for details.
 
-.. c:autodoc:: include/fejix/core/map.h
+.. c:autodoc:: include/fejix/interface/app.h include/fejix/interface/ram.h
 
 .. toctree::
    :maxdepth: 2

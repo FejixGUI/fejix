@@ -7,11 +7,11 @@ size_t fj_ram_get_pixel_size(fj_ram_pixel_format_t format)
         return 0;
     }
 
-    if (format >= FJ_RAM_PIXEL_FORMAT_MIN_SIZE32) {
+    if (format >= FJ_RAM_PIXEL_FORMAT_XRGB32) {
         return 4;
     }
 
-    if (format >= FJ_RAM_PIXEL_FORMAT_MIN_SIZE24) {
+    if (format >= FJ_RAM_PIXEL_FORMAT_RGB24) {
         return 3;
     }
 

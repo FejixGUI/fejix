@@ -2,7 +2,7 @@
 
 
 /** Contains strings and NULLs for unimplemented descriptions. */
-static char const *const error_descriptions[FJ_ERR_PREDEFEIND_COUNT] = {
+static char const *const error_descriptions[FJ_ERR_PREDEFINED_COUNT] = {
     [FJ_OK] = "success",
     [FJ_ERR_UNKNOWN] = "unknown error",
     [FJ_ERR_NOT_FOUND] = "not found",
@@ -26,7 +26,7 @@ char const *fj_err_get_description(fj_err_t error)
         return "user-defined error";
     }
 
-    if (error >= FJ_ERR_PREDEFEIND_COUNT) {
+    if (error >= FJ_ERR_PREDEFINED_COUNT) {
         return "unknown future error (external implementation might have used a newer base)";
     }
 

@@ -110,6 +110,40 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
 endif()
 
 
+function(generate_implementation_for_interface INTERFACE_FILE OUTPUT_FILE)
+    file(READ "${INTERFACE_FILE}" FILE_TEXT)
+    set(OUTPUT_TEXT "")
+
+    set(FUNCTION_REGEX "FJ_PUBLIC[ \n]*([^\\(]+)\\(([^\\)]*)\\)")
+    string(REGEX MATCHALL "${FUNCTION_REGEX}" FUNCTIONS "${FILE_TEXT}")
+    foreach(FUCNTION IN LISTS FUNCTIONS)
+        string(REGEX MATCH "${FUNCTION_REGEX}" IGNORED_OUTPUT "${FUCNTION}")
+        set(BEFORE_PAREN "${CMAKE_MATCH_1}")
+        set(ARGUMENT_DEFINITION_LIST "${CMAKE_MATCH_2}")
+
+        string(REGEX MATCH "(.+[^_a-zA-Z0-9])([_a-zA-Z0-9]+)$" IGNORED_OUTPUT "${BEFORE_PAREN}")
+        set(RETURN_TYPE "${CMAKE_MATCH_1}")
+        set(FUNCTION_NAME "${CMAKE_MATCH_2}")
+        string(STRIP "${RETURN_TYPE}" RETURN_TYPE)
+
+        set(ARGUMENT_DEFINITIONS "${ARGUMENT_DEFINITION_LIST}")
+        string(REPLACE "," ";" ARGUMENT_DEFINITIONS "${ARGUMENT_DEFINITIONS}")
+        set(ARGUMENT_PASS_LIST "")
+        foreach(ARGUMENT_DEFINITION IN LISTS ARGUMENT_DEFINITIONS)
+            string(REGEX MATCH "([_a-zA-Z0-9]+)$" IGNORED_OUTPUT "${ARGUMENT_NAME}")
+            list(APPEND ARGUMENT_PASS_LIST "${CMAKE_MATCH_1}")
+        endforeach()
+
+        string(CONCAT OUTPUT_TEXT
+            "${OUTPUT_TEXT}"
+            "\n"
+            "")
+    endforeach()
+endfunction()
+
+generate_implementation_for_interface("include/fejix/app.h")
+
+
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_OBJC_STANDARD 99)

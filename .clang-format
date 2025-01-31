@@ -168,8 +168,9 @@ Macros:
     # handles macro expansions. The expansion here must match the macro name length.
     - 'FJ_OPENGL_CALL=*********const'
 
-    # This tricks clang-format into leaving FJ_PUBLIC on its own line.
+    # This tricks clang-format into leaving these macros on a separate line.
     - 'FJ_PUBLIC=[[xxxxx]]'
+    - 'FJ_SINCE(X)=[[xxxx]]'
 
 IfMacros:
     - 'FJ_TRY'

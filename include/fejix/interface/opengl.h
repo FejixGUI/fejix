@@ -148,7 +148,7 @@ struct fj_opengl_renderer_create_info {
 };
 
 
-struct fj_opengl_funcs {
+struct fj_opengl_functions {
     /**
         Always returns at least one interface. The 0-th interface is intended to be the default
         choice if you completely do not care.

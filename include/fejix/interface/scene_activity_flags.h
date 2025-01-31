@@ -29,7 +29,7 @@ enum fj_scene_activity_flags {
 
 struct fj_scene_activity_flags_manager;
 
-struct fj_scene_activity_flags_funcs {
+struct fj_scene_activity_flags_functions {
     fj_err_t (*create_manager)(
         struct fj_scene_manager *owner_manager,
         struct fj_scene_activity_flags_manager **out_manager);

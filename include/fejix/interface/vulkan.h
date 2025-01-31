@@ -18,7 +18,7 @@ struct fj_vulkan_global_info {
 };
 
 
-struct fj_vulkan_funcs {
+struct fj_vulkan_functions {
     /**
         Calls the appropriate function like ``vkCreateWin32SurfaceKHR()``,
         ``vkCreateWaylandSurfaceKHR()``, ``vkCreateAndroidSurfaceKHR()`` etc.
