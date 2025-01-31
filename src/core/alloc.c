@@ -6,33 +6,6 @@
 #include <string.h>
 
 
-static struct fj_alloc_callbacks const default_alloc_callbacks = {
-    .malloc = malloc,
-    .calloc = calloc,
-    .realloc = realloc,
-    .free = free,
-};
-
-static struct fj_alloc_callbacks const *alloc_callbacks = &default_alloc_callbacks;
-
-
-struct fj_alloc_callbacks const *fj_alloc_get_callbacks(void)
-{
-    return alloc_callbacks;
-}
-
-
-void fj_alloc_set_callbacks(struct fj_alloc_callbacks const *callbacks)
-{
-    if (callbacks == NULL) {
-        alloc_callbacks = &default_alloc_callbacks;
-        return;
-    }
-
-    alloc_callbacks = callbacks;
-}
-
-
 fj_err_t fj_alloc_uninit(void **out_ptr, size_t size)
 {
     if (size == 0) {

@@ -67,22 +67,6 @@
 #define FJ_FREE(OUT_ARRAY_PTR) (fj_free((void **) (OUT_ARRAY_PTR)))
 
 
-/** Custom allocation callbacks. */
-struct fj_alloc_callbacks {
-    /** Same as the standard malloc. */
-    void *(*malloc)(size_t size);
-
-    /** Same as the standard calloc. */
-    void *(*calloc)(size_t count, size_t size);
-
-    /** Same as the standard realloc. */
-    void *(*realloc)(void *ptr, size_t size);
-
-    /** Same as the standard free. */
-    void (*free)(void *ptr);
-};
-
-
 /**
     Allocates an uninitialized block of memory.
     Works like ``malloc``, but allocating 0 bytes is always an error.
@@ -139,15 +123,6 @@ fj_err_t fj_realloc_uninit(void **out_ptr, uint32_t item_count, size_t item_size
 FJ_PUBLIC
 fj_err_t fj_realloc_zeroed(
     void **out_ptr, uint32_t old_item_count, uint32_t new_item_count, size_t item_size);
-
-
-/** :param callbacks: If NULL, the callbacks will be reset to the defaults. */
-FJ_PUBLIC
-void fj_alloc_set_callbacks(struct fj_alloc_callbacks const *callbacks);
-
-/** If no custom callbacks have been set, the default standard allocation functions are returned. */
-FJ_PUBLIC
-struct fj_alloc_callbacks const *fj_alloc_get_callbacks(void);
 
 
 #endif

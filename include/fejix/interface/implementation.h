@@ -1,3 +1,7 @@
+/**
+This is the only mandatory interface that an implementation must provide.
+*/
+
 #ifndef FEJIX_IMPLEMENTATION_H_
 #define FEJIX_IMPLEMENTATION_H_
 
@@ -23,6 +27,7 @@ enum fj_implementation_id {
     /** Universal Windows Platform */
     FJ_IMPLEMENTATION_UWP,
 
+    /** */
     FJ_IMPLEMENTATION_PREDEFINED_COUNT,
 
     /** Minimal ID for user-defined implementations. */
@@ -30,54 +35,11 @@ enum fj_implementation_id {
 };
 
 
-typedef uint32_t fj_interface_id_t;
+void fj_implementation_get_id(fj_implementation_id_t *out_id);
 
-enum fj_interface_id {
-    FJ_INTERFACE_APP,
-    FJ_INTERFACE_APP_MANUAL_SLEEP,
-    FJ_INTERFACE_APP_ACTIVITY_HINTS,
-    FJ_INTERFACE_IMAGE_CONSUMER,
-    FJ_INTERFACE_SCENE,
-    FJ_INTERFACE_SCENE_LAYOUT,
-    FJ_INTERFACE_SCENE_LAYOUT_TRIGGER,
-    FJ_INTERFACE_SCENE_SYNC,
-    FJ_INTERFACE_RAM,
-    FJ_INTERFACE_OPENGL,
-    FJ_INTERFACE_VULKAN,
+void fj_implementation_get_name(char const **out_name);
 
-    FJ_INTERFACE_PREDEFINED_COUNT,
-    FJ_INTERFACE_USER = 0x1000,
-};
-
-
-struct fj_implementation {
-    fj_implementation_id_t id;
-    fj_version_t version;
-
-    /** Indexed by interface ID. */
-    void const *const *interfaces;
-
-    uint32_t interface_count;
-};
-
-
-FJ_PUBLIC
-void fj_implementation_set_global(struct fj_implementation const *implementation);
-
-/** :returns: NULL if there is no current implementation set. */
-FJ_PUBLIC
-struct fj_implementation const *fj_implementation_get_global(void);
-
-/** Returns NULL for unknown IDs. */
-FJ_PUBLIC
-char const *fj_implementation_get_name(fj_implementation_id_t id);
-
-/** Returns NULL if the specified implementation was not built into the library. */
-FJ_PUBLIC
-struct fj_implementation const *fj_implementation_get_builtin(fj_implementation_id_t id);
-
-FJ_PUBLIC
-fj_err_t fj_implementation_get_default_id(fj_implementation_id_t *out_id);
+void fj_implementation_get_version(fj_version_t *out_version);
 
 
 #endif
