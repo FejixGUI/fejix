@@ -4,31 +4,30 @@
 
 void fj_implementation_set_global(struct fj_implementation const * implementation)
 {
-(void) implementation;
-/* no-op */
+    (void) implementation;
+    /* do nothing by default */;
 }
 
 struct fj_implementation const * fj_implementation_get_global(void)
 {
-
-return 0;
+    
+    return 0;
 }
 
 char const * fj_implementation_get_name(fj_implementation_id_t id)
 {
-(void) id;
-return 0;
+    (void) id;
+    return 0;
 }
 
 struct fj_implementation const * fj_implementation_get_builtin(fj_implementation_id_t id)
 {
-(void) id;
-return 0;
+    (void) id;
+    return 0;
 }
 
 fj_err_t fj_implementation_get_default_id(fj_implementation_id_t * out_id)
 {
-(void) out_id;
-return FJ_ERR_UNSUPPORTED;
+    (void) out_id;
+    return FJ_ERR_UNSUPPORTED;
 }
-

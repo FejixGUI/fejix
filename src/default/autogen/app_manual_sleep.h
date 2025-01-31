@@ -4,13 +4,12 @@
 
 bool fj_app_manual_sleep_get_supported(void)
 {
-
-return 0;
+    
+    return 0;
 }
 
 fj_err_t fj_app_manual_sleep(struct fj_app * app)
 {
-(void) app;
-return FJ_ERR_UNSUPPORTED;
+    (void) app;
+    return FJ_ERR_UNSUPPORTED;
 }
-

@@ -2,7 +2,7 @@
 #define FEJIX_SCENE_LAYOUT_H_
 
 
-#include <fejix/scene.h>
+#include <fejix/interface/scene.h>
 
 
 struct fj_scene_layout;

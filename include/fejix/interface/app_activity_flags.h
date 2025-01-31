@@ -2,7 +2,7 @@
 #define FEJIX_APP_ACTIVITY_FLAGS_H_
 
 
-#include <fejix/app.h>
+#include <fejix/interface/app.h>
 
 
 typedef uint32_t fj_app_activity_flags_t;

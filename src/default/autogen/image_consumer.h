@@ -4,7 +4,6 @@
 
 void fj_image_consumer_get_desired_size(struct fj_image_consumer * image_consumer, struct fj_size * out_size)
 {
-(void) image_consumer; (void) out_size;
-/* no-op */
+    (void) image_consumer; (void) out_size;
+    /* do nothing by default */;
 }
-

@@ -2,8 +2,8 @@
 #define FEJIX_VULKAN_H_
 
 
-#include <fejix/app.h>
-#include <fejix/image_consumer.h>
+#include <fejix/interface/app.h>
+#include <fejix/interface/image_consumer.h>
 
 
 struct fj_vulkan_global_info {

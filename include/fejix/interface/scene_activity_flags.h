@@ -2,7 +2,7 @@
 #define FEJIX_SCENE_ACTIVITY_FLAGS_H_
 
 
-#include <fejix/scene.h>
+#include <fejix/interface/scene.h>
 
 
 typedef uint32_t fj_scene_activity_flags_t;

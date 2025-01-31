@@ -4,13 +4,12 @@
 
 fj_app_activity_flags_t fj_app_activity_flags_get_supported_flags(struct fj_app * app)
 {
-(void) app;
-return 0;
+    (void) app;
+    return 0;
 }
 
 fj_err_t fj_app_activity_flags_set_flags(struct fj_app * app, fj_app_activity_flags_t flags)
 {
-(void) app; (void) flags;
-return FJ_ERR_UNSUPPORTED;
+    (void) app; (void) flags;
+    return FJ_ERR_UNSUPPORTED;
 }
-

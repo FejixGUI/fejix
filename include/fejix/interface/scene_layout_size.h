@@ -2,7 +2,7 @@
 #define FEJIX_SCENE_LAYOUT_SIZE_H_
 
 
-#include <fejix/scene_layout.h>
+#include <fejix/interface/scene_layout.h>
 
 
 typedef uint32_t fj_scene_layout_size_hint_flags_t;

@@ -2,8 +2,8 @@
 #define FEJIX_OPENGL_H_
 
 
-#include <fejix/app.h>
-#include <fejix/scene.h>
+#include <fejix/interface/app.h>
+#include <fejix/interface/scene.h>
 
 
 /* Based on khrplatform.h from Khronos. */

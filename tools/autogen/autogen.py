@@ -1,103 +1,136 @@
 import os, re
 
+
+def read_file(file_path: str):
+    with open(file_path) as file:
+        return file.read()
+
+def write_file(file_path: str, text: str):
+    with open(file_path, "w") as file:
+        file.write(text)
+
+
 class CTypedIdentifier():
     pattern = r"(?P<type>[^\)]+\W)(?P<name>\w+)"
 
-    def __init__(self, type: str, identifier: str):
+    def __init__(self, type: str, name: str):
         self.type = type.strip()
-        self.identifier = identifier.strip()
+        self.name = name.strip()
 
     def __str__(self):
-        return self.type + " " + self.identifier
+        return self.type + " " + self.name
 
     def __repr__(self):
         return str(self)
 
-    def parse(text) -> 'CTypedIdentifier':
+    def parse(text: str) -> 'CTypedIdentifier':
         match = re.match(CTypedIdentifier.pattern, text.strip())
         return CTypedIdentifier(match.group('type'), match.group('name'))
 
 
 class CFunction():
-    pattern = r"(/\*[ ]*(?P<since>since v[^ \*]+)[ ]*\*/)?[ \n]*(?P<type_and_name>[^\(\)\n]+)\((?P<args>[^\(\)]*)\);"
+    pattern = r"(?P<tag>[^\(\)\n]+)\((?P<args>[^\(\)]*)\);"
 
-    def __init__(self, name: CTypedIdentifier, args: list[CTypedIdentifier], since_tag = None):
-        self.name = name
+    def __init__(self, tag: CTypedIdentifier, args: list[CTypedIdentifier]):
+        self.tag = tag
         self.args = args
-        self.since_tag = since_tag
 
     def __str__(self):
-        output = ""
-
-        if self.since_tag is not None:
-            output += "/* " + self.since_tag + " */"
-
-        output += str(self.name)
-
-        output += '('
-
-        if len(self.args) == 0:
-            output += 'void'
-        else:
-            output += ", ".join([str(arg) for arg in self.args])
-
-        output += ')'
-
-        return output
+        return self.definition()
 
     def __repr__(self):
         return str(self)
 
-    def parse(text) -> 'CFunction':
+    def parse(text: str) -> 'CFunction':
         match = re.match(CFunction.pattern, text)
 
-        name = CTypedIdentifier.parse(match.group('type_and_name'))
-        since_tag = match.group('since')
+        name = CTypedIdentifier.parse(match.group('tag'))
 
         args = []
         if match.group('args') != 'void':
             for arg_text in match.group('args').split(','):
                 args.append(CTypedIdentifier.parse(arg_text))
 
-        return CFunction(name, args, since_tag=since_tag)
+        return CFunction(name, args)
 
-    def with_name_decorated(self, prefix = '', suffix = '') -> 'CFunction':
-        new_identifier = prefix + self.name.identifier + suffix
-        return CFunction(CTypedIdentifier(self.name.type, new_identifier), self.args)
+    def definition(self) -> str:
+        return f"{self.tag}({self.define_args()})"
 
-    def default_implementation(self):
-        text = str(self) + "\n{\n"
-        text += self.argument_ignore_statement() + "\n"
-        text += self.default_return_statement() + "\n"
-        text += "}\n"
-        return text
+    def pointer_declaration(self) -> str:
+        return f"{self.tag.type} (*{self.tag.name})({self.define_args()})"
 
-    def argument_ignore_statement(self):
+    def has_void_args(self) -> bool:
+        return len(self.args) == 0
+
+    def define_args(self) -> str:
+        if self.has_void_args():
+            return "void"
+        else:
+            return ", ".join([str(arg) for arg in self.args])
+
+    def pass_args(self) -> str:
+        return ", ".join([arg.name for arg in self.args])
+
+    def call(self):
+        return f"{self.tag.name}({self.pass_args()})"
+
+    def with_suffix(self, suffix: str) -> 'CFunction':
+        new_name = self.tag.name + suffix
+        return CFunction(CTypedIdentifier(self.tag.type, new_name), self.args)
+
+    def default_implementation(self) -> str:
+        return (
+            f"{self.definition()}\n"
+            "{\n"
+            f"    {self.ignore_arguments()}\n"
+            f"    {self.return_()}{self.default_return_value()};\n"
+            "}\n"
+        )
+
+    def loadable_implementation(self):
+        function_ptr = self.with_suffix("_ptr")
+        return (
+            f"static {function_ptr.pointer_declaration()};\n"
+            f"{self.definition()}\n"
+            "{\n"
+            f"    if ({function_ptr.tag.name} != NULL)\n"
+            f"        {self.return_()}{function_ptr.call()};\n"
+            f"    {self.return_()}{self.default_return_value()};\n"
+            "}\n"
+        )
+
+    def ignore_arguments(self):
         if len(self.args) == 0:
             return ""
 
-        return " ".join(["(void) " + arg.identifier + ";" for arg in self.args])
+        return f"{' '.join([f'(void) {arg.name};' for arg in self.args])}"
 
-    def default_return_statement(self):
-        if self.name.type == "void":
-            return "/* no-op */"
-        elif self.name.type == "fj_err_t":
-            return "return FJ_ERR_UNSUPPORTED;"
+    def return_(self):
+        if self.tag.type == "void":
+            return ""
         else:
-            return "return 0;"
+            return "return "
+
+    def default_return_value(self):
+        if self.tag.type == "void":
+            return "/* do nothing by default */"
+        elif self.tag.type == "fj_err_t":
+            return "FJ_ERR_UNSUPPORTED"
+        else:
+            return "0"
 
 
-class CParsedSource():
-    def __init__(self, functions: list[CFunction]):
+class CSource():
+    def __init__(self, file_name: str, functions: list[CFunction]):
         self.functions = functions
+        self.file_name = file_name
 
-    # Recognizes only the Fejix source code style!
-    # The type must be on the same line as the identifier with it
-    def parse(text) -> 'CParsedSource':
+    def parse_file(file_path: str) -> 'CSource':
         functions = []
-        for match in re.finditer(CFunction.pattern, text):
+        for match in re.finditer(CFunction.pattern, read_file(file_path)):
             functions.append(CFunction.parse(match.group(0)))
-        return CParsedSource(functions)
+
+        return CSource(os.path.basename(file_path), functions)
 
 
 class Autogen():
@@ -110,60 +143,66 @@ class Autogen():
         self.input_path = os.path.join(self.project_path, "include", "fejix", "interface")
 
         self.default_output_path = os.path.join(self.project_path, "src", "default", "autogen")
-        self.loader_output_path = os.path.join(self.project_path, "src", "loader", "autogen")
+        self.loadable_output_path = os.path.join(self.project_path, "src", "loader", "autogen")
 
     def process_files(self):
+        sources = list(self.input_sources())
+        self.generate_default_implementations(sources)
+        self.generate_loadable_implementations(sources)
+
+    def generate_default_implementations(self, sources: list[CSource]):
+        for source in sources:
+            text = (
+                f"{Autogen.autogen_header}"
+                f"#include <fejix/interface/{source.file_name}>\n"
+                "\n"
+                f"{'\n'.join(function.default_implementation() \
+                             for function in source.functions)}"
+            )
+
+            self.write_default_implementation(source.file_name, text)
+
+    def write_default_implementation(self, file_name: str, text: str):
+        write_file(os.path.join(self.default_output_path, file_name), text)
+
+    def generate_loadable_implementations(self, sources: list[CSource]):
+        functions = []
+        text = (
+            f"{Autogen.autogen_header}"
+            "#include <src/loader/loadable.h>\n"
+            "\n"
+        )
+
+        for source in sources:
+            functions += source.functions
+            text += (
+                f"#include <fejix/interface/{source.file_name}>\n"
+                "\n"
+                f"{'\n'.join([function.loadable_implementation() \
+                              for function in source.functions])}"
+                "\n"
+            )
+
+        text += (
+            "char const *function_names[] = {\n"
+            f"{''.join([f'"{function.tag.name}",\n' \
+                        for function in functions])}"
+            "};\n"
+            "\n"
+            "void **function_pointers[] = {\n"
+            f"{''.join([f'(void **) &{function.tag.name},\n' \
+                        for function in functions])}"
+            "};\n"
+        )
+
+        write_file(os.path.join(self.loadable_output_path, "loadable.c"), text)
+
+    def input_sources(self):
         for file_name in os.listdir(self.input_path):
-            self.process_file(file_name)
-
-    def process_file(self, file_name: str):
-        source = self.read_input_file(file_name)
-        parsed_source = CParsedSource.parse(source)
-        self.generate_output(parsed_source, file_name)
-
-    def generate_output(self, parsed_source: CParsedSource, file_name: str):
-        self.generate_default_implementation(parsed_source, file_name)
-        self.generate_loader(parsed_source, file_name)
-
-    def generate_default_implementation(self, parsed_source: CParsedSource, file_name: str):
-        text = Autogen.autogen_header
-
-        text += "#include <fejix/interface/" + file_name + ">\n\n"
-
-        for function in parsed_source.functions:
-            text += function.default_implementation() + "\n"
-
-        self.write_output_file(self.default_output_path, file_name, text)
-
-    def generate_loader(self, parsed_source: CParsedSource, file_name: str):
-        pass
-
-    def file_paths(self, dir_path: str):
-        for name in os.listdir(dir_path):
-            path = os.path.join(dir_path, name)
-            if os.path.isfile(path):
-                yield path
-
-    def read_file(self, file_path: str):
-        with open(file_path) as file:
-            return file.read()
-
-    def write_file(self, file_path: str, text: str):
-        with open(file_path, "w") as file:
-            file.write(text)
-
-    def read_input_file(self, file_name: str):
-        return self.read_file(os.path.join(self.input_path, file_name))
-
-    def write_output_file(self, output_path: str, file_name: str, text: str):
-        self.write_file(os.path.join(output_path, file_name), text)
-
-
-def main():
-    autogen = Autogen()
-    autogen.process_files()
+            yield CSource.parse_file(os.path.join(self.input_path, file_name))
 
 
 if __name__ == "__main__":
-    main()
+    autogen = Autogen()
+    autogen.process_files()
 
