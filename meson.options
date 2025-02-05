@@ -1,0 +1,14 @@
+option(
+    'build_implementation',
+    type: 'boolean',
+    value: true,
+    description: 'Provide fejix_implementation_dep, which links to at least one implementation'
+)
+
+option(
+    'implementations',
+    type: 'array',
+    choices: ['loader', 'winapi', 'wayland', 'x11', 'cocoa'],
+    value: [],
+    description: 'Implementations to build, detected if empty'
+)

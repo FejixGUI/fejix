@@ -170,38 +170,28 @@ Macros:
 
     # This tricks clang-format into leaving these macros on a separate line.
     - 'FJ_PUBLIC=[[xxxxx]]'
-    - 'FJ_SINCE(X)=[[xxxx]]'
 
 IfMacros:
     - 'FJ_TRY'
 
-AttributeMacros:
-    - 'CALLBACK'
-    - 'WINAPI'
-    - 'WINUSERAPI'
-
 # Sort includes
 IncludeBlocks: Regroup
 IncludeCategories:
-    # Private headers
-    -   Regex: '^<src/'
+    # Private quoted headers
+    -   Regex: '^"'
         Priority: 1
-        CaseSensitive: true
 
-    # Public ext headers
-    -   Regex: '^<fejix/ext/'
+    # Private headers
+    -   Regex: '^<fejix_'
         Priority: 10
-        CaseSensitive: true
 
     # Public core headers
     -   Regex: '^<fejix/core/'
-        Priority: 15
-        CaseSensitive: true
+        Priority: 30
 
-    # Public (matched if all regexes above did not match)
+    # Other public headers (matched if all regexes above did not match)
     -   Regex: '^<fejix/'
-        Priority: 2
-        CaseSensitive: true
+        Priority: 20
 
     # Standard includes (at the bottom)
     -   Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|malloc|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype).h>'
