@@ -1,14 +1,15 @@
 project('fejix_core')
 
 add_languages('c')
+add_project_arguments('-DFJ_OPT_INTERNAL', language: 'c')
 
 headers_dep = subproject('headers').get_variable('headers_dep')
 
 sources = [
-    'alloc.c',
-    'base.c',
-    'utils.c',
-    'vec.c',
+    'src'/'alloc.c',
+    'src'/'base.c',
+    'src'/'utils.c',
+    'src'/'vec.c',
 ]
 
 core = static_library(

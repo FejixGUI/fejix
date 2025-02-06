@@ -1,3 +1,5 @@
+project('fejix_unixshm')
+
 if target_machine.system() in ['linux']
     # Enables Linux extensions like memfd_create in <sys/mman.h> (not needed for FreeBSD)
     linux_arguments = [

@@ -177,27 +177,23 @@ IfMacros:
 # Sort includes
 IncludeBlocks: Regroup
 IncludeCategories:
-    # Private quoted headers
-    -   Regex: '^"'
+    # Private headers (at the top)
+    -   Regex: '^<src/'
         Priority: 1
-
-    # Private headers
-    -   Regex: '^<fejix_'
-        Priority: 10
 
     # Public core headers
     -   Regex: '^<fejix/core/'
-        Priority: 30
-
-    # Other public headers (matched if all regexes above did not match)
-    -   Regex: '^<fejix/'
         Priority: 20
+
+    # Other public headers (matched if the regex above is not matched)
+    -   Regex: '^<fejix/'
+        Priority: 10
 
     # Standard includes (at the bottom)
     -   Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|malloc|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype).h>'
         Priority: 100
         CaseSensitive: true
 
-    # Platform-specific headers (matched if all regexes above did not match)
+    # Platform-specific headers
     -   Regex: '^.*'
-        Priority: 50
+        Priority: 90

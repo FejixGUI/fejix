@@ -1,10 +1,11 @@
 project('fejix_loader')
 
 add_languages('c')
+add_project_arguments('-DFJ_OPT_INTERNAL', language: 'c')
 
-sources = ['loader.c']
+sources = ['src'/'loader.c']
 foreach interface_header_id: subproject('headers').get_variable('interface_header_ids')
-    sources += 'autogen'/interface_header_id+'.c'
+    sources += 'src'/'autogen'/interface_header_id+'.c'
 endforeach
 
 loader = library(
