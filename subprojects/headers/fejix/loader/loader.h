@@ -5,20 +5,16 @@
 #include <fejix/core/base.h>
 
 
-/** :returns: The pointer to the requested function or NULL. */
-typedef void const *(*fj_loader_load_function_fn_t)(void *callback_data, char const *function_name);
+/**
+    Loads library functions from the shared library file.
+    :param library_file_path: The path to the shared library file, encoded in UTF-8. If NULL,
+        the default path inferred from the environment is used.
+*/
+FJ_PUBLIC
+fj_err_t fj_loader_load_library(char const *library_file_path);
 
-struct fj_loader {
-    fj_loader_load_function_fn_t load_function;
-    void *userdata;
-};
+FJ_PUBLIC
+void fj_loader_unload_library(void);
 
-fj_err_t fj_loader_load(struct fj_loader const *loader);
-
-fj_err_t fj_loader_open_library(char const *library_path, struct fj_loader *out_loader);
-
-fj_err_t fj_loader_close_library(struct fj_loader const *loader);
-
-char const *fj_loader_get_default_library_path(void);
 
 #endif

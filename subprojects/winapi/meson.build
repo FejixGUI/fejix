@@ -21,8 +21,16 @@ add_project_arguments(cc.get_supported_arguments(['-Werror=vla']), language: ['c
 
 
 sources = ['src'/'utils.c']
-foreach header_id, default_source: subproject('default').get_variable('default_sources')
-    sources += default_source
+
+implemented = {
+    'app': '<=0.0.1'
+}
+foreach interface, version_defaults: subproject('default').get_variable('default_sources')
+    foreach version, default_source: version_defaults
+        if interface not in implemented or not implemented[interface].version_compare(version)
+            sources += default_source
+        endif
+    endforeach
 endforeach
 
 winapi = library(

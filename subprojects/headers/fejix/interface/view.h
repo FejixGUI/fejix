@@ -3,7 +3,7 @@
 
 
 #include <fejix/interface/app.h>
-#include <fejix/interface/image_consumer.h>
+#include <fejix/interface/image.h>
 
 #include <fejix/core/primitives.h>
 

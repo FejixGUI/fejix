@@ -16,7 +16,8 @@ core = static_library(
     'fejix_core',
     sources: sources,
     dependencies: [headers_dep],
-    build_by_default: false,
+    build_by_default: false, # Do not build e.g. if header-only
+    pic: true, # Core may be linked to by both static and shared implementation libs
 )
 
 core_dep = declare_dependency(

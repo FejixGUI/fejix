@@ -55,7 +55,7 @@ struct fj_app_create_info {
 
 
 FJ_PUBLIC
-fj_err_t fj_app_check_supported(void);
+fj_version_t fj_app_get_version(void);
 
 FJ_PUBLIC
 fj_err_t fj_app_create(struct fj_app **out_app, struct fj_app_create_info const *info);

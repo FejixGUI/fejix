@@ -2,7 +2,7 @@
 #define FEJIX_RAM_H_
 
 
-#include <fejix/interface/scene.h>
+#include <fejix/interface/view.h>
 
 
 /** */

@@ -1,61 +1,78 @@
 #include <src/loader.h>
 
-#include <fejix/interface/implementation.h>
+#include <fejix/loader/loader.h>
 
 #include <fejix/core/utils.h>
 
+#include <dlfcn.h>
+
 #include <stdlib.h>
-#include <string.h>
 
-int a(void)
+
+static void *library;
+
+
+static fj_loader_function_t load_function(char const *function_name)
 {
-    return 1;
+    return (fj_loader_function_t) dlsym(library, function_name);
 }
-// extern struct fj_implementation const fj_winapi_implementation;
-// extern struct fj_implementation const fj_wayland_implementation;
-
-// static struct fj_implementation const *const implementations[] = {
-// #ifdef FJ_OPT_WAYLAND
-//     [FJ_IMPLEMENTATION_WAYLAND] = &fj_wayland_implementation,
-// #endif
-// #ifdef FJ_OPT_WINAPI
-//     [FJ_IMPLEMENTATION_WINAPI] = &fj_winapi_implementation,
-// #endif
-//     NULL,  // Keeps this array non-empty, avoids warnings.
-// };
 
 
-// static char const *const implementation_names[] = {
-//     [FJ_IMPLEMENTATION_X11] = "x11",       [FJ_IMPLEMENTATION_WAYLAND] = "wayland",
-//     [FJ_IMPLEMENTATION_ANDK] = "andk",     [FJ_IMPLEMENTATION_COCOA] = "cocoa",
-//     [FJ_IMPLEMENTATION_WINAPI] = "winapi",
-// };
+static void load_functions(void)
+{
+    for (uint32_t i = 0; i < fj_loader_function_count; i++) {
+        *fj_loader_function_pointers[i] = load_function(fj_loader_function_names[i]);
+    }
+}
+
+static void unload_functions(void)
+{
+    for (uint32_t i = 0; i < fj_loader_function_count; i++) {
+        *fj_loader_function_pointers[i] = NULL;
+    }
+}
 
 
-// static uint32_t get_implementation_count(void)
-// {
-//     return FJ_LEN(implementations) - 1;  // accounting for the ending NULL
-// }
+static fj_err_t load_library(char const *library_path)
+{
+    library = dlopen(library_path);
+
+    if (library == NULL) {
+        return FJ_ERR_CANNOT_LOAD_LIBRARY;
+    }
+
+    load_functions();
+
+    return FJ_OK;
+}
 
 
-// char const *fj_implementation_get_name(fj_implementation_id_t id)
-// {
-//     if (id >= FJ_LEN(implementation_names) || implementation_names[id] == NULL) {
-//         return NULL;
-//     }
-
-//     return implementation_names[id];
-// }
+static void unload_library(void)
+{
+    unload_functions();
+    dlclose(library);
+}
 
 
-// struct fj_implementation const *fj_implementation_get_builtin(fj_implementation_id_t id)
-// {
-//     if (id >= FJ_LEN(implementations) || implementations[id] == NULL) {
-//         return NULL;
-//     }
+static char const *get_default_library_path(void)
+{
+    // TODO loader-posix default library path
+    return "fejix_wayland.dll";
+}
 
-//     return implementations[id];
-// }
+
+fj_err_t fj_loader_load_library(char const *library_path)
+{
+    fj_err_t result = load_library(library_path);
+
+    return result;
+}
+
+
+void fj_loader_unload_library(void)
+{
+    unload_library();
+}
 
 
 // static fj_err_t get_builtin_implementation_id_by_name(

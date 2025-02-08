@@ -2,12 +2,13 @@ project('fejix_headers')
 
 add_languages('c')
 
-interface_header_ids = [
-    'app',
-    'app_manual_sleep',
-    'ram',
-    'opengl',
-]
+# dict[interface_id:str -> versions:list[str]]
+interfaces = {
+    'app': ['0.0.1'],
+    'app_manual_sleep': ['0.0.1'],
+    'ram': ['0.0.1'],
+    # 'opengl': ['0.0.1'],
+}
 
 headers = [
     'fejix'/'core'/'alloc.h',
@@ -16,8 +17,8 @@ headers = [
     'fejix'/'core'/'vec.h',
     'fejix'/'loader'/'loader.h',
 ]
-foreach header_id: interface_header_ids
-    headers += 'fejix'/'interface'/header_id+'.h'
+foreach interface, versions: interfaces
+    headers += 'fejix'/'interface'/interface+'.h'
 endforeach
 
 headers_dep = declare_dependency(include_directories: '.')

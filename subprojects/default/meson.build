@@ -2,10 +2,17 @@ project('fejix_default')
 
 add_languages('c')
 
-# dict[interface_header_id:str -> default_file:list[File]]
+# dict[interface_id:str -> dict[version:str -> file_name:str]]
 default_sources = {}
-foreach interface_header_id: subproject('headers').get_variable('interface_header_ids')
+foreach interface, versions: subproject('headers').get_variable('interfaces')
+    version_defaults = {}
+    foreach version: versions
+        version_defaults += {
+            version: files('src'/'autogen'/interface+'-since-v'+version+'.c')
+        }
+    endforeach
+
     default_sources += {
-        interface_header_id: files('src'/'autogen'/interface_header_id+'.c')
+        version: version_defaults
     }
 endforeach

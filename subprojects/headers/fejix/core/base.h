@@ -66,7 +66,7 @@ enum fj_err {
     /** */
     FJ_ERR_NOT_FOUND,
     /** */
-    FJ_ERR_CANNOT_SELECT_IMPLEMENTATION,
+    FJ_ERR_CANNOT_LOAD_LIBRARY,
     /** */
     FJ_ERR_ALLOCATION_FAILED,
     /** */
@@ -74,13 +74,13 @@ enum fj_err {
     /** */
     FJ_ERR_CONNECTION_FAILED,
     /** */
-    FJ_ERR_REQUEST_SENDING_FAILED,
+    FJ_ERR_IO_READ_FAILED,
+    /** */
+    FJ_ERR_IO_WRITE_FAILED,
+    /** */
+    FJ_ERR_IO_WAITING_FAILED,
     /** */
     FJ_ERR_REQUEST_FAILED,
-    /** */
-    FJ_ERR_EVENT_WAITING_FAILED,
-    /** */
-    FJ_ERR_EVENT_READING_FAILED,
     /** */
     FJ_ERR_INVALID_TEXT_ENCODING,
     /** */
