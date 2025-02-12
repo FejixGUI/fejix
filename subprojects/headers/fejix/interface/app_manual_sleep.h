@@ -5,9 +5,8 @@
 #include <fejix/interface/app.h>
 
 
-/** TODO: docs */
 FJ_PUBLIC
-bool fj_app_manual_sleep_get_supported(void);
+bool fj_app_manual_sleep_get_interface_version(void);
 
 
 /**

@@ -29,15 +29,6 @@
 #define FJ_PUBLIC FJ_PUBLIC_C_LINKAGE FJ_PUBLIC_VISIBILITY
 
 
-/**
-    Evaluates to an rvalue being the userdata pointer.
-    The userdata pointer must always be the first member of the struct that has it.
-
-    This is type-unsafe! Use it only on types that support userdata creation parameter.
-*/
-#define FJ_USERDATA(OBJECT) (*(void **) (OBJECT))
-
-
 #define FJ_VERSION(MAJOR, MINOR, PATCH)                                         \
     ((fj_version_t) ((((MAJOR) & 0xfffff) << 20) | (((MINOR) & 0xfffff) << 10)) \
      | ((PATCH) & 0xfffff))

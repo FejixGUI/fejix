@@ -36,8 +36,7 @@
 typedef double fj_dots_per_metre_t;
 
 
-/** Time in seconds. Timeouts typically use values from ``0..+inf``. */
-typedef double fj_seconds_t;
+typedef uint64_t fj_nanoseconds_t;
 
 
 typedef uint32_t fj_orientation_id_t;
@@ -83,7 +82,7 @@ struct fj_density {
     fj_dots_per_metre_t column_density;
 };
 
-struct fj_content_geometry {
+struct fj_geometry {
     struct fj_size size;
     struct fj_density density;
     fj_orientation_id_t orientation;

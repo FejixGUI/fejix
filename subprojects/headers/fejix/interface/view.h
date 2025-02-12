@@ -1,5 +1,5 @@
-#ifndef FEJIX_SCENE_H_
-#define FEJIX_SCENE_H_
+#ifndef FEJIX_VIEW_H_
+#define FEJIX_VIEW_H_
 
 
 #include <fejix/interface/app.h>
@@ -8,51 +8,40 @@
 #include <fejix/core/primitives.h>
 
 
-struct fj_scene_manager;
-struct fj_scene;
+struct fj_view_manager;
+struct fj_view;
 
-struct fj_scene_create_info {
-    void *userdata;
-};
 
-struct fj_scene_manager_callbacks {
-    fj_err_t (*on_content_geometry_update)(
-        struct fj_app *app, struct fj_scene *scene, struct fj_content_geometry const *geometry);
+fj_version_t fj_view_get_interface_version(void);
 
-    fj_err_t (*on_dismissed)(struct fj_app *app, struct fj_scene *scene);
-};
+fj_err_t fj_view_create_manager(struct fj_app *owner_app, struct fj_view_manager **out_manager);
 
-struct fj_scene_manager_create_info {
-    struct fj_scene_manager_callbacks const *callbacks;
-};
+fj_err_t fj_view_destroy_manager(struct fj_view_manager *manager);
 
-struct fj_scene_functions {
-    fj_err_t (*create_manager)(
-        struct fj_app *owner_app,
-        struct fj_scene_manager **out_manager,
-        struct fj_scene_manager_create_info const *info);
+fj_err_t fj_view_create(struct fj_view_manager *manager, struct fj_view **out_view, void *userdata);
 
-    fj_err_t (*destroy_manager)(struct fj_scene_manager *manager);
+/** Destroying a view inside one of its callbacks is undefined behavior. */
+fj_err_t fj_view_destroy(struct fj_view_manager *manager, struct fj_view *view);
 
-    fj_err_t (*create_scene)(
-        struct fj_scene_manager *manager,
-        struct fj_scene **out_scene,
-        struct fj_scene_create_info const *info);
+/** Not binding images inside the callback is platform-specific behavior. */
+typedef fj_err_t (*fj_view_on_bind_images_fn_t)(
+    void *userdata, struct fj_image_bind_context *context);
 
-    /** Destroying a scene inside one of its callbacks is undefined behavior. */
-    fj_err_t (*destroy_scene)(struct fj_scene_manager *manager, struct fj_scene *scene);
+void fj_view_on_bind_images(struct fj_view_manager *manager, fj_view_on_bind_images_fn_t callback);
 
-    void (*get_image_consumer)(
-        struct fj_scene_manager *manager,
-        struct fj_scene *scene,
-        struct fj_image_consumer **out_consumer);
+typedef fj_err_t (*fj_view_on_dismiss_fn_t)(void *userdata);
 
-    fj_err_t (*dismiss_scene)(struct fj_scene_manager *manager, struct fj_scene *scene);
+void fj_view_on_dismiss(struct fj_view_manager *manager, fj_view_on_dismiss_fn_t callback);
 
-    /** :param scenes: Must contain at least one scene. */
-    fj_err_t (*update_scenes)(
-        struct fj_scene_manager *manager, struct fj_scene *const *scenes, uint32_t scene_count);
-};
+typedef fj_err_t (*fj_view_on_update_geometry_fn_t)(
+    void *userdata, struct fj_geometry const *geometry);
+
+void fj_view_on_update_geometry(
+    struct fj_view_manager *manager, fj_view_on_update_geometry_fn_t callback);
+
+/** :param views: Must contain at least one view. */
+fj_err_t fj_view_update_batch(
+    struct fj_view_manager *manager, struct fj_view *const *views, uint32_t view_count);
 
 
 #endif

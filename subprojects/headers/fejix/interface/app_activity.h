@@ -1,5 +1,5 @@
-#ifndef FEJIX_APP_ACTIVITY_FLAGS_H_
-#define FEJIX_APP_ACTIVITY_FLAGS_H_
+#ifndef FEJIX_APP_ACTIVITY_H_
+#define FEJIX_APP_ACTIVITY_H_
 
 
 #include <fejix/interface/app.h>
@@ -18,11 +18,11 @@ enum fj_app_activity_flags {
 
 
 FJ_PUBLIC
-fj_app_activity_flags_t fj_app_activity_flags_get_supported_flags(struct fj_app *app);
+fj_version_t fj_app_activity_get_interface_version(struct fj_app *app);
 
 
 FJ_PUBLIC
-fj_err_t fj_app_activity_flags_set_flags(struct fj_app *app, fj_app_activity_flags_t flags);
+fj_err_t fj_app_activity_set_flags(struct fj_app *app, fj_app_activity_flags_t flags);
 
 
 #endif

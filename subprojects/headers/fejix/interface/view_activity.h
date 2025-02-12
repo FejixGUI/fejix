@@ -1,14 +1,14 @@
-#ifndef FEJIX_SCENE_ACTIVITY_FLAGS_H_
-#define FEJIX_SCENE_ACTIVITY_FLAGS_H_
+#ifndef FEJIX_VIEW_ACTIVITY_H_
+#define FEJIX_VIEW_ACTIVITY_H_
 
 
-#include <fejix/interface/scene.h>
+#include <fejix/interface/view.h>
 
 
-typedef uint32_t fj_scene_activity_flags_t;
+typedef uint32_t fj_view_activity_flags_t;
 
 // TODO: rename this to focus hints and add to one of the future input interfaces.
-enum fj_scene_activity_flags {
+enum fj_view_activity_flags {
     FJ_SCENE_ACTIVITY_NONDISMISSABLE = 1 << 0,
 
     /** Inhibits the screensaver. */
@@ -36,13 +36,13 @@ struct fj_scene_activity_flags_functions {
 
     fj_err_t (*destroy_manager)(struct fj_scene_activity_flags_manager *manager);
 
-    fj_scene_activity_flags_t (*get_supported_flags)(
+    fj_view_activity_flags_t (*get_supported_flags)(
         struct fj_scene_activity_flags_manager *manager, struct fj_scene *scene);
 
     fj_err_t (*set_flags)(
         struct fj_scene_activity_flags_manager *manager,
         struct fj_scene *scene,
-        fj_scene_activity_flags_t flags);
+        fj_view_activity_flags_t flags);
 };
 
 
