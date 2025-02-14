@@ -1,1 +1,0 @@
-project('fejix_wayland')

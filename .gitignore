@@ -1,13 +1,21 @@
-build*/
-_build*/
-/out*
-
-compile_commands.json
-compile_flags.txt
-
+# All hidden files
 .*
+
+# Allow important configuration files
 !.gitignore
 !.gitkeep
 !.editorconfig
 !.clang-format
 !.clangd
+
+# Configurations for language servers
+compile_commands.json
+compile_flags.txt
+
+# Binary output directories
+_build*/
+build*/
+/dist*/
+/out*/
+/target*/
+/bin*/

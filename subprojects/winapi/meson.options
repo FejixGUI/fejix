@@ -1,9 +1,0 @@
-# WIN10_TH2 does not include modern DPI functions, there is probably no reason to include it
-# Other WIN10 versions introduce no APIs we are interested in
-option(
-    'winapi_version',
-    type: 'combo',
-    value: 'WIN10_RS1',
-    choices: ['WINXP', 'VISTA', 'WIN7', 'WIN8', 'WINBLUE', 'WIN10_RS1'],
-    description: 'Spcifies WinAPI version, i.e. what is passed to NTDDI_VERSION and _WIN32_WINNT'
-)

@@ -40,9 +40,9 @@ Use `.clang-format` and note a few things:
 | `out_` | Output function parameter |
 | `on_`  | Event callback function.  |
 
-| Suffix         | Meaning                                                              |
-| -------------- | -------------------------------------------------------------------- |
-| `_fn_t`        | Function typedef                                                     |
+| Suffix         | Meaning            |
+| -------------- | ------------------ |
+| `_fn_t`        | Function typedef   |
 
 ## Errors
 
@@ -87,6 +87,7 @@ Because all interface functions must have a callable default implementation and 
 implementations are generated automatically, all functions must return one of the following:
 * ``void`` (the default return value is not generated)
 * ``fj_err_t`` (the default return value is ``FJ_ERR_UNSUPPORTED``)
+* a pointer (the default value is ``NULL``)
 * a numeric value e.g. representing flags (the default value is ``0``)
 
 For any other return types the automatic code generator may fail to generate reasonable defaults
@@ -109,35 +110,5 @@ As a side note, default implementations do not touch the output values, so the u
 set the output parameters to NULL or other default values and always check for errors and/or if
 the output value is unchanged.
 It is even unnecessary for implementations to return NULLs to output parameters on failures.
-
-### Extending interfaces
-
-Adding functions to interfaces in minor versions looks like this:
-
-1. Add a function suffixed with `/* since vVERSION.WHEN.ADDED */`
-```c
-// file: fejix/interface/wakawaka.h
-
-...
-
-fj_err_t wakawaka_foobar(struct foobar **out_foobar);
-/* since v1.2.3 */
-```
-
-2. Run:
-```sh
-python tools/autogen.py
-```
-
-This generates `wakawaka-since-v1.2.3.c` in
-[`subprojects/default/src/autogen/`](../subprojects/default/src/autogen/)
-with default function implementations.
-Library implementations that do not provide their own versions of the added functions will
-automatically pick up the file.
-
-This is done in order to let the existing code work despite not being complete.
-
-An implementation that provides the added functions simply needs to exclude the default
-source file.
 
 **TODO: docs**
