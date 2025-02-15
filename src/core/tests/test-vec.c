@@ -10,9 +10,9 @@ int main(void)
 {
     // TODO: better tests
 
-    int _1 = 1;
-    int _2 = 2;
-    int _3 = 3;
+    int _1 = 111;
+    int _2 = 222;
+    int _3 = 333;
 
     struct fj_vec v;
 
@@ -26,26 +26,26 @@ int main(void)
         assert(false);
     }
 
-    FJ_TRY (fj_vec_insert(&v, &_3, 0, 1)) {
+    FJ_TRY (fj_vec_insert(&v, 0, &_3)) {
         assert(false);
     }
 
     assert(v.length == 3);
 
     {
-        int *v_items = (int *) v.items;
-        assert(v_items[0] == 3 && v_items[1] == 1 && v_items[2] == 2);
+        int *items = v.items;
+        assert(items[0] == _3 && items[1] == _1 && items[2] == _2);
     }
 
-    FJ_TRY (fj_vec_remove(&v, 1, 1)) {
+    FJ_TRY (fj_vec_remove(&v, 1, NULL)) {
         assert(false);
     }
 
     assert(v.length == 2);
 
     {
-        int *v_items = (int *) v.items;
-        assert(v_items[0] == 3 && v_items[1] == 2);
+        int *items = v.items;
+        assert(items[0] == _3 && items[1] == _2);
     }
 
     fj_vec_deinit(&v);

@@ -32,15 +32,6 @@
 /** Gets the length of a static array. Note: this double-evaluates the argument. */
 #define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 
-/** Note: this double-evaluates the arguments. */
-#define FJ_MIN(A, B) (((A) < (B)) ? (A) : (B))
-
-/** Note: this double-evaluates the arguments. */
-#define FJ_MAX(A, B) (((A) > (B)) ? (A) : (B))
-
-/** Note: this double-evaluates the arguments. */
-#define FJ_CLAMP(X, MIN, MAX) FJ_MAX(FJ_MIN((X), (MAX)), (MIN))
-
 
 /**
     The returned string must be freed manually.
@@ -76,6 +67,16 @@ uint32_t fj_u32_prev_multiple(uint32_t x, uint32_t divisor);
 /** Returns the previous multiple of the divisor. */
 FJ_PUBLIC
 uint64_t fj_u64_prev_multiple(uint64_t x, uint64_t divisor);
+
+static inline uint32_t fj_u32_max(uint32_t a, uint32_t b)
+{
+    return a > b ? a : b;
+}
+
+static inline uint32_t fj_u32_min(uint32_t a, uint32_t b)
+{
+    return a < b ? a : b;
+}
 
 
 #endif

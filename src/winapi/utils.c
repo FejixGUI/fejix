@@ -32,7 +32,7 @@ fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 
     if (result == 0) {
         FJ_FREE(utf16_string);
-        return FJ_ERR_INVALID_TEXT_ENCODING;
+        return FJ_ERR_INVALID_ENCODING;
     }
 
     return FJ_OK;
@@ -67,7 +67,7 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 
     if (result == 0) {
         FJ_FREE(string);
-        return FJ_ERR_INVALID_TEXT_ENCODING;
+        return FJ_ERR_INVALID_ENCODING;
     }
 
     return FJ_OK;
@@ -112,7 +112,7 @@ static fj_err_t create_window_class(WNDCLASSEX *class_info)
     class_info->lpszClassName = MAKEINTATOM(RegisterClassEx(class_info));
 
     if (class_info->lpszClassName == NULL) {
-        return FJ_ERR_REQUEST_FAILED;
+        return FJ_ERR_REQUEST_REJECTED;
     }
 
     return FJ_OK;
@@ -179,7 +179,7 @@ fj_err_t fj_winapi_window_create(
             UnregisterClass(class_info.lpszClassName, class_info.hInstance);
         }
 
-        return FJ_ERR_REQUEST_FAILED;
+        return FJ_ERR_REQUEST_REJECTED;
     }
 
     return FJ_OK;
@@ -192,12 +192,12 @@ fj_err_t fj_winapi_window_destroy(HWND window)
     bool should_destroy_class = is_of_junk_class(window);
 
     if (DestroyWindow(window) == 0) {
-        return FJ_ERR_REQUEST_FAILED;
+        return FJ_ERR_REQUEST_REJECTED;
     }
 
     if (should_destroy_class) {
         if (UnregisterClass(class_name, GetModuleHandle(NULL)) == 0) {
-            return FJ_ERR_REQUEST_FAILED;
+            return FJ_ERR_REQUEST_REJECTED;
         }
     }
 
