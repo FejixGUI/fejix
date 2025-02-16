@@ -1,77 +1,37 @@
+/*
+    The loader does not really support platforms other than Unix-like with X11/Wayland/etc. for now.
+    The reason is that it is simply not needed on other platforms.
+
+    The lack of support for other platforms mainly means that default implementation paths are not
+    hard-coded in this file (but they should be).
+
+    The lack of support for Windows means that Unicode paths are not implemented yet.
+    Windows treats file paths as wchar_t arrays not necessarily being valid UTF-16.
+    To support Windows and Unicode paths, one might prefer using
+    GetEnvironmentVariable() over getenv() because the latter only supports ASCII
+    and FJ_LIBRARY_LOAD_SYSTEM_ENCODED_PATH to avoid errors arising from conversions between
+    UTF-16 and UTF-8.
+
+    That all is in fact quite simple to implement, but makes no sense to me at this moment.
+
+    The user can still manually load a dynamic library and load the functions using
+    fj_loader_load_functions() on any platform if it is really necessary.
+*/
+
 #include <src/loader/loader.h>
 
 #include <fejix/loader/loader.h>
 
+#include <fejix/core/alloc.h>
 #include <fejix/core/utils.h>
 
-#include <dlfcn.h>
 
-#include <stdlib.h>
-
-
-static void *library;
-
-
-static fj_loader_function_t load_function(char const *function_name)
-{
-    return (fj_loader_function_t) (uintptr_t) dlsym(library, function_name);
-}
-
-
-static void load_functions(void)
+void fj_loader_load_functions(struct fj_library const *library)
 {
     for (uint32_t i = 0; i < fj_loader_function_count; i++) {
-        *fj_loader_function_pointers[i] = load_function(fj_loader_function_names[i]);
+        *fj_loader_function_pointers[i]
+            = library->load_function(library->library_data, fj_loader_function_names[i]);
     }
-}
-
-static void unload_functions(void)
-{
-    for (uint32_t i = 0; i < fj_loader_function_count; i++) {
-        *fj_loader_function_pointers[i] = NULL;
-    }
-}
-
-
-static fj_err_t load_library(char const *library_path)
-{
-    library = dlopen(library_path, RTLD_LAZY);
-
-    if (library == NULL) {
-        return FJ_ERR_CANNOT_LOAD_LIBRARY;
-    }
-
-    load_functions();
-
-    return FJ_OK;
-}
-
-
-static void unload_library(void)
-{
-    unload_functions();
-    dlclose(library);
-}
-
-
-static char const *get_default_library_path(void)
-{
-    // TODO loader-posix default library path
-    return "fejix_wayland.dll";
-}
-
-
-fj_err_t fj_loader_load_library(char const *library_path)
-{
-    fj_err_t result = load_library(library_path);
-
-    return result;
-}
-
-
-void fj_loader_unload_library(void)
-{
-    unload_library();
 }
 
 
@@ -204,3 +164,9 @@ void fj_loader_unload_library(void)
 
 //     return FJ_ERR_CANNOT_SELECT_IMPLEMENTATION;
 // }
+
+
+fj_err_t fj_loader_load_default_library(struct fj_library *out_library)
+{
+    return FJ_ERR_CANNOT_LOAD_LIBRARY;
+}

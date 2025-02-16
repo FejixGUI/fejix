@@ -20,6 +20,7 @@ static char const *const error_descriptions[FJ_ERR_PREDEFINED_COUNT] = {
     [FJ_ERR_INVALID_ENCODING] = "invalid text encoding",
     [FJ_ERR_CANNOT_CREATE_TEMPFILE] = "cannot create temporary file",
     [FJ_ERR_CANNOT_ALLOCATE_SHARED] = "cannot allocate shared memory",
+    [FJ_ERR_CANNOT_LOAD_LIBRARY] = "cannot load dynamic library",
 };
 
 

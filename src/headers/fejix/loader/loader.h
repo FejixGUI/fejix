@@ -2,19 +2,21 @@
 #define FEJIX_LOADER_INCLUDED
 
 
-#include <fejix/core/base.h>
+#include <fejix/core/library.h>
 
 
 /**
-    Loads library functions from the shared library file.
-    :param library_file_path: The path to the shared library file, encoded in UTF-8. If NULL,
-        the default path inferred from the environment is used.
+    The returned library object must be unloaded with ``fj_library_unload()``.
 */
 FJ_PUBLIC
-fj_err_t fj_loader_load_library(char const *library_file_path);
+fj_err_t fj_loader_load_default_library(struct fj_library *out_library);
 
+/**
+    Replaces the default no-op dummy function implementations with the functions from the library.
+    The missing functions are left no-op.
+*/
 FJ_PUBLIC
-void fj_loader_unload_library(void);
+void fj_loader_load_functions(struct fj_library const *library);
 
 
 #endif

@@ -12,6 +12,7 @@ target_sources(
     PRIVATE
         "${fejix_core_path}/alloc.c"
         "${fejix_core_path}/base.c"
+        "${fejix_core_path}/library.c"
         "${fejix_core_path}/utils.c"
         "${fejix_core_path}/vec.c")
 

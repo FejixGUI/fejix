@@ -93,6 +93,8 @@ enum {
     FJ_ERR_CANNOT_CREATE_TEMPFILE,
     /** */
     FJ_ERR_CANNOT_ALLOCATE_SHARED,
+    /** */
+    FJ_ERR_CANNOT_LOAD_LIBRARY,
 
     /** */
     FJ_ERR_PREDEFINED_COUNT,
