@@ -68,11 +68,13 @@ uint32_t fj_u32_prev_multiple(uint32_t x, uint32_t divisor);
 FJ_PUBLIC
 uint64_t fj_u64_prev_multiple(uint64_t x, uint64_t divisor);
 
+/** */
 static inline uint32_t fj_u32_max(uint32_t a, uint32_t b)
 {
     return a > b ? a : b;
 }
 
+/** */
 static inline uint32_t fj_u32_min(uint32_t a, uint32_t b)
 {
     return a < b ? a : b;

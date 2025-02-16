@@ -168,5 +168,9 @@ fj_err_t fj_vec_push(struct fj_vec *vec, void const *item)
 
 fj_err_t fj_vec_pop(struct fj_vec *vec, void *out_item)
 {
+    if (vec->length == 0) {
+        return FJ_ERR_VECTOR_EMPTY;
+    }
+
     return fj_vec_remove(vec, vec->length - 1, out_item);
 }

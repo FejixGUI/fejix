@@ -4,7 +4,8 @@
 /** Contains strings and NULLs for unimplemented descriptions. */
 static char const *const error_descriptions[FJ_ERR_PREDEFINED_COUNT] = {
     [FJ_OK] = "success",
-    [FJ_ERR_UNSUPPORTED] = "feature unsupported",
+    [FJ_ERR_UNIMPLEMENTED] = "unsupported by the implementation",
+    [FJ_ERR_UNSUPPORTED] = "feature unsupported by the system",
     [FJ_ERR_INTERNAL_FAILURE] = "internal failure",
     [FJ_ERR_CANNOT_ALLOCATE] = "cannot allocate",
     [FJ_ERR_INVALID_ALLOCATION] = "invalid allocation",
@@ -12,8 +13,8 @@ static char const *const error_descriptions[FJ_ERR_PREDEFINED_COUNT] = {
     [FJ_ERR_VECTOR_EMPTY] = "vector is empty, cannot remove",
     [FJ_ERR_INVALID_INDEX] = "invalid index",
     [FJ_ERR_CONNECTION_FAILED] = "connection failed",
-    [FJ_ERR_INPUT_FAILED] = "input operation failed",
-    [FJ_ERR_OUTPUT_FAILED] = "output operation failed",
+    [FJ_ERR_IOREAD_FAILED] = "I/O read operation failed",
+    [FJ_ERR_IOWRITE_FAILED] = "I/O write operation failed",
     [FJ_ERR_WAITING_FAILED] = "waiting failed",
     [FJ_ERR_REQUEST_REJECTED] = "request rejected",
     [FJ_ERR_INVALID_ENCODING] = "invalid text encoding",

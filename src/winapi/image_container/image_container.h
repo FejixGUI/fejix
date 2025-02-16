@@ -7,14 +7,14 @@
 #include <windows.h>
 
 
-enum fj_winapi_image_container_type {
+enum {
     FJ_WINAPI_IMAGE_CONTAINER_WINDOW,
     FJ_WINAPI_IMAGE_CONTAINER_CUSTOM_OPENGL,
 };
 
 
 struct fj_image_container {
-    enum fj_winapi_image_container_type type;
+    enum type;
     struct fj_size size;
 
     /** Used by the interfaces that create images. */

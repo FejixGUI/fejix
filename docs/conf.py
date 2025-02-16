@@ -17,7 +17,7 @@ html_theme = 'furo'
 html_static_path = ['_static']
 
 script_dir = os.path.dirname(os.path.realpath(__file__))
-hawkmoth_root = os.path.abspath(os.path.join(script_dir, ".."))
+hawkmoth_root = os.path.abspath(os.path.join(script_dir, "..", "src", "headers"))
 print('[docs/conf.py] using root path:', hawkmoth_root)
 
 if os.environ.get('DOCS_DEFAULT_CLANG_ARGS') is not None:
@@ -29,7 +29,7 @@ else:
 
 hawkmoth_clang += [
     '-std=c99',
-    '-I' + os.path.join(hawkmoth_root, "include"),
+    '-I' + os.path.join(hawkmoth_root),
 
     # We are not using Clang, we are using a Clang library, which does not have to understand
     # even definitions of built-in types! Suppress all warnings possibly arising from that.

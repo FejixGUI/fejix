@@ -14,7 +14,7 @@
 
 typedef uint32_t fj_wayland_interface_id_t;
 
-enum fj_wayland_interface_id {
+enum {
     FJ_WAYLAND_INTERFACE_COMPOSITOR,
     FJ_WAYLAND_INTERFACE_SHM,
     FJ_WAYLAND_INTERFACE_SEAT,

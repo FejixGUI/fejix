@@ -91,7 +91,9 @@ class CFunction():
         if self.tag.type == "void":
             return "/* do nothing by default */"
         elif self.tag.type == "fj_err_t":
-            return "FJ_ERR_UNSUPPORTED"
+            return "FJ_ERR_UNIMPLEMENTED"
+        elif self.tag.type == "bool":
+            return "false"
         elif self.tag.type.endswith('*'):
             return "NULL"
         else:

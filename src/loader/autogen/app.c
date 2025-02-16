@@ -4,13 +4,13 @@
 
 #include <fejix/interface/app.h>
 
-fj_loader_function_t _fj_app_get_interface_version_ptr;
-fj_version_t fj_app_get_interface_version(void)
+fj_loader_function_t _fj_has_app_ptr;
+bool fj_has_app(void)
 {
-    if (_fj_app_get_interface_version_ptr != NULL) {
-        return ((fj_version_t(*)(void))_fj_app_get_interface_version_ptr)();
+    if (_fj_has_app_ptr != NULL) {
+        return ((bool(*)(void))_fj_has_app_ptr)();
     }
-    return 0;
+    return false;
 }
 
 fj_loader_function_t _fj_app_create_ptr;
@@ -19,7 +19,7 @@ fj_err_t fj_app_create(struct fj_app ** out_app, void * app_userdata)
     if (_fj_app_create_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app ** out_app, void * app_userdata))_fj_app_create_ptr)(out_app, app_userdata);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_app_destroy_ptr;
@@ -28,7 +28,7 @@ fj_err_t fj_app_destroy(struct fj_app * app)
     if (_fj_app_destroy_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * app))_fj_app_destroy_ptr)(app);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_app_on_continue_ptr;
@@ -64,7 +64,7 @@ fj_err_t fj_app_launch(struct fj_app * app)
     if (_fj_app_launch_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * app))_fj_app_launch_ptr)(app);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_app_request_continue_ptr;
@@ -73,7 +73,7 @@ fj_err_t fj_app_request_continue(struct fj_app * app)
     if (_fj_app_request_continue_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * app))_fj_app_request_continue_ptr)(app);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_app_request_finish_ptr;
@@ -82,6 +82,6 @@ fj_err_t fj_app_request_finish(struct fj_app * app)
     if (_fj_app_request_finish_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * app))_fj_app_request_finish_ptr)(app);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

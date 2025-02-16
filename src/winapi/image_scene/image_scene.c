@@ -4,7 +4,7 @@
 #include <fejix/core/utils.h>
 
 
-enum custom_window_message_id {
+enum {
     /**
         lparam contains *HDWP - a pointer to a DeferWindowPos structure handle.
         If a window needs to change its layout through DeferWindowPos, it should do

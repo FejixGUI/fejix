@@ -19,7 +19,7 @@ fj_err_t fj_ram_create_manager(struct fj_app * owner_app, struct fj_ram_manager 
     if (_fj_ram_create_manager_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * owner_app, struct fj_ram_manager ** out_manager))_fj_ram_create_manager_ptr)(owner_app, out_manager);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_destroy_manager_ptr;
@@ -28,25 +28,25 @@ fj_err_t fj_ram_destroy_manager(struct fj_ram_manager * manager)
     if (_fj_ram_destroy_manager_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_ram_manager * manager))_fj_ram_destroy_manager_ptr)(manager);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_get_supported_formats_ptr;
-void fj_ram_get_supported_formats(struct fj_ram_manager * manager, fj_ram_pixel_format_t ** out_formats, uint32_t * out_count, struct fj_image_bind_context * image_bind_context)
+void fj_ram_get_supported_formats(struct fj_ram_manager * manager, fj_ram_pixel_format_t ** out_formats, uint32_t * out_count, struct fj_image_binding * image_binding)
 {
     if (_fj_ram_get_supported_formats_ptr != NULL) {
-        ((void(*)(struct fj_ram_manager * manager, fj_ram_pixel_format_t ** out_formats, uint32_t * out_count, struct fj_image_bind_context * image_bind_context))_fj_ram_get_supported_formats_ptr)(manager, out_formats, out_count, image_bind_context);
+        ((void(*)(struct fj_ram_manager * manager, fj_ram_pixel_format_t ** out_formats, uint32_t * out_count, struct fj_image_binding * image_binding))_fj_ram_get_supported_formats_ptr)(manager, out_formats, out_count, image_binding);
     }
     /* do nothing by default */;
 }
 
 fj_loader_function_t _fj_ram_create_images_ptr;
-fj_err_t fj_ram_create_images(struct fj_ram_manager * manager, struct fj_ram_images ** out_images, fj_ram_pixel_format_t format, struct fj_image_bind_context * image_bind_context)
+fj_err_t fj_ram_create_images(struct fj_ram_manager * manager, struct fj_ram_images ** out_images, fj_ram_pixel_format_t format, struct fj_image_binding * image_binding)
 {
     if (_fj_ram_create_images_ptr != NULL) {
-        return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images ** out_images, fj_ram_pixel_format_t format, struct fj_image_bind_context * image_bind_context))_fj_ram_create_images_ptr)(manager, out_images, format, image_bind_context);
+        return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images ** out_images, fj_ram_pixel_format_t format, struct fj_image_binding * image_binding))_fj_ram_create_images_ptr)(manager, out_images, format, image_binding);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_destroy_images_ptr;
@@ -55,7 +55,7 @@ fj_err_t fj_ram_destroy_images(struct fj_ram_manager * manager, struct fj_ram_im
     if (_fj_ram_destroy_images_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images * images))_fj_ram_destroy_images_ptr)(manager, images);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_resize_images_ptr;
@@ -64,7 +64,7 @@ fj_err_t fj_ram_resize_images(struct fj_ram_manager * manager, struct fj_ram_ima
     if (_fj_ram_resize_images_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images * images))_fj_ram_resize_images_ptr)(manager, images);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_wait_image_available_ptr;
@@ -73,7 +73,7 @@ fj_err_t fj_ram_wait_image_available(struct fj_ram_manager * manager, struct fj_
     if (_fj_ram_wait_image_available_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images * images))_fj_ram_wait_image_available_ptr)(manager, images);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_get_available_image_info_ptr;
@@ -82,7 +82,7 @@ fj_err_t fj_ram_get_available_image_info(struct fj_ram_manager * manager, struct
     if (_fj_ram_get_available_image_info_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images * images, struct fj_ram_image_info * out_image_info))_fj_ram_get_available_image_info_ptr)(manager, images, out_image_info);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_ram_present_image_ptr;
@@ -91,6 +91,6 @@ fj_err_t fj_ram_present_image(struct fj_ram_manager * manager, struct fj_ram_ima
     if (_fj_ram_present_image_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_ram_manager * manager, struct fj_ram_images * images))_fj_ram_present_image_ptr)(manager, images);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

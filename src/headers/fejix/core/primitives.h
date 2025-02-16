@@ -41,7 +41,7 @@ typedef uint64_t fj_microseconds_t;
 
 typedef uint32_t fj_orientation_id_t;
 
-enum fj_orientation_id {
+enum {
     FJ_ORIENTATION_NORMAL = 1,
     FJ_ORIENTATION_ROTATE90 = 1 << 1,
     FJ_ORIENTATION_ROTATE180 = 1 << 2,

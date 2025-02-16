@@ -7,7 +7,7 @@
 
 typedef uint32_t fj_app_clock_resolution_t;
 
-enum fj_app_clock_resolution {
+enum {
     FJ_APP_CLOCK_RESOLUTION_LOW,
     FJ_APP_CLOCK_RESOLUTION_HIGH,
 };
@@ -17,7 +17,7 @@ struct fj_app_clock;
 
 
 FJ_PUBLIC
-fj_version_t fj_app_clock_get_interface_version(void);
+void fj_has_app_clock(void);
 
 FJ_PUBLIC
 fj_err_t fj_app_clock_create(

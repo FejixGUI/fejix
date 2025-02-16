@@ -4,13 +4,13 @@
 
 #include <fejix/interface/view.h>
 
-fj_loader_function_t _fj_view_get_interface_version_ptr;
-fj_version_t fj_view_get_interface_version(void)
+fj_loader_function_t _fj_has_view_ptr;
+bool fj_has_view(void)
 {
-    if (_fj_view_get_interface_version_ptr != NULL) {
-        return ((fj_version_t(*)(void))_fj_view_get_interface_version_ptr)();
+    if (_fj_has_view_ptr != NULL) {
+        return ((bool(*)(void))_fj_has_view_ptr)();
     }
-    return 0;
+    return false;
 }
 
 fj_loader_function_t _fj_view_create_manager_ptr;
@@ -19,7 +19,7 @@ fj_err_t fj_view_create_manager(struct fj_app * owner_app, struct fj_view_manage
     if (_fj_view_create_manager_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * owner_app, struct fj_view_manager ** out_manager))_fj_view_create_manager_ptr)(owner_app, out_manager);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_view_destroy_manager_ptr;
@@ -28,7 +28,7 @@ fj_err_t fj_view_destroy_manager(struct fj_view_manager * manager)
     if (_fj_view_destroy_manager_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_view_manager * manager))_fj_view_destroy_manager_ptr)(manager);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_view_create_ptr;
@@ -37,7 +37,7 @@ fj_err_t fj_view_create(struct fj_view_manager * manager, struct fj_view ** out_
     if (_fj_view_create_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_view_manager * manager, struct fj_view ** out_view, void * userdata))_fj_view_create_ptr)(manager, out_view, userdata);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_view_destroy_ptr;
@@ -46,7 +46,7 @@ fj_err_t fj_view_destroy(struct fj_view_manager * manager, struct fj_view * view
     if (_fj_view_destroy_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_view_manager * manager, struct fj_view * view))_fj_view_destroy_ptr)(manager, view);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_loader_function_t _fj_view_on_bind_images_ptr;
@@ -82,6 +82,6 @@ fj_err_t fj_view_update_batch(struct fj_view_manager * manager, struct fj_view *
     if (_fj_view_update_batch_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_view_manager * manager, struct fj_view *const * views, uint32_t view_count))_fj_view_update_batch_ptr)(manager, views, view_count);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

@@ -3,7 +3,7 @@
 
 
 #include <fejix/interface/app.h>
-#include <fejix/interface/scene.h>
+#include <fejix/interface/view.h>
 
 
 /* Based on khrplatform.h from Khronos. */
@@ -16,74 +16,91 @@
 /** OpenGL ABI calling convention native to the target OS. */
 #define FJ_OPENGL_CALL FJ_OPENGL_CALL_IMPL
 
+/** Identifies OpenGL native interface, a.k.a. OpenGL platform. */
+typedef uint32_t fj_opengl_platform_id_t;
 
-typedef uint32_t fj_opengl_manager_interface_id_t;
+/** */
+enum {
+    /** Khronos native platform graphics interface. */
+    FJ_OPENGL_PLATFORM_EGL,
 
-// TODO: Add emulated OpenGL implementations?
-enum fj_opengl_manager_interface_id {
-    /** OpenGL over X interface. */
-    FJ_OPENGL_MANAGER_INTERFACE_GLX,
+    /** Web OpenGL interface. */
+    FJ_OPENGL_PLATFORM_WEBGL,
 
-    /** Khronos native platform graphics interface - (not necessarily) Embedded OpenGL. */
-    FJ_OPENGL_MANAGER_INTERFACE_EGL,
+    /** OpenGL over X Window System. */
+    FJ_OPENGL_PLATFORM_GLX,
 
     /** Windows OpenGL interface. */
-    FJ_OPENGL_MANAGER_INTERFACE_WGL,
+    FJ_OPENGL_PLATFORM_WGL,
+
+    /** Core OpenGL. */
+    FJ_OPENGL_PLATFORM_CGL,
 };
 
 
 typedef uint32_t fj_opengl_feature_flags_t;
 
-enum fj_opengl_feature_flags {
-    FJ_OPENGL_FEATURE_GLOBAL_SAME_FUNCTION_GETTER = 1 << 0,
-    FJ_OPENGL_FEATURE_GLOBAL_PROTECTED_MODE = 1 << 1,
-    FJ_OPENGL_FEATURE_MANAGER_SAME_FUNCTION_GETTER = 1 << 2,
-    FJ_OPENGL_FEATURE_RENDERER_SAME_FUNCTION_GETTER = 1 << 3,
-    FJ_OPENGL_FEATURE_RENDERER_API_OPENGL_DESKTOP = 1 << 4,
-    FJ_OPENGL_FEATURE_RENDERER_API_OPENGL_ES = 1 << 5,
-    FJ_OPENGL_FEATURE_RENDERER_FRIEND = 1 << 6,
-    FJ_OPENGL_FEATURE_RENDERER_SEPARATE_INPUT_OUTPUT = 1 << 7,
+enum {
+    FJ_OPENGL_FEATURE_GLOBAL_PROTECTED_MODE = 1 << 0,
+
+    /**
+        If not present, means that renderer function loaders can only be used for
+        renderers of the same image format.
+
+        If present, means that renderer function loaders are essentially the same function and
+        can be used for any renderers created for the same manager.
+    */
+    FJ_OPENGL_FEATURE_RENDERER_SAME_FUNCTIONS = 1 << 1,
+
+    FJ_OPENGL_FEATURE_RENDERER_API_OPENGL_DESKTOP = 1 << 2,
+    FJ_OPENGL_FEATURE_RENDERER_API_OPENGL_ES = 1 << 3,
+    FJ_OPENGL_FEATURE_RENDERER_FRIEND = 1 << 4,
+    FJ_OPENGL_FEATURE_RENDERER_SEPARATE_READ_DRAW = 1 << 5,
+    FJ_OPENGL_FEATURE_RENDERER_VSYNC = 1 << 6,
+    FJ_OPENGL_FEATURE_RENDERER_ADAPTIVE_VSYNC = 1 << 7,
+
+    /** If not present, means that only the linear colorspace is available. */
     FJ_OPENGL_FEATURE_IMAGE_COLORSPACE_SRGB = 1 << 8,
+
     FJ_OPENGL_FEATURE_IMAGE_MULTISAMPLING = 1 << 9,
 };
 
 
 typedef uint32_t fj_opengl_attribute_id_t;
 
-enum fj_opengl_image_attribute_id {
-    FJ_OPENGL_IMAGE_ATTRIBUTE_BUFFER_COUNT,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_BUFFER_STEREO,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_MULTISAMPLING_BUFFER_COUNT,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_MULTISAMPLING_SAMPLE_COUNT,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_RED_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_GREEN_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_BLUE_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_ALPHA_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_ACCUM_RED_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_ACCUM_GREEN_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_ACCUM_BLUE_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_ACCUM_ALPHA_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_DEPTH_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_STENCIL_BITS,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_COLORSPACE_SRGB,
-    FJ_OPENGL_IMAGE_ATTRIBUTE_PROTECTED,
+enum {
+    FJ_OPENGL_ATTRIBUTE_IMAGE_COUNT,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_STEREO,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_SAMPLES,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_RED_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_GREEN_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_BLUE_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_ALPHA_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_ACCUM_RED_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_ACCUM_GREEN_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_ACCUM_BLUE_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_ACCUM_ALPHA_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_DEPTH_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_STENCIL_BITS,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_COLORSPACE_SRGB,
+    FJ_OPENGL_ATTRIBUTE_IMAGE_PROTECTED,
     // TODO
 };
 
-enum fj_opengl_renderer_attribute_id {
-    FJ_OPENGL_RENDERER_ATTRIBUTE_API_OPENGL_DESKTOP,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_API_OPENGL_ES,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_API_VERSION_MAJOR,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_API_VERSION_MINOR,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_API_BACKWARD_COMPATIBLE,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_API_FOREWARD_COMPATIBLE,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_DEBUG,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_PROTECTED,
-    FJ_OPENGL_RENDERER_ATTRIBUTE_INDIRECT,
+enum {
+    FJ_OPENGL_ATTRIBUTE_RENDERER_API_OPENGL_DESKTOP,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_API_OPENGL_ES,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_API_VERSION_MAJOR,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_API_VERSION_MINOR,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_API_BACKWARD_COMPATIBLE,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_API_FORWARD_COMPATIBLE,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_DEBUG_MODE,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_PROTECTED,
+    FJ_OPENGL_ATTRIBUTE_RENDERER_INDIRECT,
     // TODO
 };
 
-typedef uint32_t fj_opengl_attribute_value_t;
+typedef int32_t fj_opengl_attribute_value_t;
 
 struct fj_opengl_attribute {
     fj_opengl_attribute_id_t id;
@@ -98,161 +115,213 @@ struct fj_opengl_attribute_list {
 
 typedef void (FJ_OPENGL_CALL *fj_opengl_function_t)(void);
 
-typedef fj_opengl_function_t (FJ_OPENGL_CALL *fj_opengl_function_getter_t)(
-    char const *function_name);
+struct fj_opengl_function_loader {
+    void *callback_data;
+
+    /**
+        The loader for global platform-specific functions.
+        Those are the same functions that are used internally for context creation.
+
+        If this returns a non-NULL value, it does not mean that the function is usable.
+        Always check for extension avilability before using extension functions.
+    */
+    fj_opengl_function_t (*load)(void *callback_data, char const *function_name);
+};
 
 
 struct fj_opengl_manager;
 
-/** Resized automatically by the native OpenGL interface. */
+/** Resized automatically by the native OpenGL interface. TODO: docs */
 struct fj_opengl_images;
-
-struct fj_opengl_image_format;
 
 struct fj_opengl_renderer;
 
-struct fj_opengl_manager_internal_info {
+
+struct fj_opengl_platform {
+    fj_opengl_platform_id_t platform_id;
+
+    struct fj_opengl_function_loader platform_function_loader;
+
     /**
         Contains:
-        * ``EGLDisplay*`` for EGL.
-        * ``Display*`` for GLX.
-        * NULL for other implementations.
+        * ``EGLDisplay*`` on EGL.
+        * ``Display*`` on GLX.
+        * NULL on other platforms.
     */
-    void *manager_internal;
-
-    /**
-        The getter for global platform-specific functions.
-        Those are the same functions that are used internally for context creation.
-
-        This must only be called with the internal thread state.
-    */
-    fj_opengl_function_getter_t function_getter;
+    void *platform_object;
 };
 
-struct fj_opengl_manager_create_info {
-    /** Ignored if NULL. If any members are NULL, they are ignored. */
-    struct fj_opengl_manager_internal_info const *import_internal_info;
+/**
+    Image formats are equal if at least some fields of this structure are equal.
+    Fields that are null must not be considered.
 
-    fj_opengl_manager_interface_id_t interface_id;
-};
-
-struct fj_opengl_image_create_info {
-    struct fj_opengl_attribute_list attributes;
-};
-
-struct fj_opengl_renderer_create_info {
-    struct fj_opengl_attribute_list attributes;
-
-    /** Specifies the renderer with which the new renderer will share some object IDs. */
-    struct fj_opengl_context *friend_renderer;
+    Note that checking if image formats are equal is not only a rarely used feature on its own,
+    but is also somewhat unneeded when ``FJ_OPENGL_FEATURE_GLOBAL_SAME_FUNCTIONS`` is
+    available.
+*/
+struct fj_opengl_image_format {
+    uint32_t platform_format_id;
+    void *platform_format_object;
 };
 
 
-struct fj_opengl_functions {
-    /**
-        Always returns at least one interface. The 0-th interface is intended to be the default
-        choice if you completely do not care.
-    */
-    void (*get_supported_manager_interface_ids)(
-        fj_opengl_manager_interface_id_t **out_interface_ids, uint32_t *out_count);
+bool fj_has_opengl(void);
 
-    fj_err_t (*create_manager)(
-        struct fj_app *owner_app,
-        struct fj_opengl_manager **out_manager,
-        struct fj_opengl_manager_create_info const *info);
+bool fj_opengl_has_platform(fj_opengl_platform_id_t platform_id);
 
-    fj_err_t (*destroy_manager)(struct fj_opengl_manager *manager);
+fj_err_t fj_opengl_create_default_platform(
+    struct fj_app *owner_app,
+    struct fj_opengl_platform **out_platform,
+    fj_opengl_platform_id_t platform_id);
 
-    fj_opengl_manager_interface_id_t (*get_manager_interface_id)(struct fj_opengl_manager *manager);
+fj_err_t fj_opengl_destroy_default_platform(
+    struct fj_app *owner_app, struct fj_opengl_platform *platform);
 
-    fj_opengl_feature_flags_t (*get_manager_feature_flags)(struct fj_opengl_manager *manager);
+fj_err_t fj_opengl_create_manager(
+    struct fj_app *owner_app,
+    struct fj_opengl_manager **out_manager,
+    struct fj_opengl_platform const *platform);
 
-    void (*get_manager_internal_info)(
-        struct fj_opengl_manager *manager, struct fj_opengl_manager_internal_info *out_info);
+fj_err_t fj_opengl_destroy_manager(struct fj_opengl_manager *manager);
 
-    /** Creates a standalone off-screen image consumer. */
-    fj_err_t (*create_image_consumer)(
-        struct fj_opengl_manager *manager,
-        struct fj_image_consumer **out_image_consumer,
-        struct fj_size const *image_consumer_size);
+void fj_opengl_get_manager_platform(
+    struct fj_opengl_manager *manager, struct fj_opengl_platform const **out_platform);
 
-    /** Destroys a standalone off-screen image consumer. */
-    fj_err_t (*destroy_image_consumer)(
-        struct fj_opengl_manager *manager, struct fj_image_consumer *image_consumer);
+/**
+    Gets the platform extensions, which are not the same as renderer extensions.
 
-    fj_err_t (*create_image_format)(
-        struct fj_opengl_manager *manager,
-        struct fj_opengl_image_format **out_image_format,
-        struct fj_opengl_attribute_list const *image_attributes,
-        struct fj_image_consumer *image_consumer);
+    The renderer extensions must be retrieved with ``glGetString()``.
 
-    fj_err_t (*destroy_image_format)(
-        struct fj_opengl_manager *manager, struct fj_opengl_image_format *image_format);
+    :returns: Null-terminated string containing extension names separated by single spaces.
+*/
+char const *fj_opengl_get_manager_extensions(struct fj_opengl_manager *manager);
 
-    fj_err_t (*create_images)(
-        struct fj_opengl_manager *manager,
-        struct fj_opengl_images **out_images,
-        struct fj_opengl_image_format *image_format,
-        struct fj_image_consumer *image_consumer);
+fj_opengl_feature_flags_t fj_opengl_get_manager_feature_flags(struct fj_opengl_manager *manager);
 
-    fj_err_t (*destroy_images)(struct fj_opengl_manager *manager, struct fj_opengl_images *images);
+fj_err_t fj_opengl_create_offscreen_image_binding(
+    struct fj_opengl_manager *manager,
+    struct fj_image_binding **out_image_binding,
+    struct fj_size const *image_size);
 
-    /**
-        :returns:
-            * ``EGLSurface*`` for EGL.
-            * ``HDC*`` for WGL.
-            * ``GLXDrawable*`` for GLX.
-    */
-    void *(*get_images_internal)(struct fj_opengl_manager *manger, struct fj_opengl_images *images);
+fj_err_t fj_opengl_destroy_offscreen_image_binding(
+    struct fj_opengl_manager *manager, struct fj_image_binding *image_binding);
 
-    fj_err_t (*present_image)(struct fj_opengl_manager *manager, struct fj_opengl_images *images);
+bool fj_opengl_can_bind(struct fj_opengl_manager *manager, struct fj_image_binding *image_binding);
 
-    fj_err_t (*create_renderer)(
-        struct fj_opengl_manager *manager,
-        struct fj_opengl_renderer **out_renderer,
-        struct fj_opengl_images *images,
-        struct fj_opengl_renderer_create_info const *info);
+/** Unsupported attributes raise an error. Duplicated attributes are resolved by the last value. */
+fj_err_t fj_opengl_create_image_format(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_image_format **out_image_format,
+    struct fj_opengl_attribute_list const *attribute_list,
+    struct fj_image_binding *image_binding);
 
-    fj_err_t (*destroy_renderer)(
-        struct fj_opengl_manager *manager, struct fj_opengl_renderer *renderer);
+fj_err_t fj_opengl_destroy_image_format(
+    struct fj_opengl_manager *manager, struct fj_opengl_image_format *image_format);
 
-    /**
-        :returns:
-            * ``EGLContext*`` for EGL.
-            * ``HGLRC*`` for WGL.
-            * ``GLXContext*`` for GLX.
-    */
-    void *(*get_renderer_internal)(struct fj_opengl_renderer *renderer);
+fj_err_t fj_opengl_get_image_format_attribute(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_image_format const *image_format,
+    fj_opengl_attribute_id_t id,
+    fj_opengl_attribute_value_t *out_value);
 
-    /**
-        The returned function must only be called under the appropriate thread rendering state.
-        That is, the specified rendering context must be current.
-    */
-    fj_opengl_function_getter_t (*get_renderer_function_getter)(
-        struct fj_opengl_manager *manager, struct fj_opengl_renderer *renderer);
+fj_err_t fj_opengl_create_images(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_images **out_images,
+    struct fj_opengl_image_format const *image_format,
+    struct fj_image_binding *image_binding);
 
-    /** Sets the given rendering context as current. */
-    fj_err_t (*set_thread_state)(
-        struct fj_opengl_manager *manager,
-        struct fj_opengl_renderer *renderer,
-        struct fj_opengl_images *input_images,
-        struct fj_opengl_images *output_images);
+fj_err_t fj_opengl_destroy_images(
+    struct fj_opengl_manager *manager, struct fj_opengl_images *images);
 
-    /**
-        Sets no rendering context as current.
-        Any OpenGL functions that operate on the thread state will fail.
-    */
-    fj_err_t (*clear_thread_state)(struct fj_opengl_manager *manager);
+void fj_opengl_get_images_image_format(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_images *images,
+    struct fj_opengl_image_format const **out_image_format);
 
-    /**
-        Sets such a state under which manager functions can be loaded. This typically means that an
-        internal manager rendering context and images are set as current.
+/**
+    :param out_platform_object: Returns:
+        * ``EGLSurface*`` on EGL.
+        * ``HDC*`` on WGL.
+        * ``GLXDrawable*`` on GLX.
+        * ``NULL`` on other platforms.
+*/
+void fj_opengl_get_images_platform_object(
+    struct fj_opengl_manager *manager, struct fj_opengl_images *images, void *out_platform_object);
 
-        This is used internally in most functions that operate on the manager and create/destroy
-        rendering contexts.
-    */
-    fj_err_t (*set_thread_state_internal)(struct fj_opengl_manager *manager);
-};
+fj_err_t fj_opengl_swap_images(struct fj_opengl_manager *manager, struct fj_opengl_images *images);
+
+/**
+    :param friend_renderer: specifies the renderer with which the new renderer will share some
+        object IDs.
+*/
+fj_err_t fj_opengl_create_renderer(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_renderer **out_renderer,
+    struct fj_opengl_attribute_list attribute_list,
+    struct fj_opengl_image_format *image_format,
+    struct fj_opengl_renderer *friend_renderer);
+
+fj_err_t fj_opengl_destroy_renderer(
+    struct fj_opengl_manager *manager, struct fj_opengl_renderer *renderer);
+
+fj_err_t fj_opengl_get_renderer_attribute(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_renderer *renderer,
+    fj_opengl_attribute_id_t id,
+    fj_opengl_attribute_value_t *out_value);
+
+void fj_opengl_get_renderer_image_format(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_renderer *renderer,
+    struct fj_opengl_image_format **out_image_format);
+
+/**
+    :param out_platform_object: Returns:
+        * ``EGLContext*`` on EGL.
+        * ``HGLRC*`` on WGL.
+        * ``GLXContext*`` on GLX.
+        * ``NULL`` on other platforms.
+*/
+void fj_opengl_get_renderer_platform_object(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_renderer *renderer,
+    void *out_platform_object);
+
+/**
+    The returned function must only be called under the appropriate thread rendering state.
+    That is, the specified rendering context must be current.
+*/
+void fj_opengl_get_renderer_function_getter(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_renderer *renderer,
+    struct fj_opengl_function_loader const *out_function_loader);
+
+/**
+    Sets the given rendering context as current.
+
+    If the ``FJ_OPENGL_FEATURE_RENDERER_SEPARATE_READ_DRAW`` feature is not supported,
+    ``read_images`` must be the same as ``draw_images``.
+*/
+fj_err_t fj_opengl_set_current_in_thread(
+    struct fj_opengl_manager *manager,
+    struct fj_opengl_renderer *renderer,
+    struct fj_opengl_images *read_images,
+    struct fj_opengl_images *draw_images);
+
+/**
+    Sets no rendering context as current.
+    Any OpenGL functions that operate on the thread state will fail.
+*/
+fj_err_t fj_opengl_unset_current_in_thread(struct fj_opengl_manager *manager);
+
+/**
+    Sets such a state under which manager functions can be loaded. This typically means that an
+    internal dummy rendering context of the manager is set as current.
+
+    This is used internally in most functions that operate on the manager and create/destroy
+    rendering contexts.
+*/
+fj_err_t fj_opengl_set_dummy_current_in_thread(struct fj_opengl_manager *manager);
 
 
 #endif

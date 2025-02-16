@@ -9,7 +9,7 @@
 typedef uint32_t fj_ram_pixel_format_t;
 
 /** */
-enum fj_ram_pixel_format {
+enum {
     /** */
     FJ_RAM_PIXEL_FORMAT_RGB24,
     /** */
@@ -62,14 +62,14 @@ void fj_ram_get_supported_formats(
     struct fj_ram_manager *manager,
     fj_ram_pixel_format_t **out_formats,
     uint32_t *out_count,
-    struct fj_image_bind_context *image_bind_context);
+    struct fj_image_binding *image_binding);
 
 /** */
 fj_err_t fj_ram_create_images(
     struct fj_ram_manager *manager,
     struct fj_ram_images **out_images,
     fj_ram_pixel_format_t format,
-    struct fj_image_bind_context *image_bind_context);
+    struct fj_image_binding *image_binding);
 
 fj_err_t fj_ram_destroy_images(struct fj_ram_manager *manager, struct fj_ram_images *images);
 

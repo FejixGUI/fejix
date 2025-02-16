@@ -11,6 +11,6 @@ fj_version_t fj_app_activity_get_interface_version(struct fj_app * app)
 fj_err_t fj_app_activity_set_flags(struct fj_app * app, fj_app_activity_flags_t flags)
 {
     (void) app; (void) flags;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

@@ -2,34 +2,34 @@
 
 #include <fejix/interface/app_clock.h>
 
-fj_version_t fj_app_clock_get_interface_version(void)
+void fj_has_app_clock(void)
 {
 
-    return 0;
+    /* do nothing by default */;
 }
 
 fj_err_t fj_app_clock_create(struct fj_app * app, struct fj_app_clock ** out_clock, void * clock_userdata)
 {
     (void) app; (void) out_clock; (void) clock_userdata;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_app_clock_destroy(struct fj_app * app, struct fj_app_clock * clock)
 {
     (void) app; (void) clock;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_app_clock_start_ticking(struct fj_app * app, struct fj_app_clock * clock, fj_microseconds_t tick_interval, fj_app_clock_resolution_t flags)
 {
     (void) app; (void) clock; (void) tick_interval; (void) flags;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_app_clock_stop_ticking(struct fj_app * app, struct fj_app_clock * clock)
 {
     (void) app; (void) clock;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 void fj_app_clock_on_tick(struct fj_app * app, fj_app_clock_on_tick_fn_t callback)

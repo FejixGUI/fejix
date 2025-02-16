@@ -8,7 +8,7 @@
 typedef uint32_t fj_view_activity_flags_t;
 
 // TODO: rename this to focus hints and add to one of the future input interfaces.
-enum fj_view_activity_flags {
+enum {
     FJ_SCENE_ACTIVITY_NONDISMISSABLE = 1 << 0,
 
     /** Inhibits the screensaver. */

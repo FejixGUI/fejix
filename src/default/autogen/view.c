@@ -2,34 +2,34 @@
 
 #include <fejix/interface/view.h>
 
-fj_version_t fj_view_get_interface_version(void)
+bool fj_has_view(void)
 {
 
-    return 0;
+    return false;
 }
 
 fj_err_t fj_view_create_manager(struct fj_app * owner_app, struct fj_view_manager ** out_manager)
 {
     (void) owner_app; (void) out_manager;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_view_destroy_manager(struct fj_view_manager * manager)
 {
     (void) manager;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_view_create(struct fj_view_manager * manager, struct fj_view ** out_view, void * userdata)
 {
     (void) manager; (void) out_view; (void) userdata;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_view_destroy(struct fj_view_manager * manager, struct fj_view * view)
 {
     (void) manager; (void) view;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 void fj_view_on_bind_images(struct fj_view_manager * manager, fj_view_on_bind_images_fn_t callback)
@@ -53,6 +53,6 @@ void fj_view_on_update_geometry(struct fj_view_manager * manager, fj_view_on_upd
 fj_err_t fj_view_update_batch(struct fj_view_manager * manager, struct fj_view *const * views, uint32_t view_count)
 {
     (void) manager; (void) views; (void) view_count;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

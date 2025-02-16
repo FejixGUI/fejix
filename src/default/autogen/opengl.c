@@ -2,4 +2,177 @@
 
 #include <fejix/interface/opengl.h>
 
+bool fj_has_opengl(void)
+{
+
+    return false;
+}
+
+bool fj_opengl_has_platform(fj_opengl_platform_id_t platform_id)
+{
+    (void) platform_id;
+    return false;
+}
+
+fj_err_t fj_opengl_create_default_platform(struct fj_app * owner_app, struct fj_opengl_platform ** out_platform, fj_opengl_platform_id_t platform_id)
+{
+    (void) owner_app; (void) out_platform; (void) platform_id;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_destroy_default_platform(struct fj_app * owner_app, struct fj_opengl_platform * platform)
+{
+    (void) owner_app; (void) platform;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_create_manager(struct fj_app * owner_app, struct fj_opengl_manager ** out_manager, struct fj_opengl_platform const * platform)
+{
+    (void) owner_app; (void) out_manager; (void) platform;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_destroy_manager(struct fj_opengl_manager * manager)
+{
+    (void) manager;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+void fj_opengl_get_manager_platform(struct fj_opengl_manager * manager, struct fj_opengl_platform const ** out_platform)
+{
+    (void) manager; (void) out_platform;
+    /* do nothing by default */;
+}
+
+char const * fj_opengl_get_manager_extensions(struct fj_opengl_manager * manager)
+{
+    (void) manager;
+    return NULL;
+}
+
+fj_opengl_feature_flags_t fj_opengl_get_manager_feature_flags(struct fj_opengl_manager * manager)
+{
+    (void) manager;
+    return 0;
+}
+
+fj_err_t fj_opengl_create_offscreen_image_binding(struct fj_opengl_manager * manager, struct fj_image_binding ** out_image_binding, struct fj_size const * image_size)
+{
+    (void) manager; (void) out_image_binding; (void) image_size;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_destroy_offscreen_image_binding(struct fj_opengl_manager * manager, struct fj_image_binding * image_binding)
+{
+    (void) manager; (void) image_binding;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+bool fj_opengl_can_bind(struct fj_opengl_manager * manager, struct fj_image_binding * image_binding)
+{
+    (void) manager; (void) image_binding;
+    return false;
+}
+
+fj_err_t fj_opengl_create_image_format(struct fj_opengl_manager * manager, struct fj_opengl_image_format ** out_image_format, struct fj_opengl_attribute_list const * attribute_list, struct fj_image_binding * image_binding)
+{
+    (void) manager; (void) out_image_format; (void) attribute_list; (void) image_binding;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_destroy_image_format(struct fj_opengl_manager * manager, struct fj_opengl_image_format * image_format)
+{
+    (void) manager; (void) image_format;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_get_image_format_attribute(struct fj_opengl_manager * manager, struct fj_opengl_image_format const * image_format, fj_opengl_attribute_id_t id, fj_opengl_attribute_value_t * out_value)
+{
+    (void) manager; (void) image_format; (void) id; (void) out_value;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_create_images(struct fj_opengl_manager * manager, struct fj_opengl_images ** out_images, struct fj_opengl_image_format const * image_format, struct fj_image_binding * image_binding)
+{
+    (void) manager; (void) out_images; (void) image_format; (void) image_binding;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_destroy_images(struct fj_opengl_manager * manager, struct fj_opengl_images * images)
+{
+    (void) manager; (void) images;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+void fj_opengl_get_images_image_format(struct fj_opengl_manager * manager, struct fj_opengl_images * images, struct fj_opengl_image_format const ** out_image_format)
+{
+    (void) manager; (void) images; (void) out_image_format;
+    /* do nothing by default */;
+}
+
+void fj_opengl_get_images_platform_object(struct fj_opengl_manager * manager, struct fj_opengl_images * images, void * out_platform_object)
+{
+    (void) manager; (void) images; (void) out_platform_object;
+    /* do nothing by default */;
+}
+
+fj_err_t fj_opengl_swap_images(struct fj_opengl_manager * manager, struct fj_opengl_images * images)
+{
+    (void) manager; (void) images;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_create_renderer(struct fj_opengl_manager * manager, struct fj_opengl_renderer ** out_renderer, struct fj_opengl_attribute_list attribute_list, struct fj_opengl_image_format * image_format, struct fj_opengl_renderer * friend_renderer)
+{
+    (void) manager; (void) out_renderer; (void) attribute_list; (void) image_format; (void) friend_renderer;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_destroy_renderer(struct fj_opengl_manager * manager, struct fj_opengl_renderer * renderer)
+{
+    (void) manager; (void) renderer;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_get_renderer_attribute(struct fj_opengl_manager * manager, struct fj_opengl_renderer * renderer, fj_opengl_attribute_id_t id, fj_opengl_attribute_value_t * out_value)
+{
+    (void) manager; (void) renderer; (void) id; (void) out_value;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+void fj_opengl_get_renderer_image_format(struct fj_opengl_manager * manager, struct fj_opengl_renderer * renderer, struct fj_opengl_image_format ** out_image_format)
+{
+    (void) manager; (void) renderer; (void) out_image_format;
+    /* do nothing by default */;
+}
+
+void fj_opengl_get_renderer_platform_object(struct fj_opengl_manager * manager, struct fj_opengl_renderer * renderer, void * out_platform_object)
+{
+    (void) manager; (void) renderer; (void) out_platform_object;
+    /* do nothing by default */;
+}
+
+void fj_opengl_get_renderer_function_getter(struct fj_opengl_manager * manager, struct fj_opengl_renderer * renderer, struct fj_opengl_function_loader const * out_function_loader)
+{
+    (void) manager; (void) renderer; (void) out_function_loader;
+    /* do nothing by default */;
+}
+
+fj_err_t fj_opengl_set_current_in_thread(struct fj_opengl_manager * manager, struct fj_opengl_renderer * renderer, struct fj_opengl_images * read_images, struct fj_opengl_images * draw_images)
+{
+    (void) manager; (void) renderer; (void) read_images; (void) draw_images;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_unset_current_in_thread(struct fj_opengl_manager * manager)
+{
+    (void) manager;
+    return FJ_ERR_UNIMPLEMENTED;
+}
+
+fj_err_t fj_opengl_set_dummy_current_in_thread(struct fj_opengl_manager * manager)
+{
+    (void) manager;
+    return FJ_ERR_UNIMPLEMENTED;
+}
 

@@ -2,4 +2,15 @@
 
 #include <fejix/interface/vulkan.h>
 
+bool fj_has_vulkan(void)
+{
+
+    return false;
+}
+
+fj_err_t fj_vulkan_create_surface(struct fj_app * app, void * out_surface, struct fj_image_binding * image_binding, struct fj_vulkan_global_info const * global_info)
+{
+    (void) app; (void) out_surface; (void) image_binding; (void) global_info;
+    return FJ_ERR_UNIMPLEMENTED;
+}
 

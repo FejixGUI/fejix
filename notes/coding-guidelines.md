@@ -86,20 +86,21 @@ See:
 Because all interface functions must have a callable default implementation and all default
 implementations are generated automatically, all functions must return one of the following:
 * ``void`` (the default return value is not generated)
-* ``fj_err_t`` (the default return value is ``FJ_ERR_UNSUPPORTED``)
-* a pointer (the default value is ``NULL``)
-* a numeric value e.g. representing flags (the default value is ``0``)
+* ``bool`` (the default value is ``false``)
+* ``fj_err_t`` (the default return value is ``FJ_ERR_UNIMPLEMENTED``)
+* a pointer (must end with ``*``, typedefs are not supported) (the default value is ``NULL``)
+* a numeric value (the default value is ``0``)
 
 For any other return types the automatic code generator may fail to generate reasonable defaults
 that compile reliably without warnings.
 
 If a function needs to return a value of another type, it must do so with an output parameter
-and return either ``void`` or ``fj_err_t``.
+and return one of the supported return types.
 
 Returning ``void`` in such case is sufficient if e.g. the returned object is retrieved
 from an input object parameter, whose constructor function returns ``fj_err_t``. Example:
 ```c
-/* If unimplemented, this returns FJ_ERR_UNSUPPORTED without touching the arguments. */
+/* If unimplemented, this returns FJ_ERR_UNIMPLEMENTED without touching the arguments. */
 fj_err_t fj_xxx_create(struct xxx **out_xxx);
 
 /* To call this, the user MUST make sure that xxx was created successfully. */

@@ -19,6 +19,6 @@ fj_err_t fj_app_activity_set_flags(struct fj_app * app, fj_app_activity_flags_t 
     if (_fj_app_activity_set_flags_ptr != NULL) {
         return ((fj_err_t(*)(struct fj_app * app, fj_app_activity_flags_t flags))_fj_app_activity_set_flags_ptr)(app, flags);
     }
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

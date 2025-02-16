@@ -3,7 +3,7 @@
 
 
 #include <fejix/interface/app.h>
-#include <fejix/interface/image.h>
+#include <fejix/interface/image_binding.h>
 
 #include <fejix/core/primitives.h>
 
@@ -12,7 +12,7 @@ struct fj_view_manager;
 struct fj_view;
 
 
-fj_version_t fj_view_get_interface_version(void);
+bool fj_has_view(void);
 
 fj_err_t fj_view_create_manager(struct fj_app *owner_app, struct fj_view_manager **out_manager);
 
@@ -25,7 +25,7 @@ fj_err_t fj_view_destroy(struct fj_view_manager *manager, struct fj_view *view);
 
 /** Not binding images inside the callback is platform-specific behavior. */
 typedef fj_err_t (*fj_view_on_bind_images_fn_t)(
-    void *userdata, struct fj_image_bind_context *context);
+    void *userdata, struct fj_image_binding *image_binding);
 
 void fj_view_on_bind_images(struct fj_view_manager *manager, fj_view_on_bind_images_fn_t callback);
 

@@ -2,15 +2,15 @@
 
 #include <fejix/interface/app_manual_sleep.h>
 
-bool fj_app_manual_sleep_get_interface_version(void)
+bool fj_has_app_manual_sleep(void)
 {
 
-    return 0;
+    return false;
 }
 
 fj_err_t fj_app_manual_sleep(struct fj_app * app)
 {
     (void) app;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

@@ -10,7 +10,7 @@
 #include <math.h>
 
 
-enum global_message_id {
+enum {
     GLOBAL_MESSAGE_ITERATE = WM_USER,
     GLOBAL_MESSAGE_WAKEUP,
 };
@@ -94,8 +94,8 @@ static fj_err_t app_wakeup_immediately(struct fj_app *app)
 }
 
 
-static LRESULT CALLBACK global_window_procedure(
-    HWND window_handle, UINT message, WPARAM wparam, LPARAM lparam)
+static LRESULT CALLBACK
+global_window_procedure(HWND window_handle, UINT message, WPARAM wparam, LPARAM lparam)
 {
     struct fj_app *app = fj_winapi_window_get_data(window_handle);
 
@@ -276,7 +276,7 @@ static fj_err_t app_set_activity_hint(
             return FJ_OK;
 
         default:
-            return FJ_ERR_UNSUPPORTED;
+            return FJ_ERR_UNIMPLEMENTED;
     }
 }
 

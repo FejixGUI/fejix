@@ -7,7 +7,7 @@
 
 typedef uint32_t fj_scene_layout_size_hint_flags_t;
 
-enum fj_scene_layout_size_hint_flags {
+enum {
     FJ_SCENE_LAYOUT_SIZE_HINT_PREFERRED_SIZE = 1,
     FJ_SCENE_LAYOUT_SIZE_HINT_MIN_SIZE = 1 << 1,
     FJ_SCENE_LAYOUT_SIZE_HINT_MAX_SIZE = 1 << 2,

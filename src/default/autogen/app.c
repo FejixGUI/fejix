@@ -2,22 +2,22 @@
 
 #include <fejix/interface/app.h>
 
-fj_version_t fj_app_get_interface_version(void)
+bool fj_has_app(void)
 {
 
-    return 0;
+    return false;
 }
 
 fj_err_t fj_app_create(struct fj_app ** out_app, void * app_userdata)
 {
     (void) out_app; (void) app_userdata;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_app_destroy(struct fj_app * app)
 {
     (void) app;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 void fj_app_on_continue(struct fj_app * app, fj_app_on_continue_fn_t callback)
@@ -41,18 +41,18 @@ void fj_app_on_finish(struct fj_app * app, fj_app_on_finish_fn_t callback)
 fj_err_t fj_app_launch(struct fj_app * app)
 {
     (void) app;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_app_request_continue(struct fj_app * app)
 {
     (void) app;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 
 fj_err_t fj_app_request_finish(struct fj_app * app)
 {
     (void) app;
-    return FJ_ERR_UNSUPPORTED;
+    return FJ_ERR_UNIMPLEMENTED;
 }
 

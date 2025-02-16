@@ -7,7 +7,7 @@
 
 typedef uint32_t fj_app_suspend_type_t;
 
-enum fj_app_suspend_type {
+enum {
     /**
         The app lost primary focus due to interruption by another app.
         This may also be referred to as "deactivated" state.
@@ -28,7 +28,7 @@ enum fj_app_suspend_type {
 
 typedef uint32_t fj_app_finish_type_t;
 
-enum fj_app_finish_type {
+enum {
     /** Finish due to the app's own request. */
     FJ_APP_FINISH_NORMAL,
 
@@ -43,9 +43,8 @@ enum fj_app_finish_type {
 struct fj_app;
 
 
-/** Returns ``FJ_VERSION(0,0,0)`` (equal to ``0``) if unsupported. */
 FJ_PUBLIC
-fj_version_t fj_app_get_interface_version(void);
+bool fj_has_app(void);
 
 FJ_PUBLIC
 fj_err_t fj_app_create(struct fj_app **out_app, void *app_userdata);

@@ -7,7 +7,7 @@
 
 typedef uint32_t fj_app_activity_flags_t;
 
-enum fj_app_activity_flags {
+enum {
     /**
         The app will not be forced to finish while it is doing a critical activity.
 
