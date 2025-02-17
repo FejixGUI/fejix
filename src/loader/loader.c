@@ -1,23 +1,3 @@
-/*
-    The loader does not really support platforms other than Unix-like with X11/Wayland/etc. for now.
-    The reason is that it is simply not needed on other platforms.
-
-    The lack of support for other platforms mainly means that default implementation paths are not
-    hard-coded in this file (but they should be).
-
-    The lack of support for Windows means that Unicode paths are not implemented yet.
-    Windows treats file paths as wchar_t arrays not necessarily being valid UTF-16.
-    To support Windows and Unicode paths, one might prefer using
-    GetEnvironmentVariable() over getenv() because the latter only supports ASCII
-    and FJ_LIBRARY_LOAD_SYSTEM_ENCODED_PATH to avoid errors arising from conversions between
-    UTF-16 and UTF-8.
-
-    That all is in fact quite simple to implement, but makes no sense to me at this moment.
-
-    The user can still manually load a dynamic library and load the functions using
-    fj_loader_load_functions() on any platform if it is really necessary.
-*/
-
 #include <src/loader/loader.h>
 
 #include <fejix/loader/loader.h>
@@ -166,7 +146,12 @@ void fj_loader_load_functions(struct fj_library const *library)
 // }
 
 
-fj_err_t fj_loader_load_default_library(struct fj_library *out_library)
+char const *default_library_names[] = {
+    NULL,  // Prevents warnings about the array being empty
+};
+
+
+fj_err_t fj_loader_load(void)
 {
     return FJ_ERR_CANNOT_LOAD_LIBRARY;
 }

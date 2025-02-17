@@ -6,10 +6,10 @@
 
 
 /**
-    The returned library object must be unloaded with ``fj_library_unload()``.
+    Loads the functions from a default library (configurable at compile time).
 */
 FJ_PUBLIC
-fj_err_t fj_loader_load_default_library(struct fj_library *out_library);
+fj_err_t fj_loader_load(void);
 
 /**
     Replaces the default no-op dummy function implementations with the functions from the library.

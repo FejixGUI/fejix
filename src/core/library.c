@@ -32,45 +32,21 @@ static fj_err_t str_into_utf16(char const *string, LPWSTR *out_utf16_string)
     return FJ_OK;
 }
 
-static fj_err_t library_load_utf8(
-    struct fj_library *out_library, char const *utf8_path, fj_library_load_flags_t flags)
-{
-    LPWSTR utf16_path = NULL;
-    FJ_TRY (str_into_utf16(utf8_path, &utf16_path)) {
-        return fj_result;
-    }
-
-    flags &= FJ_LIBRARY_SYSTEM_ENCODED_PATH;
-
-    FJ_TRY (fj_library_load(out_library, (void *) utf16_path, flags)) {
-        FJ_FREE(&utf16_path);
-        return fj_result;
-    }
-
-    FJ_FREE(&utf16_path);
-    return FJ_OK;
-}
-
 static fj_library_function_t load_function(void *library_data, char const *function_name)
 {
     return (fj_library_function_t) GetProcAddress(library_data, function_name);
 }
 
-fj_err_t fj_library_load(
-    struct fj_library *out_library, char const *path, fj_library_load_flags_t flags)
+static fj_err_t load_library(struct fj_library *out_library, LPCWSTR path)
 {
-    if (!(flags & FJ_LIBRARY_SYSTEM_ENCODED_PATH)) {
-        return library_load_utf8(out_library, path, flags);
-    }
-
 #    if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
-    out_library->library_data = LoadLibrary((void *) path);
+    out_library->library_data = LoadLibrary(path);
 
 #    else
 
     // LoadLibrary is not available on UWP (Universal Windows Platform) used by Microsoft Store
-    out_library->library_data = LoadPackagedLibrary((void *) path, 0);
+    out_library->library_data = LoadPackagedLibrary(path, 0);
 
 #    endif
 
@@ -80,6 +56,22 @@ fj_err_t fj_library_load(
 
     out_library->load_function = load_function;
 
+    return FJ_OK;
+}
+
+fj_err_t fj_library_load(struct fj_library *out_library, char const *path)
+{
+    LPWSTR utf16_path = NULL;
+    FJ_TRY (str_into_utf16(path, &utf16_path)) {
+        return fj_result;
+    }
+
+    FJ_TRY (load_library(out_library, utf16_path)) {
+        FJ_FREE(&utf16_path);
+        return fj_result;
+    }
+
+    FJ_FREE(&utf16_path);
     return FJ_OK;
 }
 
@@ -100,14 +92,9 @@ static fj_library_function_t load_function(void *library_data, char const *funct
     return (fj_library_function_t) dlsym(library_data, function_name);
 }
 
-fj_err_t fj_library_load(
-    struct fj_library *out_library, char const *path, fj_library_load_flags_t flags)
+fj_err_t fj_library_load(struct fj_library *out_library, char const *path)
 {
-    int dl_flags = 0;
-    dl_flags |= (flags & FJ_LIBRARY_LOAD_GLOBAL) ? RTLD_GLOBAL : 0;
-    dl_flags |= (flags & FJ_LIBRARY_LOAD_LAZY) ? RTLD_LAZY : RTLD_NOW;
-
-    out_library->library_data = dlopen(path, dl_flags);
+    out_library->library_data = dlopen(path, RTLD_LOCAL | RTLD_NOW);
 
     if (out_library->library_data == NULL) {
         return FJ_ERR_CANNOT_LOAD_LIBRARY;

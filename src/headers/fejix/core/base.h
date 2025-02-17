@@ -13,7 +13,7 @@
 #    define FJ_PUBLIC_C_LINKAGE
 #endif
 
-#if defined(_WIN32) && defined(FJ_OPT_PRIVATE)
+#if defined(_WIN32) && defined(FJ_OPT_PUBLIC_EXPORT)
 #    define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
 #    define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
