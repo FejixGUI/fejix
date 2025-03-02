@@ -5,16 +5,8 @@
 #include <fejix/interface/app.h>
 #include <fejix/interface/view.h>
 
+#include <fejix/core/library.h>
 
-/* Based on khrplatform.h from Khronos. */
-#if defined(_WIN32) && !defined(_WIN32_WCE) && !defined(__SCITECH_SNAP__)
-#    define FJ_OPENGL_CALL_IMPL __stdcall
-#else
-#    define FJ_OPENGL_CALL_IMPL
-#endif
-
-/** OpenGL ABI calling convention native to the target OS. */
-#define FJ_OPENGL_CALL FJ_OPENGL_CALL_IMPL
 
 /** Identifies OpenGL native interface, a.k.a. OpenGL platform. */
 typedef uint32_t fj_opengl_platform_id_t;
@@ -33,7 +25,7 @@ enum {
     /** Windows OpenGL interface. */
     FJ_OPENGL_PLATFORM_WGL,
 
-    /** Core OpenGL. */
+    /** Apple's Core OpenGL. */
     FJ_OPENGL_PLATFORM_CGL,
 };
 
@@ -113,34 +105,8 @@ struct fj_opengl_attribute_list {
 };
 
 
-typedef void (FJ_OPENGL_CALL *fj_opengl_function_t)(void);
-
-struct fj_opengl_function_loader {
-    void *callback_data;
-
-    /**
-        The loader for global platform-specific functions.
-        Those are the same functions that are used internally for context creation.
-
-        If this returns a non-NULL value, it does not mean that the function is usable.
-        Always check for extension avilability before using extension functions.
-    */
-    fj_opengl_function_t (*load)(void *callback_data, char const *function_name);
-};
-
-
-struct fj_opengl_manager;
-
-/** Resized automatically by the native OpenGL interface. TODO: docs */
-struct fj_opengl_images;
-
-struct fj_opengl_renderer;
-
-
 struct fj_opengl_platform {
     fj_opengl_platform_id_t platform_id;
-
-    struct fj_opengl_function_loader platform_function_loader;
 
     /**
         Contains:
@@ -149,34 +115,42 @@ struct fj_opengl_platform {
         * NULL on other platforms.
     */
     void *platform_object;
+
+    struct fj_library const *platform_library;
 };
+
+struct fj_opengl_manager;
 
 /**
     Image formats are equal if at least some fields of this structure are equal.
     Fields that are null must not be considered.
 
     Note that checking if image formats are equal is not only a rarely used feature on its own,
-    but is also somewhat unneeded when ``FJ_OPENGL_FEATURE_GLOBAL_SAME_FUNCTIONS`` is
+    but is also somewhat unneeded when ``FJ_OPENGL_FEATURE_RENDERER_SAME_FUNCTIONS`` is
     available.
 */
 struct fj_opengl_image_format {
-    uint32_t platform_format_id;
-    void *platform_format_object;
+    void *platform_object;
 };
+
+/** Resized automatically by the native OpenGL interface. TODO: docs */
+struct fj_opengl_images;
+
+struct fj_opengl_renderer;
 
 
 bool fj_has_opengl(void);
 
 bool fj_opengl_has_platform(fj_opengl_platform_id_t platform_id);
 
-fj_err_t fj_opengl_create_default_platform(
+fj_err_t fj_opengl_create_platform(
     struct fj_app *owner_app,
     struct fj_opengl_platform **out_platform,
     fj_opengl_platform_id_t platform_id);
 
-fj_err_t fj_opengl_destroy_default_platform(
-    struct fj_app *owner_app, struct fj_opengl_platform *platform);
+fj_err_t fj_opengl_destroy_platform(struct fj_app *owner_app, struct fj_opengl_platform *platform);
 
+/** References the platform for the whole manager lifetime. */
 fj_err_t fj_opengl_create_manager(
     struct fj_app *owner_app,
     struct fj_opengl_manager **out_manager,
@@ -288,13 +262,13 @@ void fj_opengl_get_renderer_platform_object(
     void *out_platform_object);
 
 /**
-    The returned function must only be called under the appropriate thread rendering state.
+    The returned function loader must only be called under the appropriate thread rendering state.
     That is, the specified rendering context must be current.
 */
-void fj_opengl_get_renderer_function_getter(
+void fj_opengl_get_renderer_library(
     struct fj_opengl_manager *manager,
     struct fj_opengl_renderer *renderer,
-    struct fj_opengl_function_loader const *out_function_loader);
+    struct fj_library *out_library);
 
 /**
     Sets the given rendering context as current.

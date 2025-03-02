@@ -49,6 +49,7 @@ struct fj_ram_image_info {
 };
 
 
+/** */
 fj_version_t fj_ram_get_interface_version(void);
 
 /** */
@@ -56,6 +57,9 @@ fj_err_t fj_ram_create_manager(struct fj_app *owner_app, struct fj_ram_manager *
 
 /** */
 fj_err_t fj_ram_destroy_manager(struct fj_ram_manager *manager);
+
+/** */
+bool fj_ram_can_bind(struct fj_ram_manager *manager, struct fj_image_binding *image_binding);
 
 /** */
 void fj_ram_get_supported_formats(
@@ -71,6 +75,7 @@ fj_err_t fj_ram_create_images(
     fj_ram_pixel_format_t format,
     struct fj_image_binding *image_binding);
 
+/** */
 fj_err_t fj_ram_destroy_images(struct fj_ram_manager *manager, struct fj_ram_images *images);
 
 /**

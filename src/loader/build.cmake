@@ -26,7 +26,7 @@ target_link_libraries(
         fejix_private_core_lib
         "${fejix_loader_extra_libs}")
 
-foreach(library IN LISTS fejix_loader_default_libraries)
+foreach(library IN LISTS fejix_loader_libraries)
     target_compile_definitions(
         fejix_loader_lib
         PRIVATE

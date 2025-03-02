@@ -24,6 +24,35 @@
         FJ_TRY (FJ_ERR_ALLOCATION_FAILED) {
             assert(fj_result == FJ_ERR_ALLOCATION_FAILED);
         }
+
+    Real example:
+
+    .. code-block:: c
+
+        int *x;
+        FJ_TRY (FJ_ALLOC_ZEROED(&x)) {
+            printf("Error: %s\n", fj_err_get_description(fj_result));
+            exit(1);
+        }
+
+        *x = 123;
+
+    Idiomatic example:
+
+    .. code-block:: c
+
+        fj_err_t foobar() {
+            FJ_TRY (foo()) {
+                return fj_result;
+            }
+
+            FJ_TRY (bar()) {
+                undo_foo();
+                return fj_result;
+            }
+
+            return FJ_OK;
+        }
 */
 #define FJ_TRY(EXPR)                                                                            \
     for (fj_err_t fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
