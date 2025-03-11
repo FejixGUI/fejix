@@ -1,5 +1,3 @@
-set(fejix_winapi_path "${fejix_root_path}/src/winapi")
-
 string(REGEX MATCH "^[^_]+" fejix_winapi_win32_version "${fejix_winapi_ntddi_version}")
 
 
@@ -17,7 +15,7 @@ target_compile_definitions(
 target_sources(
     fejix_winapi_lib
     PRIVATE
-        "${fejix_winapi_path}/utils.c")
+        "${CMAKE_CURRENT_LIST_DIR}/utils.c")
 
 target_link_libraries(
     fejix_winapi_lib
@@ -27,13 +25,8 @@ target_link_libraries(
         fejix_core_lib)
 
 
-install(
-    TARGETS fejix_winapi_lib
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
-
-
 if("${fejix_build_tests}")
-    add_executable(fejix_winapi_utils_test_exe "${fejix_winapi_path}/tests/test-utils.c")
+    add_executable(fejix_winapi_utils_test_exe "${CMAKE_CURRENT_LIST_DIR}/tests/test-utils.c")
     target_link_libraries(fejix_winapi_utils_test_exe fejix_winapi_lib fejix_private_core_lib)
     add_test(NAME fejix_winapi_utils_test COMMAND fejix_winapi_utils_test_exe)
 endif()
