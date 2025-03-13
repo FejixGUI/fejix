@@ -1,42 +1,28 @@
 #include <fejix/core.h>
+#include <fejix/utils/memory.h>
 
 
-/** Contains strings and NULLs for unimplemented descriptions. */
-static char const *const error_descriptions[FJ_ERR_PREDEFINED_COUNT] = {
+/** Each element is a string or NULL if unimplemented. */
+static char const *error_descriptions[] = {
     [FJ_OK] = "success",
-    [FJ_ERR_UNIMPLEMENTED] = "unsupported by the implementation",
-    [FJ_ERR_UNSUPPORTED] = "feature unsupported by the system",
-    [FJ_ERR_INTERNAL_FAILURE] = "internal failure",
-    [FJ_ERR_CANNOT_ALLOCATE] = "cannot allocate",
-    [FJ_ERR_INVALID_ALLOCATION] = "invalid allocation",
-    [FJ_ERR_CANNOT_OPEN_FILE] = "cannot open file",
-    [FJ_ERR_VECTOR_EMPTY] = "vector is empty, cannot remove",
-    [FJ_ERR_INVALID_INDEX] = "invalid index",
-    [FJ_ERR_CONNECTION_FAILED] = "connection failed",
-    [FJ_ERR_IOREAD_FAILED] = "I/O read operation failed",
-    [FJ_ERR_IOWRITE_FAILED] = "I/O write operation failed",
-    [FJ_ERR_WAITING_FAILED] = "waiting failed",
-    [FJ_ERR_REQUEST_REJECTED] = "request rejected",
+    [FJ_ERR_OUT_OF_MEMORY] = "out of memory",
+    [FJ_ERR_UNIMPLEMENTED] = "unimplemented",
+    [FJ_ERR_OPERATION_FAILED] = "operation failed",
+    [FJ_ERR_IO_FAILED] = "input/output failed",
+    [FJ_ERR_UNAVAILABLE] = "feature unavailable on the system",
+    [FJ_ERR_ACCESS_DENIED] = "access denied",
+    [FJ_ERR_CONCURRENT_ACCESS] = "concurrent access not permitted",
+    [FJ_ERR_INVALID_USAGE] = "invalid usage (bug)",
+    [FJ_ERR_INVALID_OPERATION] = "invalid operation",
     [FJ_ERR_INVALID_ENCODING] = "invalid text encoding",
-    [FJ_ERR_CANNOT_CREATE_TEMPFILE] = "cannot create temporary file",
-    [FJ_ERR_CANNOT_ALLOCATE_SHARED] = "cannot allocate shared memory",
-    [FJ_ERR_CANNOT_LOAD_LIBRARY] = "cannot load dynamic library",
 };
 
 
 char const *fj_err_get_description(fj_err_t error)
 {
-    if (error >= FJ_ERR_USER) {
-        return "user-defined error";
+    if (error >= FJ_LEN(error_descriptions) || error_descriptions[error] == NULL) {
+        return "unknown error (did someone forget to write a description?)";
     }
-
-    if (error >= FJ_ERR_PREDEFINED_COUNT) {
-        return "unknown future error (external implementation might have used a newer core base)";
-    }
-
-    if (error_descriptions[error] == NULL) {
-        return "some error (description not implemented yet)";
-    };
 
     return error_descriptions[error];
 }

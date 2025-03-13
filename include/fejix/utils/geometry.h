@@ -15,12 +15,10 @@
 #define FJ_DPM_FROM_DPI(DPI) ((double) (DPI) / FJ_INCH_LENGTH)
 
 
-/**
-    Concepts like text/interface scaling factor are mostly derived from the ratio to 96 DPI.
+/** Concepts like text/interface scaling factor are mostly derived from the ratio to 96 DPI.
     That is, if the current DPI is 120, the content of the appropriate size is considered to be
     scaled by 120 / 96 = 125% compared to the "unscaled" ("density-unaware") content rendered at
-    96 DPI.
-*/
+    96 DPI. */
 #define FJ_DPM_INTO_SCALING_FACTOR(DPM) (FJ_DPM_INTO_DPI(DPM) / FJ_LEGACY_DPI)
 
 #define FJ_DPM_FROM_SCALING_FACTOR(FACTOR) (FJ_DPM_FROM_DPI(FJ_LEGACY_DPI * (double) (FACTOR)))

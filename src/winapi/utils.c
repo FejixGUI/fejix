@@ -9,7 +9,7 @@
 
 fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 {
-    int32_t output_char_count = MultiByteToWideChar(
+    int32_t output_chars_length = MultiByteToWideChar(
         CP_UTF8,
         0, /* flags */
         string,
@@ -18,7 +18,7 @@ fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
         0     /* output chars count (unknown, asking for it) */
     );
 
-    FJ_TRY (FJ_REALLOC_UNINIT(utf16_string, output_char_count)) {
+    FJ_TRY (FJ_REALLOC_UNINIT(utf16_string, output_chars_length)) {
         return fj_result;
     }
 
@@ -28,7 +28,7 @@ fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
         string,
         -1, /* convert the entire string */
         *utf16_string,
-        output_char_count);
+        output_chars_length);
 
     if (result == 0) {
         FJ_FREE(utf16_string);

@@ -58,13 +58,13 @@ void fj_free(void **ptr)
 }
 
 
-fj_err_t fj_realloc_uninit(void **ptr, uint32_t item_count, size_t item_size)
+fj_err_t fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
 {
     if (item_size == 0) {
         return FJ_ERR_INVALID_USAGE;
     }
 
-    if (item_count == 0) {
+    if (items_length == 0) {
         if (ptr != NULL) {
             free((void *) ptr);
         }
@@ -73,7 +73,7 @@ fj_err_t fj_realloc_uninit(void **ptr, uint32_t item_count, size_t item_size)
         return FJ_OK;
     }
 
-    size_t size = item_count * item_size;
+    size_t size = items_length * item_size;
 
     if (*ptr == NULL) {
         return fj_alloc_uninit(ptr, size);
@@ -91,13 +91,13 @@ fj_err_t fj_realloc_uninit(void **ptr, uint32_t item_count, size_t item_size)
 
 
 fj_err_t fj_realloc_zeroed(
-    void **ptr, uint32_t old_item_count, uint32_t new_item_count, size_t item_size)
+    void **ptr, uint32_t old_items_length, uint32_t new_items_length, size_t item_size)
 {
     if (item_size == 0) {
         return FJ_ERR_INVALID_USAGE;
     }
 
-    if (new_item_count == 0) {
+    if (new_items_length == 0) {
         if (*ptr != NULL) {
             free((void *) *ptr);
         }
@@ -107,8 +107,8 @@ fj_err_t fj_realloc_zeroed(
     }
 
     void *old_ptr = *ptr;
-    size_t old_size = old_item_count * item_size;
-    size_t new_size = new_item_count * item_size;
+    size_t old_size = old_items_length * item_size;
+    size_t new_size = new_items_length * item_size;
 
     if (*ptr == NULL) {
         return fj_alloc_zeroed(ptr, new_size);

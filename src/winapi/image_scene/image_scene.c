@@ -5,12 +5,10 @@
 
 
 enum {
-    /**
-        lparam contains *HDWP - a pointer to a DeferWindowPos structure handle.
+    /** lparam contains *HDWP - a pointer to a DeferWindowPos structure handle.
         If a window needs to change its layout through DeferWindowPos, it should do
         BeginDeferWindowPos (if the handle is NULL) and then DeferWindowPos saving the result into
-        the handle behind the pointer.
-    */
+        the handle behind the pointer. */
     CUSTOM_WINDOW_MESSAGE_UPDATE = WM_USER,
 };
 

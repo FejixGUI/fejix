@@ -7,20 +7,17 @@
 #include <windows.h>
 
 
-/**
-    Converts UTF-8 to Windows multibyte ("wide") encoding.
+/** Converts UTF-8 to Windows multibyte ("wide") encoding.
     The returned string must be freed manually.
 
     :param out_utf16_string: Returns the converted string or NULL.
-    :returns: Error if the given string is invalid UTF-8.
-*/
+    :returns: Error if the given string is invalid UTF-8. */
 fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *out_utf16_string);
 
 /** :param out_string: Returns the converted UTF-8 string or NULL. */
 fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **out_string);
 
-/**
-    Registers a window class and creates a window with it.
+/** Registers a window class and creates a window with it.
 
     :param class_info:
         If NULL and the class name in ``window_info`` is NULL, a new class with default parameters
@@ -43,15 +40,12 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **out_string);
 
         Some fields, if unspecified, fall back to the defaults:
         * class name: the special name of a newly created class (if it is created).
-        * instance: ``GetModulehandle(NULL)``.
-*/
+        * instance: ``GetModulehandle(NULL)``. */
 fj_err_t fj_winapi_window_create(
     HWND *out_window, WNDCLASSEX const *class_info, CREATESTRUCT const *window_info);
 
-/**
-    Destroys the window. If the library created a window class for that specific window with
-    ``fj_winapi_window_create()``, the class is also destroyed.
-*/
+/** Destroys the window. If the library created a window class for that specific window with
+    ``fj_winapi_window_create()``, the class is also destroyed. */
 fj_err_t fj_winapi_window_destroy(HWND window);
 
 void fj_winapi_window_set_data(HWND window, void *data);

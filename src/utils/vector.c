@@ -10,8 +10,8 @@ static void shift_tail(
 {
     void *src = (uint8_t *) ptr + source_index * item_size;
     void *dst = (uint8_t *) ptr + destination_index * item_size;
-    uint32_t item_move_count = length - source_index;
-    memmove(dst, src, item_size * item_move_count);
+    uint32_t moved_items_length = length - source_index;
+    memmove(dst, src, item_size * moved_items_length);
 }
 
 
@@ -65,22 +65,6 @@ fj_err_t fj_vector_shrink_at(
     *length += 1;
 
     return FJ_OK;
-}
-
-
-fj_err_t fj_vector_expand(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
-{
-    return fj_vector_expand_at(items, length, capacity, *length, item_size);
-}
-
-
-fj_err_t fj_vector_shrink(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
-{
-    if (*length == 0) {
-        return FJ_ERR_INVALID_USAGE;
-    }
-
-    return fj_vector_shrink_at(items, length, capacity, *length - 1, item_size);
 }
 
 
