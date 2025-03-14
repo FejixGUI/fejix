@@ -10,18 +10,18 @@ project(
 include(GNUInstallDirs)
 
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library type. If loader is enabled, it makes other implementations build as shared.")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library type. If loader is enabled, it makes other ports build as shared.")
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
-set(fejix_build_winapi OFF CACHE BOOL "Build WinAPI ") # TODO how to call a backend? implementation?
+set(fejix_build_winapi OFF CACHE BOOL "Build WinAPI port")
 
-set(fejix_detect_implementations ON CACHE BOOL "Enable the implementations common for the target OS")
+set(fejix_detect_ports ON CACHE BOOL "Enable the library ports common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
 
-if("${fejix_detect_implementations}")
+if("${fejix_detect_ports}")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "^Windows$|MSYS|Cygwin")
         set(fejix_build_winapi ON)
     elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|BSD|DragonFly")
@@ -68,7 +68,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/build.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/src/utils/build.cmake")
 
-if("winapi" IN_LIST "${fejix_implementations}")
+if("${fejix_build_winapi}")
     include("${CMAKE_CURRENT_LIST_DIR}/winapi/build.cmake")
 endif()
 

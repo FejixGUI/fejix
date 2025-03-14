@@ -5,6 +5,15 @@
 #include <fejix/core.h>
 
 
+enum {
+    FJ_IO_CONNECTION_IDLE,
+    FJ_IO_CONNECTION_FINISH,
+    FJ_IO_CONNECTION_PAUSE,
+    FJ_IO_CONNECTION_HIBERNATE,
+    FJ_IO_CONNECTION_LOW_MEMORY,
+};
+
+
 typedef uint32_t fj_io_protocol_id_t;
 
 typedef uint32_t fj_io_property_id_t;
@@ -19,9 +28,9 @@ struct fj_io_element;
 
 typedef fj_err_t (*fj_io_event_callback_fn_t)(
     struct fj_io_connection *connection,
-    struct fj_io_element *element,
     fj_io_event_id_t event_id,
-    void const *event_data);
+    struct fj_io_element *opt_element,
+    void const *opt_event_data);
 
 
 struct fj_io_port {
@@ -30,12 +39,16 @@ struct fj_io_port {
 
     void const *(*get_protocol)(fj_io_protocol_id_t id);
 
-    fj_err_t (*create_connection)(
+    fj_err_t (*connect)(
         struct fj_io_connection **out_connection, fj_io_event_callback_fn_t event_callback);
 
-    fj_err_t (*destroy_connection)(struct fj_io_connection *connection);
+    fj_err_t (*disconnect)(struct fj_io_connection *connection);
 
-    fj_err_t (*run_connection)(struct fj_io_connection *connection);
+    fj_err_t (*serve)(struct fj_io_connection *connection);
+
+    fj_err_t (*idle)(struct fj_io_connection *connection);
+
+    fj_err_t (*set_ready_to_finish)(struct fj_io_connection *connection);
 
     fj_err_t (*synchronize_elements)(
         struct fj_io_connection *connection,

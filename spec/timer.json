@@ -1,0 +1,92 @@
+{
+    "name": "timer",
+    "id": 1,
+    "types": [
+        {
+            "name": "timer",
+            "struct": "opaque"
+        },
+        {
+            "name": "timer_type",
+            "enum": [
+                "generic",
+                "precise"
+            ]
+        }
+    ],
+    "methods": [
+        {
+            "name": "create_timer",
+            "args": [
+                {
+                    "name": "timer",
+                    "out": true,
+                    "type": {
+                        "ref_to_mut": "timer"
+                    }
+                },
+                {
+                    "name": "timer_type",
+                    "type": "timer_type"
+                }
+            ]
+        },
+        {
+            "name": "destroy_timer",
+            "args": [
+                {
+                    "name": "timer",
+                    "type": {
+                        "ref_to_mut": "timer"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "set_interval",
+            "args": [
+                {
+                    "name": "timer",
+                    "type": {
+                        "ref_to_mut": "timer"
+                    }
+                },
+                {
+                    "name": "interval",
+                    "type": "microseconds"
+                }
+            ]
+        },
+        {
+            "name": "set_periodic",
+            "args": [
+                {
+                    "name": "timer",
+                    "type": {
+                        "ref_to_mut": "timer"
+                    }
+                },
+                {
+                    "name": "periodic",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "get_remaining_time",
+            "args": [
+                {
+                    "name": "timer",
+                    "type": {
+                        "ref_to_mut": "timer"
+                    }
+                },
+                {
+                    "name": "remaining_time",
+                    "out": true,
+                    "type": "microseconds"
+                }
+            ]
+        }
+    ]
+}
