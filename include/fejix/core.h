@@ -46,8 +46,6 @@
     for (fj_err_t fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
         if (fj_result != FJ_OK)  // Outside of for loop to avoid dead code if the block returns
 
-#define FJ_USERDATA(STRUCT_PTR) (*(void **) (void *) (STRUCT_PTR))
-
 /** Version triple. */
 typedef uint32_t fj_version_t;
 

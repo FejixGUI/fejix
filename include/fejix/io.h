@@ -13,6 +13,10 @@ enum {
     FJ_IO_CONNECTION_LOW_MEMORY,
 };
 
+enum {
+    FJ_IO_ELEMENT_USERDATA,
+};
+
 
 typedef uint32_t fj_io_protocol_id_t;
 
@@ -26,11 +30,12 @@ struct fj_io_connection;
 struct fj_io_element;
 
 
-typedef fj_err_t (*fj_io_event_callback_fn_t)(
+typedef fj_err_t (*fj_io_event_callback_t)(
     struct fj_io_connection *connection,
     fj_io_event_id_t event_id,
+    void const *opt_event_data,
     struct fj_io_element *opt_element,
-    void const *opt_event_data);
+    void *opt_callback_data);
 
 
 struct fj_io_port {
@@ -40,7 +45,9 @@ struct fj_io_port {
     void const *(*get_protocol)(fj_io_protocol_id_t id);
 
     fj_err_t (*connect)(
-        struct fj_io_connection **out_connection, fj_io_event_callback_fn_t event_callback);
+        struct fj_io_connection **out_connection,
+        fj_io_event_callback_t event_callback,
+        void *opt_callback_data);
 
     fj_err_t (*disconnect)(struct fj_io_connection *connection);
 

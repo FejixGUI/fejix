@@ -1,10 +1,10 @@
 {
-    "name": "timer",
-    "id": 1,
+    "protocol_name": "timer",
+    "protocol_id": 1,
     "types": [
         {
             "name": "timer",
-            "struct": "opaque"
+            "is_special": "element"
         },
         {
             "name": "timer_type",
@@ -14,20 +14,28 @@
             ]
         }
     ],
+    "events": [
+        {
+            "name": "timeout",
+            "args": [
+                {
+                    "name": "timer",
+                    "type": "timer"
+                }
+            ]
+        }
+    ],
     "methods": [
         {
             "name": "create_timer",
             "args": [
                 {
                     "name": "timer",
-                    "out": true,
-                    "type": {
-                        "ref_to_mut": "timer"
-                    }
+                    "returns": "timer"
                 },
                 {
                     "name": "timer_type",
-                    "type": "timer_type"
+                    "accepts": "timer_type"
                 }
             ]
         },
@@ -36,9 +44,7 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": {
-                        "ref_to_mut": "timer"
-                    }
+                    "accepts": "timer"
                 }
             ]
         },
@@ -47,13 +53,11 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": {
-                        "ref_to_mut": "timer"
-                    }
+                    "accepts": "timer"
                 },
                 {
                     "name": "interval",
-                    "type": "microseconds"
+                    "accepts": "microseconds"
                 }
             ]
         },
@@ -62,13 +66,11 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": {
-                        "ref_to_mut": "timer"
-                    }
+                    "accepts": "timer"
                 },
                 {
                     "name": "periodic",
-                    "type": "bool"
+                    "accepts": "bool"
                 }
             ]
         },
@@ -77,14 +79,11 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": {
-                        "ref_to_mut": "timer"
-                    }
+                    "accepts": "timer"
                 },
                 {
                     "name": "remaining_time",
-                    "out": true,
-                    "type": "microseconds"
+                    "returns": "microseconds"
                 }
             ]
         }
