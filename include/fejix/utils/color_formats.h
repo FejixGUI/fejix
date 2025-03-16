@@ -1,13 +1,11 @@
-#ifndef FEJIX_UTILS_COLOR_H_INCLUDED
-#define FEJIX_UTILS_COLOR_H_INCLUDED
+#ifndef FEJIX_UTILS_COLOR_FORMATS_H_INCLUDED
+#define FEJIX_UTILS_COLOR_FORMATS_H_INCLUDED
 
 
 #include <fejix/core.h>
 
 
-typedef uint32_t fj_color_format_t;
-
-/* Borrowed from the Vulkan specification of VkFormat by Khronos. */
+/* Borrowed from the Vulkan specification from Khronos. */
 enum {
     FJ_COLOR_FORMAT_R4G4_UNORM_PACK8,
     FJ_COLOR_FORMAT_R4G4B4A4_UNORM_PACK16,

@@ -20,6 +20,7 @@ enum {
     FJ_TIMER_TIMEOUT,
 };
 
+
 struct fj_timer_timeout {
     uint8_t _unused;
 };
@@ -40,7 +41,7 @@ struct fj_timer {
     fj_err_t (*set_interval)(
         struct fj_io_connection *conn,
         struct fj_io_element *timer,
-        fj_microseconds_t interval
+        fj_time_t interval
     );
 
     fj_err_t (*set_periodic)(
@@ -52,7 +53,7 @@ struct fj_timer {
     fj_err_t (*get_remaining_time)(
         struct fj_io_connection *conn,
         struct fj_io_element *timer,
-        fj_microseconds_t *out_remaining_time
+        fj_time_t *out_remaining_time
     );
 };
 

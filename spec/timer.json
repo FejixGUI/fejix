@@ -1,4 +1,5 @@
 {
+    "format": "fejix_protocol-0.1",
     "name": "timer",
     "id": 1,
     "enums": [
@@ -49,7 +50,7 @@
                 },
                 {
                     "name": "interval",
-                    "type": "microseconds"
+                    "type": "time"
                 }
             ]
         },
@@ -75,7 +76,7 @@
                 },
                 {
                     "name": "remaining_time",
-                    "type": "microseconds",
+                    "type": "time",
                     "out": true
                 }
             ]

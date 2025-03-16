@@ -42,17 +42,14 @@ enum {
     {%- endfor %}
 };
 
-{%- for event in protocol["events"] %}
+{%- endif -%}
 
-struct fj_{{ event["name"] }} {
-    {%- if "args" in event -%}
-    {%- for arg in event["args"] %}
-    {{ annotate_with_type(arg) }};
-    {%- endfor -%}
-    {%- else %}
-    uint8_t _unused;
-    {%- endif %}
-};
+
+
+{%- if "returned_objects" in protocol %}
+{% for obj in protocol["returned_objects"] %}
+
+struct fj_{{ obj["name"] }};
 {%- endfor -%}
 {%- endif -%}
 
@@ -71,10 +68,19 @@ struct fj_{{ struct["name"] }} {
 
 
 
-{%- if "returned_objects" in protocol %}
-{% for obj in protocol["returned_objects"] %}
+{%- if "events" in protocol %}
 
-struct fj_{{ obj["name"] }};
+
+{% for event in protocol["events"] -%}
+struct fj_{{ event["name"] }} {
+    {%- if "args" in event -%}
+    {%- for arg in event["args"] %}
+    {{ annotate_with_type(arg) }};
+    {%- endfor -%}
+    {%- else %}
+    uint8_t _unused;
+    {%- endif %}
+};
 {%- endfor -%}
 {%- endif -%}
 
