@@ -1,0 +1,109 @@
+#ifndef FJ_{{protocol["name"]|upper}}_H_INCLUDED
+#define FJ_{{protocol["name"]|upper}}_H_INCLUDED
+
+
+{% if "dependencies" in protocol -%}
+    {%- for dep in protocol["dependencies"] -%}
+        #include <fejix/protocols/{{ dep["name"] }}.h>
+    {% endfor -%}
+{%- else -%}
+    #include <fejix/io.h>
+{%- endif -%}
+
+
+{%- if True %}
+
+
+enum { FJ_{{ protocol["name"]|upper }}_PROTOCOL = {{ protocol["id"] }} };
+{%- endif -%}
+
+
+{%- if "enums" in protocol %}
+{% for enum in protocol["enums"] %}
+
+typedef uint32_t fj_{{ enum["name"] }}_t;
+
+enum {
+    {%- for variant in enum["variants"] %}
+    FJ_{{ enum_without_suffix(enum)|upper }}_{{ variant|upper }},
+    {%- endfor %}
+};
+{%- endfor -%}
+{%- endif -%}
+
+
+
+{%- if "events" in protocol %}
+
+
+enum {
+    {%- for event in protocol["events"] %}
+    FJ_{{ event["name"]|upper }},
+    {%- endfor %}
+};
+
+{%- for event in protocol["events"] %}
+
+struct fj_{{ event["name"] }} {
+    {%- if "args" in event -%}
+    {%- for arg in event["args"] %}
+    {{ annotate_with_type(arg) }};
+    {%- endfor -%}
+    {%- else %}
+    uint8_t _unused;
+    {%- endif %}
+};
+{%- endfor -%}
+{%- endif -%}
+
+
+
+{%- if "structs" in protocol %}
+{% for struct in protocol["structs"] %}
+
+struct fj_{{ struct["name"] }} {
+    {%- for field in struct["fields"] %}
+    {{ annotate_with_type(field) }};
+    {%- endfor %}
+};
+{%- endfor -%}
+{%- endif -%}
+
+
+
+{%- if "returned_objects" in protocol %}
+{% for obj in protocol["returned_objects"] %}
+
+struct fj_{{ obj["name"] }};
+{%- endfor -%}
+{%- endif -%}
+
+
+
+{%- if "methods" in protocol %}
+
+
+struct fj_{{ protocol["name"] }} {
+    {%- for method in protocol["methods"] %}
+    fj_err_t (*{{ method["name"] }})(
+        struct fj_io_connection *conn
+        {%- if "args" in method -%} , {%- endif %}
+        {%- for arg in method["args"] %}
+        {{ annotate_with_type(arg) }}
+        {%- if not loop.last -%} , {%- endif %}
+        {%- endfor %}
+    );
+    {% if not loop.last -%}
+    {% endif -%}
+    {%- endfor -%}
+};
+
+{%- endif -%}
+
+
+
+{%- if True %}
+
+
+#endif
+{% endif -%}

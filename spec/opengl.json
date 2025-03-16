@@ -1,0 +1,32 @@
+{
+    "name": "opengl",
+    "id": 17,
+    "enums": [
+        {
+            "name": "image_attribute",
+            "suffix": "_attribute",
+            "variants": [
+                "color_format",
+                "depth_bits",
+                "stencil_bits"
+            ]
+        }
+    ],
+    "returned_objects": [
+        {
+            "name": "opengl_swapchain"
+        }
+    ],
+    "methods": [
+        {
+            "name": "create_swapchain",
+            "args": [
+                {
+                    "name": "swapchain",
+                    "out": true,
+                    "type": "returned_object:opengl_swapchain"
+                }
+            ]
+        }
+    ]
+}

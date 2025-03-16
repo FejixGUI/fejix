@@ -1,14 +1,11 @@
 {
-    "protocol_name": "timer",
-    "protocol_id": 1,
-    "types": [
-        {
-            "name": "timer",
-            "is_special": "element"
-        },
+    "name": "timer",
+    "id": 1,
+    "enums": [
         {
             "name": "timer_type",
-            "enum": [
+            "suffix": "_type",
+            "variants": [
                 "generic",
                 "precise"
             ]
@@ -16,13 +13,7 @@
     ],
     "events": [
         {
-            "name": "timeout",
-            "args": [
-                {
-                    "name": "timer",
-                    "type": "timer"
-                }
-            ]
+            "name": "timer_timeout"
         }
     ],
     "methods": [
@@ -31,11 +22,12 @@
             "args": [
                 {
                     "name": "timer",
-                    "returns": "timer"
+                    "type": "io_element",
+                    "out": true
                 },
                 {
                     "name": "timer_type",
-                    "accepts": "timer_type"
+                    "type": "enum:timer_type"
                 }
             ]
         },
@@ -44,7 +36,7 @@
             "args": [
                 {
                     "name": "timer",
-                    "accepts": "timer"
+                    "type": "io_element"
                 }
             ]
         },
@@ -53,11 +45,11 @@
             "args": [
                 {
                     "name": "timer",
-                    "accepts": "timer"
+                    "type": "io_element"
                 },
                 {
                     "name": "interval",
-                    "accepts": "microseconds"
+                    "type": "microseconds"
                 }
             ]
         },
@@ -66,11 +58,11 @@
             "args": [
                 {
                     "name": "timer",
-                    "accepts": "timer"
+                    "type": "io_element"
                 },
                 {
                     "name": "periodic",
-                    "accepts": "bool"
+                    "type": "bool"
                 }
             ]
         },
@@ -79,11 +71,12 @@
             "args": [
                 {
                     "name": "timer",
-                    "accepts": "timer"
+                    "type": "io_element"
                 },
                 {
                     "name": "remaining_time",
-                    "returns": "microseconds"
+                    "type": "microseconds",
+                    "out": true
                 }
             ]
         }

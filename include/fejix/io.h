@@ -5,6 +5,10 @@
 #include <fejix/core.h>
 
 
+#define FJ_PROPERTY_PROTOCOL_ID(PROPERTY_ID) (((PROPERTY_ID) >> 16) & 0xFFFF)
+#define FJ_EVENT_PROTOCOL_ID(EVENT_ID) (((EVENT_ID) >> 16) & 0xFFFF)
+
+
 enum {
     FJ_IO_CONNECTION_IDLE,
     FJ_IO_CONNECTION_FINISH,
@@ -18,7 +22,7 @@ enum {
 };
 
 
-typedef uint32_t fj_io_protocol_id_t;
+typedef uint16_t fj_io_protocol_id_t;
 
 typedef uint32_t fj_io_property_id_t;
 
