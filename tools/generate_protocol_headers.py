@@ -1,5 +1,5 @@
 import argparse, os, pathlib, json, jinja2
-
+import traceback
 
 PATH = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
@@ -8,6 +8,8 @@ supported_formats = [
 ]
 
 builtin_types = {
+    "any": "void const *",
+    "anymut": "void *",
     "int8": "int8_t",
     "uint8": "uint8_t",
     "int16": "int16_t",
@@ -18,11 +20,18 @@ builtin_types = {
     "uint64": "uint64_t",
     "bool": "bool",
     "string": "char const *",
-    "time": "fj_time_t",
-    "density": "fj_density_t",
-    "color_format": "fj_color_format_t",
-    "io_element": "struct fj_io_element *",
-    # Structs like 'size' or 'rect' work just normally when using 'struct:' notation
+    "stringmut": "char *",
+}
+
+type_containers = {
+    "ref": "const *",
+    "refmut": "*",
+    "array": "const *",
+    "arraymut": "*",
+    "opt_ref": "const *",
+    "opt_refmut": "*",
+    "opt_array": "const *",
+    "opt_arraymut": "*",
 }
 
 
@@ -34,21 +43,20 @@ def main():
     )
 
     argparser.add_argument('-d', '--destdir', required = True)
+    argparser.add_argument('-v', '--verbose', action = "store_true")
     argparser.add_argument('protocol_files', nargs = "+")
 
     args = argparser.parse_args()
 
     env = jinja2.Environment(
         loader = jinja2.FileSystemLoader(PATH),
-        trim_blocks = False,
+        trim_blocks = True,
         lstrip_blocks = True
     )
 
     template = env.get_template("protocol_header.h.jinja")
 
     for protocol_file in args.protocol_files:
-        print("Processing " + protocol_file + "...")
-
         try:
             file_stem = pathlib.Path(protocol_file).stem
             header_file = os.path.join(args.destdir, file_stem + ".h")
@@ -64,14 +72,20 @@ def main():
             output = template.render(
                 protocol = protocol,
                 enum_without_suffix = enum_without_suffix,
-                annotate_with_type = annotate_with_type
+                make_type = make_type
             )
 
             open(header_file, "w").write(output)
 
         except Exception as e:
-            print('[Error] ' + e.args[0])
-            print('[Warning] File skipped')
+            print("Error in '" + str(protocol_file) + "': " + ", ".join(e.args))
+            print("File '" + str(protocol_file) + "' skipped due to errors")
+
+            if args.verbose:
+                traceback.print_exception(e)
+            else:
+                print("Use --verbose to print the full traceback")
+
 
 
 def enum_without_suffix(enum: dict) -> str:
@@ -81,70 +95,29 @@ def enum_without_suffix(enum: dict) -> str:
     return enum["name"][ : -len(enum["suffix"])]
 
 
-def alphabetic_separator(type_string: str) -> str:
-    if type_string[-1].isalpha():
-        return " "
-
-    return ""
-
-def star_separator(type_string: str) -> str:
-    if type_string[-1] == "*":
-        return ""
-
-    return " "
-
-# arg may be a struct field, event arg or method arg of form:
-#   [module::[typeclass:]]type
-# Examples:
-#   bool
-#   uint32
-#   struct:my_struct
-#   some_protocol::enum:my_enum
-def annotate_with_type(arg: dict) -> str:
+# Accepts a list of type components (e.g. ["opt_array", "refmut", "mytype"])
+# Returns a corresponding C type string (e.g. fj_mytype_t * const*)
+def make_type(type_spec: list, output_argument: bool = False) -> str:
     out = ""
 
-    type = arg["type"]
-    typeclass = ""
-    _module = ""
+    for index, component in enumerate(reversed(type_spec)):
+        if index == 0:
+            if component in builtin_types:
+                out += builtin_types[component]
+                continue
 
-    if "::" in type:
-        (_module, type) = type.split("::")
+            out += "fj_" + component + "_t"
 
-    if ":" in type:
-        (typeclass, type) = type.split(":")
+            continue
 
-    if typeclass == "struct":
-        out += "struct fj_" + type
-    elif typeclass == "returned_object":
-        out += "struct fj_" + type + " *"
-    elif typeclass == "enum":
-        out += "fj_" + type + "_t"
-    elif typeclass == "":
-        if type in builtin_types:
-            out += builtin_types[type]
-        else:
-            raise Exception("Unknown type '" + type + "' in '" + arg["type"] + "'")
-    else:
-        raise Exception("Unknown typeclass '" + typeclass + "' in '" + arg["type"] + "'")
+        if component in type_containers:
+            out += " " + type_containers[component]
+            continue
 
-    if typeclass == "struct":
-        if not "out" in arg:
-            out += alphabetic_separator(out)
-            out += "const"
+        raise Exception("Unknown type '" + component + "' in '" + ",".join(type_spec) + "'")
 
-    if "out" in arg:
-        out += star_separator(out)
+    if output_argument:
         out += "*"
-
-    out += alphabetic_separator(out)
-
-    if "optional" in arg:
-        out += "opt_"
-
-    if "out" in arg:
-        out += "out_"
-
-    out += arg["name"]
 
     return out
 

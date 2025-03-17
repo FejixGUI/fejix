@@ -17,15 +17,12 @@ enum {
 };
 
 
-struct fj_opengl_swapchain;
+typedef struct fj_opengl_swapchain fj_opengl_swapchain_t;
 
 
-struct fj_opengl {
-    fj_err_t (*create_swapchain)(
-        struct fj_io_connection *conn,
-        struct fj_opengl_swapchain **out_swapchain
-    );
-};
+typedef struct fj_opengl {
+    fj_err_t (*create_swapchain)(fj_io_connection_t *conn, fj_opengl_swapchain_t *out_swapchain);
+} fj_opengl_t;
 
 
 #endif

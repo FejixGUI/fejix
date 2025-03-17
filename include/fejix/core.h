@@ -150,30 +150,30 @@ typedef double fj_density_t;
 typedef uint32_t fj_color_format_t;
 
 
-struct fj_position {
+typedef struct fj_position {
     uint32_t x;
     uint32_t y;
-};
+} fj_position_t;
 
-struct fj_offset {
+typedef struct fj_offset {
     int32_t x;
     int32_t y;
-};
+} fj_offset_t;
 
-struct fj_size {
+typedef struct fj_size {
     uint32_t width;
     uint32_t height;
-};
+} fj_size_t;
 
-struct fj_rect {
+typedef struct fj_rect {
     struct fj_position position;
     struct fj_size size;
-};
+} fj_rect_t;
 
-struct fj_viewport {
+typedef struct fj_viewport {
     struct fj_offset offset;
     struct fj_size size;
-};
+} fj_viewport_t;
 
 
 /** Always returns a valid printable string, even for invalid error IDs. */

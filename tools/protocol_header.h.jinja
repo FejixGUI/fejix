@@ -2,114 +2,98 @@
 #define FJ_{{protocol["name"]|upper}}_H_INCLUDED
 
 
-{% if "dependencies" in protocol -%}
-    {%- for dep in protocol["dependencies"] -%}
-        #include <fejix/protocols/{{ dep["name"] }}.h>
-    {% endfor -%}
-{%- else -%}
+{% if "dependencies" in protocol %}
+    {% for dep in protocol["dependencies"] %}
+        #include <fejix/protocols/{{ dep }}.h>
+    {% endfor %}
+{% else %}
     #include <fejix/io.h>
-{%- endif -%}
-
-
-{%- if True %}
+{% endif %}
 
 
 enum { FJ_{{ protocol["name"]|upper }}_PROTOCOL = {{ protocol["id"] }} };
-{%- endif -%}
 
 
-{%- if "enums" in protocol %}
 {% for enum in protocol["enums"] %}
+    typedef uint32_t fj_{{ enum["name"] }}_t;
 
-typedef uint32_t fj_{{ enum["name"] }}_t;
+    enum {
+        {% for variant in enum["variants"] %}
+            FJ_{{ enum_without_suffix(enum)|upper }}_{{ variant|upper }},
+        {% endfor %}
+    };
 
-enum {
-    {%- for variant in enum["variants"] %}
-    FJ_{{ enum_without_suffix(enum)|upper }}_{{ variant|upper }},
-    {%- endfor %}
-};
-{%- endfor -%}
-{%- endif -%}
-
-
-
-{%- if "events" in protocol %}
-
-
-enum {
-    {%- for event in protocol["events"] %}
-    FJ_{{ event["name"]|upper }},
-    {%- endfor %}
-};
-
-{%- endif -%}
+    {# ^^^ Keep empty line ^^^ #}
+{% endfor %}
 
 
 
-{%- if "returned_objects" in protocol %}
+{% if "events" in protocol %}
+    enum {
+        {% for event in protocol["events"] %}
+            FJ_{{ protocol["name"]|upper }}_EVENT_{{ event["name"]|upper }},
+        {% endfor %}
+    };
+{% endif %}
+
+
+
+{% if "properties" in protocol %}
+    enum {
+        {% for prop in protocol["properties"] %}
+            FJ_{{ protocol["name"]|upper }}_PROP_{{ prop["name"]|upper }},
+        {% endfor %}
+    };
+{% endif %}
+
+
+
 {% for obj in protocol["returned_objects"] %}
+    typedef struct fj_{{ obj["name"] }} fj_{{ obj["name"] }}_t;
 
-struct fj_{{ obj["name"] }};
-{%- endfor -%}
-{%- endif -%}
+    {# ^^^ Keep empty line ^^^ #}
+{% endfor %}
 
 
 
-{%- if "structs" in protocol %}
+{% for alias in protocol["aliases"] %}
+    typedef {{ make_type(alias["type"]) }} fj_{{ alias["name"] }}_t;
+
+    {# ^^^ Keep empty line ^^^ #}
+{% endfor %}
+
+
+
 {% for struct in protocol["structs"] %}
+    typedef struct fj_{{ struct["name"] }} {
+        {% for member in struct["members"] %}
+            {{ make_type(member["type"]) }} {{ member["name"] }};
+        {% endfor %}
+    } fj_{{ struct["name"] }}_t;
 
-struct fj_{{ struct["name"] }} {
-    {%- for field in struct["fields"] %}
-    {{ annotate_with_type(field) }};
-    {%- endfor %}
-};
-{%- endfor -%}
-{%- endif -%}
-
-
-
-{%- if "events" in protocol %}
-
-
-{% for event in protocol["events"] -%}
-struct fj_{{ event["name"] }} {
-    {%- if "args" in event -%}
-    {%- for arg in event["args"] %}
-    {{ annotate_with_type(arg) }};
-    {%- endfor -%}
-    {%- else %}
-    uint8_t _unused;
-    {%- endif %}
-};
-{%- endfor -%}
-{%- endif -%}
+    {# ^^^ Keep empty line ^^^ #}
+{% endfor %}
 
 
 
-{%- if "methods" in protocol %}
+{% if "methods" in protocol %}
+    typedef struct fj_{{ protocol["name"] }} {
+        {% for method in protocol["methods"] %}
 
+            {# ^^^ Keep empty line ^^^ #}
+            fj_err_t (*{{ method["name"] }})(
+                fj_io_connection_t *conn
+                {% if "args" in method %} , {% endif %}
+                {% for arg in method["args"] %}
+                    {{ make_type(arg["type"], "out" in arg) }} {{ "out_" if "out" in arg else "" }}{{ arg["name"] }}
+                    {% if not loop.last %} , {% endif %}
+                {% endfor %}
+            );
+        {% endfor %}
+    } fj_{{ protocol["name"] }}_t;
+{% endif %}
 
-struct fj_{{ protocol["name"] }} {
-    {%- for method in protocol["methods"] %}
-    fj_err_t (*{{ method["name"] }})(
-        struct fj_io_connection *conn
-        {%- if "args" in method -%} , {%- endif %}
-        {%- for arg in method["args"] %}
-        {{ annotate_with_type(arg) }}
-        {%- if not loop.last -%} , {%- endif %}
-        {%- endfor %}
-    );
-    {% if not loop.last -%}
-    {% endif -%}
-    {%- endfor -%}
-};
-
-{%- endif -%}
-
-
-
-{%- if True %}
 
 
 #endif
-{% endif -%}
+{{ "\n" }}

@@ -23,12 +23,17 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": "io_element",
+                    "type": [
+                        "refmut",
+                        "io_element"
+                    ],
                     "out": true
                 },
                 {
                     "name": "timer_type",
-                    "type": "enum:timer_type"
+                    "type": [
+                        "timer_type"
+                    ]
                 }
             ]
         },
@@ -37,7 +42,10 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": "io_element"
+                    "type": [
+                        "refmut",
+                        "io_element"
+                    ]
                 }
             ]
         },
@@ -46,11 +54,16 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": "io_element"
+                    "type": [
+                        "refmut",
+                        "io_element"
+                    ]
                 },
                 {
                     "name": "interval",
-                    "type": "time"
+                    "type": [
+                        "time"
+                    ]
                 }
             ]
         },
@@ -59,11 +72,16 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": "io_element"
+                    "type": [
+                        "refmut",
+                        "io_element"
+                    ]
                 },
                 {
                     "name": "periodic",
-                    "type": "bool"
+                    "type": [
+                        "bool"
+                    ]
                 }
             ]
         },
@@ -72,11 +90,16 @@
             "args": [
                 {
                     "name": "timer",
-                    "type": "io_element"
+                    "type": [
+                        "refmut",
+                        "io_element"
+                    ]
                 },
                 {
                     "name": "remaining_time",
-                    "type": "time",
+                    "type": [
+                        "time"
+                    ],
                     "out": true
                 }
             ]

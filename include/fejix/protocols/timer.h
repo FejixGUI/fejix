@@ -17,45 +17,23 @@ enum {
 
 
 enum {
-    FJ_TIMER_TIMEOUT,
+    FJ_TIMER_EVENT_TIMER_TIMEOUT,
 };
 
 
-struct fj_timer_timeout {
-    uint8_t _unused;
-};
-
-
-struct fj_timer {
+typedef struct fj_timer {
     fj_err_t (*create_timer)(
-        struct fj_io_connection *conn,
-        struct fj_io_element **out_timer,
-        fj_timer_type_t timer_type
-    );
+        fj_io_connection_t *conn, fj_io_element_t **out_timer, fj_timer_type_t timer_type);
 
-    fj_err_t (*destroy_timer)(
-        struct fj_io_connection *conn,
-        struct fj_io_element *timer
-    );
+    fj_err_t (*destroy_timer)(fj_io_connection_t *conn, fj_io_element_t *timer);
 
-    fj_err_t (*set_interval)(
-        struct fj_io_connection *conn,
-        struct fj_io_element *timer,
-        fj_time_t interval
-    );
+    fj_err_t (*set_interval)(fj_io_connection_t *conn, fj_io_element_t *timer, fj_time_t interval);
 
-    fj_err_t (*set_periodic)(
-        struct fj_io_connection *conn,
-        struct fj_io_element *timer,
-        bool periodic
-    );
+    fj_err_t (*set_periodic)(fj_io_connection_t *conn, fj_io_element_t *timer, bool periodic);
 
     fj_err_t (*get_remaining_time)(
-        struct fj_io_connection *conn,
-        struct fj_io_element *timer,
-        fj_time_t *out_remaining_time
-    );
-};
+        fj_io_connection_t *conn, fj_io_element_t *timer, fj_time_t *out_remaining_time);
+} fj_timer_t;
 
 
 #endif

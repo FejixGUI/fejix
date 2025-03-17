@@ -25,7 +25,9 @@
                 {
                     "name": "swapchain",
                     "out": true,
-                    "type": "returned_object:opengl_swapchain"
+                    "type": [
+                        "opengl_swapchain"
+                    ]
                 }
             ]
         }
