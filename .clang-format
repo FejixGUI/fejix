@@ -172,10 +172,10 @@ Macros:
     # handle the column limit correctly.
     - 'FJ_OPENGL_CALL=*********const'
 
-    # This tricks clang-format into leaving this macro on a separate line.
+    # This tricks clang-format into leaving these macros on their own lines.
     # clang-format does not support proper custom attributes as of now.
     - 'FJ_PUBLIC=[[xxxxx]]'
-    - 'FJ_PUBLIC_INLINE=[[xxxxxxxxxxxx]]'
+    - 'FJ_INLINE=[[xxxxx]]'
 
 IfMacros:
     - 'FJ_TRY'

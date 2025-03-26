@@ -10,11 +10,11 @@
 
 
 enum {
-    FJ_IO_CONNECTION_IDLE,
-    FJ_IO_CONNECTION_FINISH,
-    FJ_IO_CONNECTION_PAUSE,
-    FJ_IO_CONNECTION_HIBERNATE,
-    FJ_IO_CONNECTION_LOW_MEMORY,
+    FJ_IO_CONNECTION_FINISH = 0,
+    FJ_IO_CONNECTION_IDLE = 1,
+    FJ_IO_CONNECTION_PAUSE = 2,
+    FJ_IO_CONNECTION_HIBERNATE = 3,
+    FJ_IO_CONNECTION_LOW_MEMORY = 4,
 };
 
 enum {
@@ -35,11 +35,11 @@ typedef struct fj_io_element fj_io_element_t;
 
 
 typedef fj_err_t (*fj_io_event_callback_t)(
+    void *opt_callback_data,
     fj_io_connection_t *connection,
     fj_io_event_id_t event_id,
     void const *opt_event_data,
-    fj_io_element_t *opt_element,
-    void *opt_callback_data);
+    fj_io_element_t *opt_element);
 
 
 typedef struct fj_io_port {
@@ -55,11 +55,11 @@ typedef struct fj_io_port {
 
     fj_err_t (*disconnect)(fj_io_connection_t *connection);
 
-    fj_err_t (*serve)(fj_io_connection_t *connection);
+    fj_err_t (*launched)(fj_io_connection_t *connection);
+
+    fj_err_t (*should_finish)(fj_io_connection_t *connection);
 
     fj_err_t (*idle)(fj_io_connection_t *connection);
-
-    fj_err_t (*set_ready_to_finish)(fj_io_connection_t *connection);
 
     fj_err_t (*synchronize_elements)(
         fj_io_connection_t *connection, fj_io_element_t *const *elements, uint32_t elements_length);

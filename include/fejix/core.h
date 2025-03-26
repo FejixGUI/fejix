@@ -2,7 +2,6 @@
 #define FEJIX_CORE_H_INCLUDED
 
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -23,32 +22,17 @@
 
 #define FJ_PUBLIC FJ_PUBLIC_C_LINKAGE FJ_PUBLIC_VISIBILITY
 
-#define FJ_PUBLIC_INLINE FJ_PUBLIC_C_LINKAGE static inline
+#define FJ_INLINE FJ_PUBLIC_C_LINKAGE static inline
 
 
-#define FJ_VERSION(MAJOR, MINOR, PATCH)                                         \
-    ((fj_version_t) ((((MAJOR) & 0xfffff) << 20) | (((MINOR) & 0xfffff) << 10)) \
-     | ((PATCH) & 0xfffff))
-
-#define FJ_VERSION_MAJOR(VERSION) ((VERSION) >> 20 & 0xfffff)
-#define FJ_VERSION_MINOR(VERSION) ((VERSION) >> 10 & 0xfffff)
-#define FJ_VERSION_PATCH(VERSION) ((VERSION) & 0xfffff)
-
-/** Gets the next major version. The next version for `1.2.3` is `2.0.0`. */
-#define FJ_VERSION_NEXT(VERSION) (FJ_VERSION(FJ_VERSION_MAJOR(VERSION) + 1, 0, 0))
-
-/** Checks if the version is compatible with the required version.
-    For example, version `1.2.3` is compatible with versions from `1.2.3` to `2.0.0`. */
-#define FJ_VERSION_COMPATIBLE(VERSION, WITH_VERSION) \
-    ((VERSION) >= WITH_VERSION && (VERSION) < FJ_VERSION_NEXT(WITH_VERSION))
-
-
-#define FJ_TIME_FROM_MICROS(MICROSECONDS) ((fj_time_t) (MICROSECONDS))
-#define FJ_TIME_FROM_MILLIS(MILLISECONDS) ((fj_time_t) (MILLISECONDS) * UINT64_C(1000))
-#define FJ_TIME_FROM_SECONDS(SECONDS) ((fj_time_t) (MILLISECONDS) * UINT64_C(1000000))
-#define FJ_TIME_INTO_MICROS(TIME) (TIME)
-#define FJ_TIME_INTO_MILLIS(TIME) ((TIME) / UINT64_C(1000))
-#define FJ_TIME_INTO_SECONDS(TIME) ((TIME) / UINT64_C(1000000))
+#define FJ_TIME_FROM_NANOS(NANOSECONDS) ((fj_time_t) (NANOSECONDS))
+#define FJ_TIME_FROM_MICROS(MICROSECONDS) ((fj_time_t) (MICROSECONDS) * UINT64_C(1000))
+#define FJ_TIME_FROM_MILLIS(MILLISECONDS) ((fj_time_t) (MILLISECONDS) * UINT64_C(1000000))
+#define FJ_TIME_FROM_SECONDS(SECONDS) ((fj_time_t) (SECONDS) * UINT64_C(1000000000))
+#define FJ_TIME_INTO_NANOS(TIME) (TIME)
+#define FJ_TIME_INTO_MICROS(TIME) ((TIME) / UINT64_C(1000))
+#define FJ_TIME_INTO_MILLIS(TIME) ((TIME) / UINT64_C(1000000))
+#define FJ_TIME_INTO_SECONDS(TIME) ((TIME) / UINT64_C(1000000000))
 
 /** The length of a metric inch in metres. */
 #define FJ_INCH_LENGTH (0.0254)
@@ -137,10 +121,7 @@ enum {
 };
 
 
-/** Version triple. */
-typedef uint32_t fj_version_t;
-
-/** Time in microseconds. */
+/** Time in nanoseconds. */
 typedef uint64_t fj_time_t;
 
 /** Dots-per-metres (DPM). */
@@ -149,6 +130,12 @@ typedef double fj_density_t;
 /** The values are defined in `utils/color_formats.h` */
 typedef uint32_t fj_color_format_t;
 
+
+typedef struct fj_version {
+    uint8_t major;
+    uint8_t minor;
+    uint8_t patch;
+} fj_version_t;
 
 typedef struct fj_position {
     uint32_t x;

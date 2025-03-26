@@ -38,7 +38,7 @@
 #include <fejix/core.h>
 
 
-/** Gets the length of a static array. Note: this double-evaluates the argument. */
+/** Gets the length of a static array. */
 #define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 
 #define FJ_ALLOC_UNINIT(OUT_OBJECT_PTR) \
