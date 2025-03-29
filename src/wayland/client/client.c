@@ -12,8 +12,8 @@
 
 struct wayland_dynamic_global_event {
     struct fj_wayland_global global;
-    fj_wayland_interface_id_t interface_id;
-    fj_bool8_t added;
+    fj_wayland_interface_id interface_id;
+    fj_bool8 added;
 };
 
 
@@ -27,7 +27,7 @@ static char const *const wayland_interface_names[] = {
     [FJ_WAYLAND_INTERFACE_OUTPUT] = "wl_output",
 };
 
-static fj_wayland_interface_type_t const wayland_interface_types[] = {
+static fj_wayland_interface_type const wayland_interface_types[] = {
     [FJ_WAYLAND_INTERFACE_MAX] = FJ_WAYLAND_INTERFACE_STATIC,
 
     [FJ_WAYLAND_INTERFACE_COMPOSITOR] = FJ_WAYLAND_INTERFACE_STATIC,
@@ -64,13 +64,13 @@ static uint32_t wayland_get_interface_id(char const * /*[]*/ interface_name)
 }
 
 
-fj_wayland_interface_type_t fj_wayland_get_interface_type(fj_wayland_interface_id_t interface_id)
+fj_wayland_interface_type fj_wayland_get_interface_type(fj_wayland_interface_id interface_id)
 {
     return wayland_interface_types[interface_id];
 }
 
 
-struct wl_interface const *wayland_get_interface(fj_wayland_interface_id_t interface_id)
+struct wl_interface const *wayland_get_interface(fj_wayland_interface_id interface_id)
 {
     return wayland_interfaces[interface_id];
 }
@@ -79,9 +79,8 @@ struct wl_interface const *wayland_get_interface(fj_wayland_interface_id_t inter
 void fj_wayland_get_global_by_id(
     struct fj_client *client,
     uint32_t object_id,
-    fj_wayland_interface_id_t /*out*/ *out_interface_id,
-    struct fj_wayland_global const * /*? out*/ *out_global
-)
+    fj_wayland_interface_id /*out*/ *out_interface_id,
+    struct fj_wayland_global const * /*? out*/ *out_global)
 {
     *out_interface_id = FJ_WAYLAND_INTERFACE_MAX;
     *out_global = NULL;
@@ -97,9 +96,8 @@ void fj_wayland_get_global_by_id(
 
             case FJ_WAYLAND_INTERFACE_DYNAMIC:
                 for (uint32_t j = 0; j < client->interfaces[i].global_list.length; j++) {
-                    struct fj_wayland_global const *global = fj_vec_offset(
-                        &client->interfaces[i].global_list, j
-                    );
+                    struct fj_wayland_global const *global
+                        = fj_vec_offset(&client->interfaces[i].global_list, j);
 
                     if (global->id == object_id) {
                         *out_interface_id = i;
@@ -113,18 +111,14 @@ void fj_wayland_get_global_by_id(
 
 
 struct fj_wayland_global const * /*?*/ fj_wayland_get_static_global(
-    struct fj_client *client,
-    fj_wayland_interface_id_t interface_id
-)
+    struct fj_client *client, fj_wayland_interface_id interface_id)
 {
     return &client->interfaces[interface_id].global;
 }
 
 
-static fj_err_t wayland_handle_dynamic_global_event(
-    struct fj_client *client,
-    struct fj_wayland_event_wrapper const *event_wrapper
-)
+static fj_err wayland_handle_dynamic_global_event(
+    struct fj_client *client, struct fj_wayland_event_wrapper const *event_wrapper)
 {
     struct wayland_dynamic_global_event const *event = event_wrapper->event;
 
@@ -155,9 +149,8 @@ static fj_err_t wayland_handle_dynamic_global_event(
 
 static void wayland_handle_static_global(
     struct fj_client *client,
-    fj_wayland_interface_id_t interface_id,
-    struct fj_wayland_global const *global
-)
+    fj_wayland_interface_id interface_id,
+    struct fj_wayland_global const *global)
 {
     client->interfaces[interface_id].global = *global;
 }
@@ -165,10 +158,9 @@ static void wayland_handle_static_global(
 
 static void wayland_handle_dynamic_global(
     struct fj_client *client,
-    fj_wayland_interface_id_t interface_id,
+    fj_wayland_interface_id interface_id,
     struct fj_wayland_global const *global,
-    fj_bool8_t added
-)
+    fj_bool8 added)
 {
     struct wayland_dynamic_global_event const event = {
         .global = *global,
@@ -196,8 +188,7 @@ static void wayland_registry_add(
     struct wl_registry *registry,
     uint32_t object_id,
     char const *interface_name,
-    uint32_t interface_version
-)
+    uint32_t interface_version)
 {
     struct fj_client *client = (void *) _client;
     (void) registry;
@@ -207,7 +198,7 @@ static void wayland_registry_add(
         .version = interface_version,
     };
 
-    fj_wayland_interface_id_t interface_id = wayland_get_interface_id(interface_name);
+    fj_wayland_interface_id interface_id = wayland_get_interface_id(interface_name);
 
     if (interface_id == FJ_WAYLAND_INTERFACE_MAX) {
         return;
@@ -225,11 +216,7 @@ static void wayland_registry_add(
 }
 
 
-static void wayland_registry_remove(
-    void *_client,
-    struct wl_registry *registry,
-    uint32_t object_id
-)
+static void wayland_registry_remove(void *_client, struct wl_registry *registry, uint32_t object_id)
 {
     struct fj_client *client = (void *) _client;
     (void) registry;
@@ -254,7 +241,7 @@ static struct wl_registry_listener const registry_listener = {
 };
 
 
-static fj_err_t wayland_init_event_recording(struct fj_client *client)
+static fj_err wayland_init_event_recording(struct fj_client *client)
 {
     fj_vec_init(&client->recorded_events, sizeof(struct fj_wayland_event_wrapper));
 
@@ -276,7 +263,7 @@ static void wayland_deinit_event_recording(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_record_events_waited(struct fj_client *client)
+static fj_err wayland_record_events_waited(struct fj_client *client)
 {
     if (wl_display_dispatch(client->display) == -1) {
         return FJ_ERR_EVENT_READING_FAILED;
@@ -290,7 +277,7 @@ static fj_err_t wayland_record_events_waited(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_record_events_pending(struct fj_client *client)
+static fj_err wayland_record_events_pending(struct fj_client *client)
 {
     if (wl_display_dispatch_pending(client->display) == -1) {
         return FJ_ERR_EVENT_READING_FAILED;
@@ -304,7 +291,7 @@ static fj_err_t wayland_record_events_pending(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_record_events_roundtrip(struct fj_client *client)
+static fj_err wayland_record_events_roundtrip(struct fj_client *client)
 {
     if (wl_display_roundtrip(client->display) == -1) {
         return FJ_ERR_EVENT_READING_FAILED;
@@ -318,11 +305,10 @@ static fj_err_t wayland_record_events_roundtrip(struct fj_client *client)
 }
 
 
-static fj_bool8_t filter_all_events(
+static fj_bool8 filter_all_events(
     struct fj_client *client,
     void *filter_callback_data,
-    struct fj_wayland_event_wrapper const *event_wrapper
-)
+    struct fj_wayland_event_wrapper const *event_wrapper)
 {
     (void) client;
     (void) filter_callback_data;
@@ -332,11 +318,10 @@ static fj_bool8_t filter_all_events(
 }
 
 
-static fj_bool8_t filter_interface_init_events(
+static fj_bool8 filter_interface_init_events(
     struct fj_client *client,
     void *filter_callback_data,
-    struct fj_wayland_event_wrapper const *event_wrapper
-)
+    struct fj_wayland_event_wrapper const *event_wrapper)
 {
     (void) client;
     (void) filter_callback_data;
@@ -345,11 +330,8 @@ static fj_bool8_t filter_interface_init_events(
 }
 
 
-static fj_err_t wayland_handle_event(
-    struct fj_client *client,
-    size_t index,
-    struct fj_wayland_event_wrapper const *wrapper_ptr
-)
+static fj_err wayland_handle_event(
+    struct fj_client *client, size_t index, struct fj_wayland_event_wrapper const *wrapper_ptr)
 {
     struct fj_wayland_event_wrapper wrapper = *wrapper_ptr;
 
@@ -372,16 +354,11 @@ static fj_err_t wayland_handle_event(
 }
 
 
-fj_err_t fj_wayland_handle_events(
-    struct fj_client *client,
-    void *filter_callback_data,
-    fj_wayland_event_filter_fn_t *event_filter
-)
+fj_err fj_wayland_handle_events(
+    struct fj_client *client, void *filter_callback_data, fj_wayland_event_filter_fn *event_filter)
 {
     for (size_t i = 0; i < client->recorded_events.length;) {
-        struct fj_wayland_event_wrapper const *wrapper = fj_vec_offset(
-            &client->recorded_events, i
-        );
+        struct fj_wayland_event_wrapper const *wrapper = fj_vec_offset(&client->recorded_events, i);
 
         if (event_filter(client, filter_callback_data, wrapper)) {
             FJ_TRY (wayland_handle_event(client, i, wrapper)) {
@@ -397,24 +374,23 @@ fj_err_t fj_wayland_handle_events(
 }
 
 
-fj_err_t fj_wayland_roundtrip(struct fj_client *client)
+fj_err fj_wayland_roundtrip(struct fj_client *client)
 {
     return wayland_record_events_roundtrip(client);
 }
 
 
-fj_err_t fj_wayland_wait_for_events(struct fj_client *client)
+fj_err fj_wayland_wait_for_events(struct fj_client *client)
 {
     return wayland_record_events_waited(client);
 }
 
 
-fj_err_t fj_wayland_bind_global(
+fj_err fj_wayland_bind_global(
     struct fj_client *client,
-    fj_wayland_interface_id_t interface_id,
+    fj_wayland_interface_id interface_id,
     struct fj_wayland_global const *global,
-    void * /*? out*/ *object
-)
+    void * /*? out*/ *object)
 {
     struct wl_interface const *interface = wayland_get_interface(interface_id);
     *object = wl_registry_bind(client->registry, global->id, interface, global->version);
@@ -427,11 +403,8 @@ fj_err_t fj_wayland_bind_global(
 }
 
 
-static fj_err_t wayland_handle_poll_event(
-    void *_client,
-    fj_unixpoller_fd_t file_descriptor,
-    fj_unixpoller_event_mask_t event_mask
-)
+static fj_err wayland_handle_poll_event(
+    void *_client, fj_unixpoller_fd file_descriptor, fj_unixpoller_event_mask event_mask)
 {
     struct fj_client *client = (void *) _client;
     (void) file_descriptor;
@@ -453,7 +426,7 @@ static fj_err_t wayland_handle_poll_event(
 }
 
 
-static fj_err_t wayland_wait_display_writable(struct fj_client *client)
+static fj_err wayland_wait_display_writable(struct fj_client *client)
 {
     struct pollfd p = {
         .fd = wl_display_get_fd(client->display),
@@ -468,7 +441,7 @@ static fj_err_t wayland_wait_display_writable(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_display_flush(struct fj_client *client)
+static fj_err wayland_display_flush(struct fj_client *client)
 {
     while (wl_display_flush(client->display) != 0) {
         if (errno != EAGAIN) {
@@ -484,7 +457,7 @@ static fj_err_t wayland_display_flush(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_prepare_poll(struct fj_client *client)
+static fj_err wayland_prepare_poll(struct fj_client *client)
 {
     while (wl_display_prepare_read(client->display) != 0) {
         FJ_TRY (wayland_record_events_pending(client)) {
@@ -505,10 +478,8 @@ static fj_err_t wayland_prepare_poll(struct fj_client *client)
 }
 
 
-fj_err_t fj_wayland_record_event(
-    struct fj_client *client,
-    struct fj_wayland_event_wrapper const *wrapper
-)
+fj_err fj_wayland_record_event(
+    struct fj_client *client, struct fj_wayland_event_wrapper const *wrapper)
 {
     if (fj_wayland_record_failed(client)) {
         return FJ_ERR_ALLOCATION_FAILED;
@@ -539,13 +510,13 @@ void fj_wayland_record_fail(struct fj_client *client)
 }
 
 
-fj_bool8_t fj_wayland_record_failed(struct fj_client *client)
+fj_bool8 fj_wayland_record_failed(struct fj_client *client)
 {
     return !fj_vec_has_allocated(&client->recorded_events);
 }
 
 
-static fj_err_t wayland_connect(struct fj_client *client)
+static fj_err wayland_connect(struct fj_client *client)
 {
     client->display = wl_display_connect(NULL);
 
@@ -557,8 +528,7 @@ static fj_err_t wayland_connect(struct fj_client *client)
                 &client->unixpoller,
                 wl_display_get_fd(client->display),
                 POLLIN,
-                wayland_handle_poll_event
-            ))
+                wayland_handle_poll_event))
     {
         wl_display_disconnect(client->display);
         return fj_result;
@@ -568,7 +538,7 @@ static fj_err_t wayland_connect(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_init_registry(struct fj_client *client)
+static fj_err wayland_init_registry(struct fj_client *client)
 {
     client->registry = wl_display_get_registry(client->display);
 
@@ -606,7 +576,7 @@ static void wayland_deinit_global_lists(struct fj_client *client)
 }
 
 
-static fj_err_t wayland_init(struct fj_client *client)
+static fj_err wayland_init(struct fj_client *client)
 {
     FJ_TRY (wayland_connect(client)) {
         return fj_result;
@@ -639,19 +609,19 @@ static void wayland_deinit(struct fj_client *client)
 }
 
 
-static fj_err_t client_init_run(struct fj_client *client)
+static fj_err client_init_run(struct fj_client *client)
 {
     return client->callbacks.idle(client->data);
 }
 
 
-static fj_err_t client_prepare_poll(struct fj_client *client)
+static fj_err client_prepare_poll(struct fj_client *client)
 {
     return wayland_prepare_poll(client);
 }
 
 
-static fj_err_t client_end_poll(struct fj_client *client)
+static fj_err client_end_poll(struct fj_client *client)
 {
     return client->callbacks.idle(client->data);
 }
@@ -663,7 +633,7 @@ static void client_cancel_poll(struct fj_client *client)
 }
 
 
-static fj_err_t client_init(struct fj_client *client, struct fj_client_info const *info)
+static fj_err client_init(struct fj_client *client, struct fj_client_info const *info)
 {
     FJ_TRY (fj_str_clone(info->name, &client->name)) {
         return fj_result;
@@ -684,7 +654,7 @@ static fj_err_t client_init(struct fj_client *client, struct fj_client_info cons
 }
 
 
-static fj_err_t client_deinit(struct fj_client *client)
+static fj_err client_deinit(struct fj_client *client)
 {
     wayland_deinit(client);
     fj_unixpoller_deinit(&client->unixpoller);
@@ -693,12 +663,11 @@ static fj_err_t client_deinit(struct fj_client *client)
 }
 
 
-static fj_err_t client_create(
+static fj_err client_create(
     struct fj_client * /*? out*/ *_client,
     struct fj_client_callbacks const *callbacks,
     void *callback_data,
-    struct fj_client_info const *info
-)
+    struct fj_client_info const *info)
 {
     struct fj_client **client = (void *) _client;
 
@@ -718,11 +687,11 @@ static fj_err_t client_create(
 }
 
 
-static fj_err_t client_destroy(struct fj_client *_client)
+static fj_err client_destroy(struct fj_client *_client)
 {
     struct fj_client *client = (void *) _client;
 
-    fj_err_t result = client_deinit(client);
+    fj_err result = client_deinit(client);
 
     FJ_FREE(&client);
 
@@ -730,11 +699,7 @@ static fj_err_t client_destroy(struct fj_client *_client)
 }
 
 
-static fj_err_t client_run(
-    struct fj_client *_client,
-    fj_client_run_type_t run_type,
-    void *serve_data
-)
+static fj_err client_run(struct fj_client *_client, fj_client_run_type run_type, void *serve_data)
 {
     struct fj_client *client = (void *) _client;
     (void) serve_data;
@@ -766,7 +731,7 @@ static fj_err_t client_run(
 }
 
 
-static fj_err_t client_commit(struct fj_client *_client)
+static fj_err client_commit(struct fj_client *_client)
 {
     struct fj_client *client = (void *) _client;
 
@@ -778,7 +743,7 @@ static fj_err_t client_commit(struct fj_client *_client)
 }
 
 
-static void client_set_sleep_timeout(struct fj_client *_client, fj_seconds_t timeout)
+static void client_set_sleep_timeout(struct fj_client *_client, fj_seconds timeout)
 {
     struct fj_client *client = (void *) _client;
 
@@ -786,7 +751,7 @@ static void client_set_sleep_timeout(struct fj_client *_client, fj_seconds_t tim
 }
 
 
-static fj_err_t client_wakeup(struct fj_client *_client)
+static fj_err client_wakeup(struct fj_client *_client)
 {
     struct fj_client *client = (void *) _client;
 

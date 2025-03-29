@@ -3,7 +3,7 @@
 #
 # Tips for coding with this config:
 # * put 2 empty lines between function blocks for good visual separation.
-# * put trailing commas in enums/struct/arrays that should be split into multiple lines.
+# * put trailing commas in enums/structs/arrays that should be split into multiple lines.
 #
 # Unfortunately, clang-format is reasonably good only at the LLVM style.
 # This config implements a similar style in order to never fight against the tooling
@@ -19,6 +19,31 @@ IndentWidth: 4
 ColumnLimit: 100
 LineEnding: LF
 InsertNewlineAtEOF: true
+
+# int x()
+# {                                     <-
+#     if (x) {                          <-
+#        ...
+#     }
+#
+#     for (somethinglonglonglonglong;
+#          somethinglonglonglonglong;
+#          somethinglonglonglonglong)
+#     {                                 <-
+#         ...
+#     }
+# }
+#
+# void f(void) {
+#     /* Empty on purpose */            <-
+# }
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterNamespace: true
+    AfterClass: true
+    AfterFunction: true
+    AfterControlStatement: MultiLine
+AllowShortFunctionsOnASingleLine: None
 
 # int x()
 # {
@@ -75,26 +100,6 @@ AllowAllParametersOfDeclarationOnNextLine: true
 # }
 PackConstructorInitializers: NextLine
 
-# int x()
-# {                                     <-
-#     if (x) {                          <-
-#        ...
-#     }
-#
-#     for (somethinglonglonglonglong;
-#          somethinglonglonglonglong;
-#          somethinglonglonglonglong)
-#     {                                 <-
-#         ...
-#     }
-# }
-BreakBeforeBraces: Custom
-BraceWrapping:
-    AfterNamespace: true
-    AfterClass: true
-    AfterFunction: true
-    AfterControlStatement: MultiLine
-
 # (struct x) { .s = (struct s) { .x = 1, .y = 2 } }
 #
 # (struct x) {
@@ -106,9 +111,8 @@ BraceWrapping:
 SpaceBeforeCpp11BracedList: true
 Cpp11BracedListStyle: false
 
-# int x() { }
-#          ^
-AllowShortFunctionsOnASingleLine: Empty
+# CppThing thing = { }
+#                   ^
 SpaceInEmptyBlock: true
 
 # (int) x
@@ -175,7 +179,6 @@ Macros:
     # This tricks clang-format into leaving these macros on their own lines.
     # clang-format does not support proper custom attributes as of now.
     - 'FJ_PUBLIC=[[xxxxx]]'
-    - 'FJ_INLINE=[[xxxxx]]'
 
 IfMacros:
     - 'FJ_TRY'

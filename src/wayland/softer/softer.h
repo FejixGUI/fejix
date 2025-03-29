@@ -1,9 +1,8 @@
-#include <fejix/interface/softer.h>
-
+#include <src/unixshm/unixshm.h>
 #include <src/wayland/client/client.h>
 #include <src/wayland/output/output.h>
 
-#include <src/unixshm/unixshm.h>
+#include <fejix/interface/softer.h>
 
 #include <fejix/core/vec.h>
 
@@ -11,20 +10,19 @@
 struct fj_wayland_softer_canvas_global_data {
     struct fj_softer_canvas_callbacks callbacks;
 
-    struct wl_shm * shm;
+    struct wl_shm *shm;
 
-    /** Contains fj_softer_pixel_format_id_t */
+    /** Contains fj_softer_pixel_format_id */
     struct fj_vec pixel_formats;
 };
 
 
 struct fj_wayland_softer_canvas_buffer {
     struct fj_unixshm shm;
-    struct wl_shm_pool * pool;
-    struct wl_buffer * buffer;
-    fj_bool32_t available;
-    uint32_t age; // TODO
-
+    struct wl_shm_pool *pool;
+    struct wl_buffer *buffer;
+    fj_bool32 available;
+    uint32_t age;  // TODO
 };
 
 

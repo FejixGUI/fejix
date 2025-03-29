@@ -7,7 +7,6 @@ Diagnostics:
             - readability-identifier-naming
 
         Remove:
-            - bugprone-reserved-identifier
             - bugprone-sizeof-expression
             - bugprone-easily-swappable-parameters
 
@@ -22,7 +21,6 @@ Diagnostics:
             readability-identifier-naming.FunctionCase: lower_case
             readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
             readability-identifier-naming.EnumConstantCase: UPPER_CASE
-            readability-identifier-naming.TypedefSuffix: _t
             readability-identifier-naming.VariableIgnoredRegexp: '^_[_a-z0-9]*$'
             readability-identifier-naming.MemberIgnoredRegexp: '^_[_a-z0-9]*$'
 

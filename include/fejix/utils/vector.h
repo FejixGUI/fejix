@@ -86,13 +86,13 @@
 /** The index must be between `0` and `length`.
     Returns `FJ_ERR_INVALID_USAGE` or `FJ_ERR_OUT_OF_MEMORY`. */
 FJ_PUBLIC
-fj_err_t fj_vector_expand_at(
+fj_err fj_vector_expand_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size);
 
 /** The index must be between `0` and `length-1`.
     Returns `FJ_ERR_INVALID_USAGE` or `FJ_ERR_OUT_OF_MEMORY`. */
 FJ_PUBLIC
-fj_err_t fj_vector_shrink_at(
+fj_err fj_vector_shrink_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size);
 
 /** Frees the vector items and sets the length and capacity to zero. */

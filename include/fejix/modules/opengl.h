@@ -9,14 +9,14 @@ enum { FJ_OPENGL_ID = 17 };
 
 
 typedef struct fj_opengl {
-    fj_err_t (*init)(
-        fj_io_connection_t *conn,
+    fj_err (*init)(
+        fj_io_connection *conn,
         opt_native_interface,
         opt_function_loader_callback,
         opt_callback_data,
         opt_native_interface_name);
 
-    fj_err_t (*deinit)(fj_io_connection_t *conn);
+    fj_err (*deinit)(fj_io_connection *conn);
 
     get_native_interface();
 
@@ -31,10 +31,10 @@ typedef struct fj_opengl {
 
     get_framebuffer_config_property();
 
-    fj_err_t (*create_element)(
-        fj_io_connection_t *conn, framebuffer_config, fj_io_element_t *out_element);
+    fj_err (*create_element)(
+        fj_io_connection *conn, framebuffer_config, fj_io_element *out_element);
 
-    fj_err_t (*destroy_element)(fj_io_connection_t *conn, fj_io_element_t *element);
+    fj_err (*destroy_element)(fj_io_connection *conn, fj_io_element *element);
 
     create_renderer(element, renderer);
 
@@ -54,7 +54,7 @@ typedef struct fj_opengl {
 
     set_native_thread_state();
 
-} fj_opengl_t;
+} fj_opengl;
 
 
 #endif

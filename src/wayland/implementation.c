@@ -10,7 +10,7 @@ static void const *interfaces[] = {
 };
 
 
-static void const *get_interface_functions(fj_interface_id_t id)
+static void const *get_interface_functions(fj_interface_id id)
 {
     if (id >= FJ_LEN(interfaces)) {
         return NULL;

@@ -7,7 +7,7 @@
 #include <wchar.h>
 
 
-fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
+fj_err fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 {
     int32_t output_chars_length = MultiByteToWideChar(
         CP_UTF8,
@@ -39,7 +39,7 @@ fj_err_t fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 }
 
 
-fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
+fj_err fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 {
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,
@@ -74,7 +74,7 @@ fj_err_t fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 }
 
 
-static fj_err_t get_junk_class_name(WCHAR out_string[32])
+static fj_err get_junk_class_name(WCHAR out_string[32])
 {
     static unsigned int counter = 0;
     counter++;
@@ -93,7 +93,7 @@ static bool is_of_junk_class(HWND window)
 }
 
 
-static fj_err_t create_window_class(WNDCLASSEX *class_info)
+static fj_err create_window_class(WNDCLASSEX *class_info)
 {
     class_info->cbSize = sizeof(class_info);
 
@@ -127,7 +127,7 @@ static inline bool window_needs_new_class(
 }
 
 
-fj_err_t fj_winapi_window_create(
+fj_err fj_winapi_window_create(
     HWND *out_window, WNDCLASSEX const *maybe_class_info, CREATESTRUCT const *maybe_window_info)
 {
     WNDCLASSEX class_info = { 0 };
@@ -186,7 +186,7 @@ fj_err_t fj_winapi_window_create(
 }
 
 
-fj_err_t fj_winapi_window_destroy(HWND window)
+fj_err fj_winapi_window_destroy(HWND window)
 {
     LPWSTR class_name = (void *) GetClassLongPtr(window, GCW_ATOM);
     bool should_destroy_class = is_of_junk_class(window);

@@ -53,8 +53,8 @@ target_compile_options(
 target_compile_definitions(
     fejix
     PRIVATE
-        "$<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>"
-        "FJ_OPT_PUBLIC_EXPORT")
+        "FJ_BUILDING_PRIVATE_CODE"
+        "$<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>")
 
 target_include_directories(
     fejix

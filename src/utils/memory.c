@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-fj_err_t fj_alloc_uninit(void **out_ptr, size_t size)
+fj_err fj_alloc_uninit(void **out_ptr, size_t size)
 {
     if (size == 0) {
         *out_ptr = NULL;
@@ -22,7 +22,7 @@ fj_err_t fj_alloc_uninit(void **out_ptr, size_t size)
 }
 
 
-fj_err_t fj_alloc_zeroed(void **out_ptr, size_t size)
+fj_err fj_alloc_zeroed(void **out_ptr, size_t size)
 {
     if (size == 0) {
         *out_ptr = NULL;
@@ -39,7 +39,7 @@ fj_err_t fj_alloc_zeroed(void **out_ptr, size_t size)
 }
 
 
-fj_err_t fj_alloc_copied(void **out_ptr, void const *source, size_t size)
+fj_err fj_alloc_copied(void **out_ptr, void const *source, size_t size)
 {
     FJ_TRY (fj_alloc_uninit(out_ptr, size)) {
         return fj_result;
@@ -58,7 +58,7 @@ void fj_free(void **ptr)
 }
 
 
-fj_err_t fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
+fj_err fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
 {
     if (item_size == 0) {
         return FJ_ERR_INVALID_USAGE;
@@ -90,7 +90,7 @@ fj_err_t fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
 }
 
 
-fj_err_t fj_realloc_zeroed(
+fj_err fj_realloc_zeroed(
     void **ptr, uint32_t old_items_length, uint32_t new_items_length, size_t item_size)
 {
     if (item_size == 0) {
@@ -129,7 +129,7 @@ fj_err_t fj_realloc_zeroed(
 }
 
 
-fj_err_t fj_string_clone(char const *str, char const **out_clone)
+fj_err fj_string_clone(char const *str, char const **out_clone)
 {
     size_t length = strlen(str);
 

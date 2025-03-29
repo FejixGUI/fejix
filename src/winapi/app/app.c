@@ -36,7 +36,7 @@ static DWORD app_get_wakeup_timeout(struct fj_app *app)
 }
 
 
-static fj_err_t app_post_iteration_message(struct fj_app *app)
+static fj_err app_post_iteration_message(struct fj_app *app)
 {
     if (SendNotifyMessage(app->global_window, GLOBAL_MESSAGE_ITERATE, 0, 0) == FALSE) {
         return FJ_ERR_REQUEST_FAILED;
@@ -46,7 +46,7 @@ static fj_err_t app_post_iteration_message(struct fj_app *app)
 }
 
 
-static fj_err_t app_sleep(struct fj_app *app)
+static fj_err app_sleep(struct fj_app *app)
 {
     DWORD wait_result = MsgWaitForMultipleObjectsEx(
         0, NULL, app_get_wakeup_timeout(app), QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE);
@@ -61,7 +61,7 @@ static fj_err_t app_sleep(struct fj_app *app)
 }
 
 
-static fj_err_t app_iterate(struct fj_app *app)
+static fj_err app_iterate(struct fj_app *app)
 {
     FJ_TRY (app->callbacks->on_idle(app)) {
         return fj_result;
@@ -84,7 +84,7 @@ static fj_err_t app_iterate(struct fj_app *app)
 }
 
 
-static fj_err_t app_wakeup_immediately(struct fj_app *app)
+static fj_err app_wakeup_immediately(struct fj_app *app)
 {
     if (!SendNotifyMessage(app->global_window, GLOBAL_MESSAGE_WAKEUP, 0, 0)) {
         return FJ_ERR_REQUEST_SENDING_FAILED;
@@ -139,7 +139,7 @@ global_window_procedure(HWND window_handle, UINT message, WPARAM wparam, LPARAM 
 }
 
 
-static fj_err_t create_global_window(struct fj_app *app)
+static fj_err create_global_window(struct fj_app *app)
 {
     WNDCLASSEX class_info = {
         .lpfnWndProc = global_window_procedure,
@@ -157,19 +157,19 @@ static fj_err_t create_global_window(struct fj_app *app)
 }
 
 
-static fj_err_t destroy_global_window(struct fj_app *app)
+static fj_err destroy_global_window(struct fj_app *app)
 {
     return fj_winapi_window_destroy(app->global_window);
 }
 
 
-static fj_err_t app_alloc(struct fj_app **out_app)
+static fj_err app_alloc(struct fj_app **out_app)
 {
     return FJ_ALLOC_ZEROED(out_app);
 }
 
 
-static fj_err_t app_destroy(struct fj_app *app)
+static fj_err app_destroy(struct fj_app *app)
 {
     if (app->global_window != NULL) {
         destroy_global_window(app);
@@ -181,7 +181,7 @@ static fj_err_t app_destroy(struct fj_app *app)
 }
 
 
-static fj_err_t app_create(struct fj_app **out_app, struct fj_app_create_info const *info)
+static fj_err app_create(struct fj_app **out_app, struct fj_app_create_info const *info)
 {
     FJ_TRY (FJ_ALLOC_ZEROED(out_app)) {
         return fj_result;
@@ -202,7 +202,7 @@ static fj_err_t app_create(struct fj_app **out_app, struct fj_app_create_info co
 }
 
 
-static fj_err_t app_launch(struct fj_app *app)
+static fj_err app_launch(struct fj_app *app)
 {
     FJ_TRY (app_post_iteration_message(app)) {
         return fj_result;
@@ -226,7 +226,7 @@ static fj_err_t app_launch(struct fj_app *app)
 }
 
 
-static fj_err_t app_manual_sleep(struct fj_app *app)
+static fj_err app_manual_sleep(struct fj_app *app)
 {
     FJ_TRY (app_sleep(app)) {
         return fj_result;
@@ -248,13 +248,13 @@ static void app_set_finished(struct fj_app *app)
 }
 
 
-static void app_wakeup_after_timeout(struct fj_app *app, fj_seconds_t timeout)
+static void app_wakeup_after_timeout(struct fj_app *app, fj_seconds timeout)
 {
     app->wakeup_timeout = timeout;
 }
 
 
-static fj_bool8_t app_get_activity_hint_supported(struct fj_app *app, fj_app_activity_hint_t hint)
+static fj_bool8 app_get_activity_hint_supported(struct fj_app *app, fj_app_activity_hint hint)
 {
     (void) app;
 
@@ -267,8 +267,7 @@ static fj_bool8_t app_get_activity_hint_supported(struct fj_app *app, fj_app_act
     }
 }
 
-static fj_err_t app_set_activity_hint(
-    struct fj_app *app, fj_app_activity_hint_t hint, fj_bool8_t value)
+static fj_err app_set_activity_hint(struct fj_app *app, fj_app_activity_hint hint, fj_bool8 value)
 {
     switch (hint) {
         case FJ_APP_ACTIVITY_CRITICAL:
@@ -291,7 +290,7 @@ static struct fj_app_activity_hints_functions const app_activity_hints_functions
 };
 
 
-static void const *app_get_interface_functions(fj_app_interface_id_t id)
+static void const *app_get_interface_functions(fj_app_interface_id id)
 {
     switch (id) {
         case FJ_APP_INTERFACE_MANUAL_SLEEP:
@@ -305,7 +304,7 @@ static void const *app_get_interface_functions(fj_app_interface_id_t id)
     }
 }
 
-static fj_app_implementation_id_t app_get_implementation_id(void)
+static fj_app_implementation_id app_get_implementation_id(void)
 {
     return FJ_APP_IMPLEMENTATION_WINAPI;
 }

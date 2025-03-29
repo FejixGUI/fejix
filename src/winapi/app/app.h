@@ -12,9 +12,9 @@ struct fj_app {
     struct fj_app_callbacks const *callbacks;
 
     HWND global_window;
-    fj_seconds_t wakeup_timeout;
-    fj_bool8_t is_finished;
-    fj_bool8_t is_critical;
+    fj_seconds wakeup_timeout;
+    fj_bool8 is_finished;
+    fj_bool8 is_critical;
 };
 
 

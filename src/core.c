@@ -18,7 +18,7 @@ static char const *error_descriptions[] = {
 };
 
 
-char const *fj_err_get_description(fj_err_t error)
+char const *fj_err_get_description(fj_err error)
 {
     if (error >= FJ_LEN(error_descriptions) || error_descriptions[error] == NULL) {
         return "unknown error (did someone forget to write a description?)";

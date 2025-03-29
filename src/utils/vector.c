@@ -15,7 +15,7 @@ static void shift_tail(
 }
 
 
-fj_err_t fj_vector_expand_at(
+fj_err fj_vector_expand_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size)
 {
     if (index > *length) {
@@ -41,7 +41,7 @@ fj_err_t fj_vector_expand_at(
 }
 
 
-fj_err_t fj_vector_shrink_at(
+fj_err fj_vector_shrink_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size)
 {
     if (index >= *length) {

@@ -3,22 +3,22 @@ Fejix
 =========
 
 Fejix is a cross-platform GUI base library.
-It can be used to build UI frameworks, game engines and other tools that need to use system APIs
-for things like windows, mouse/keyboard/touch input, graphical API interop etc.
+It wraps system APIs for window output, keyboard/mouse/other input processing etc.
+and can be used to build UI frameworks, game engines and other tools.
 
 Fejix is *not* a graphics rendering engine or a full-blown GUI framework.
 
 Goals:
 
-* **feature-rich**:
+* **feature-richness**:
 
     No extension libraries.
     Functionality is either in Fejix or does not exist.
 
-* **no bloat**:
+* **API simplicity**
 
-    No object-oriented metaprogramming like in GDK or Qt Base.
-    Just simple enough C.
+    No obscure object-oriented metaprogramming magic like in GTK or Qt.
+    Just simple enough C. Or at least I think so.
 
 * **modularity**:
 
@@ -26,9 +26,21 @@ Goals:
     which may or may not be available at runtime.
     Simple to design, extend, port, and reimplement.
 
+Nice to have:
+
+* ability to **port existing projects** to Fejix:
+
+    Fejix has a few modules that implement legacy or not-so-cross-platform behaviors specifically
+    to allow other libraries and programs to gradually migrate to it.
+
+* **clean code**:
+
+    ...which kinda makes sense, doesn't it? If you find something too complicated to read and
+    extend, feel free to discuss it.
+
 ::
 
-    Note, however, that hardly anything has been implemented.
+    Note, however, that hardly anything has been done so far.
 
     This library is in its earliest development stage.
 
@@ -41,6 +53,4 @@ License
 =========
 
 Copyright 2024-2025 Mark Lagodych.
-Licensed under `Apache-2.0`_
-
-.. _`Apache-2.0`: ./LICENSE.txt.
+Licensed under `Apache-2.0 <./LICENSE.txt>`_

@@ -24,7 +24,7 @@
 
 #ifdef FJ_UNIXSHM_USE_MEMFD
 
-static fj_err_t open_shm_file(int32_t /*out*/ *fd)
+static fj_err open_shm_file(int32_t /*out*/ *fd)
 {
     *fd = memfd_create("fejix-unixshm-file", MFD_CLOEXEC);
 
@@ -52,7 +52,7 @@ static uint32_t rand32(void)
 }
 
 
-static fj_err_t open_shm_file(int32_t /*out*/ *fd)
+static fj_err open_shm_file(int32_t /*out*/ *fd)
 {
     for (uint32_t i = 0; i < 16; i++) {
         char temp_file_name[32];
@@ -78,7 +78,7 @@ static fj_err_t open_shm_file(int32_t /*out*/ *fd)
 #endif  // FJ_UNIXSHM_USE_SHM
 
 
-static fj_err_t shm_map(struct fj_unixshm *shm)
+static fj_err shm_map(struct fj_unixshm *shm)
 {
     if (ftruncate(shm->file, (off_t) shm->size) == -1) {
         return FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED;
@@ -94,7 +94,7 @@ static fj_err_t shm_map(struct fj_unixshm *shm)
 }
 
 
-static fj_err_t shm_unmap(struct fj_unixshm *shm)
+static fj_err shm_unmap(struct fj_unixshm *shm)
 {
     if (munmap(shm->data, shm->size) == -1) {
         return FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED;
@@ -104,7 +104,7 @@ static fj_err_t shm_unmap(struct fj_unixshm *shm)
 }
 
 
-fj_err_t fj_unixshm_alloc(struct fj_unixshm /*out*/ *shm, size_t size)
+fj_err fj_unixshm_alloc(struct fj_unixshm /*out*/ *shm, size_t size)
 {
     shm->size = fj_size_next_power_of_two(size);
 
@@ -124,7 +124,7 @@ fj_err_t fj_unixshm_alloc(struct fj_unixshm /*out*/ *shm, size_t size)
 }
 
 
-fj_err_t fj_unixshm_unref(struct fj_unixshm *shm)
+fj_err fj_unixshm_unref(struct fj_unixshm *shm)
 {
     if (close(shm->file) == -1) {
         return FJ_ERR_SHARED_MEMORY_ALLOCATION_FAILED;
@@ -138,7 +138,7 @@ fj_err_t fj_unixshm_unref(struct fj_unixshm *shm)
 }
 
 
-fj_err_t fj_unixshm_free(struct fj_unixshm *shm)
+fj_err fj_unixshm_free(struct fj_unixshm *shm)
 {
     FJ_TRY (shm_unmap(shm)) {
         return fj_result;
@@ -148,7 +148,7 @@ fj_err_t fj_unixshm_free(struct fj_unixshm *shm)
 }
 
 
-fj_err_t fj_unixshm_realloc(struct fj_unixshm *shm, size_t size)
+fj_err fj_unixshm_realloc(struct fj_unixshm *shm, size_t size)
 {
     if (size <= shm->size) {
         return FJ_OK;

@@ -103,13 +103,13 @@ static LRESULT CALLBACK window_procedure(HWND window, UINT message, WPARAM wpara
 }
 
 
-static void const *get_interface_functions(fj_image_scene_interface_id_t id)
+static void const *get_interface_functions(fj_image_scene_interface_id id)
 {
     return NULL;
 }
 
 
-static fj_err_t create_manager(
+static fj_err create_manager(
     struct fj_app *owner_app,
     struct fj_image_scene_manager **out_manager,
     struct fj_image_scene_manager_create_info const *info)
@@ -128,14 +128,14 @@ static fj_err_t create_manager(
 }
 
 
-static fj_err_t destroy_manager(struct fj_image_scene_manager *manager)
+static fj_err destroy_manager(struct fj_image_scene_manager *manager)
 {
     FJ_FREE(manager);
     return FJ_OK;
 }
 
 
-static fj_err_t create_image_scene(
+static fj_err create_image_scene(
     struct fj_image_scene_manager *manager,
     struct fj_image_scene **out_image_scene,
     struct fj_image_scene_create_info const *info)
@@ -169,7 +169,7 @@ static fj_err_t create_image_scene(
 }
 
 
-static fj_err_t destroy_image_scene(
+static fj_err destroy_image_scene(
     struct fj_image_scene_manager *manager, struct fj_image_scene *image_scene)
 {
     (void) manager;
@@ -193,7 +193,7 @@ static void get_image_container(
 }
 
 
-static fj_err_t image_scene_update(
+static fj_err image_scene_update(
     struct fj_image_scene_manager *manager,
     struct fj_image_scene *const *image_scenes,
     uint32_t image_scene_count)
