@@ -1,9 +1,7 @@
 /** Example:
 
     ```
-    struct my_vector {
-        FJ_VECTOR(int)
-    };
+    FJ_DEFINE_VECTOR(my_vector, int)
 
     // Vectors must be initialised with zeroes!
     struct my_vector v = { 0 };
@@ -43,10 +41,11 @@
 #include <fejix/core.h>
 
 
-/** Defines the fields of a vector structure. */
-#define FJ_VECTOR(ITEM_TYPE) \
-    ITEM_TYPE *items;        \
-    uint32_t length, capacity;
+#define FJ_DEFINE_VECTOR(VECTOR_TYPE_NAME, ITEM_TYPE) \
+    struct VECTOR_TYPE_NAME {                         \
+        ITEM_TYPE *items;                             \
+        uint32_t length, capacity;                    \
+    };
 
 #define FJ_VECTOR_EXPAND_AT(VECTOR, INDEX) \
     (fj_vector_expand_at(                  \
@@ -57,11 +56,12 @@
         sizeof(*(VECTOR)->items)))
 
 #define FJ_VECTOR_EXPAND(VECTOR)    \
-    (fj_vector_expand(              \
+    (fj_vector_expand_at(           \
         (void **) &(VECTOR)->items, \
         &(VECTOR)->length,          \
         (VECTOR)->length,           \
         &(VECTOR)->capacity,        \
+        (VECTOR)->length,           \
         sizeof(*(VECTOR)->items)))
 
 #define FJ_VECTOR_SHRINK_AT(VECTOR, INDEX) \
@@ -74,10 +74,11 @@
 
 #define FJ_VECTOR_SHRINK(VECTOR)                             \
     ((VECTOR)->length == 0 ? FJ_ERR_INVALID_USAGE            \
-                           : fj_vector_shrink(               \
+                           : fj_vector_shrink_at(            \
                                  (void **) &(VECTOR)->items, \
                                  &(VECTOR)->length,          \
                                  &(VECTOR)->capacity,        \
+                                 (VECTOR)->length - 1,       \
                                  sizeof(*(VECTOR)->items)))
 
 #define FJ_VECTOR_FREE(VECTOR) \
@@ -95,7 +96,8 @@ FJ_PUBLIC
 fj_err fj_vector_shrink_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size);
 
-/** Frees the vector items and sets the length and capacity to zero. */
+/** Frees the vector items and sets the length and capacity to
+ * zero. */
 FJ_PUBLIC
 void fj_vector_free(void **items, uint32_t *length, uint32_t *capacity);
 

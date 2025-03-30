@@ -179,6 +179,7 @@ Macros:
     # This tricks clang-format into leaving these macros on their own lines.
     # clang-format does not support proper custom attributes as of now.
     - 'FJ_PUBLIC=[[xxxxx]]'
+    - 'FJ_HELPER=[[xxxxx]]'
 
 IfMacros:
     - 'FJ_TRY'

@@ -28,14 +28,12 @@ size_t fj_size_lower_pow2(size_t x);
 FJ_PUBLIC
 size_t fj_size_higher_multiple(uint64_t x, size_t kernel);
 
-FJ_INLINE
-uint32_t fj_u32_max(uint32_t a, uint32_t b)
+static inline uint32_t fj_u32_max(uint32_t a, uint32_t b)
 {
     return a > b ? a : b;
 }
 
-FJ_INLINE
-uint32_t fj_u32_min(uint32_t a, uint32_t b)
+static inline uint32_t fj_u32_min(uint32_t a, uint32_t b)
 {
     return a < b ? a : b;
 }

@@ -7,23 +7,29 @@
 
 
 #ifdef __cplusplus
-#    define FJ_PUBLIC_EXTERN_C extern "C"
+#    define FJ_PUBLIC_LINKAGE extern "C"
 #else
-#    define FJ_PUBLIC_EXTERN_C
+#    define FJ_PUBLIC_LINKAGE
 #endif
 
 #if defined(_WIN32) && defined(FJ_BUILDING_PRIVATE_CODE)
-#    define FJ_PUBLIC_EXPORT __declspec(dllexport)
+#    define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
 #elif defined(__GNUC__) && __GNUC__ >= 4
-#    define FJ_PUBLIC_EXPORT __attribute__((visibility("default")))
+#    define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
 #else
-#    define FJ_PUBLIC_EXPORT
+#    define FJ_PUBLIC_VISIBILITY
 #endif
 
-#define FJ_PUBLIC FJ_PUBLIC_EXTERN_C FJ_PUBLIC_EXPORT
+#define FJ_PUBLIC FJ_PUBLIC_LINKAGE FJ_PUBLIC_VISIBILITY
+
+#ifdef FJ_BUILDING_HELPERS
+#    define FJ_HELPER FJ_PUBLIC_VISIBILITY extern inline
+#else
+#    define FJ_HELPER FJ_PUBLIC_VISIBILITY inline
+#endif
 
 
-#ifdef FJ_BUILDING_PRIVATE_CODE
+#if defined(FJ_BUILDING_PRIVATE_CODE) && !defined(FJ_BUILDING_HELPERS)
 #    define FJ_DEFINE_MODULE(MODULE_NAME) struct MODULE_NAME;
 #else
 #    define FJ_DEFINE_MODULE(MODULE_NAME)                \
@@ -32,7 +38,7 @@
         };
 #endif
 
-#ifdef FJ_BUILDING_PRIVATE_CODE
+#if defined(FJ_BUILDING_PRIVATE_CODE) && !defined(FJ_BUILDING_HELPERS)
 #    define FJ_DEFINE_OBJECT(OBJECT_NAME) struct OBJECT_NAME;
 #else
 #    define FJ_DEFINE_OBJECT(OBJECT_NAME) \
@@ -52,24 +58,28 @@
 
 /** The length of a metric inch in metres. */
 #define FJ_INCH_LENGTH (0.0254)
-#define FJ_LEGACY_DPI (96.0)
+#define FJ_STANDARD_DPI (96.0)
 
 #define FJ_DENSITY_INTO_DPM(DENSITY) (DENSITY)
 #define FJ_DENSITY_INTO_DPI(DENSITY) ((double) (DENSITY) * FJ_INCH_LENGTH)
 #define FJ_DENSITY_FROM_DPM(DPM) (DPM)
 #define FJ_DENSITY_FROM_DPI(DPI) ((double) (DPI) / FJ_INCH_LENGTH)
 
-/** Concepts like text/interface scaling factor are mostly derived from the ratio to 96 DPI.
+/**
+    Concepts like text/interface scaling factor are mostly derived from the ratio to 96 DPI.
     That is, if the current DPI is 120, the content of the appropriate size is considered to be
     scaled by 120 / 96 = 125% compared to the "unscaled" ("density-unaware") content rendered at
-    96 DPI. */
-#define FJ_DPM_INTO_LEGACY_SCALING(DENSITY) (FJ_DENSITY_INTO_DPI(DENSITY) / FJ_LEGACY_DPI)
-#define FJ_DPM_FROM_LEGACY_SCALING(FACTOR) (FJ_DENSITY_FROM_DPI(FJ_LEGACY_DPI * (double) (FACTOR)))
+    the standard 96 DPI.
+*/
+#define FJ_DENSITY_INTO_STANDARD_SCALING(DENSITY) (FJ_DENSITY_INTO_DPI(DENSITY) / FJ_STANDARD_DPI)
+
+#define FJ_DENSITY_FROM_STANDARD_SCALING(SCALING_FACTOR) \
+    (FJ_DENSITY_FROM_DPI(FJ_STANDARD_DPI * (double) (SCALING_FACTOR)))
 
 
 #define FJ_TRY(EXPR)                                                                          \
     for (fj_err fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
-        if (fj_result != FJ_OK)  // Outside of for loop to avoid dead code if the block returns
+        if (fj_result != FJ_OK)
 
 
 /** Error code. */
@@ -199,6 +209,8 @@ struct fj_viewport2d {
 /** Always returns a valid printable string, even for invalid error IDs. */
 FJ_PUBLIC
 char const *fj_err_get_description(fj_err error);
+
+// TODO time, version, density, geometry utils as static?/inline functions
 
 
 #endif

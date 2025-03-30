@@ -39,7 +39,7 @@ struct fj_main_module_callbacks {
 struct fj_main_module_methods {
     char const *(*get_implementation_name)(void);
 
-    struct fj_version (*get_implementation_version)(void);
+    struct fj_version (*get_api_version)(void);
 
     fj_err (*get_module)(struct fj_main_module **out_mod);
 
@@ -71,6 +71,9 @@ char const *fj_main_get_default_implementation_name(void);
 
 FJ_PUBLIC
 fj_err fj_main_get_module(struct fj_main_module **out_mod);
+
+
+#include <fejix/modules/helpers/main.h>
 
 
 #endif
