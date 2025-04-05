@@ -34,15 +34,17 @@ InsertNewlineAtEOF: true
 #     }
 # }
 #
-# void f(void) {
-#     /* Empty on purpose */            <-
-# }
+# void f(void) { }                      <-
+# struct X { }                          <-
 BreakBeforeBraces: Custom
 BraceWrapping:
     AfterNamespace: true
     AfterClass: true
     AfterFunction: true
     AfterControlStatement: MultiLine
+    SplitEmptyFunction: false
+    SplitEmptyRecord: false
+    SplitEmptyNamespace: false
 AllowShortFunctionsOnASingleLine: None
 
 # int x()
@@ -169,17 +171,16 @@ IndentPPDirectives: AfterHash
 
 Macros:
     # This tricks clang-format into correctly formatting calling conventions in function pointer
-    # declarations and typedefs.
-    # The problem is that clang-format does not fully understand the code semantics and poorly
-    # handles macro expansions.
-    # The expansion here must match the macro name character count in order for clang-format to
-    # handle the column limit correctly.
-    - 'FJ_OPENGL_CALL=*********const'
+    # declarations and typedefs. The problem is that clang-format does not fully understand the code
+    # semantics and poorly handles macro expansions. The expansion here must match the macro name
+    # character count in order for clang-format to handle the column limit correctly.
+    # Example usage:
+    # typedef int (MY_CALLING_CONVENTION *some_function_type)(int arg, int arg2);
+    - 'MY_CALLING_CONVENTION=****************const'
 
     # This tricks clang-format into leaving these macros on their own lines.
     # clang-format does not support proper custom attributes as of now.
     - 'FJ_PUBLIC=[[xxxxx]]'
-    - 'FJ_HELPER=[[xxxxx]]'
 
 IfMacros:
     - 'FJ_TRY'

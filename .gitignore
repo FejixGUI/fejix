@@ -2,6 +2,7 @@
 .*
 
 # Allow important configuration files
+!.gitmodules
 !.gitignore
 !.gitkeep
 !.editorconfig

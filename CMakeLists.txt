@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
     fejix
-    VERSION 0.0.1
+    VERSION 0.1.0
     DESCRIPTION "Cross-platform low-level GUI base library"
     HOMEPAGE_URL "https://github.com/FejixGUI/fejix")
 
@@ -16,12 +16,12 @@ set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
 set(fejix_build_winapi OFF CACHE BOOL "Build WinAPI port")
 
-set(fejix_detect_ports ON CACHE BOOL "Enable the library ports common for the target OS")
+set(fejix_detect_backends ON CACHE BOOL "Enable the backends that are common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
 
-if("${fejix_detect_ports}")
+if("${fejix_detect_backends}")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "^Windows$|MSYS|Cygwin")
         set(fejix_build_winapi ON)
     elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|BSD|DragonFly")
