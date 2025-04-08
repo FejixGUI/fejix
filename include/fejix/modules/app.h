@@ -26,41 +26,27 @@ enum fj_app_event_type {
 };
 
 
-/**
-    This must be shown!
-*/
-FJ_DEFINE_OBJECT(fj_app)
+FJ_OPAQUE_OBJECT(fj_app_manager)
 
-/**
-    Wow
-*/
-struct test {
-    /** Wow */
-    int x;
-};
+typedef fj_err (*fj_app_event_callback)(
+    void *callback_data, enum fj_app_event_type type, void *opt_event_data);
 
 
-// fejix-autogen methods since 0.1.0
+FJ_METHOD_NONNULL(
+    fj_app_create_manager,
+    fj_err,
+    struct fj_app_manager **out_app_manager,
+    fj_app_event_callback callback,
+    void *callback_data)
 
-FJ_PUBLIC
-fj_err (*fj_app_create_manager)(
-    struct fj_app **out_app_manager,
-    fj_err (*event_callback)(
-        void *callback_data, enum fj_app_event_type type, void *opt_event_data),
-    void *callback_data);
-
-FJ_PUBLIC
-fj_err (*fj_app_destroy_manager)(struct fj_app *app_manager);
+FJ_METHOD(fj_app_destroy_manager, fj_err, struct fj_app_manager *app_manager)
 
 /** May never return! */
-FJ_PUBLIC
-fj_err (*fj_app_launched)(struct fj_app *app_manager);
+FJ_METHOD(fj_app_launched, fj_err, struct fj_app_manager *app_manager)
 
-FJ_PUBLIC
-fj_err (*fj_app_request_finish)(struct fj_app *app_manager);
+FJ_METHOD(fj_app_request_finish, fj_err, struct fj_app_manager *app_manager)
 
-FJ_PUBLIC
-fj_err (*fj_app_request_idle)(struct fj_app *app_manager);
+FJ_METHOD(fj_app_request_idle, fj_err, struct fj_app_manager *app_manager)
 
 
 #endif

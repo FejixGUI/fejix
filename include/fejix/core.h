@@ -10,39 +10,64 @@
 #include <stdint.h>
 
 
-#ifdef __cplusplus
-#    define FJ_PUBLIC_LINKAGE extern "C"
-#else
-#    define FJ_PUBLIC_LINKAGE extern
-#endif
+#define FJ_VERSION_MAJOR (0)
+#define FJ_VERSION_MINOR (1)
+#define FJ_VERSION_PATCH (0)
 
-#if defined(_WIN32)
-#    if defined(FJ_BUILDING_PRIVATE_CODE)
-#        define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
-#    else
-#        define FJ_PUBLIC_VISIBILITY __declspec(dllimport)
-#    endif
-#elif defined(__GNUC__) && __GNUC__ >= 4
-#    define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
+
+#ifdef FJ_BUILDING_DOCS
+
+#    define FJ_PUBLIC extern
+
 #else
-#    define FJ_PUBLIC_VISIBILITY
+
+#    ifdef __cplusplus
+#        define FJ_PUBLIC_LINKAGE extern "C"
+#    else
+#        define FJ_PUBLIC_LINKAGE extern
+#    endif
+
+#    if defined(_WIN32)
+#        if defined(FJ_BUILDING_PRIVATE_CODE)
+#            define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
+#        else
+#            define FJ_PUBLIC_VISIBILITY __declspec(dllimport)
+#        endif
+#    elif defined(__GNUC__) && __GNUC__ >= 4
+#        define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
+#    else
+#        define FJ_PUBLIC_VISIBILITY
+#    endif
+
+#    define FJ_PUBLIC FJ_PUBLIC_LINKAGE FJ_PUBLIC_VISIBILITY
+
 #endif
 
 #ifdef FJ_BUILDING_DOCS
-#    define FJ_PUBLIC extern
+
+#    define FJ_OPAQUE_OBJECT(TYPE) \
+        struct TYPE { };
+
 #else
-#    define FJ_PUBLIC FJ_PUBLIC_LINKAGE FJ_PUBLIC_VISIBILITY
+
+#    define FJ_OPAQUE_OBJECT(TYPE) struct TYPE;
+
 #endif
 
-#define FJ_DEFINE_OBJECT(TYPE) struct TYPE;
 
+#define FJ_USERDATA(OBJECT_PTR) (*(void **) (void *) (OBJECT_PTR))
+
+#ifndef FJ_METHOD
+#    define FJ_METHOD(NAME, RETURN_TYPE, ...) FJ_PUBLIC RETURN_TYPE (*NAME)(__VA_ARGS__);
+#endif
+
+#ifndef FJ_METHOD_NONNULL
+#    define FJ_METHOD_NONNULL(NAME, RETURN_TYPE, ...) FJ_METHOD(NAME, RETURN_TYPE, __VA_ARGS__)
+#endif
 
 #define FJ_TRY(EXPR)                                                                          \
     for (fj_err fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
         if (fj_result != FJ_OK)
-
-
-#define FJ_USERDATA(OBJECT_PTR) (*(void **) (void *) (OBJECT_PTR))
 
 
 /** Error code. */
@@ -119,12 +144,6 @@ typedef uint64_t fj_time;
 /** Dots-per-metres (DPM). */
 typedef double fj_density;
 
-
-struct fj_version {
-    uint8_t major;
-    uint8_t minor;
-    uint8_t patch;
-};
 
 /** 2D absolute position. */
 struct fj_position2d {

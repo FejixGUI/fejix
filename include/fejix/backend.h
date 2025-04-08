@@ -6,10 +6,7 @@
 
 
 FJ_PUBLIC
-void fj_backend_get_list(char const *const *out_backends, uint32_t *out_backends_length);
-
-FJ_PUBLIC
-fj_err fj_backend_get_version(char const *backend_name, struct fj_version *out_version);
+void fj_backend_get_list(char const *const **out_backends, uint32_t *out_backends_length);
 
 /**
     \returns NULL if there are no backends built in, otherwise always returns a valid backend.
