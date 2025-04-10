@@ -8,33 +8,43 @@ Fejix is *not* a graphics rendering engine or a full-blown GUI framework with wi
 
 Goals:
 
-* **feature-richness**:
+* **Feature-rich library**:
 
-    No extension libraries.
-    Functionality is either in Fejix or does not exist.
+    No extension libraries. Fejix has all the functionality you need.
 
-* **API simplicity**
+* **Simple API**:
 
-    No obscure object-oriented metaprogramming magic like in GTK or Qt.
-    Just simple enough C.
+    It's (almost) just C.
 
-* **modularity**:
+    No convoluted object-oriented metaprogramming magic gets in your way,
+    regardless of whether you are using or developing the library.
 
-    Many small API modules, each of them may or may not be available at runtime.
+* **Modular API**:
 
-    Makes it simple to design, extend, port, and reimplement the library.
+    The library is divided into many small modules, and each of them may or may not be available at
+    runtime depending on the platform features and the current support of those features in Fejix.
+
+    This makes it simpler to design, extend, port, and reimplement the library.
+
+* **Modular backends**:
+
+    All backends directly expose their functions to the user, no wrappers or abstractions.
+    Thus backends are completely independent of each other and are fairly easy to add,
+    replace, enable/disable for compilation, and enable/disable at runtime.
 
 Nice to have:
 
-* ability to **port existing projects** to Fejix:
+* Ability to **port existing projects** to Fejix:
 
-    Fejix has a few modules that implement legacy or not-so-cross-platform behaviors specifically
-    to allow other libraries and programs to gradually migrate to it.
+    The library has a few modules that implement legacy or not-so-cross-platform behaviors
+    specifically to allow other libraries and programs depending on those behaviors to gradually
+    migrate to Fejix.
 
-* **clean code**:
+* **Clean code**:
 
-    ...which kinda makes sense, doesn't it? If you find something too complicated to read and
-    extend, feel free to discuss it.
+    ...to the extent that it remains fairly easy to add nice shiny features to the library, because
+    there a *lot* of nice shiny features in the giant fragmented world of graphical operating
+    systems.
 
 
 > Note, however, that hardly anything has been done so far.

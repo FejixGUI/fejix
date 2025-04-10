@@ -9,9 +9,9 @@ int main(void)
 {
     // TODO: better tests
 
-    struct {
-        FJ_VECTOR(int)
-    } v = { 0 };
+    FJ_DEFINE_VECTOR(myvec, int)
+
+    struct myvec v;
 
     assert(FJ_VECTOR_EXPAND(&v) == FJ_OK);
     v.items[0] = 111;

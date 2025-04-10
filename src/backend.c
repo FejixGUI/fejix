@@ -5,15 +5,9 @@
 #include <string.h>
 
 
-#ifdef FJ_BUILDING_X11
-void fj_x11_init_methods(void);
-#endif
-#ifdef FJ_BUILDING_WINAPI
-void fj_winapi_init_methods(void);
-#endif
-#ifdef FJ_BUILDING_WAYLAND
-void fj_wayland_init_methods(void);
-#endif
+void fj_modules_init_x11(void);
+void fj_modules_init_winapi(void);
+void fj_modules_init_wayland(void);
 
 static char const *const backends[] = {
 #ifdef FJ_BUILDING_X11
@@ -28,15 +22,15 @@ static char const *const backends[] = {
     NULL,  // Avoid warnings about empty array
 };
 
-static void (*method_initialization_funcs[])(void) = {
+static void (*modules_init_funcs[])(void) = {
 #ifdef FJ_BUILDING_X11
-    fj_x11_init_methods,
+    fj_modules_init_x11,
 #endif
 #ifdef FJ_BUILDING_WINAPI
-    fj_winapi_init_methods,
+    fj_modules_init_winapi,
 #endif
 #ifdef FJ_BUILDING_WAYLAND
-    fj_wayland_init_methods,
+    fj_modules_init_wayland,
 #endif
     NULL,
 };
@@ -88,7 +82,7 @@ fj_err fj_backend_select(char const *backend_name)
 {
     for (uint32_t i = 0; i < FJ_LEN(backends) - 1; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
-            method_initialization_funcs[i]();
+            modules_init_funcs[i]();
         }
     }
 

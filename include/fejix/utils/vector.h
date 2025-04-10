@@ -59,7 +59,6 @@
     (fj_vector_expand_at(           \
         (void **) &(VECTOR)->items, \
         &(VECTOR)->length,          \
-        (VECTOR)->length,           \
         &(VECTOR)->capacity,        \
         (VECTOR)->length,           \
         sizeof(*(VECTOR)->items)))

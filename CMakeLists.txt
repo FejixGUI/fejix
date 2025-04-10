@@ -10,16 +10,15 @@ project(
 include(GNUInstallDirs)
 
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library type. If loader is enabled, it makes other ports build as shared.")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library type.")
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
-set(fejix_build_winapi OFF CACHE BOOL "Build WinAPI port")
+set(fejix_build_winapi OFF CACHE BOOL "Build WindowsAPI backend")
 
 set(fejix_detect_backends ON CACHE BOOL "Enable the backends that are common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
-
 
 if("${fejix_detect_backends}")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "^Windows$|MSYS|Cygwin")
@@ -68,10 +67,19 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/build.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/src/utils/build.cmake")
 
+set(fejix_backend_count 0)
+
 if("${fejix_build_winapi}")
     include("${CMAKE_CURRENT_LIST_DIR}/winapi/build.cmake")
+    math(EXPR fejix_backend_count "${fejix_backend_count} + 1")
 endif()
 
+if("${fejix_backend_count}" EQUAL 1)
+    target_compile_definitions(
+        fejix
+        PRIVATE
+            "FJ_BUILDING_SINGLE_BACKEND")
+endif()
 
 install(
     DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/include/fejix"

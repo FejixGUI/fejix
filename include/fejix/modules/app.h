@@ -49,4 +49,13 @@ FJ_METHOD(fj_app_request_finish, fj_err, struct fj_app_manager *app_manager)
 FJ_METHOD(fj_app_request_idle, fj_err, struct fj_app_manager *app_manager)
 
 
+FJ_METHOD_LIST_BEGIN(fj_app)
+FJ_METHOD_LIST_ITEM(fj_app_create_manager)
+FJ_METHOD_LIST_ITEM(fj_app_destroy_manager)
+FJ_METHOD_LIST_ITEM(fj_app_launched)
+FJ_METHOD_LIST_ITEM(fj_app_request_finish)
+FJ_METHOD_LIST_ITEM(fj_app_request_idle)
+FJ_METHOD_LIST_END()
+
+
 #endif

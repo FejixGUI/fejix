@@ -65,6 +65,18 @@
 #    define FJ_METHOD_NONNULL(NAME, RETURN_TYPE, ...) FJ_METHOD(NAME, RETURN_TYPE, __VA_ARGS__)
 #endif
 
+#ifndef FJ_METHOD_LIST_BEGIN
+#    define FJ_METHOD_LIST_BEGIN(MODULE_NAME)
+#endif
+
+#ifndef FJ_METHOD_LIST_END
+#    define FJ_METHOD_LIST_END()
+#endif
+
+#ifndef FJ_METHOD_LIST_ITEM
+#    define FJ_METHOD_LIST_ITEM(METHOD_NAME)
+#endif
+
 #define FJ_TRY(EXPR)                                                                          \
     for (fj_err fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
         if (fj_result != FJ_OK)
