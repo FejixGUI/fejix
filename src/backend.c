@@ -5,32 +5,34 @@
 #include <string.h>
 
 
-void fj_modules_init_x11(void);
-void fj_modules_init_winapi(void);
-void fj_modules_init_wayland(void);
+void fj_init_methods_x11(void);
+void fj_init_methods_winapi(void);
+void fj_init_methods_wayland(void);
 
+// Backends are in alphabetic order
 static char const *const backends[] = {
-#ifdef FJ_BUILDING_X11
-    "X11",
+#ifdef FJ_BUILDING_WAYLAND
+    "wayland",
 #endif
 #ifdef FJ_BUILDING_WINAPI
-    "WindowsAPI",
+    "winapi",
 #endif
-#ifdef FJ_BUILDING_WAYLAND
-    "Wayland",
+#ifdef FJ_BUILDING_X11
+    "x11",
 #endif
-    NULL,  // Avoid warnings about empty array
+    NULL,  // Avoid warnings about an empty array
 };
 
-static void (*modules_init_funcs[])(void) = {
-#ifdef FJ_BUILDING_X11
-    fj_modules_init_x11,
+// Backends are in alphabetic order
+static void (*method_initialization_funcs[])(void) = {
+#ifdef FJ_BUILDING_WAYLAND
+    fj_init_methods_wayland,
 #endif
 #ifdef FJ_BUILDING_WINAPI
-    fj_modules_init_winapi,
+    fj_init_methods_winapi,
 #endif
-#ifdef FJ_BUILDING_WAYLAND
-    fj_modules_init_wayland,
+#ifdef FJ_BUILDING_X11
+    fj_init_methods_x11,
 #endif
     NULL,
 };
@@ -45,32 +47,39 @@ void fj_backend_get_list(char const *const **out_backends, uint32_t *out_backend
 
 char const *fj_backend_get_default(void)
 {
-    if (getenv("FEJIX_BACKEND_HINT") != NULL) {
+    {
         char const *hint = getenv("FEJIX_BACKEND_HINT");
-        for (uint32_t i = 0; i < FJ_LEN(backends) - 1; i++) {
-            if (strcmp(backends[i], hint) == 0) {
-                return backends[i];
+
+        if (hint != NULL) {
+            for (uint32_t i = 0; i < FJ_LEN(backends) - 1; i++) {
+                if (strcmp(backends[i], hint) == 0) {
+                    return backends[i];
+                }
             }
         }
     }
 
-#if defined(FJ_BUILDING_WAYLAND)
+#if defined(FJ_BUILDING_WAYLAND) || defined(FJ_BUILDING_X11)
     if (getenv("XDG_SESSION_TYPE") != NULL) {
         if (strcmp(getenv("XDG_SESSION_TYPE"), "wayland") == 0) {
-            return "Wayland";
+            return "wayland";
         }
-    } else if (getenv("WAYLAND_DISPLAY") != NULL) {
-        return "Wayland";
+
+        if (strcmp(getenv("XDG_SESSION_TYPE"), "x11") == 0) {
+            return "x11";
+        }
+    }
+#endif
+
+#if defined(FJ_BUILDING_WAYLAND)
+    if (getenv("WAYLAND_DISPLAY") != NULL) {
+        return "wayland";
     }
 #endif
 
 #if defined(FJ_BUILDING_X11)
-    if (getenv("XDG_SESSION_TYPE") != NULL) {
-        if (strcmp(getenv("XDG_SESSION_TYPE"), "x11") == 0) {
-            return "X11";
-        }
-    } else if (getenv("DISPLAY") != NULL) {
-        return "X11";
+    if (getenv("DISPLAY") != NULL) {
+        return "x11";
     }
 #endif
 
@@ -78,13 +87,22 @@ char const *fj_backend_get_default(void)
 }
 
 
+#ifdef FJ_BUILDING_SINGLE_BACKEND
+fj_err fj_backend_select(char const *backend_name)
+{
+    // All functions are already initialized statically in this case
+    (void) backend_name;
+    return FJ_OK;
+}
+#else
 fj_err fj_backend_select(char const *backend_name)
 {
     for (uint32_t i = 0; i < FJ_LEN(backends) - 1; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
-            modules_init_funcs[i]();
+            method_initialization_funcs[i]();
         }
     }
 
     return FJ_ERR_UNAVAILABLE;
 }
+#endif

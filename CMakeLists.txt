@@ -14,20 +14,22 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library ty
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
-set(fejix_build_winapi OFF CACHE BOOL "Build WindowsAPI backend")
-
-set(fejix_detect_backends ON CACHE BOOL "Enable the backends that are common for the target OS")
+set(fejix_backends "" CACHE STRING "The backends to enable. If \"detect\", selects the backends common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
-if("${fejix_detect_backends}")
+if("${fejix_backends}" STREQUAL "detect")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "^Windows$|MSYS|Cygwin")
-        set(fejix_build_winapi ON)
+        set(fejix_backends "winapi")
     elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|BSD|DragonFly")
-        set(fejix_build_wayland ON)
-        set(fejix_build_x11 ON)
+        set(fejix_backends "wayland" "x11")
+    else()
+        message(WARNING "Fejix could not detect backends for the target OS")
+        set(fejix_backends "")
     endif()
 endif()
+
+list(LENGTH fejix_backends fejix_backend_count)
 
 enable_language("C")
 
@@ -55,6 +57,13 @@ target_compile_definitions(
         "FJ_BUILDING_PRIVATE_CODE"
         "$<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>")
 
+if("${fejix_backend_count}" EQUAL 1)
+    target_compile_definitions(
+        fejix
+        PRIVATE
+            "FJ_BUILDING_SINGLE_BACKEND")
+endif()
+
 target_include_directories(
     fejix
     PUBLIC
@@ -67,18 +76,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/build.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/src/utils/build.cmake")
 
-set(fejix_backend_count 0)
-
-if("${fejix_build_winapi}")
+if("winapi" IN_LIST fejix_backends)
     include("${CMAKE_CURRENT_LIST_DIR}/winapi/build.cmake")
-    math(EXPR fejix_backend_count "${fejix_backend_count} + 1")
-endif()
-
-if("${fejix_backend_count}" EQUAL 1)
-    target_compile_definitions(
-        fejix
-        PRIVATE
-            "FJ_BUILDING_SINGLE_BACKEND")
 endif()
 
 install(

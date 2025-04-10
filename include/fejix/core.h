@@ -45,12 +45,12 @@
 
 #ifdef FJ_BUILDING_DOCS
 
-#    define FJ_OPAQUE_OBJECT(TYPE) \
+#    define FJ_OPAQUE_STRUCT(TYPE) \
         struct TYPE { };
 
 #else
 
-#    define FJ_OPAQUE_OBJECT(TYPE) struct TYPE;
+#    define FJ_OPAQUE_STRUCT(TYPE) struct TYPE;
 
 #endif
 

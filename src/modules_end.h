@@ -27,4 +27,17 @@
 #define FJ_METHOD_LIST_ITEM(METHOD_NAME)
 #define FJ_METHOD_LIST_END()
 
+
+// Suppress warnings about unused arguments in the default dummies for non-null methods.
+
+// This applies to both GCC and Clang
+#if defined(__GNUC__)
+#    pragma GCC diagnostic ignored "-Wunused"
+#endif
+// This applies to MSVC
+#if defined(_MSC_VER)
+#    pragma warning(disable : 4100)
+#endif
+
+
 #include <src/modules_all.h>

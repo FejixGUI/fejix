@@ -14,10 +14,12 @@ Goals:
 
 * **Simple API**:
 
-    It's (almost) just C.
+    It's just C.
 
-    No convoluted object-oriented metaprogramming magic gets in your way,
-    regardless of whether you are using or developing the library.
+    No obscure object-oriented metaprogramming magic gets in your way.
+
+    ...except for the code that selects the right library backend at runtime/compile time.
+    That's just not possible to do without macros.
 
 * **Modular API**:
 
@@ -30,7 +32,7 @@ Goals:
 
     All backends directly expose their functions to the user, no wrappers or abstractions.
     Thus backends are completely independent of each other and are fairly easy to add,
-    replace, enable/disable for compilation, and enable/disable at runtime.
+    replace, enable/disable for compilation, and select at runtime.
 
 Nice to have:
 
@@ -46,8 +48,6 @@ Nice to have:
     there a *lot* of nice shiny features in the giant fragmented world of graphical operating
     systems.
 
-
-> Note, however, that hardly anything has been done so far.
 > This library is in its earliest development stage.
 > The most interesting thing to see here is this emoji: 🌸.
 > Yay.

@@ -26,7 +26,7 @@ enum fj_app_event_type {
 };
 
 
-FJ_OPAQUE_OBJECT(fj_app_manager)
+FJ_OPAQUE_STRUCT(fj_app_manager)
 
 typedef fj_err (*fj_app_event_callback)(
     void *callback_data, enum fj_app_event_type type, void *opt_event_data);
