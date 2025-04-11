@@ -32,7 +32,7 @@
 
 // This applies to both GCC and Clang
 #if defined(__GNUC__)
-#    pragma GCC diagnostic ignored "-Wunused"
+#    pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 // This applies to MSVC
 #if defined(_MSC_VER)
@@ -40,4 +40,4 @@
 #endif
 
 
-#include <src/modules_all.h>
+#include <fejix/modules/_all.h>

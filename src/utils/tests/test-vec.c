@@ -11,7 +11,7 @@ int main(void)
 
     FJ_DEFINE_VECTOR(myvec, int)
 
-    struct myvec v;
+    struct myvec v = { 0 };
 
     assert(FJ_VECTOR_EXPAND(&v) == FJ_OK);
     v.items[0] = 111;

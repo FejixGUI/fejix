@@ -28,7 +28,7 @@ fj_err fj_vector_expand_at(
             return fj_result;
         }
 
-        *capacity *= 2;
+        *capacity = new_capacity;
     }
 
     if (index != *length) {
@@ -52,17 +52,17 @@ fj_err fj_vector_shrink_at(
         shift_tail(*items, *length, index + 1, index, item_size);
     }
 
-    if (*length == *capacity / 2) {
+    if (*length <= *capacity / 4) {
         uint32_t new_capacity = fj_u32_max(*capacity / 2, 1);
         FJ_TRY (fj_realloc_zeroed(items, *capacity, new_capacity, item_size)) {
             return fj_result;
         }
 
-        *capacity *= 2;
+        *capacity = new_capacity;
     }
 
 
-    *length += 1;
+    *length -= 1;
 
     return FJ_OK;
 }

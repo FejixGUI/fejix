@@ -1,14 +1,14 @@
 # Fejix
 
-Fejix is a universal cross-platform GUI base library.
-It wraps system APIs for window output, keyboard/mouse/other input processing etc.
+Fejix is a low-level cross-platform GUI base library.
+It wraps system APIs for window output, keyboard, mouse and other input processing etc.
 and can be used to build UI frameworks, game engines and other tools.
 
-Fejix is *not* a graphics rendering engine or a full-blown GUI framework with widgets.
+Fejix is *not* a graphics rendering engine or a widget framework.
 
-Goals:
+Features:
 
-* **Feature-rich library**:
+* **Feature-rich**:
 
     No extension libraries. Fejix has all the functionality you need.
 
@@ -34,7 +34,7 @@ Goals:
     Thus backends are completely independent of each other and are fairly easy to add,
     replace, enable/disable for compilation, and select at runtime.
 
-Nice to have:
+Secondary features:
 
 * Ability to **port existing projects** to Fejix:
 
