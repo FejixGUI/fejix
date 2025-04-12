@@ -5,11 +5,11 @@
 #include <fejix/modules/app.h>
 
 
-enum fj_opengl_surface_target_type {
-    FJ_OPENGL_SURFACE_TARGET_WINDOW = 0,
-    FJ_OPENGL_SURFACE_TARGET_PIXMAP = 1,
+enum fj_opengl_surface_type {
+    FJ_OPENGL_SURFACE_WINDOW = 0,
+    FJ_OPENGL_SURFACE_PIXMAP = 1,
 
-    FJ_OPENGL_SURFACE_TARGET_ENUM32 = INT32_MAX,
+    FJ_OPENGL_SURFACE_ENUM32 = INT32_MAX,
 };
 
 
@@ -22,10 +22,10 @@ struct fj_opengl_manager_info {
 };
 
 struct fj_opengl_surface_info {
-    void *target_object;
-    enum fj_opengl_surface_target_type target_type;
+    enum fj_opengl_surface_type surface_type;
     void *egl_config;
     intptr_t const *egl_attribs;
+    void *target_object;
 };
 
 

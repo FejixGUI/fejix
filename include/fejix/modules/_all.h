@@ -3,3 +3,4 @@
 #include <fejix/modules/app.h>
 #include <fejix/modules/app_serialize.h>
 #include <fejix/modules/clock.h>
+#include <fejix/modules/opengl.h>

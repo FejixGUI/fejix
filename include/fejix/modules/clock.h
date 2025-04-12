@@ -29,7 +29,7 @@ FJ_METHOD(
     fj_clock_create,
     fj_err,
     struct fj_clock_manager *manager,
-    fj_time precision,
+    fj_time requested_precision,
     struct fj_clock **out_clock)
 
 FJ_METHOD(fj_clock_destroy, fj_err, struct fj_clock_manager *manager, struct fj_clock *clock)
