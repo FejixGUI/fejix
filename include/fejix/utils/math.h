@@ -50,6 +50,15 @@ static inline uint32_t fj_u32_min(uint32_t a, uint32_t b)
     return a < b ? a : b;
 }
 
+static inline size_t fj_size_max(size_t a, size_t b)
+{
+    return a > b ? a : b;
+}
+
+static inline size_t fj_size_min(size_t a, size_t b)
+{
+    return a < b ? a : b;
+}
 
 static inline fj_time fj_time_from_nanos(uint64_t nanoseconds)
 {

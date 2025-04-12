@@ -35,9 +35,9 @@ typedef fj_err (*fj_app_event_callback)(
 FJ_METHOD_NONNULL(
     fj_app_create_manager,
     fj_err,
-    struct fj_app_manager **out_app_manager,
-    fj_app_event_callback callback,
-    void *callback_data)
+    fj_app_event_callback event_callback,
+    void *callback_data,
+    struct fj_app_manager **out_app_manager)
 
 FJ_METHOD(fj_app_destroy_manager, fj_err, struct fj_app_manager *app_manager)
 

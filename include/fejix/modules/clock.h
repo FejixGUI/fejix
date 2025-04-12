@@ -12,7 +12,7 @@ enum fj_clock_event_type {
 };
 
 typedef fj_err (*fj_clock_event_callback)(
-    void *callback_data, enum fj_clock_event_type, void *opt_event_data);
+    void *callback_data, enum fj_clock_event_type event_type, void *opt_event_data);
 
 FJ_OPAQUE_STRUCT(fj_clock_manager)
 FJ_OPAQUE_STRUCT(fj_clock)
@@ -20,8 +20,8 @@ FJ_OPAQUE_STRUCT(fj_clock)
 FJ_METHOD_NONNULL(
     fj_clock_create_manager,
     fj_err,
-    struct fj_clock_manager **out_manager,
-    struct fj_app_manager *app_manager)
+    struct fj_app_manager *app_manager,
+    struct fj_clock_manager **out_manager)
 
 FJ_METHOD(fj_clock_destroy_manager, fj_err, struct fj_clock_manager *manager)
 
@@ -29,8 +29,8 @@ FJ_METHOD(
     fj_clock_create,
     fj_err,
     struct fj_clock_manager *manager,
-    struct fj_clock **out_clock,
-    fj_time precision)
+    fj_time precision,
+    struct fj_clock **out_clock)
 
 FJ_METHOD(fj_clock_destroy, fj_err, struct fj_clock_manager *manager, struct fj_clock *clock)
 
