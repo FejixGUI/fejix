@@ -9,9 +9,9 @@
 #include <fejix/core.h>
 
 
-/** Event type */
+/** App event type */
 enum fj_app_event_type {
-    /** App has finished */
+    /** App is finishing. */
     FJ_APP_EVENT_FINISH = 0,
     /** */
     FJ_APP_EVENT_IDLE = 1,

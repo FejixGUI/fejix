@@ -1,7 +1,11 @@
-/** Example:
+/**
+    \file
 
-    ```
-    FJ_DEFINE_VECTOR(my_vector, int)
+    Example:
+
+    \code{.c}
+
+    FJ_VECTOR_STRUCT(my_vector, int)
 
     // Vectors must be initialised with zeroes!
     struct my_vector v = { 0 };
@@ -31,7 +35,8 @@
     }
 
     FJ_VECTOR_FREE(&v);
-    ```
+
+    \endcode
 */
 
 #ifndef FEJIX_UTILS_VECTOR_H_INCLUDED
@@ -41,7 +46,7 @@
 #include <fejix/core.h>
 
 
-#define FJ_DEFINE_VECTOR(VECTOR_TYPE_NAME, ITEM_TYPE) \
+#define FJ_VECTOR_STRUCT(VECTOR_TYPE_NAME, ITEM_TYPE) \
     struct VECTOR_TYPE_NAME {                         \
         ITEM_TYPE *items;                             \
         uint32_t length, capacity;                    \

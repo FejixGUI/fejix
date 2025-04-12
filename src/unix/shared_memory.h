@@ -1,29 +1,29 @@
-#ifndef FEJIX_UNIXBASE_SHM_H_INCLUDED
-#define FEJIX_UNIXBASE_SHM_H_INCLUDED
+#ifndef FEJIX_UNIX_SHARED_MEMORY_H_INCLUDED
+#define FEJIX_UNIX_SHARED_MEMORY_H_INCLUDED
 
 
 #include <fejix/core.h>
 
 
 /** Growable shared memory chunk with size of powers of two. */
-struct fj_unixbase_shm {
+struct fj_unix_shared_buffer {
     int32_t file;
     size_t size;
     void *data;
 };
 
 
-fj_err fj_unixbase_shm_alloc(struct fj_unixbase_shm *buffer, size_t size);
+fj_err fj_unix_shared_alloc(struct fj_unix_shared_buffer *buffer, size_t size);
 
-fj_err fj_unixbase_shm_free(struct fj_unixbase_shm *buffer);
+fj_err fj_unix_shared_free(struct fj_unix_shared_buffer *buffer);
 
 /** The buffer never gets shrinked. */
-fj_err fj_unixbase_shm_realloc(struct fj_unixbase_shm *buffer, size_t size);
+fj_err fj_unix_shared_realloc(struct fj_unix_shared_buffer *buffer, size_t size);
 
 /** Closes the buffer's file descriptor, but does not unmap the memory.
     This is used when the shell still needs to use the buffer's memory, but the client handle
     is no longer needed and can be destroyed. */
-fj_err fj_unixbase_shm_unref(struct fj_unixbase_shm *buffer);
+fj_err fj_unix_shared_unref(struct fj_unix_shared_buffer *buffer);
 
 
 #endif

@@ -2,7 +2,7 @@
 #    define _GNU_SOURCE
 #endif
 
-#include <src/unixbase/shm.h>
+#include <src/unix/shared_memory.h>
 
 #include <fejix/utils/math.h>
 #include <fejix/utils/memory.h>
@@ -73,25 +73,15 @@ static fj_err open_shm_file(int32_t *out_fd)
 #endif  // FJ_UNIXSHM_USE_SHM
 
 
-static fj_err shm_map(struct fj_unixbase_shm *shm)
+static fj_err shm_map(struct fj_unix_shared_buffer *buffer)
 {
-    if (ftruncate(shm->file, (off_t) shm->size) == -1) {
+    if (ftruncate(buffer->file, (off_t) buffer->size) == -1) {
         return FJ_ERR_IO_FAILED;
     }
 
-    shm->data = mmap(NULL, shm->size, PROT_READ | PROT_WRITE, MAP_SHARED, shm->file, 0);
+    buffer->data = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->file, 0);
 
-    if (shm->data == MAP_FAILED) {
-        return FJ_ERR_IO_FAILED;
-    }
-
-    return FJ_OK;
-}
-
-
-static fj_err shm_unmap(struct fj_unixbase_shm *shm)
-{
-    if (munmap(shm->data, shm->size) == -1) {
+    if (buffer->data == MAP_FAILED) {
         return FJ_ERR_IO_FAILED;
     }
 
@@ -99,19 +89,29 @@ static fj_err shm_unmap(struct fj_unixbase_shm *shm)
 }
 
 
-fj_err fj_unixbase_shm_alloc(struct fj_unixbase_shm *out_shm, size_t size)
+static fj_err shm_unmap(struct fj_unix_shared_buffer *buffer)
 {
-    out_shm->size = fj_size_higher_pow2(size);
+    if (munmap(buffer->data, buffer->size) == -1) {
+        return FJ_ERR_IO_FAILED;
+    }
 
-    FJ_TRY (open_shm_file(&out_shm->file)) {
+    return FJ_OK;
+}
+
+
+fj_err fj_unix_shared_alloc(struct fj_unix_shared_buffer *out_buffer, size_t size)
+{
+    out_buffer->size = fj_size_higher_pow2(size);
+
+    FJ_TRY (open_shm_file(&out_buffer->file)) {
         return fj_result;
     }
 
-    FJ_TRY (shm_map(out_shm)) {
-        close(out_shm->file);
-        out_shm->file = -1;
-        out_shm->size = 0;
-        out_shm->data = NULL;
+    FJ_TRY (shm_map(out_buffer)) {
+        close(out_buffer->file);
+        out_buffer->file = -1;
+        out_buffer->size = 0;
+        out_buffer->data = NULL;
         return fj_result;
     }
 
@@ -119,39 +119,39 @@ fj_err fj_unixbase_shm_alloc(struct fj_unixbase_shm *out_shm, size_t size)
 }
 
 
-fj_err fj_unixbase_shm_unref(struct fj_unixbase_shm *shm)
+fj_err fj_unix_shared_unref(struct fj_unix_shared_buffer *buffer)
 {
-    if (close(shm->file) == -1) {
+    if (close(buffer->file) == -1) {
         return FJ_ERR_IO_FAILED;
     }
 
-    shm->file = -1;
-    shm->data = NULL;
-    shm->size = 0;
+    buffer->file = -1;
+    buffer->data = NULL;
+    buffer->size = 0;
 
     return FJ_OK;
 }
 
 
-fj_err fj_unixbase_shm_free(struct fj_unixbase_shm *shm)
+fj_err fj_unix_shared_free(struct fj_unix_shared_buffer *buffer)
 {
-    FJ_TRY (shm_unmap(shm)) {
+    FJ_TRY (shm_unmap(buffer)) {
         return fj_result;
     }
 
-    return fj_unixbase_shm_unref(shm);
+    return fj_unix_shared_unref(buffer);
 }
 
 
-fj_err fj_unixbase_shm_realloc(struct fj_unixbase_shm *shm, size_t size)
+fj_err fj_unix_shared_realloc(struct fj_unix_shared_buffer *buffer, size_t size)
 {
-    if (size <= shm->size) {
+    if (size <= buffer->size) {
         return FJ_OK;
     }
 
-    shm->size = fj_size_max(fj_size_higher_pow2(size), shm->size);
+    buffer->size = fj_size_max(fj_size_higher_pow2(size), buffer->size);
 
-    FJ_TRY (shm_map(shm)) {
+    FJ_TRY (shm_map(buffer)) {
         return fj_result;
     }
 
