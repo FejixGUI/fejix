@@ -5,31 +5,22 @@
 #include <fejix/modules/app.h>
 
 
-enum fj_opengl_surface_type {
-    FJ_OPENGL_SURFACE_WINDOW = 0,
-    FJ_OPENGL_SURFACE_PIXMAP = 1,
-
-    FJ_OPENGL_SURFACE_ENUM32 = INT32_MAX,
-};
-
-
-typedef void *(*fj_opengl_function_loader)(void *callback_data, char const *function_name);
+typedef void *(*fj_opengl_function_load_callback)(void *callback_data, char const *function_name);
 
 
 struct fj_opengl_manager_info {
     void *egl_display;
-    fj_opengl_function_loader function_loader;
+    fj_opengl_function_load_callback function_load_callback;
+    void *function_load_callback_data;
 };
 
-struct fj_opengl_surface_info {
-    enum fj_opengl_surface_type surface_type;
+struct fj_opengl_window_surface_info {
     void *egl_config;
     intptr_t const *egl_attribs;
-    void *target_object;
 };
 
 
-FJ_OPAQUE_STRUCT(fj_opengl_manager)
+FJ_OPAQUE_STRUCT_WITH_USERDATA(fj_opengl_manager)
 
 FJ_METHOD_NONNULL(
     fj_opengl_create_manager,
@@ -41,10 +32,10 @@ FJ_METHOD_NONNULL(
 FJ_METHOD(fj_opengl_destroy_manager, fj_err, struct fj_opengl_manager *manager)
 
 FJ_METHOD(
-    fj_opengl_create_surface,
+    fj_opengl_create_window_surface,
     fj_err,
     struct fj_opengl_manager *manager,
-    struct fj_opengl_surface_info const *egl_surface_info,
+    struct fj_opengl_window_surface_info const *surface_info,
     void **out_egl_surface)
 
 FJ_METHOD_LIST_BEGIN(fj_opengl)

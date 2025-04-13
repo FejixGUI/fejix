@@ -72,8 +72,8 @@ void fj_unix_events_deinit(struct fj_unix_events *events)
         close(events->wakeup_pipe[1]);
     }
 
-    FJ_VECTOR_FREE(&events->pollfds);
-    FJ_VECTOR_FREE(&events->callbacks);
+    fj_unix_events_pollfd_vector_free(&events->pollfds);
+    fj_unix_events_callback_vector_free(&events->callbacks);
 }
 
 
@@ -89,17 +89,13 @@ fj_err fj_unix_events_add(
         .revents = 0,
     };
 
-    FJ_TRY (FJ_VECTOR_EXPAND(&events->pollfds)) {
+    FJ_TRY (fj_unix_events_pollfd_vector_push(&events->pollfds, &pollfd)) {
         return fj_result;
     }
 
-    events->pollfds.items[events->pollfds.length - 1] = pollfd;
-
-    FJ_TRY (FJ_VECTOR_EXPAND(&events->callbacks)) {
+    FJ_TRY (fj_unix_events_callback_vector_push(&events->callbacks, &callback)) {
         return fj_result;
     }
-
-    events->callbacks.items[events->callbacks.length - 1] = callback;
 
     return FJ_OK;
 }
@@ -109,11 +105,11 @@ fj_err fj_unix_events_remove(struct fj_unix_events *events, int file_descriptor)
 {
     for (size_t i = 0; i < events->pollfds.length; i++) {
         if (events->pollfds.items[i].fd == file_descriptor) {
-            FJ_TRY (FJ_VECTOR_SHRINK_AT(&events->pollfds, i)) {
+            FJ_TRY (fj_unix_events_pollfd_vector_remove(&events->pollfds, i)) {
                 return fj_result;
             }
 
-            FJ_TRY (FJ_VECTOR_SHRINK_AT(&events->callbacks, i)) {
+            FJ_TRY (fj_unix_events_callback_vector_remove(&events->callbacks, i)) {
                 return fj_result;
             }
 

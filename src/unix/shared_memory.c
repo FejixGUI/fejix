@@ -1,6 +1,5 @@
-#ifndef _GNU_SOURCE
-#    define _GNU_SOURCE
-#endif
+#undef _GNU_SOURCE
+#define _GNU_SOURCE
 
 #include <src/unix/shared_memory.h>
 
@@ -70,7 +69,7 @@ static fj_err open_shm_file(int32_t *out_fd)
     return FJ_ERR_IO_FAILED;
 }
 
-#endif  // FJ_UNIXSHM_USE_SHM
+#endif
 
 
 static fj_err shm_map(struct fj_unix_shared_buffer *buffer)

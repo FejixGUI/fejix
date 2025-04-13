@@ -12,8 +12,8 @@ typedef fj_err (*fj_unix_events_callback)(
     void *callback_data, int file_descriptor, short event_mask);
 
 
-FJ_VECTOR_STRUCT(fj_unix_events_pollfd_vector, struct pollfd)
-FJ_VECTOR_STRUCT(fj_unix_events_callback_vector, fj_unix_events_callback)
+FJ_VECTOR_OF(fj_unix_events_pollfd_vector, struct pollfd)
+FJ_VECTOR_OF(fj_unix_events_callback_vector, fj_unix_events_callback)
 
 struct fj_unix_events {
     int wakeup_pipe[2];

@@ -5,34 +5,34 @@
 #include <stdlib.h>
 
 
+FJ_VECTOR_OF(myvec, int)
+
+
 int main(void)
 {
     // TODO: better tests
 
-    FJ_DEFINE_VECTOR(myvec, int)
-
     struct myvec v = { 0 };
 
-    assert(FJ_VECTOR_EXPAND(&v) == FJ_OK);
-    v.items[0] = 111;
+    int _111 = 111, _222 = 222, _333 = 333;
 
-    assert(FJ_VECTOR_EXPAND(&v) == FJ_OK);
-    v.items[1] = 222;
+    assert(myvec_push(&v, &_111) == FJ_OK);
 
-    assert(FJ_VECTOR_EXPAND_AT(&v, 0) == FJ_OK);
-    v.items[0] = 333;
+    assert(myvec_push(&v, &_222) == FJ_OK);
+
+    assert(myvec_insert(&v, 0, &_333) == FJ_OK);
 
     assert(v.length == 3);
 
     assert(v.items[0] == 333 && v.items[1] == 111 && v.items[2] == 222);
 
-    assert(FJ_VECTOR_SHRINK_AT(&v, 1) == FJ_OK);
+    assert(myvec_remove(&v, 1) == FJ_OK);
 
     assert(v.length == 2);
 
     assert(v.items[0] == 333 && v.items[1] == 222);
 
-    FJ_VECTOR_FREE(&v);
+    myvec_free(&v);
 
     puts("OK");
 

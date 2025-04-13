@@ -26,17 +26,16 @@ enum fj_app_event_type {
 };
 
 
-FJ_OPAQUE_STRUCT(fj_app_manager)
+FJ_OPAQUE_STRUCT_WITH_USERDATA(fj_app_manager)
 
 typedef fj_err (*fj_app_event_callback)(
-    void *callback_data, enum fj_app_event_type type, void *opt_event_data);
+    struct fj_app_manager *app_manager, enum fj_app_event_type type, void *opt_event_data);
 
 
 FJ_METHOD_NONNULL(
     fj_app_create_manager,
     fj_err,
     fj_app_event_callback event_callback,
-    void *callback_data,
     struct fj_app_manager **out_app_manager)
 
 FJ_METHOD(fj_app_destroy_manager, fj_err, struct fj_app_manager *app_manager)

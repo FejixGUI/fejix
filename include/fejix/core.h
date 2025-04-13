@@ -44,19 +44,19 @@
 
 #endif
 
-#ifdef FJ_BUILDING_DOCS
+#ifdef FJ_BUILDING_PRIVATE_CODE
 
-#    define FJ_OPAQUE_STRUCT(TYPE) \
-        struct TYPE { };
+#    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) \
+        struct TYPE {                            \
+            void *userdata;                      \
+        };
 
 #else
 
-#    define FJ_OPAQUE_STRUCT(TYPE) struct TYPE;
+#    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) struct TYPE;
 
 #endif
 
-
-#define FJ_USERDATA(OBJECT_PTR) (*(void **) (void *) (OBJECT_PTR))
 
 #ifndef FJ_METHOD
 #    define FJ_METHOD(NAME, RETURN_TYPE, ...) FJ_PUBLIC RETURN_TYPE (*NAME)(__VA_ARGS__);
