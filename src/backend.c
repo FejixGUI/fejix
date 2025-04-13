@@ -23,6 +23,8 @@ static char const *const backends[] = {
     NULL,  // Avoid warnings about an empty array
 };
 
+static uint32_t const backends_length = FJ_LEN(backends) - 1;
+
 // Backends are in alphabetic order
 static void (*method_initialization_funcs[])(void) = {
 #ifdef FJ_BUILDING_WAYLAND
@@ -51,7 +53,7 @@ char const *fj_backend_get_default(void)
         char const *hint = getenv("FEJIX_BACKEND_HINT");
 
         if (hint != NULL) {
-            for (uint32_t i = 0; i < FJ_LEN(backends) - 1; i++) {
+            for (uint32_t i = 0; i < backends_length; i++) {
                 if (strcmp(backends[i], hint) == 0) {
                     return backends[i];
                 }
@@ -97,7 +99,7 @@ fj_err fj_backend_select(char const *backend_name)
 #else
 fj_err fj_backend_select(char const *backend_name)
 {
-    for (uint32_t i = 0; i < FJ_LEN(backends) - 1; i++) {
+    for (uint32_t i = 0; i < backends_length; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
             method_initialization_funcs[i]();
         }
