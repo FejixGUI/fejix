@@ -18,6 +18,8 @@ set(fejix_backends "" CACHE STRING "The backends to enable. If \"detect\", selec
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
+set(fejix_build_unix_utils OFF)
+
 if("${fejix_backends}" STREQUAL "detect")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "^Windows$|MSYS|Cygwin")
         set(fejix_backends "winapi")
@@ -36,6 +38,14 @@ enable_language("C")
 if("${fejix_build_tests}")
     enable_testing()
 endif()
+
+
+add_library(fejix_private INTERFACE)
+
+target_include_directories(
+    fejix_private
+    INTERFACE
+        "${CMAKE_CURRENT_LIST_DIR}")
 
 
 add_library(fejix)
@@ -71,13 +81,26 @@ target_include_directories(
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}")
 
+target_sources(
+    fejix
+    PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/src/core.c"
+        "${CMAKE_CURRENT_LIST_DIR}/src/backend.c")
 
-include("${CMAKE_CURRENT_LIST_DIR}/src/build.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/modules/build.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/src/utils/build.cmake")
 
 if("winapi" IN_LIST fejix_backends)
-    include("${CMAKE_CURRENT_LIST_DIR}/winapi/build.cmake")
+    include("${CMAKE_CURRENT_LIST_DIR}/src/winapi/build.cmake")
+endif()
+
+if("x11" IN_LIST fejix_backends)
+    include("${CMAKE_CURRENT_LIST_DIR}/src/x11/build.cmake")
+endif()
+
+if("${fejix_build_unix_utils}")
+    include("${CMAKE_CURRENT_LIST_DIR}/src/unix/build.cmake")
 endif()
 
 install(

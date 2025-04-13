@@ -22,7 +22,7 @@
 
 static fj_err open_shm_file(int32_t *out_fd)
 {
-    *out_fd = memfd_create("fejix-unixbase_shm-file", MFD_CLOEXEC);
+    *out_fd = memfd_create("fejix-shared-memory-file", MFD_CLOEXEC);
 
     if (*out_fd == -1) {
         return FJ_ERR_IO_FAILED;
@@ -50,7 +50,7 @@ static fj_err open_shm_file(int32_t *out_fd)
 {
     for (uint32_t i = 0; i < 16; i++) {
         char temp_file_name[32];
-        snprintf(temp_file_name, 32, "%s%08x", "/fejix-unixbase_shm-", rand32());
+        snprintf(temp_file_name, 32, "%s%08x", "/fejix-shared-memory-", rand32());
 
         *out_fd = shm_open(temp_file_name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 

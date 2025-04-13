@@ -4,8 +4,10 @@
 
 #include <fejix/modules/app.h>
 
+typedef void (*fj_opengl_function_pointer)(void);
 
-typedef void *(*fj_opengl_function_load_callback)(void *callback_data, char const *function_name);
+typedef fj_opengl_function_pointer (*fj_opengl_function_load_callback)(
+    void *callback_data, char const *function_name);
 
 
 struct fj_opengl_manager_info {

@@ -39,21 +39,11 @@ FJ_METHOD(
 
 FJ_METHOD(fj_clock_destroy, fj_err, struct fj_clock_manager *manager, struct fj_clock *clock)
 
-FJ_METHOD(
-    fj_clock_get_remaining_time,
-    fj_err,
-    struct fj_clock_manager *manager,
-    struct fj_clock *clock,
-    fj_time *out_remaining_time)
-
 FJ_METHOD_LIST_BEGIN(fj_clock)
 FJ_METHOD_LIST_ITEM(fj_clock_create_manager)
 FJ_METHOD_LIST_ITEM(fj_clock_destroy_manager)
 FJ_METHOD_LIST_ITEM(fj_clock_create)
 FJ_METHOD_LIST_ITEM(fj_clock_destroy)
-FJ_METHOD_LIST_ITEM(fj_clock_start_ticking)
-FJ_METHOD_LIST_ITEM(fj_clock_stop_ticking)
-FJ_METHOD_LIST_ITEM(fj_clock_get_remaining_time)
 FJ_METHOD_LIST_END()
 
 #endif

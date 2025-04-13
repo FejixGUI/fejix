@@ -20,7 +20,7 @@ int main(void)
     assert(fj_unix_shared_alloc(&buffer2, (size_t) 640 * 480 * 4) == FJ_OK);
     assert(fj_unix_shared_free(&buffer2) == FJ_OK);
 
-    assert(fj_unix_shared_free(&buffer2) == FJ_OK);
+    assert(fj_unix_shared_free(&buffer) == FJ_OK);
 
     return 0;
 }

@@ -46,14 +46,14 @@
 
 #ifdef FJ_BUILDING_PRIVATE_CODE
 
+#    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) struct TYPE;
+
+#else
+
 #    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) \
         struct TYPE {                            \
             void *userdata;                      \
         };
-
-#else
-
-#    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) struct TYPE;
 
 #endif
 
