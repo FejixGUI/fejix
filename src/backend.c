@@ -20,10 +20,8 @@ static char const *const backends[] = {
 #ifdef FJ_BUILDING_X11
     "x11",
 #endif
-    NULL,  // Avoid warnings about an empty array
+    NULL,  // Avoid warnings about the array being empty
 };
-
-static uint32_t const backends_length = FJ_LEN(backends) - 1;
 
 // Backends are in alphabetic order
 static void (*method_initialization_funcs[])(void) = {
@@ -36,14 +34,16 @@ static void (*method_initialization_funcs[])(void) = {
 #ifdef FJ_BUILDING_X11
     fj_init_methods_x11,
 #endif
-    NULL,
+    NULL,  // Avoid warnings about the array being empty
 };
+
+static uint32_t const backends_length = FJ_LEN(backends) - 1;
 
 
 void fj_backend_get_list(char const *const **out_backends, uint32_t *out_backends_length)
 {
     *out_backends = backends;
-    *out_backends_length = FJ_LEN(backends) - 1;
+    *out_backends_length = backends_length;
 }
 
 
@@ -85,26 +85,35 @@ char const *fj_backend_get_default(void)
     }
 #endif
 
-    return backends[0];
+    return backends[0];  // This is NULL if there are no backends
 }
 
 
 #ifdef FJ_BUILDING_SINGLE_BACKEND
+
 fj_err fj_backend_select(char const *backend_name)
 {
-    // All functions are already initialized statically in this case
-    (void) backend_name;
+    if (strcmp(backends[0], backend_name) != 0) {
+        return FJ_ERR_UNAVAILABLE;
+    }
+
+    // Do nothing, all the methods are already defined initialized
+
     return FJ_OK;
 }
+
 #else
+
 fj_err fj_backend_select(char const *backend_name)
 {
     for (uint32_t i = 0; i < backends_length; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
             method_initialization_funcs[i]();
+            return FJ_OK;
         }
     }
 
     return FJ_ERR_UNAVAILABLE;
 }
+
 #endif

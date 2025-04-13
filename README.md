@@ -14,12 +14,7 @@ Features:
 
 * **Simple API**:
 
-    It's just C.
-
-    No obscure object-oriented metaprogramming magic gets in your way.
-
-    ...except for the code that selects the right library backend at runtime/compile time.
-    That's just not possible to do without macros.
+    It's just C. Use of metaprogramming in public code is limited to just three simple macros or so.
 
 * **Modular API**:
 
