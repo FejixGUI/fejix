@@ -21,9 +21,9 @@ set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI vers
 set(fejix_build_unix_utils OFF)
 
 if("${fejix_backends}" STREQUAL "detect")
-    if("${CMAKE_SYSTEM_NAME}" MATCHES "^Windows$|MSYS|Cygwin")
+    if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
         set(fejix_backends "winapi")
-    elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|BSD|DragonFly")
+    elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|FreeBSD|OpenBSD|NetBSD|DragonFly")
         set(fejix_backends "wayland" "x11")
     else()
         message(WARNING "Fejix could not detect backends for the target OS")
@@ -64,14 +64,23 @@ target_compile_options(
 target_compile_definitions(
     fejix
     PRIVATE
-        "FJ_BUILDING_PRIVATE_CODE"
+        "FJ_COMPILE_OPT_PRIVATE_CODE"
         "$<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>")
 
 if("${fejix_backend_count}" EQUAL 1)
     target_compile_definitions(
         fejix
         PRIVATE
-            "FJ_BUILDING_SINGLE_BACKEND")
+            "FJ_COMPILE_OPT_SINGLE_BACKEND")
+endif()
+
+if("${BUILD_SHARED_LIBS}" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Windows|WindowsStore|MSYS|CYGWIN|WindowsCE|WindowsPhone")
+    target_compile_definitions(
+        fejix
+        PRIVATE
+            "FJ_COMPILE_OPT_DLLEXPORT"
+        INTERFACE
+            "FJ_INCLUDE_OPT_DLLIMPORT")
 endif()
 
 target_include_directories(

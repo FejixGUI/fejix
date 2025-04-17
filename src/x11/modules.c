@@ -1,4 +1,4 @@
-#define FJ_BACKEND_SUFFIX x11
+#define FJ_INTERNAL_OPT_BACKEND_SUFFIX x11
 #include <src/modules/begin.h>
 
 #include <fejix/modules/app.h>

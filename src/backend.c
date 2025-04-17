@@ -11,13 +11,13 @@ void fj_init_methods_wayland(void);
 
 // Backends are in alphabetic order
 static char const *const backends[] = {
-#ifdef FJ_BUILDING_WAYLAND
+#ifdef FJ_COMPILE_OPT_WAYLAND
     "wayland",
 #endif
-#ifdef FJ_BUILDING_WINAPI
+#ifdef FJ_COMPILE_OPT_WINAPI
     "winapi",
 #endif
-#ifdef FJ_BUILDING_X11
+#ifdef FJ_COMPILE_OPT_X11
     "x11",
 #endif
     NULL,  // Avoid warnings about the array being empty
@@ -25,13 +25,13 @@ static char const *const backends[] = {
 
 // Backends are in alphabetic order
 static void (*method_initialization_funcs[])(void) = {
-#ifdef FJ_BUILDING_WAYLAND
+#ifdef FJ_COMPILE_OPT_WAYLAND
     fj_init_methods_wayland,
 #endif
-#ifdef FJ_BUILDING_WINAPI
+#ifdef FJ_COMPILE_OPT_WINAPI
     fj_init_methods_winapi,
 #endif
-#ifdef FJ_BUILDING_X11
+#ifdef FJ_COMPILE_OPT_X11
     fj_init_methods_x11,
 #endif
     NULL,  // Avoid warnings about the array being empty
@@ -61,7 +61,7 @@ char const *fj_backend_get_default(void)
         }
     }
 
-#if defined(FJ_BUILDING_WAYLAND) || defined(FJ_BUILDING_X11)
+#if defined(FJ_COMPILE_OPT_WAYLAND) || defined(FJ_COMPILE_OPT_X11)
     if (getenv("XDG_SESSION_TYPE") != NULL) {
         if (strcmp(getenv("XDG_SESSION_TYPE"), "wayland") == 0) {
             return "wayland";
@@ -73,13 +73,13 @@ char const *fj_backend_get_default(void)
     }
 #endif
 
-#if defined(FJ_BUILDING_WAYLAND)
+#if defined(FJ_COMPILE_OPT_WAYLAND)
     if (getenv("WAYLAND_DISPLAY") != NULL) {
         return "wayland";
     }
 #endif
 
-#if defined(FJ_BUILDING_X11)
+#if defined(FJ_COMPILE_OPT_X11)
     if (getenv("DISPLAY") != NULL) {
         return "x11";
     }
@@ -89,7 +89,7 @@ char const *fj_backend_get_default(void)
 }
 
 
-#ifdef FJ_BUILDING_SINGLE_BACKEND
+#ifdef FJ_COMPILE_OPT_SINGLE_BACKEND
 
 fj_err fj_backend_select(char const *backend_name)
 {

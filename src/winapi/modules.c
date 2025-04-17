@@ -1,4 +1,4 @@
-#define FJ_BACKEND_SUFFIX winapi
+#define FJ_INTERNAL_OPT_BACKEND_SUFFIX winapi
 #include <src/modules/begin.h>
 
 #include <fejix/modules/app.h>

@@ -1,5 +1,30 @@
 /**
     \file
+
+    ## C metaprogramming tricks
+
+    ### For public code
+
+    #### `FJ_PUBLIC`
+
+    This macro adds the required modifiers like `extern` or `__declspec(dllimport)` to public
+    declarations.
+
+    #### `FJ_OPAQUE_STRUCT_WITH_USERDATA`
+
+    This macro defines a struct with a single field called `void *userdata`,
+    but only for public code.
+
+    This makes for basically the easiest way to get and set the userdata.
+    The backends can define the structs any way they like, but must specify `void *userdata` as
+    their first field.
+
+    - [ ] TODO discuss FJ_COMPILE_OPT_* and FJ_INCLUDE_OPT_* macros
+
+    ### For private code
+
+    - [ ] TODO discuss FJ_METHOD, FJ_METHOD_LIST and the backend selection mechanism.
+
 */
 
 #ifndef FEJIX_CORE_H_INCLUDED
@@ -16,24 +41,22 @@
 #define FJ_VERSION_PATCH (0)
 
 
-#ifdef FJ_BUILDING_DOCS
+#if defined(FJ_COMPILE_OPT_DOCS)
 
 #    define FJ_PUBLIC extern
 
 #else
 
-#    ifdef __cplusplus
+#    if defined(__cplusplus)
 #        define FJ_PUBLIC_LINKAGE extern "C"
 #    else
 #        define FJ_PUBLIC_LINKAGE extern
 #    endif
 
-#    if defined(_WIN32)
-#        if defined(FJ_BUILDING_PRIVATE_CODE)
-#            define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
-#        else
-#            define FJ_PUBLIC_VISIBILITY __declspec(dllimport)
-#        endif
+#    if defined(FJ_COMPILE_OPT_DLLEXPORT)
+#        define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
+#    elif defined(FJ_INCLUDE_OPT_DLLIMPORT)
+#        define FJ_PUBLIC_VISIBILITY __declspec(dllimport)
 #    elif defined(__GNUC__) && __GNUC__ >= 4
 #        define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
 #    else
@@ -44,7 +67,7 @@
 
 #endif
 
-#ifdef FJ_BUILDING_PRIVATE_CODE
+#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
 
 #    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) struct TYPE;
 
