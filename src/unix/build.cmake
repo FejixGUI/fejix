@@ -11,7 +11,7 @@ if("${fejix_build_tests}")
 
     target_link_libraries(fejix_unix_shared_memory_test_exe
         PRIVATE
-            fejix fejix_private)
+            fejix fejix_private_headers)
 
     add_test(
         NAME fejix_unix_shared_memory_test

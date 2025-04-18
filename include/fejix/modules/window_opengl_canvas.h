@@ -9,8 +9,8 @@
 #include <fejix/modules/window.h>
 
 
-FJ_OBJECT(fj_window_opengl_canvas_manager)
-FJ_OBJECT(fj_window_opengl_canvas)
+FJ_OBJECT_TYPE(fj_window_opengl_canvas_manager)
+FJ_OBJECT_TYPE(fj_window_opengl_canvas)
 
 
 struct fj_window_opengl_canvas_info {

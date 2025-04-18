@@ -9,7 +9,7 @@
 #include <fejix/core.h>
 
 
-FJ_OBJECT(fj_connection)
+FJ_OBJECT_TYPE(fj_connection)
 
 
 /** \{ */
@@ -38,8 +38,11 @@ struct fj_connection_event {
 /** \} */
 
 
-typedef enum fj_error (*fj_connection_event_callback)(
-    struct fj_connection *connection, struct fj_connection_event *event);
+FJ_CALLBACK_TYPE(
+    fj_connection_event_callback,
+    enum fj_error,
+    struct fj_connection *sender,
+    struct fj_connection_event *event)
 
 
 FJ_METHOD_NONNULL(fj_connection_create, enum fj_error, struct fj_connection **out_connection)

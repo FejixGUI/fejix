@@ -3,7 +3,7 @@
 
 
 /** Each element is a string or NULL if unimplemented. */
-static char const *error_descriptions[] = {
+static char const *error_descriptions[FJ_ERROR_MAX] = {
     [FJ_OK] = "success",
     [FJ_ERROR_OUT_OF_MEMORY] = "out of memory",
     [FJ_ERROR_UNIMPLEMENTED] = "unimplemented",
@@ -20,8 +20,8 @@ static char const *error_descriptions[] = {
 
 char const *fj_error_get_description(enum fj_error error)
 {
-    if (error >= FJ_LEN(error_descriptions) || error_descriptions[error] == NULL) {
-        return "unknown error (did someone forget to write a description?)";
+    if (error >= FJ_ERROR_MAX || error_descriptions[error] == NULL) {
+        return "unnamed error (did someone forget to write a description?)";
     }
 
     return error_descriptions[error];

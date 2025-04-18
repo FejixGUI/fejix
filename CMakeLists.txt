@@ -18,7 +18,10 @@ set(fejix_backends "" CACHE STRING "The backends to enable. If \"detect\", selec
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
+# The following variables enable some shared utils and can be enabled in backend build scripts
+
 set(fejix_build_unix_utils OFF)
+
 
 if("${fejix_backends}" STREQUAL "detect")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
@@ -40,15 +43,24 @@ if("${fejix_build_tests}")
 endif()
 
 
-add_library(fejix_private INTERFACE)
+if("${fejix_build_tests}")
+    add_library(fejix_private_headers INTERFACE)
 
-target_include_directories(
-    fejix_private
-    INTERFACE
-        "${CMAKE_CURRENT_LIST_DIR}")
+    target_include_directories(
+        fejix_private_headers
+        INTERFACE
+            "${CMAKE_CURRENT_LIST_DIR}")
+endif()
 
 
 add_library(fejix)
+
+set_target_properties(
+    fejix
+    VERSION
+        "${CMAKE_PROJECT_VERSION}"
+    SOVERSION
+        "${CMAKE_PROJECT_VERSION_MAJOR}")
 
 target_compile_features(
     fejix

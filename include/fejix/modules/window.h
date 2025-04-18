@@ -9,8 +9,8 @@
 #include <fejix/modules/connection.h>
 
 
-FJ_OBJECT(fj_window_manager)
-FJ_OBJECT(fj_window)
+FJ_OBJECT_TYPE(fj_window_manager)
+FJ_OBJECT_TYPE(fj_window)
 
 
 FJ_METHOD_NONNULL(

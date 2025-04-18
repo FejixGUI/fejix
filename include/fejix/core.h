@@ -61,7 +61,28 @@
     This is here primarily because Doxygen does not recognize struct forward declarations, so we
     actually define it a bit differently in Doxygen to make the structs appear in the docs.
 */
-#define FJ_OBJECT(TYPE) struct TYPE;
+#define FJ_OBJECT_TYPE(TYPE) struct TYPE;
+
+#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
+#    define FJ_CALLBACK_TYPE(NAME, RETURN_TYPE, ...)   \
+        typedef RETURN_TYPE (*NAME)(__VA_ARGS__);      \
+        static RETURN_TYPE NAME##_default(__VA_ARGS__) \
+        {                                              \
+            (void) sender;                             \
+            (void) event;                              \
+            return FJ_ERROR_UNIMPLEMENTED;             \
+        }
+#else
+/**
+    Defines a typedef for an event callback function pointer.
+
+    Even though it looks like you can define any arguments you want, there must be exactly *two*
+    arguments called *sender* and *event*. The reason is that in private code this also defines
+    a default placeholder to make using callbacks in backend code easier. To avoid unused parameter
+    warnings, we explicitly ignore the parameters, which uses their names.
+*/
+#    define FJ_CALLBACK_TYPE(NAME, RETURN_TYPE, ...) typedef RETURN_TYPE (*NAME)(__VA_ARGS__);
+#endif
 
 #if !defined(FJ_METHOD) || defined(FJ_COMPILE_OPT_DOCS)
 /**
@@ -135,6 +156,8 @@ enum fj_error {
 
     /** Invalid text encoding. */
     FJ_ERROR_INVALID_ENCODING = 10,
+
+    FJ_ERROR_MAX,
 
     FJ_ERROR_ENUM32 = INT32_MAX,
 };

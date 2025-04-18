@@ -9,12 +9,13 @@
 #include <fejix/modules/connection.h>
 
 
-FJ_OBJECT(fj_clock_manager)
-FJ_OBJECT(fj_clock)
+FJ_OBJECT_TYPE(fj_clock_manager)
+FJ_OBJECT_TYPE(fj_clock)
 
 
 /** \{ */
 enum fj_clock_event_type {
+    /** The regular clock event. */
     FJ_CLOCK_EVENT_TICK = 0,
 
     FJ_CLOCK_EVENT_ENUM32 = INT32_MAX,
@@ -23,14 +24,19 @@ enum fj_clock_event_type {
 struct fj_clock_event {
     enum fj_clock_event_type type;
     union fj_clock_event_data {
-        void *_unused;
+        struct fj_clock_event_tick {
+            struct fj_clock *clock;
+        } tick;
     } data;
 };
 /** \} */
 
 
-typedef enum fj_error (*fj_clock_event_callback)(
-    struct fj_clock *clock, struct fj_clock_event *event);
+FJ_CALLBACK_TYPE(
+    fj_clock_event_callback,
+    enum fj_error,
+    struct fj_clock_manager *sender,
+    struct fj_clock_event *event)
 
 
 FJ_METHOD_NONNULL(
