@@ -1,30 +1,5 @@
 /**
     \file
-
-    ## C metaprogramming tricks
-
-    ### For public code
-
-    #### `FJ_PUBLIC`
-
-    This macro adds the required modifiers like `extern` or `__declspec(dllimport)` to public
-    declarations.
-
-    #### `FJ_OPAQUE_STRUCT_WITH_USERDATA`
-
-    This macro defines a struct with a single field called `void *userdata`,
-    but only for public code.
-
-    This makes for basically the easiest way to get and set the userdata.
-    The backends can define the structs any way they like, but must specify `void *userdata` as
-    their first field.
-
-    - [ ] TODO discuss FJ_COMPILE_OPT_* and FJ_INCLUDE_OPT_* macros
-
-    ### For private code
-
-    - [ ] TODO discuss FJ_METHOD, FJ_METHOD_LIST and the backend selection mechanism.
-
 */
 
 #ifndef FEJIX_CORE_H_INCLUDED
@@ -43,6 +18,16 @@
 
 #if defined(FJ_COMPILE_OPT_DOCS)
 
+/**
+    Defines the appropriate external linkage.
+
+    This expands to `extern` (`extern "C"` for C++) and adds special attributes for shared libraries
+    if needed.
+
+    If using the library compiled as shared (`.dll`) on Microsoft Windows, you need to define
+    `FJ_INCLUDE_OPT_DLLIMPORT` before including any library headers so that the library gets linked
+    correctly.
+*/
 #    define FJ_PUBLIC extern
 
 #else
@@ -67,83 +52,92 @@
 
 #endif
 
-#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
+/**
+    Forward-declares a struct.
 
-#    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) struct TYPE;
+    Even though each backend may define the struct in its own way, the first field is always the
+    userdata and is accessible with #FJ_USERDATA.
 
-#else
+    This is here primarily because Doxygen does not recognize struct forward declarations, so we
+    actually define it a bit differently in Doxygen to make the structs appear in the docs.
+*/
+#define FJ_OBJECT(TYPE) struct TYPE;
 
-#    define FJ_OPAQUE_STRUCT_WITH_USERDATA(TYPE) \
-        struct TYPE {                            \
-            void *userdata;                      \
-        };
+#if !defined(FJ_METHOD) || defined(FJ_COMPILE_OPT_DOCS)
+/**
+    Defines a function pointer which can be NULL.
 
-#endif
-
-
-#ifndef FJ_METHOD
+    The function pointer may be NULL if unimplemented by the currently selected backend.
+*/
 #    define FJ_METHOD(NAME, RETURN_TYPE, ...) FJ_PUBLIC RETURN_TYPE (*NAME)(__VA_ARGS__);
 #endif
 
-#ifndef FJ_METHOD_NONNULL
+#if !defined(FJ_METHOD_NONNULL) || defined(FJ_COMPILE_OPT_DOCS)
+/**
+    Defines a function pointer which cannot be NULL.
+
+    Calling the function results in #FJ_ERROR_UNIMPLEMENTED if the method is unimplemented by the
+    currently selected backend.
+*/
 #    define FJ_METHOD_NONNULL(NAME, RETURN_TYPE, ...) FJ_METHOD(NAME, RETURN_TYPE, __VA_ARGS__)
 #endif
 
-#ifndef FJ_METHOD_LIST_BEGIN
+#if !defined(FJ_METHOD_LIST_BEGIN)
 #    define FJ_METHOD_LIST_BEGIN(MODULE_NAME)
 #endif
 
-#ifndef FJ_METHOD_LIST_END
+#if !defined(FJ_METHOD_LIST_END)
 #    define FJ_METHOD_LIST_END()
 #endif
 
-#ifndef FJ_METHOD_LIST_ITEM
+#if !defined(FJ_METHOD_LIST_ITEM)
 #    define FJ_METHOD_LIST_ITEM(METHOD_NAME)
 #endif
 
-#define FJ_TRY(EXPR)                                                                          \
-    for (fj_err fj_result = (EXPR), _fj_try_guard = 1; _fj_try_guard == 1; _fj_try_guard = 0) \
-        if (fj_result != FJ_OK)
+/**
+    Retrieves the object's userdata as its first field.
+*/
+#define FJ_USERDATA(OBJECT) (*(void **) (OBJECT))
 
 
 /** Error code. */
-typedef enum {
+enum fj_error {
     /** Success */
     FJ_OK = 0,
 
     /** Out of memory */
-    FJ_ERR_OUT_OF_MEMORY = 1,
+    FJ_ERROR_OUT_OF_MEMORY = 1,
 
     /** The requested operation is not implemented and therefore no work has been done. */
-    FJ_ERR_UNIMPLEMENTED = 2,
+    FJ_ERROR_UNIMPLEMENTED = 2,
 
     /** The operation has failed, a generic error returned when concrete reasons are unknown. */
-    FJ_ERR_OPERATION_FAILED = 3,
+    FJ_ERROR_OPERATION_FAILED = 3,
 
     /** Input/output operation failed. */
-    FJ_ERR_IO_FAILED = 4,
+    FJ_ERROR_IO_FAILED = 4,
 
     /** The requested operation or resource are not available on the system. */
-    FJ_ERR_UNAVAILABLE = 5,
+    FJ_ERROR_UNAVAILABLE = 5,
 
     /** Access denied to create a file, share memory, connect to a device etc. */
-    FJ_ERR_ACCESS_DENIED = 6,
+    FJ_ERROR_ACCESS_DENIED = 6,
 
     /** Concurrent access to the object is not permitted. */
-    FJ_ERR_CONCURRENT_ACCESS = 7,
+    FJ_ERROR_CONCURRENT_ACCESS = 7,
 
     /** Invalid usage indicates a programming error like zero allocation size, index out of range,
         removing from an empty vector etc. */
-    FJ_ERR_INVALID_USAGE = 8,
+    FJ_ERROR_INVALID_USAGE = 8,
 
     /** The requested operation cannot be done on the specified object. */
-    FJ_ERR_INVALID_OPERATION = 9,
+    FJ_ERROR_INVALID_OPERATION = 9,
 
     /** Invalid text encoding. */
-    FJ_ERR_INVALID_ENCODING = 10,
+    FJ_ERROR_INVALID_ENCODING = 10,
 
-    FJ_ERR_ENUM32 = INT32_MAX,
-} fj_err;
+    FJ_ERROR_ENUM32 = INT32_MAX,
+};
 
 
 enum fj_orientation {
@@ -226,7 +220,7 @@ struct fj_viewport2d {
 
 /** Always returns a valid printable string, even for invalid error IDs. */
 FJ_PUBLIC
-char const *fj_err_get_description(fj_err error);
+char const *fj_error_get_description(enum fj_error error);
 
 
 #endif

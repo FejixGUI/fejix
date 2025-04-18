@@ -18,7 +18,7 @@
                                                    \
     static RETURN_TYPE NAME##_default(__VA_ARGS__) \
     {                                              \
-        return FJ_ERR_UNIMPLEMENTED;               \
+        return FJ_ERROR_UNIMPLEMENTED;             \
     }                                              \
                                                    \
     RETURN_TYPE (*NAME)(__VA_ARGS__) = NAME##_default;

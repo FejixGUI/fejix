@@ -68,20 +68,20 @@
 
     Returns a new pointer or NULL on failure. */
 FJ_PUBLIC
-fj_err fj_alloc_uninit(void **out_ptr, size_t size);
+enum fj_error fj_alloc_uninit(void **out_ptr, size_t size);
 
 /** Allocates a block of memory initialized with zeros.
     Works like `calloc(1,)`, but allocating 0 bytes is always an error.
 
     Returns a new pointer or NULL on failure. */
 FJ_PUBLIC
-fj_err fj_alloc_zeroed(void **out_ptr, size_t size);
+enum fj_error fj_alloc_zeroed(void **out_ptr, size_t size);
 
 /** Allocates a block of memory initialised with bytes from `source`.
 
     Returns a new pointer or NULL on failure. */
 FJ_PUBLIC
-fj_err fj_alloc_copied(void **out_ptr, void const *source, size_t size);
+enum fj_error fj_alloc_copied(void **out_ptr, void const *source, size_t size);
 
 /** Frees a block of memory.
 
@@ -100,18 +100,18 @@ void fj_free(void **out_ptr);
 
     Returns a new pointer on success, does not change the pointer on failure. */
 FJ_PUBLIC
-fj_err fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size);
+enum fj_error fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size);
 
 /** Similar to `fj_realloc_uninit`, but all new items of the array are initialised to zeroes. */
 FJ_PUBLIC
-fj_err fj_realloc_zeroed(
+enum fj_error fj_realloc_zeroed(
     void **ptr, uint32_t old_items_length, uint32_t new_items_length, size_t item_size);
 
 /** The returned string must be freed manually.
 
     Returns the cloned string or NULL on failure. */
 FJ_PUBLIC
-fj_err fj_alloc_string_copied(char const *str, char const **out_clone);
+enum fj_error fj_alloc_string_copied(char const *str, char const **out_clone);
 
 
 #endif

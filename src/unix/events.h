@@ -8,7 +8,7 @@
 #include <sys/poll.h>
 
 
-typedef fj_err (*fj_unix_events_callback)(
+typedef enum fj_error (*fj_unix_events_callback)(
     void *callback_data, int file_descriptor, short event_mask);
 
 
@@ -23,11 +23,11 @@ struct fj_unix_events {
 };
 
 
-fj_err fj_unix_events_init(struct fj_unix_events *events, void *callback_data);
+enum fj_error fj_unix_events_init(struct fj_unix_events *events, void *callback_data);
 
 void fj_unix_events_deinit(struct fj_unix_events *events);
 
-fj_err fj_unix_events_add(
+enum fj_error fj_unix_events_add(
     struct fj_unix_events *events,
     int file_descriptor,
     short events_to_watch,
@@ -38,11 +38,11 @@ fj_err fj_unix_events_add(
     If the file descriptor has not beed added to the watching list, this
     returns `FJ_OK`.
 */
-fj_err fj_unix_events_remove(struct fj_unix_events *events, int file_descriptor);
+enum fj_error fj_unix_events_remove(struct fj_unix_events *events, int file_descriptor);
 
-fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout);
+enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout);
 
-fj_err fj_unix_events_wakeup(struct fj_unix_events *events);
+enum fj_error fj_unix_events_wakeup(struct fj_unix_events *events);
 
 
 #endif

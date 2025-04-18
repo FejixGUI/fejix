@@ -36,23 +36,23 @@ static DWORD app_get_wakeup_timeout(struct fj_app *app)
 }
 
 
-static fj_err app_post_iteration_message(struct fj_app *app)
+static enum fj_error app_post_iteration_message(struct fj_app *app)
 {
     if (SendNotifyMessage(app->global_window, GLOBAL_MESSAGE_ITERATE, 0, 0) == FALSE) {
-        return FJ_ERR_REQUEST_FAILED;
+        return FJ_ERROR_REQUEST_FAILED;
     }
 
     return FJ_OK;
 }
 
 
-static fj_err app_sleep(struct fj_app *app)
+static enum fj_error app_sleep(struct fj_app *app)
 {
     DWORD wait_result = MsgWaitForMultipleObjectsEx(
         0, NULL, app_get_wakeup_timeout(app), QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE);
 
     if (wait_result == WAIT_FAILED) {
-        return FJ_ERR_EVENT_WAITING_FAILED;
+        return FJ_ERROR_EVENT_WAITING_FAILED;
     }
 
     app->wakeup_timeout = INFINITY;
@@ -61,7 +61,7 @@ static fj_err app_sleep(struct fj_app *app)
 }
 
 
-static fj_err app_iterate(struct fj_app *app)
+static enum fj_error app_iterate(struct fj_app *app)
 {
     FJ_TRY (app->callbacks->on_idle(app)) {
         return fj_result;
@@ -84,10 +84,10 @@ static fj_err app_iterate(struct fj_app *app)
 }
 
 
-static fj_err app_wakeup_immediately(struct fj_app *app)
+static enum fj_error app_wakeup_immediately(struct fj_app *app)
 {
     if (!SendNotifyMessage(app->global_window, GLOBAL_MESSAGE_WAKEUP, 0, 0)) {
-        return FJ_ERR_REQUEST_SENDING_FAILED;
+        return FJ_ERROR_REQUEST_SENDING_FAILED;
     }
 
     return FJ_OK;
@@ -139,7 +139,7 @@ global_window_procedure(HWND window_handle, UINT message, WPARAM wparam, LPARAM 
 }
 
 
-static fj_err create_global_window(struct fj_app *app)
+static enum fj_error create_global_window(struct fj_app *app)
 {
     WNDCLASSEX class_info = {
         .lpfnWndProc = global_window_procedure,
@@ -157,19 +157,19 @@ static fj_err create_global_window(struct fj_app *app)
 }
 
 
-static fj_err destroy_global_window(struct fj_app *app)
+static enum fj_error destroy_global_window(struct fj_app *app)
 {
     return fj_winapi_window_destroy(app->global_window);
 }
 
 
-static fj_err app_alloc(struct fj_app **out_app)
+static enum fj_error app_alloc(struct fj_app **out_app)
 {
     return FJ_ALLOC_ZEROED(out_app);
 }
 
 
-static fj_err app_destroy(struct fj_app *app)
+static enum fj_error app_destroy(struct fj_app *app)
 {
     if (app->global_window != NULL) {
         destroy_global_window(app);
@@ -181,7 +181,7 @@ static fj_err app_destroy(struct fj_app *app)
 }
 
 
-static fj_err app_create(struct fj_app **out_app, struct fj_app_create_info const *info)
+static enum fj_error app_create(struct fj_app **out_app, struct fj_app_create_info const *info)
 {
     FJ_TRY (FJ_ALLOC_ZEROED(out_app)) {
         return fj_result;
@@ -202,7 +202,7 @@ static fj_err app_create(struct fj_app **out_app, struct fj_app_create_info cons
 }
 
 
-static fj_err app_launch(struct fj_app *app)
+static enum fj_error app_launch(struct fj_app *app)
 {
     FJ_TRY (app_post_iteration_message(app)) {
         return fj_result;
@@ -226,7 +226,7 @@ static fj_err app_launch(struct fj_app *app)
 }
 
 
-static fj_err app_manual_sleep(struct fj_app *app)
+static enum fj_error app_manual_sleep(struct fj_app *app)
 {
     FJ_TRY (app_sleep(app)) {
         return fj_result;
@@ -267,7 +267,8 @@ static fj_bool8 app_get_activity_hint_supported(struct fj_app *app, fj_app_activ
     }
 }
 
-static fj_err app_set_activity_hint(struct fj_app *app, fj_app_activity_hint hint, fj_bool8 value)
+static enum fj_error app_set_activity_hint(
+    struct fj_app *app, fj_app_activity_hint hint, fj_bool8 value)
 {
     switch (hint) {
         case FJ_APP_ACTIVITY_CRITICAL:
@@ -275,7 +276,7 @@ static fj_err app_set_activity_hint(struct fj_app *app, fj_app_activity_hint hin
             return FJ_OK;
 
         default:
-            return FJ_ERR_UNIMPLEMENTED;
+            return FJ_ERROR_UNIMPLEMENTED;
     }
 }
 

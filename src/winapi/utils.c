@@ -7,7 +7,7 @@
 #include <wchar.h>
 
 
-fj_err fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
+enum fj_error fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 {
     int32_t output_chars_length = MultiByteToWideChar(
         CP_UTF8,
@@ -32,14 +32,14 @@ fj_err fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 
     if (result == 0) {
         FJ_FREE(utf16_string);
-        return FJ_ERR_INVALID_ENCODING;
+        return FJ_ERROR_INVALID_ENCODING;
     }
 
     return FJ_OK;
 }
 
 
-fj_err fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
+enum fj_error fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 {
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,
@@ -67,14 +67,14 @@ fj_err fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 
     if (result == 0) {
         FJ_FREE(string);
-        return FJ_ERR_INVALID_ENCODING;
+        return FJ_ERROR_INVALID_ENCODING;
     }
 
     return FJ_OK;
 }
 
 
-static fj_err get_junk_class_name(WCHAR out_string[32])
+static enum fj_error get_junk_class_name(WCHAR out_string[32])
 {
     static unsigned int counter = 0;
     counter++;
@@ -93,7 +93,7 @@ static bool is_of_junk_class(HWND window)
 }
 
 
-static fj_err create_window_class(WNDCLASSEX *class_info)
+static enum fj_error create_window_class(WNDCLASSEX *class_info)
 {
     class_info->cbSize = sizeof(class_info);
 
@@ -112,7 +112,7 @@ static fj_err create_window_class(WNDCLASSEX *class_info)
     class_info->lpszClassName = MAKEINTATOM(RegisterClassEx(class_info));
 
     if (class_info->lpszClassName == NULL) {
-        return FJ_ERR_REQUEST_REJECTED;
+        return FJ_ERROR_REQUEST_REJECTED;
     }
 
     return FJ_OK;
@@ -127,7 +127,7 @@ static inline bool window_needs_new_class(
 }
 
 
-fj_err fj_winapi_window_create(
+enum fj_error fj_winapi_window_create(
     HWND *out_window, WNDCLASSEX const *maybe_class_info, CREATESTRUCT const *maybe_window_info)
 {
     WNDCLASSEX class_info = { 0 };
@@ -179,25 +179,25 @@ fj_err fj_winapi_window_create(
             UnregisterClass(class_info.lpszClassName, class_info.hInstance);
         }
 
-        return FJ_ERR_REQUEST_REJECTED;
+        return FJ_ERROR_REQUEST_REJECTED;
     }
 
     return FJ_OK;
 }
 
 
-fj_err fj_winapi_window_destroy(HWND window)
+enum fj_error fj_winapi_window_destroy(HWND window)
 {
     LPWSTR class_name = (void *) GetClassLongPtr(window, GCW_ATOM);
     bool should_destroy_class = is_of_junk_class(window);
 
     if (DestroyWindow(window) == 0) {
-        return FJ_ERR_REQUEST_REJECTED;
+        return FJ_ERROR_REQUEST_REJECTED;
     }
 
     if (should_destroy_class) {
         if (UnregisterClass(class_name, GetModuleHandle(NULL)) == 0) {
-            return FJ_ERR_REQUEST_REJECTED;
+            return FJ_ERROR_REQUEST_REJECTED;
         }
     }
 

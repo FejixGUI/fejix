@@ -15,18 +15,21 @@ static void shift_tail(
 }
 
 
-fj_err fj_vector_expand_at(
+enum fj_error fj_vector_expand_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size)
 {
+    enum fj_error e;
+
     if (index > *length) {
-        return FJ_ERR_INVALID_USAGE;
+        return FJ_ERROR_INVALID_USAGE;
     }
 
     if (*length == *capacity) {
         uint32_t new_capacity = fj_u32_max(*capacity * 2, 1);
-        FJ_TRY (fj_realloc_zeroed(items, *capacity, new_capacity, item_size)) {
-            return fj_result;
-        }
+        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+
+        if (e)
+            return e;
 
         *capacity = new_capacity;
     }
@@ -41,11 +44,13 @@ fj_err fj_vector_expand_at(
 }
 
 
-fj_err fj_vector_shrink_at(
+enum fj_error fj_vector_shrink_at(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size)
 {
+    enum fj_error e;
+
     if (index >= *length) {
-        return FJ_ERR_INVALID_USAGE;
+        return FJ_ERROR_INVALID_USAGE;
     }
 
     if (index != *length - 1) {
@@ -54,9 +59,9 @@ fj_err fj_vector_shrink_at(
 
     if (*length <= *capacity / 4) {
         uint32_t new_capacity = fj_u32_max(*capacity / 2, 1);
-        FJ_TRY (fj_realloc_zeroed(items, *capacity, new_capacity, item_size)) {
-            return fj_result;
-        }
+        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        if (e)
+            return e;
 
         *capacity = new_capacity;
     }

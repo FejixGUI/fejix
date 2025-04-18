@@ -91,10 +91,10 @@ char const *fj_backend_get_default(void)
 
 #ifdef FJ_COMPILE_OPT_SINGLE_BACKEND
 
-fj_err fj_backend_select(char const *backend_name)
+enum fj_error fj_backend_select(char const *backend_name)
 {
     if (strcmp(backends[0], backend_name) != 0) {
-        return FJ_ERR_UNAVAILABLE;
+        return FJ_ERROR_UNAVAILABLE;
     }
 
     // Do nothing, all the methods are already defined initialized
@@ -104,7 +104,7 @@ fj_err fj_backend_select(char const *backend_name)
 
 #else
 
-fj_err fj_backend_select(char const *backend_name)
+enum fj_error fj_backend_select(char const *backend_name)
 {
     for (uint32_t i = 0; i < backends_length; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
@@ -113,7 +113,7 @@ fj_err fj_backend_select(char const *backend_name)
         }
     }
 
-    return FJ_ERR_UNAVAILABLE;
+    return FJ_ERROR_UNAVAILABLE;
 }
 
 #endif

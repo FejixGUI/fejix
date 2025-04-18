@@ -5,45 +5,46 @@
 #include <string.h>
 
 
-fj_err fj_alloc_uninit(void **out_ptr, size_t size)
+enum fj_error fj_alloc_uninit(void **out_ptr, size_t size)
 {
     if (size == 0) {
         *out_ptr = NULL;
-        return FJ_ERR_INVALID_USAGE;
+        return FJ_ERROR_INVALID_USAGE;
     }
 
     *out_ptr = malloc(size);
 
     if (*out_ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERROR_OUT_OF_MEMORY;
     }
 
     return FJ_OK;
 }
 
 
-fj_err fj_alloc_zeroed(void **out_ptr, size_t size)
+enum fj_error fj_alloc_zeroed(void **out_ptr, size_t size)
 {
     if (size == 0) {
         *out_ptr = NULL;
-        return FJ_ERR_INVALID_USAGE;
+        return FJ_ERROR_INVALID_USAGE;
     }
 
     *out_ptr = calloc(1, size);
 
     if (*out_ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERROR_OUT_OF_MEMORY;
     }
 
     return FJ_OK;
 }
 
 
-fj_err fj_alloc_copied(void **out_ptr, void const *source, size_t size)
+enum fj_error fj_alloc_copied(void **out_ptr, void const *source, size_t size)
 {
-    FJ_TRY (fj_alloc_uninit(out_ptr, size)) {
-        return fj_result;
-    }
+    enum fj_error e;
+    e = fj_alloc_uninit(out_ptr, size);
+    if (e)
+        return e;
 
     memcpy(*out_ptr, source, size);
 
@@ -58,10 +59,10 @@ void fj_free(void **ptr)
 }
 
 
-fj_err fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
+enum fj_error fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
 {
     if (item_size == 0) {
-        return FJ_ERR_INVALID_USAGE;
+        return FJ_ERROR_INVALID_USAGE;
     }
 
     if (items_length == 0) {
@@ -82,7 +83,7 @@ fj_err fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
     void *new_ptr = realloc(*ptr, size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERROR_OUT_OF_MEMORY;
     }
 
     *ptr = new_ptr;
@@ -90,11 +91,11 @@ fj_err fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
 }
 
 
-fj_err fj_realloc_zeroed(
+enum fj_error fj_realloc_zeroed(
     void **ptr, uint32_t old_items_length, uint32_t new_items_length, size_t item_size)
 {
     if (item_size == 0) {
-        return FJ_ERR_INVALID_USAGE;
+        return FJ_ERROR_INVALID_USAGE;
     }
 
     if (new_items_length == 0) {
@@ -117,7 +118,7 @@ fj_err fj_realloc_zeroed(
     void *new_ptr = realloc(old_ptr, new_size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR_OUT_OF_MEMORY;
+        return FJ_ERROR_OUT_OF_MEMORY;
     }
 
     if (new_size > old_size) {
@@ -129,13 +130,16 @@ fj_err fj_realloc_zeroed(
 }
 
 
-fj_err fj_string_clone(char const *str, char const **out_clone)
+enum fj_error fj_string_clone(char const *str, char const **out_clone)
 {
+    enum fj_error e;
+
     size_t length = strlen(str);
 
-    FJ_TRY (FJ_REALLOC_UNINIT(out_clone, length)) {
-        return fj_result;
-    }
+    e = FJ_REALLOC_UNINIT(out_clone, length);
+
+    if (e)
+        return e;
 
     memcpy((void *) *out_clone, (void *) str, length);
 

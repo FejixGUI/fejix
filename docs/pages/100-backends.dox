@@ -1,0 +1,14 @@
+/**
+
+\page backends Backends
+
+\tableofcontents
+
+\todo Discuss how backends work,
+    how #FJ_METHOD and `FJ_METHOD_LIST...` work,
+    how `modules.c` files work,
+    how module implementation works (the \#include graph and module implementation hierarchy
+    relatation),
+    how `#define fj_some_struct` is used.
+
+*/

@@ -1,47 +1,63 @@
+/**
+    \file
+*/
+
 #ifndef FJ_CLOCK_H_INCLUDED
 #define FJ_CLOCK_H_INCLUDED
 
 
-#include <fejix/modules/app.h>
+#include <fejix/modules/connection.h>
 
 
+FJ_OBJECT(fj_clock_manager)
+FJ_OBJECT(fj_clock)
+
+
+/** \{ */
 enum fj_clock_event_type {
     FJ_CLOCK_EVENT_TICK = 0,
 
     FJ_CLOCK_EVENT_ENUM32 = INT32_MAX,
 };
 
-FJ_OPAQUE_STRUCT_WITH_USERDATA(fj_clock_manager)
-FJ_OPAQUE_STRUCT_WITH_USERDATA(fj_clock)
+struct fj_clock_event {
+    enum fj_clock_event_type type;
+    union fj_clock_event_data {
+        void *_unused;
+    } data;
+};
+/** \} */
 
-typedef fj_err (*fj_clock_event_callback)(
-    struct fj_clock_manager *clock_manager,
-    struct fj_clock *clock,
-    enum fj_clock_event_type event_type,
-    void *opt_event_data);
+
+typedef enum fj_error (*fj_clock_event_callback)(
+    struct fj_clock *clock, struct fj_clock_event *event);
+
 
 FJ_METHOD_NONNULL(
     fj_clock_create_manager,
-    fj_err,
-    struct fj_app_manager *app_manager,
-    fj_clock_event_callback callback,
+    enum fj_error,
+    struct fj_connection *conn,
     struct fj_clock_manager **out_manager)
 
-FJ_METHOD(fj_clock_destroy_manager, fj_err, struct fj_clock_manager *manager)
+FJ_METHOD(fj_clock_destroy_manager, enum fj_error, struct fj_clock_manager *manager)
+
+FJ_METHOD(
+    fj_clock_set_callback, void, struct fj_clock_manager *manager, fj_clock_event_callback callback)
 
 FJ_METHOD(
     fj_clock_create,
-    fj_err,
+    enum fj_error,
     struct fj_clock_manager *manager,
     fj_time interval,
     fj_time requested_precision,
     struct fj_clock **out_clock)
 
-FJ_METHOD(fj_clock_destroy, fj_err, struct fj_clock_manager *manager, struct fj_clock *clock)
+FJ_METHOD(fj_clock_destroy, enum fj_error, struct fj_clock_manager *manager, struct fj_clock *clock)
 
 FJ_METHOD_LIST_BEGIN(fj_clock)
 FJ_METHOD_LIST_ITEM(fj_clock_create_manager)
 FJ_METHOD_LIST_ITEM(fj_clock_destroy_manager)
+FJ_METHOD_LIST_ITEM(fj_clock_set_callback)
 FJ_METHOD_LIST_ITEM(fj_clock_create)
 FJ_METHOD_LIST_ITEM(fj_clock_destroy)
 FJ_METHOD_LIST_END()

@@ -1,9 +1,16 @@
+/**
+    \file
+*/
+
 #ifndef FEJIX_WINDOW_OPENGL_CANVAS_H_INCLUDED
 #define FEJIX_WINDOW_OPENGL_CANVAS_H_INCLUDED
 
 
-#include <fejix/modules/app.h>
 #include <fejix/modules/window.h>
+
+
+FJ_OBJECT(fj_window_opengl_canvas_manager)
+FJ_OBJECT(fj_window_opengl_canvas)
 
 
 struct fj_window_opengl_canvas_info {
@@ -15,20 +22,20 @@ struct fj_window_opengl_canvas_info {
 };
 
 
-FJ_OPAQUE_STRUCT_WITH_USERDATA(fj_window_opengl_canvas_manager)
-FJ_OPAQUE_STRUCT_WITH_USERDATA(fj_window_opengl_canvas)
-
 FJ_METHOD_NONNULL(
     fj_window_opengl_canvas_create_manager,
-    fj_err,
-    struct fj_app_manager *app_manager,
+    enum fj_error,
+    struct fj_connection *conn,
     struct fj_window_opengl_canvas_manager **out_manager)
 
-FJ_METHOD(fj_window_opengl_destroy_manager, fj_err, struct fj_window_opengl_canvas_manager *manager)
+FJ_METHOD(
+    fj_window_opengl_destroy_manager,
+    enum fj_error,
+    struct fj_window_opengl_canvas_manager *manager)
 
 FJ_METHOD(
     fj_window_opengl_canvas_create,
-    fj_err,
+    enum fj_error,
     struct fj_window_opengl_canvas_manager *manager,
     struct fj_window *window,
     struct fj_window_opengl_canvas_info const *canvas_info,
@@ -36,7 +43,7 @@ FJ_METHOD(
 
 FJ_METHOD(
     fj_window_opengl_canvas_destroy,
-    fj_err,
+    enum fj_error,
     struct fj_window_opengl_canvas_manager *manager,
     struct fj_window_opengl_canvas *canvas)
 
@@ -45,6 +52,7 @@ FJ_METHOD(
         e.g. if the surface is not synced yet.
 */
 FJ_METHOD(fj_window_opengl_canvas_get_surface, void *, struct fj_window_opengl_canvas *canvas)
+
 
 FJ_METHOD_LIST_BEGIN(fj_window_opengl_canvas)
 FJ_METHOD_LIST_ITEM(fj_window_opengl_canvas_create_manager)

@@ -18,7 +18,7 @@ char const *fj_backend_get_default(void);
     \returns Error if the specified backend is not built into the library.
 */
 FJ_PUBLIC
-fj_err fj_backend_select(char const *backend_name);
+enum fj_error fj_backend_select(char const *backend_name);
 
 
 #endif
