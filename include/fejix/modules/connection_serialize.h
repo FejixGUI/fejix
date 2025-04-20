@@ -9,7 +9,7 @@
 #include <fejix/modules/connection.h>
 
 
-FJ_METHOD(fj_connection_serialize, void *, struct fj_connection *conn)
+FJ_METHOD_WITH_FALLBACK(fj_connection_serialize, void *, NULL, struct fj_connection *conn)
 
 
 FJ_METHOD_LIST_BEGIN(fj_connection_serialize)

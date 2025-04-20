@@ -13,9 +13,10 @@ FJ_OBJECT_TYPE(fj_window_manager)
 FJ_OBJECT_TYPE(fj_window)
 
 
-FJ_METHOD_NONNULL(
+FJ_METHOD_WITH_FALLBACK(
     fj_window_create_manager,
     enum fj_error,
+    FJ_ERROR_UNIMPLEMENTED,
     struct fj_connection *conn,
     struct fj_window_manager **out_manager)
 

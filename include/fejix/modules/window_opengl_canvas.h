@@ -22,9 +22,10 @@ struct fj_window_opengl_canvas_info {
 };
 
 
-FJ_METHOD_NONNULL(
+FJ_METHOD_WITH_FALLBACK(
     fj_window_opengl_canvas_create_manager,
     enum fj_error,
+    FJ_ERROR_UNIMPLEMENTED,
     struct fj_connection *conn,
     struct fj_window_opengl_canvas_manager **out_manager)
 

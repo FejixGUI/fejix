@@ -93,14 +93,15 @@
 #    define FJ_METHOD(NAME, RETURN_TYPE, ...) FJ_PUBLIC RETURN_TYPE (*NAME)(__VA_ARGS__);
 #endif
 
-#if !defined(FJ_METHOD_NONNULL) || defined(FJ_COMPILE_OPT_DOCS)
+#if !defined(FJ_METHOD_WITH_DEFAULT) || defined(FJ_COMPILE_OPT_DOCS)
 /**
     Defines a function pointer which cannot be NULL.
 
-    Calling the function results in #FJ_ERROR_UNIMPLEMENTED if the method is unimplemented by the
-    currently selected backend.
+    If the method is not implemented by the current backend, the fallback implementation is used,
+    which returns the FALLBACK_RESULT.
 */
-#    define FJ_METHOD_NONNULL(NAME, RETURN_TYPE, ...) FJ_METHOD(NAME, RETURN_TYPE, __VA_ARGS__)
+#    define FJ_METHOD_WITH_FALLBACK(NAME, RETURN_TYPE, FALLBACK_RESULT, ...) \
+        FJ_METHOD(NAME, RETURN_TYPE, __VA_ARGS__)
 #endif
 
 #if !defined(FJ_METHOD_LIST_BEGIN)

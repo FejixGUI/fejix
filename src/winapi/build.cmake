@@ -18,6 +18,6 @@ target_sources(
 
 if("${fejix_build_tests}")
     add_executable(fejix_winapi_utils_test_exe "${CMAKE_CURRENT_LIST_DIR}/tests/test-utils.c")
-    target_link_libraries(fejix_winapi_utils_test_exe fejix)
+    target_link_libraries(fejix_winapi_utils_test_exe fejix fejix_private_headers)
     add_test(NAME fejix_winapi_utils_test COMMAND fejix_winapi_utils_test_exe)
 endif()

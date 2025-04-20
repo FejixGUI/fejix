@@ -57,6 +57,7 @@ add_library(fejix)
 
 set_target_properties(
     fejix
+    PROPERTIES
     VERSION
         "${CMAKE_PROJECT_VERSION}"
     SOVERSION
