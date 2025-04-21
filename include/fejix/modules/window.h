@@ -6,7 +6,7 @@
 #define FEJIX_WINDOW_H_INCLUDED
 
 
-#include <fejix/modules/connection.h>
+#include <fejix/modules/io_thread.h>
 
 
 FJ_OBJECT_TYPE(fj_window_manager)
@@ -17,7 +17,7 @@ FJ_METHOD_WITH_FALLBACK(
     fj_window_create_manager,
     enum fj_error,
     FJ_ERROR_UNIMPLEMENTED,
-    struct fj_connection *conn,
+    struct fj_io_thread *io_thread,
     struct fj_window_manager **out_manager)
 
 FJ_METHOD(fj_window_destroy_manager, enum fj_error, struct fj_window_manager *manager)

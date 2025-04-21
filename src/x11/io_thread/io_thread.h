@@ -1,16 +1,16 @@
 #include <src/unix/events.h>
 
-#include <fejix/modules/app.h>
-#include <fejix/modules/clock.h>
+#include <fejix/modules/io_thread.h>
+#include <fejix/modules/timer.h>
 
 #include <X11/Xlib-xcb.h>
 #include <X11/Xlib.h>
 #include <xcb/xcb.h>
 
 
-struct fj_app_manager {
+struct fj_io_thread {
     void *userdata;
-    fj_app_event_callback callback;
+    fj_io_thread_event_callback callback;
 
     struct fj_unix_events events;
     bool finish_requested;

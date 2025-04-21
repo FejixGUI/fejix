@@ -2,10 +2,10 @@
 #include <src/modules/begin.h>
 
 #include <fejix/modules/clock.h>
-#include <fejix/modules/connection.h>
+#include <fejix/modules/io_thread.h>
 
 FJ_MODULE_LIST_BEGIN()
-FJ_MODULE_LIST_ITEM(fj_connection)
+FJ_MODULE_LIST_ITEM(fj_io_thread)
 FJ_MODULE_LIST_ITEM(fj_clock)
 FJ_MODULE_LIST_END()
 

@@ -6,7 +6,7 @@
 #define FJ_TIMER_H_INCLUDED
 
 
-#include <fejix/modules/connection.h>
+#include <fejix/modules/io_thread.h>
 
 
 FJ_OBJECT_TYPE(fj_timer_manager)
@@ -43,7 +43,7 @@ FJ_METHOD_WITH_FALLBACK(
     fj_timer_create_manager,
     enum fj_error,
     FJ_ERROR_UNIMPLEMENTED,
-    struct fj_connection *conn,
+    struct fj_io_thread *io_thread,
     struct fj_timer_manager **out_manager)
 
 FJ_METHOD(fj_timer_destroy_manager, enum fj_error, struct fj_timer_manager *manager)

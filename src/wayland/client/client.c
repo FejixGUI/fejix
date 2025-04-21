@@ -521,7 +521,7 @@ static enum fj_error wayland_connect(struct fj_client *client)
     client->display = wl_display_connect(NULL);
 
     if (client->display == NULL) {
-        return FJ_ERROR_CONNECTION_FAILED;
+        return FJ_ERROR_IO_THREAD_FAILED;
     }
 
     FJ_TRY (fj_unixpoller_add(
