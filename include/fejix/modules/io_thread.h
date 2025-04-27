@@ -28,20 +28,18 @@ enum fj_io_thread_event_type {
     FJ_IO_THREAD_EVENT_ENUM32 = INT32_MAX,
 };
 
-struct fj_io_thread_event {
-    enum fj_io_thread_event_type type;
-    union fj_io_thread_event_data {
-        void *_unused;
-    } data;
-};
+union fj_io_thread_event_data {
+    void *_unused;
+} data;
 /** \} */
 
 
 FJ_CALLBACK_TYPE(
     fj_io_thread_event_callback,
     enum fj_error,
-    struct fj_io_thread *sender,
-    struct fj_io_thread_event *event)
+    struct fj_io_thread *event_object,
+    enum fj_io_thread_event_type event_type,
+    union fj_io_thread_event_data event_data)
 
 
 FJ_METHOD_WITH_FALLBACK(

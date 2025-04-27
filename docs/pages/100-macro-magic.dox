@@ -10,7 +10,6 @@
     how #FJ_METHOD and `FJ_METHOD_LIST...` work,
     how `modules.c` files work,
     how module implementation works (the \#include graph and module implementation hierarchy
-    relatation),
-    how `#define fj_some_extension_struct fj_some_base_struct` is used.
+    relatation).
 
 */

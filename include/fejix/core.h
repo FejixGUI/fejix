@@ -68,18 +68,20 @@
         typedef RETURN_TYPE (*NAME)(__VA_ARGS__);      \
         static RETURN_TYPE NAME##_default(__VA_ARGS__) \
         {                                              \
-            (void) sender;                             \
-            (void) event;                              \
+            (void) event_object;                       \
+            (void) event_type;                         \
+            (void) event_data;                         \
             return FJ_ERROR_UNIMPLEMENTED;             \
         }
 #else
 /**
     Defines a typedef for an event callback function pointer.
 
-    Even though it looks like you can define any arguments you want, there must be exactly *two*
-    arguments called *sender* and *event*. The reason is that in private code this also defines
-    a default placeholder to make using callbacks in backend code easier. To avoid unused parameter
-    warnings, we explicitly ignore the parameters, which uses their names.
+    Even though it looks like you can define any arguments you want, there must be exactly *three*
+    arguments called `event_object`, `event_type` and `event_data`.
+    The reason is that in private code this also defines a default placeholder to make using
+    callbacks in backend code easier.
+    To avoid unused parameter warnings, we explicitly ignore the parameters, which uses their names.
 */
 #    define FJ_CALLBACK_TYPE(NAME, RETURN_TYPE, ...) typedef RETURN_TYPE (*NAME)(__VA_ARGS__);
 #endif
