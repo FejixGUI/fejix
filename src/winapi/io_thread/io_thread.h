@@ -21,7 +21,11 @@ struct fj_io_thread {
     bool finished;
 
     struct fj_io_thread_timer_manager timer_manager;
-    struct fj_window_manager window_manager;
+
+    struct fj_io_thread_sleep_manager {
+        void *userdata;
+        struct fj_io_thread *io_thread;
+    } sleep_manager;
 };
 
 

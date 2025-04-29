@@ -11,13 +11,19 @@ enum fj_window_view_event_type {
     FJ_WINDOW_VIEW_EVENT_CONTENT_UPDATE = 0,
 };
 
+struct fj_window_view_event_dismiss {
+    struct fj_window_view *view;
+};
+
 struct fj_window_view_event_content_update {
+    struct fj_window_view *view;
     struct fj_size2d size;
     fj_density density;
     enum fj_orientation orientation;
 };
 
 union fj_window_view_event_data {
+    struct fj_window_view_event_dismiss *dismiss;
     struct fj_window_view_event_content_update *content_update;
 };
 /** \} */
@@ -79,7 +85,7 @@ FJ_METHOD(fj_window_view_destroy_manager, enum fj_error, struct fj_window_view_m
 
 FJ_METHOD(
     fj_window_view_set_event_callback,
-    enum fj_error,
+    void,
     struct fj_window_view_manager *manager,
     fj_window_view_event_callback callback)
 
@@ -87,6 +93,7 @@ FJ_METHOD(
     fj_window_view_create,
     enum fj_error,
     struct fj_window_view_manager *manager,
+    struct fj_window *window,
     struct fj_window_view **out_view)
 
 FJ_METHOD(
@@ -102,6 +109,12 @@ FJ_METHOD(
     struct fj_window_view *view,
     enum fj_window_view_hint_type hint_type,
     union fj_window_view_hint_data hint_data)
+
+FJ_METHOD(
+    fj_window_view_request_content,
+    enum fj_error,
+    struct fj_window_view_manager *manager,
+    struct fj_window_view *view)
 
 
 FJ_METHOD_LIST_BEGIN(fj_window_view)

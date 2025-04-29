@@ -8,7 +8,7 @@
 #include <limits.h>
 
 
-DWORD fj_winapi_timer_manager_get_sleep_time(struct fj_io_thread_timer_manager *manager)
+DWORD fj_winapi_timer_manager_get_sleep_duration(struct fj_io_thread_timer_manager *manager)
 {
     if (manager->timers.length == 0) {
         return INFINITE;

@@ -31,8 +31,9 @@ Features:
 
 Secondary features:
 
-* Ability to **port existing projects** to Fejix:
+* **Portability of existing projects**:
 
+    You can straightforwardly port other projects to Fejix.
     The library has a few modules that implement legacy or not-so-cross-platform behaviors
     specifically to allow other libraries and programs depending on those behaviors to gradually
     migrate to Fejix.

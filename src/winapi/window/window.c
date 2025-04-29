@@ -1,14 +1,16 @@
 #include <src/winapi/io_thread/io_thread.h>
-#include <src/winapi/utils.h>
+#include <src/winapi/utils/window.h>
 #include <src/winapi/window/window.h>
 
 #include <fejix/utils/math.h>
 #include <fejix/utils/memory.h>
 
 
-static LRESULT __stdcall window_procedure(
+static LONG_PTR __stdcall window_procedure(
     HWND handle, UINT message, UINT_PTR wparam, LONG_PTR lparam)
 {
+    enum fj_error e;
+
     if (message == WM_CREATE) {
         CREATESTRUCT *create_info = (void *) lparam;
         struct window *window = create_info->lpCreateParams;
@@ -17,18 +19,37 @@ static LRESULT __stdcall window_procedure(
 
     struct fj_window *window = fj_winapi_window_get_data(handle);
 
-    switch (message) {
-        default:
+    LONG_PTR result = 0;
+    MSG msg = {
+        .hwnd = handle,
+        .message = message,
+        .wParam = wparam,
+        .lParam = lparam,
+    };
+
+    if (window->view != NULL) {
+        e = fj_winapi_view_handle_event(window->view->manager, window->view, &msg, &result);
+
+        if (e)  // TODO log errors here, I guess
             return DefWindowProc(handle, message, wparam, lparam);
     }
+
+    return result;
 }
 
 
 enum fj_error fj_window_create_manager_winapi(
     struct fj_io_thread *io_thread, struct fj_window_manager **out_manager)
 {
-    *out_manager = &io_thread->window_manager;
+    enum fj_error e;
+
+    e = FJ_ALLOC_ZEROED(out_manager);
+
+    if (e)
+        return e;
+
     (*out_manager)->io_thread = io_thread;
+
     return FJ_OK;
 }
 
@@ -51,7 +72,6 @@ enum fj_error fj_window_create_winapi(
         return e;
 
     (*out_window)->manager = manager;
-    (*out_window)->flags |= FJ_WINAPI_WINDOW_ABOUT_TO_CREATE;
 
     WNDCLASSEX class_info = {
         .lpfnWndProc = window_procedure,
@@ -95,9 +115,8 @@ enum fj_error fj_window_destroy_winapi(struct fj_window_manager *manager, struct
 
 enum fj_error fj_window_sync_winapi(struct fj_window_manager *manager, struct fj_window *window)
 {
-    if (window->flags & FJ_WINAPI_WINDOW_ABOUT_TO_CREATE) {
-        ShowWindow(window->handle, SW_SHOWNORMAL);
-        window->flags &= ~FJ_WINAPI_WINDOW_ABOUT_TO_CREATE;
+    if (window->view != NULL) {
+        fj_winapi_window_view_sync(window->view->manager, window->view);
     }
 
     return FJ_OK;

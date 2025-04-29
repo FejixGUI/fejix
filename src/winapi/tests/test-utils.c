@@ -1,4 +1,4 @@
-#include <src/winapi/utils.h>
+#include <src/winapi/utils/encoding.h>
 
 #include <fejix/utils/memory.h>
 

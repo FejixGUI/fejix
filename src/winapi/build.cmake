@@ -13,8 +13,12 @@ target_compile_definitions(
 target_sources(
     fejix
     PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/utils.c"
-        "${CMAKE_CURRENT_LIST_DIR}/io_thread/io_thread.c")
+        "${CMAKE_CURRENT_LIST_DIR}/utils/encoding.c"
+        "${CMAKE_CURRENT_LIST_DIR}/utils/window.c"
+        "${CMAKE_CURRENT_LIST_DIR}/io_thread/io_thread.c"
+        "${CMAKE_CURRENT_LIST_DIR}/io_thread/timer.c"
+        "${CMAKE_CURRENT_LIST_DIR}/window/window.c"
+        "${CMAKE_CURRENT_LIST_DIR}/window/view.c")
 
 
 if("${fejix_build_tests}")

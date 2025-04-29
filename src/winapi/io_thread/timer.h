@@ -25,7 +25,7 @@ struct fj_io_thread_timer_manager {
 
 
 /** \returns milliseconds, INFINITE if there are no timers. */
-DWORD fj_winapi_timer_manager_get_sleep_time(struct fj_io_thread_timer_manager *manager);
+DWORD fj_winapi_timer_manager_get_sleep_duration(struct fj_io_thread_timer_manager *manager);
 
 
 #endif

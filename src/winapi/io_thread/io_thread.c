@@ -1,13 +1,14 @@
 #include <src/winapi/io_thread/io_thread.h>
-#include <src/winapi/utils.h>
+#include <src/winapi/utils/window.h>
 
+#include <fejix/utils/math.h>
 #include <fejix/utils/memory.h>
 
 #include <math.h>
 
 
 enum {
-    INTERNAL_MESSAGE_SLEEP = WM_USER,
+    INTERNAL_MESSAGE_ITERATE = WM_USER,
     INTERNAL_MESSAGE_PING_SELF,
 };
 
@@ -23,7 +24,7 @@ static void enable_dpi_awareness_for_process(void)
 
 static enum fj_error post_sleep_message(struct fj_io_thread *io_thread)
 {
-    BOOL result = SendNotifyMessageW(io_thread->message_window, INTERNAL_MESSAGE_SLEEP, 0, 0);
+    BOOL result = SendNotifyMessageW(io_thread->message_window, INTERNAL_MESSAGE_ITERATE, 0, 0);
 
     if (result == FALSE) {
         return FJ_ERROR_OPERATION_FAILED;
@@ -33,12 +34,12 @@ static enum fj_error post_sleep_message(struct fj_io_thread *io_thread)
 }
 
 
-static enum fj_error wait_for_events(struct fj_io_thread *io_thread)
+static enum fj_error sleep(struct fj_io_thread *io_thread, DWORD duration)
 {
-    DWORD sleep_time = fj_winapi_timer_manager_get_sleep_time(&io_thread->timer_manager);
+    (void) io_thread;
 
     DWORD result = MsgWaitForMultipleObjectsEx(
-        0, NULL, sleep_time, QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE);
+        0, NULL, duration, QS_ALLINPUT, MWMO_INPUTAVAILABLE | MWMO_ALERTABLE);
 
     if (result == WAIT_FAILED) {
         return FJ_ERROR_IO_FAILED;
@@ -48,14 +49,14 @@ static enum fj_error wait_for_events(struct fj_io_thread *io_thread)
 }
 
 
-static enum fj_error sleep(struct fj_io_thread *io_thread)
+static enum fj_error iterate(struct fj_io_thread *io_thread)
 {
     enum fj_error e;
 
     union fj_io_thread_event_data data = { 0 };
     io_thread->callback(io_thread, FJ_IO_THREAD_EVENT_NO_MORE_EVENTS, data);
 
-    e = wait_for_events(io_thread);
+    e = sleep(io_thread, fj_winapi_timer_manager_get_sleep_duration(&io_thread->timer_manager));
 
     if (e)
         return e;
@@ -69,7 +70,7 @@ static enum fj_error sleep(struct fj_io_thread *io_thread)
 }
 
 
-static LRESULT __stdcall handle_message_window_event(
+static LONG_PTR __stdcall handle_message_window_event(
     HWND window_handle, UINT message, UINT_PTR wparam, LONG_PTR lparam)
 {
     enum fj_error e;
@@ -81,8 +82,8 @@ static LRESULT __stdcall handle_message_window_event(
     }
 
     switch (message) {
-        case INTERNAL_MESSAGE_SLEEP: {
-            e = sleep(io_thread);
+        case INTERNAL_MESSAGE_ITERATE: {
+            e = iterate(io_thread);
 
             if (e) {
                 PostQuitMessage((int) e);
@@ -235,17 +236,42 @@ enum fj_error fj_io_thread_finish_winapi(struct fj_io_thread *io_thread)
 }
 
 
-// static enum fj_error app_manual_sleep(struct fj_io_thread *thread)
-// {
-//     FJ_TRY (app_sleep(thread)) {
-//         return fj_result;
-//     }
+enum fj_error fj_io_thread_sleep_create_manager_winapi(
+    struct fj_io_thread *io_thread, struct fj_io_thread_sleep_manager **out_manager)
+{
+    *out_manager = &io_thread->sleep_manager;
+    (*out_manager)->io_thread = io_thread;
 
-//     MSG msg;
-//     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-//         TranslateMessage(&msg);
-//         DispatchMessage(&msg);
-//     }
+    return FJ_OK;
+}
 
-//     return FJ_OK;
-// }
+
+enum fj_error fj_io_thread_sleep_destroy_manager_winapi(struct fj_io_thread_sleep_manager *manager)
+{
+    (void) manager;
+    return FJ_OK;
+}
+
+
+enum fj_error fj_io_thread_sleep_winapi(struct fj_io_thread *thread, fj_time const *opt_duration)
+{
+    enum fj_error e;
+
+    DWORD duration = opt_duration != NULL ? fj_time_into_millis(*opt_duration) : INFINITE;
+
+    if (duration != 0) {
+        e = sleep(thread, duration);
+
+        if (e)
+            return e;
+    }
+
+    MSG msg;
+
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return FJ_OK;
+}
