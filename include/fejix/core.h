@@ -127,38 +127,38 @@
 /** Error code. */
 enum fj_error {
     /** Success */
-    FJ_OK = 0,
+    FJ_OK,
 
     /** Out of memory */
-    FJ_ERROR_OUT_OF_MEMORY = 1,
+    FJ_ERROR_OUT_OF_MEMORY,
 
     /** The requested operation is not implemented and therefore no work has been done. */
-    FJ_ERROR_UNIMPLEMENTED = 2,
+    FJ_ERROR_UNIMPLEMENTED,
 
     /** The operation has failed, a generic error returned when concrete reasons are unknown. */
-    FJ_ERROR_OPERATION_FAILED = 3,
+    FJ_ERROR_OPERATION_FAILED,
 
     /** Input/output operation failed. */
-    FJ_ERROR_IO_FAILED = 4,
+    FJ_ERROR_IO_FAILED,
 
     /** The requested operation or resource are not available on the system. */
-    FJ_ERROR_UNAVAILABLE = 5,
+    FJ_ERROR_UNAVAILABLE,
 
     /** Access denied to create a file, share memory, connect to a device etc. */
-    FJ_ERROR_ACCESS_DENIED = 6,
+    FJ_ERROR_ACCESS_DENIED,
 
     /** Concurrent access to the object is not permitted. */
-    FJ_ERROR_CONCURRENT_ACCESS = 7,
+    FJ_ERROR_CONCURRENT_ACCESS,
 
     /** Invalid usage indicates a programming error like zero allocation size, index out of range,
         removing from an empty vector etc. */
-    FJ_ERROR_INVALID_USAGE = 8,
+    FJ_ERROR_INVALID_USAGE,
 
     /** The requested operation cannot be done on the specified object. */
-    FJ_ERROR_INVALID_OPERATION = 9,
+    FJ_ERROR_INVALID_OPERATION,
 
     /** Invalid text encoding. */
-    FJ_ERROR_INVALID_ENCODING = 10,
+    FJ_ERROR_INVALID_ENCODING,
 
     FJ_ERROR_MAX,
 

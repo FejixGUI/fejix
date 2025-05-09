@@ -15,15 +15,15 @@ FJ_OBJECT_TYPE(fj_io_thread)
 /** \{ */
 enum fj_io_thread_event_type {
     /** Sent every time the conneciton has dispatched all events and may be going to sleep. */
-    FJ_IO_THREAD_EVENT_NO_MORE_EVENTS = 0,
+    FJ_IO_THREAD_EVENT_NO_MORE_EVENTS,
     /** Connection is finishing. */
-    FJ_IO_THREAD_EVENT_FINISH = 1,
+    FJ_IO_THREAD_EVENT_FINISH,
     /** */
-    FJ_IO_THREAD_EVENT_PAUSE = 2,
+    FJ_IO_THREAD_EVENT_PAUSE,
     /** */
-    FJ_IO_THREAD_EVENT_HIBERNATE = 3,
+    FJ_IO_THREAD_EVENT_HIBERNATE,
     /** */
-    FJ_IO_THREAD_EVENT_LOW_MEMORY = 4,
+    FJ_IO_THREAD_EVENT_LOW_MEMORY,
 
     FJ_IO_THREAD_EVENT_ENUM32 = INT32_MAX,
 };

@@ -43,7 +43,7 @@ enum fj_error fj_winapi_window_view_handle_event(
 
 
 enum fj_error fj_window_view_create_manager_winapi(
-    struct fj_window_manager *window_manager, struct fj_window_view_manager **out_manager)
+    struct fj_drawable_manager *window_manager, struct fj_window_view_manager **out_manager)
 {
     enum fj_error e;
 
@@ -75,7 +75,7 @@ void fj_window_view_set_callback_winapi(
 
 enum fj_error fj_window_view_create_winapi(
     struct fj_window_view_manager *manager,
-    struct fj_window *window,
+    struct fj_drawable *window,
     struct fj_window_view **out_view)
 {
     enum fj_error e;

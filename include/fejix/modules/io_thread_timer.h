@@ -16,7 +16,7 @@ FJ_OBJECT_TYPE(fj_io_thread_timer)
 /** \{ */
 enum fj_io_thread_timer_event_type {
     /** The regular timer event. */
-    FJ_IO_THREAD_TIMER_EVENT_TIMEOUT = 0,
+    FJ_IO_THREAD_TIMER_EVENT_TIMEOUT,
 
     FJ_IO_THREAD_TIMER_EVENT_ENUM32 = INT32_MAX,
 };
