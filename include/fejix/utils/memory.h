@@ -10,7 +10,7 @@
     FJ_FREE(&x); // safely frees and nulls x
     assert(x == NULL);
 
-    FJ_ALLOC_ZEROED(&x);
+    FJ_ALLOC(&x);
     assert(*x == 0);
     FJ_FREE(&x);
 
@@ -41,77 +41,96 @@
 /** Gets the length of a static array. */
 #define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 
-#define FJ_ALLOC_UNINIT(OUT_OBJECT_PTR) \
-    (fj_alloc_uninit((void **) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR))))
+#define FJ_ALLOC(...) (FJ_ALLOC_ZEROED(__VA_ARGS__))
 
 #define FJ_ALLOC_ZEROED(OUT_OBJECT_PTR) \
-    (fj_alloc_zeroed((void **) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR))))
+    (fj_alloc_zeroed((void **) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR)), 0))
+
+#define FJ_ALLOC_UNINIT(OUT_OBJECT_PTR) \
+    (fj_alloc_uninit((void **) (OUT_OBJECT_PTR), sizeof(**(OUT_OBJECT_PTR)), 0))
 
 #define FJ_ALLOC_COPIED(OUT_OBJECT_PTR, SOURCE) \
-    (fj_alloc_copied((void **) (OUT_OBJECT_PTR), (void *) (SOURCE), sizeof(**(OUT_OBJECT_PTR))))
+    (fj_alloc_copied((void **) (OUT_OBJECT_PTR), (void *) (SOURCE), sizeof(**(OUT_OBJECT_PTR)), 0))
 
-#define FJ_REALLOC_UNINIT(OUT_ARRAY_PTR, NEW_LENGTH) \
-    (fj_realloc_uninit((void **) (OUT_ARRAY_PTR), (uint32_t) NEW_LENGTH, sizeof(**(OUT_ARRAY_PTR))))
+#define FJ_REALLOC_UNINIT(ARRAY_PTR, OLD_LENGTH, NEW_LENGTH) \
+    (fj_realloc_uninit((void **) (ARRAY_PTR), OLD_LENGTH, NEW_LENGTH, sizeof(**(ARRAY_PTR)), 0))
 
-#define FJ_REALLOC_ZEROED(OUT_ARRAY_PTR, OLD_LENGTH, NEW_LENGTH) \
-    (fj_realloc_zeroed(                                          \
-        (void **) (OUT_ARRAY_PTR),                               \
-        (uint32_t) (OLD_LENGTH),                                 \
-        (uint32_t) (NEW_LENGTH),                                 \
-        sizeof(**(OUT_ARRAY_PTR))))
+#define FJ_REALLOC_ZEROED(ARRAY_PTR, OLD_LENGTH, NEW_LENGTH) \
+    (fj_realloc_zeroed((void **) (ARRAY_PTR), (OLD_LENGTH), (NEW_LENGTH), sizeof(**(ARRAY_PTR)), 0))
 
-#define FJ_FREE(OUT_ARRAY_PTR) (fj_free((void **) (OUT_ARRAY_PTR)))
+#define FJ_FREE(OBJECT_PTR) (fj_free((void **) (OBJECT_PTR), sizeof(**(OBJECT_PTR)), 0))
 
+/**
+    \param alignment The alignment of 0 means that the default C alignment and default C
+    stucture padding are used.
 
-/** Allocates an uninitialized block of memory.
+    \returns NULL on allocation failure or when freeing.
+*/
+FJ_PUBLIC
+void *(*fj_allocation_callback)(void *pointer, size_t old_size, size_t new_size, size_t alignment);
+
+/**
+    Allocates an uninitialized block of memory.
     Works like `malloc`, but allocating 0 bytes is always an error.
 
-    Returns a new pointer or NULL on failure. */
+    Returns a new pointer or NULL on failure.
+*/
 FJ_PUBLIC
-enum fj_error fj_alloc_uninit(void **out_ptr, size_t size);
+enum fj_status fj_alloc_uninit(void **out_ptr, size_t size, size_t alignment);
 
-/** Allocates a block of memory initialized with zeros.
+/**
+    Allocates a block of memory initialized with zeros.
     Works like `calloc(1,)`, but allocating 0 bytes is always an error.
 
-    Returns a new pointer or NULL on failure. */
+    \returns a new pointer or NULL on failure.
+*/
 FJ_PUBLIC
-enum fj_error fj_alloc_zeroed(void **out_ptr, size_t size);
+enum fj_status fj_alloc_zeroed(void **out_ptr, size_t size, size_t alignment);
 
-/** Allocates a block of memory initialised with bytes from `source`.
+/**
+    Allocates a block of memory initialised with bytes from `source`.
 
-    Returns a new pointer or NULL on failure. */
+    \returns a new pointer or NULL on failure.
+*/
 FJ_PUBLIC
-enum fj_error fj_alloc_copied(void **out_ptr, void const *source, size_t size);
+enum fj_status fj_alloc_copied(void **out_ptr, void const *source, size_t size, size_t alignment);
 
-/** Frees a block of memory.
+/**
+    Frees a block of memory.
 
-    References the pointer to be freed, always returns NULL. */
+    References the pointer to be freed, always returns NULL.
+*/
 FJ_PUBLIC
-void fj_free(void **out_ptr);
+void fj_free(void **ptr, size_t size, size_t alignment);
 
-/** Reallocates a block of memory for an array of items.
+/**
+    Reallocates a block of memory for an array of items.
 
     If reallocation fails, this does not change the given pointer and does not free the old block.
 
-    * `fj_realloc_uninit(NULL, 0, y) = nothing`
-    * `fj_realloc_uninit(NULL, x, y) = alloc_uninit(x*y)`
-    * `fj_realloc_uninit(out_ptr,  0, y) = free(out_ptr)`
-    * `fj_realloc_uninit(out_ptr,  x, y) = realloc_uninit(out_ptr, x*y)`
+    * `realloc(ptr:NULL, new_length:0, item_size:y) = nothing`
+    * `realloc(ptr:NULL, new_length:x, item_size:y) = alloc(x*y)`
+    * `realloc(ptr:ptr,  new_length:0, item_size:y) = free(ptr)`
+    * `realloc(ptr:ptr,  new_length:x, item_size:y) = realloc(x*y)`
 
-    Returns a new pointer on success, does not change the pointer on failure. */
+    \returns a new pointer on success, does not change the pointer on failure.
+*/
 FJ_PUBLIC
-enum fj_error fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size);
+enum fj_status fj_realloc_uninit(
+    void **ptr, size_t old_length, size_t new_length, size_t item_size, size_t item_alignment);
 
 /** Similar to `fj_realloc_uninit`, but all new items of the array are initialised to zeroes. */
 FJ_PUBLIC
-enum fj_error fj_realloc_zeroed(
-    void **ptr, uint32_t old_items_length, uint32_t new_items_length, size_t item_size);
+enum fj_status fj_realloc_zeroed(
+    void **ptr, size_t old_length, size_t new_length, size_t item_size, size_t item_alignment);
 
-/** The returned string must be freed manually.
+/**
+    The returned string must be freed manually.
 
-    Returns the cloned string or NULL on failure. */
+    \returns the cloned string or NULL on failure.
+*/
 FJ_PUBLIC
-enum fj_error fj_alloc_string_copied(char const *str, char const **out_clone);
+enum fj_status fj_alloc_string_copied(char const **out_clone, char const *source);
 
 
 #endif

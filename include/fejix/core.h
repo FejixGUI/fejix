@@ -24,7 +24,7 @@
     This expands to `extern` (`extern "C"` for C++) and adds special attributes for shared libraries
     if needed.
 
-    If using the library compiled as shared (`.dll`) on Microsoft Windows, you need to define
+    If you are using the library as shared (`.dll`) on Microsoft Windows, you need to define
     `FJ_INCLUDE_OPT_DLLIMPORT` before including any library headers so that the library gets linked
     correctly.
 */
@@ -52,143 +52,79 @@
 
 #endif
 
+#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
+#    define FJ_HANDLE(TYPE) struct TYPE;
+#else
 /**
     Forward-declares a struct.
 
     Even though each backend may define the struct in its own way, the first field is always the
-    userdata and is accessible with #FJ_USERDATA.
-
-    This is here primarily because Doxygen does not recognize struct forward declarations, so we
-    actually define it a bit differently in Doxygen to make the structs appear in the docs.
+    userdata pointer.
 */
-#define FJ_OBJECT_TYPE(TYPE) struct TYPE;
-
-#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
-#    define FJ_CALLBACK_TYPE(NAME, RETURN_TYPE, ...)   \
-        typedef RETURN_TYPE (*NAME)(__VA_ARGS__);      \
-        static RETURN_TYPE NAME##_default(__VA_ARGS__) \
-        {                                              \
-            (void) event_object;                       \
-            (void) event_type;                         \
-            (void) event_data;                         \
-            return FJ_ERROR_UNIMPLEMENTED;             \
-        }
-#else
-/**
-    Defines a typedef for an event callback function pointer.
-
-    Even though it looks like you can define any arguments you want, there must be exactly *three*
-    arguments called `event_object`, `event_type` and `event_data`.
-    The reason is that in private code this also defines a default placeholder to make using
-    callbacks in backend code easier.
-    To avoid unused parameter warnings, we explicitly ignore the parameters, which uses their names.
-*/
-#    define FJ_CALLBACK_TYPE(NAME, RETURN_TYPE, ...) typedef RETURN_TYPE (*NAME)(__VA_ARGS__);
+#    define FJ_HANDLE(TYPE) \
+        struct TYPE {       \
+            void *userdata; \
+        };
 #endif
 
-#if !defined(FJ_METHOD) || defined(FJ_COMPILE_OPT_DOCS)
-/**
-    Defines a function pointer which can be NULL.
 
-    The function pointer may be NULL if unimplemented by the currently selected backend.
-*/
-#    define FJ_METHOD(NAME, RETURN_TYPE, ...) FJ_PUBLIC RETURN_TYPE (*NAME)(__VA_ARGS__);
-#endif
-
-#if !defined(FJ_METHOD_WITH_DEFAULT) || defined(FJ_COMPILE_OPT_DOCS)
-/**
-    Defines a function pointer which cannot be NULL.
-
-    If the method is not implemented by the current backend, the fallback implementation is used,
-    which returns the FALLBACK_RESULT.
-*/
-#    define FJ_METHOD_WITH_FALLBACK(NAME, RETURN_TYPE, FALLBACK_RESULT, ...) \
-        FJ_METHOD(NAME, RETURN_TYPE, __VA_ARGS__)
-#endif
-
-#if !defined(FJ_METHOD_LIST_BEGIN)
-#    define FJ_METHOD_LIST_BEGIN(MODULE_NAME)
-#endif
-
-#if !defined(FJ_METHOD_LIST_END)
-#    define FJ_METHOD_LIST_END()
-#endif
-
-#if !defined(FJ_METHOD_LIST_ITEM)
-#    define FJ_METHOD_LIST_ITEM(METHOD_NAME)
-#endif
-
-/**
-    Retrieves the object's userdata as its first field.
-*/
-#define FJ_USERDATA(OBJECT) (*(void **) (OBJECT))
-
-
-/** Error code. */
-enum fj_error {
+/** Status code. */
+enum fj_status {
     /** Success */
-    FJ_OK,
-
-    /** Out of memory */
-    FJ_ERROR_OUT_OF_MEMORY,
+    FJ_STATUS_OK,
 
     /** The requested operation is not implemented and therefore no work has been done. */
-    FJ_ERROR_UNIMPLEMENTED,
+    FJ_STATUS_UNIMPLEMENTED,
 
-    /** The operation has failed, a generic error returned when concrete reasons are unknown. */
-    FJ_ERROR_OPERATION_FAILED,
+    /** Out of memory */
+    FJ_STATUS_OUT_OF_MEMORY,
 
     /** Input/output operation failed. */
-    FJ_ERROR_IO_FAILED,
+    FJ_STATUS_IO_FAILED,
 
     /** The requested operation or resource are not available on the system. */
-    FJ_ERROR_UNAVAILABLE,
+    FJ_STATUS_UNAVAILABLE,
 
     /** Access denied to create a file, share memory, connect to a device etc. */
-    FJ_ERROR_ACCESS_DENIED,
+    FJ_STATUS_ACCESS_DENIED,
 
     /** Concurrent access to the object is not permitted. */
-    FJ_ERROR_CONCURRENT_ACCESS,
+    FJ_STATUS_CONCURRENT_ACCESS,
 
     /** Invalid usage indicates a programming error like zero allocation size, index out of range,
         removing from an empty vector etc. */
-    FJ_ERROR_INVALID_USAGE,
+    FJ_STATUS_INVALID_USAGE,
 
     /** The requested operation cannot be done on the specified object. */
-    FJ_ERROR_INVALID_OPERATION,
+    FJ_STATUS_INVALID_OPERATION,
 
     /** Invalid text encoding. */
-    FJ_ERROR_INVALID_ENCODING,
+    FJ_STATUS_INVALID_ENCODING,
 
-    FJ_ERROR_MAX,
+    /** The operation has failed, a generic error returned when concrete reasons are unknown. */
+    FJ_STATUS_OPERATION_FAILED,
 
-    FJ_ERROR_ENUM32 = INT32_MAX,
+    FJ_STATUS_MAX,
+
+    FJ_STATUS_ENUM32 = INT32_MAX,
 };
 
 
 enum fj_orientation {
     /**
-        Rows: address-increasing memory direction of pixels corresponds to RIGHT.
-        Columns: address-increasing memory direction of rows corresponds to DOWN.
+        The standard orientation implies that:
+        - memory-increasing direction of pixels corresponds to RIGHT
+        - memory-increasing direction of rows corresponds to DOWN
     */
-    FJ_ORIENTATION_ROW_RIGHT_COLUMN_DOWN,
-    /** */
-    FJ_ORIENTATION_ROW_RIGHT_COLUMN_UP,
-    FJ_ORIENTATION_ROW_LEFT_COLUMN_DOWN,
-    FJ_ORIENTATION_ROW_LEFT_COLUMN_UP,
-    FJ_ORIENTATION_ROW_DOWN_COLUMN_RIGHT,
-    FJ_ORIENTATION_ROW_DOWN_COLUMN_LEFT,
-    FJ_ORIENTATION_ROW_UP_COLUMN_RIGHT,
-    FJ_ORIENTATION_ROW_UP_COLUMN_LEFT,
-
-    FJ_ORIENTATION_STANDARD = FJ_ORIENTATION_ROW_RIGHT_COLUMN_DOWN,
-    FJ_ORIENTATION_STANDARD_ROTATED90 = FJ_ORIENTATION_ROW_DOWN_COLUMN_LEFT,
-    FJ_ORIENTATION_STANDARD_ROTATED180 = FJ_ORIENTATION_ROW_LEFT_COLUMN_UP,
-    FJ_ORIENTATION_STANDARD_ROTATED270 = FJ_ORIENTATION_ROW_UP_COLUMN_RIGHT,
-    FJ_ORIENTATION_STANDARD_FLIPPED = FJ_ORIENTATION_ROW_RIGHT_COLUMN_UP,
-    FJ_ORIENTATION_STANDARD_FLIPPED_ROTATED90 = FJ_ORIENTATION_ROW_DOWN_COLUMN_RIGHT,
-    FJ_ORIENTATION_STANDARD_FLIPPED_ROTATED180 = FJ_ORIENTATION_ROW_LEFT_COLUMN_DOWN,
-    FJ_ORIENTATION_STANDARD_FLIPPED_ROTATED270 = FJ_ORIENTATION_ROW_UP_COLUMN_LEFT,
+    FJ_ORIENTATION_STANDARD,
+    FJ_ORIENTATION_ROTATED90,
+    FJ_ORIENTATION_ROTATED180,
+    FJ_ORIENTATION_ROTATED270,
+    /** Represents a horizontal flip, where pixels in rows are reversed. */
+    FJ_ORIENTATION_STANDARD_FLIPPED,
+    FJ_ORIENTATION_ROTATED90_FLIPPED,
+    FJ_ORIENTATION_ROTATED180_FLIPPED,
+    FJ_ORIENTATION_ROTATED270_FLIPPED,
 
     FJ_ORIENTATION_ENUM32 = INT32_MAX,
 };
@@ -244,9 +180,25 @@ struct fj_viewport2d {
 };
 
 
-/** Always returns a valid printable string, even for invalid error IDs. */
+/** Always returns a valid printable string, even for invalid status IDs. */
 FJ_PUBLIC
-char const *fj_error_get_description(enum fj_error error);
+char const *fj_status_get_description(enum fj_status s);
+
+FJ_PUBLIC
+void fj_get_backends(char const *const **out_backends, uint32_t *out_backends_length);
+
+/**
+    \returns NULL if there are no backends built in, otherwise always returns a valid backend.
+*/
+FJ_PUBLIC
+char const *fj_get_default_backend(void);
+
+/**
+    \param backend_name If NULL, the default backend is initialised.
+    \returns Error if the specified backend is not built into the library.
+*/
+FJ_PUBLIC
+enum fj_status fj_init(char const *backend_name);
 
 
 #endif

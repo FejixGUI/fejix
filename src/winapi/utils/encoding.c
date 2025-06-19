@@ -3,9 +3,9 @@
 #include <fejix/utils/memory.h>
 
 
-enum fj_error fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
+enum fj_status fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 {
-    enum fj_error e;
+    enum fj_status e;
 
     int32_t output_chars_length = MultiByteToWideChar(
         CP_UTF8,
@@ -31,16 +31,16 @@ enum fj_error fj_winapi_into_utf16(char const *string, LPWSTR *utf16_string)
 
     if (result == 0) {
         FJ_FREE(utf16_string);
-        return FJ_ERROR_INVALID_ENCODING;
+        return FJ_STATUS_INVALID_ENCODING;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
+enum fj_status fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 {
-    enum fj_error e;
+    enum fj_status e;
 
     int32_t output_size = WideCharToMultiByte(
         CP_UTF8,
@@ -69,8 +69,8 @@ enum fj_error fj_winapi_from_utf16(LPWSTR utf16_string, char const **string)
 
     if (result == 0) {
         FJ_FREE(string);
-        return FJ_ERROR_INVALID_ENCODING;
+        return FJ_STATUS_INVALID_ENCODING;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }

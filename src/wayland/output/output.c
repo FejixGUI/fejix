@@ -4,7 +4,7 @@
 #include <fejix/core/utils.h>
 
 
-static enum fj_error output_handle_init(
+static enum fj_status output_handle_init(
     struct fj_client *client, struct fj_wayland_event_wrapper const *event_wrapper)
 {
     (void) event_wrapper;
@@ -17,11 +17,11 @@ static enum fj_error output_handle_init(
         return fj_result;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-static enum fj_error output_data_init(struct fj_client *client)
+static enum fj_status output_data_init(struct fj_client *client)
 {
     struct fj_wayland_global const *compositor_global
         = fj_wayland_get_static_global(client, FJ_WAYLAND_INTERFACE_COMPOSITOR);
@@ -47,11 +47,11 @@ static enum fj_error output_data_init(struct fj_client *client)
         return fj_result;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-static enum fj_error output_init(
+static enum fj_status output_init(
     struct fj_client *_client, struct fj_output_callbacks const *callbacks)
 {
     struct fj_client *client = (void *) _client;
@@ -63,7 +63,7 @@ static enum fj_error output_init(
         return callbacks->init(client->data, NULL);
     }
 
-    FJ_TRY (FJ_ALLOC_ZEROED(&client->output)) {
+    FJ_TRY (FJ_ALLOC(&client->output)) {
         return fj_result;
     }
 
@@ -74,21 +74,21 @@ static enum fj_error output_init(
         return fj_result;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error output_deinit(struct fj_client *_client)
+enum fj_status output_deinit(struct fj_client *_client)
 {
     struct fj_client *client = (void *) _client;
 
     FJ_FREE(&client->output);
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-static enum fj_error output_create(
+static enum fj_status output_create(
     struct fj_client *_client,
     struct fj_output * /*out*/ *_output,
     fj_canvas_base *_canvas,
@@ -98,7 +98,7 @@ static enum fj_error output_create(
     struct fj_wayland_output **output = (void *) _output;
     struct fj_wayland_canvas_base *canvas = (void *) _canvas;
 
-    FJ_TRY (FJ_ALLOC_ZEROED(output)) {
+    FJ_TRY (FJ_ALLOC(output)) {
         return fj_result;
     }
 
@@ -108,16 +108,16 @@ static enum fj_error output_create(
 
     if ((*output)->surface == NULL) {
         FJ_FREE(output);
-        return FJ_ERROR_REQUEST_FAILED;
+        return FJ_STATUS_REQUEST_FAILED;
     }
 
     canvas->output = *output;
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-static enum fj_error output_destroy(struct fj_client *_client, struct fj_output *_output)
+static enum fj_status output_destroy(struct fj_client *_client, struct fj_output *_output)
 {
     struct fj_client *client = (void *) _client;
     struct fj_wayland_output *output = (void *) _output;
@@ -126,11 +126,11 @@ static enum fj_error output_destroy(struct fj_client *_client, struct fj_output 
     wl_surface_destroy(output->surface);
     FJ_FREE(&output);
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-static enum fj_error output_update(
+static enum fj_status output_update(
     struct fj_client *_client,
     struct fj_output *_output,
     struct fj_output_info const *output_info,
@@ -143,7 +143,7 @@ static enum fj_error output_update(
 
     output->info = *output_info;
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 

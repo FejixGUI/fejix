@@ -9,7 +9,7 @@
 static LONG_PTR __stdcall window_procedure(
     HWND handle, UINT message, UINT_PTR wparam, LONG_PTR lparam)
 {
-    enum fj_error e;
+    enum fj_status e;
 
     if (message == WM_CREATE) {
         CREATESTRUCT *create_info = (void *) lparam;
@@ -38,35 +38,35 @@ static LONG_PTR __stdcall window_procedure(
 }
 
 
-enum fj_error fj_window_create_manager_winapi(
+enum fj_status fj_window_create_manager_winapi(
     struct fj_io_thread *io_thread, struct fj_window_manager **out_manager)
 {
-    enum fj_error e;
+    enum fj_status e;
 
-    e = FJ_ALLOC_ZEROED(out_manager);
+    e = FJ_ALLOC(out_manager);
 
     if (e)
         return e;
 
     (*out_manager)->io_thread = io_thread;
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_window_destroy_manager_winapi(struct fj_window_manager *manager)
+enum fj_status fj_window_destroy_manager_winapi(struct fj_window_manager *manager)
 {
     (void) manager;
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_window_create_winapi(
+enum fj_status fj_window_create_winapi(
     struct fj_window_manager *manager, struct fj_window **out_window)
 {
-    enum fj_error e;
+    enum fj_status e;
 
-    e = FJ_ALLOC_ZEROED(out_window);
+    e = FJ_ALLOC(out_window);
 
     if (e)
         return e;
@@ -93,14 +93,14 @@ enum fj_error fj_window_create_winapi(
         return e;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_window_destroy_winapi(struct fj_window_manager *manager, struct fj_window *window)
+enum fj_status fj_window_destroy_winapi(struct fj_window_manager *manager, struct fj_window *window)
 {
     (void) manager;
-    enum fj_error e;
+    enum fj_status e;
 
     e = fj_winapi_window_destroy(window->handle);
 
@@ -109,15 +109,15 @@ enum fj_error fj_window_destroy_winapi(struct fj_window_manager *manager, struct
 
     FJ_FREE(&window);
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_window_sync_winapi(struct fj_window_manager *manager, struct fj_window *window)
+enum fj_status fj_window_sync_winapi(struct fj_window_manager *manager, struct fj_window *window)
 {
     if (window->view != NULL) {
         fj_winapi_window_view_sync(window->view->manager, window->view);
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }

@@ -1,3 +1,4 @@
+#include <fejix/utils/logging.h>
 #include <fejix/utils/memory.h>
 
 #include <malloc.h>
@@ -5,143 +6,137 @@
 #include <string.h>
 
 
-enum fj_error fj_alloc_uninit(void **out_ptr, size_t size)
+void *default_callback(void *pointer, size_t old_size, size_t new_size, size_t alignment)
+{
+    (void) old_size;
+    (void) alignment;
+
+    if (pointer == NULL)
+        return malloc(new_size);
+
+    if (new_size > 0)
+        return realloc(pointer, new_size);
+
+    free(pointer);
+    return NULL;
+}
+
+void *(*fj_allocation_callback)(void *pointer, size_t old_size, size_t new_size, size_t alignment)
+    = default_callback;
+
+
+enum fj_status fj_alloc_uninit(void **out_ptr, size_t size, size_t alignment)
 {
     if (size == 0) {
         *out_ptr = NULL;
-        return FJ_ERROR_INVALID_USAGE;
+        FJ_ERROR("failed to allocate 0 bytes");
+        return FJ_STATUS_INVALID_USAGE;
     }
 
-    *out_ptr = malloc(size);
+    *out_ptr = fj_allocation_callback(NULL, 0, size, alignment);
 
     if (*out_ptr == NULL) {
-        return FJ_ERROR_OUT_OF_MEMORY;
+        return FJ_STATUS_OUT_OF_MEMORY;
     }
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_alloc_zeroed(void **out_ptr, size_t size)
+enum fj_status fj_alloc_zeroed(void **out_ptr, size_t size, size_t alignment)
 {
     if (size == 0) {
         *out_ptr = NULL;
-        return FJ_ERROR_INVALID_USAGE;
+        FJ_ERROR("failed to allocate 0 bytes");
+        return FJ_STATUS_INVALID_USAGE;
     }
 
-    *out_ptr = calloc(1, size);
+    *out_ptr = fj_allocation_callback(NULL, 0, size, alignment);
 
     if (*out_ptr == NULL) {
-        return FJ_ERROR_OUT_OF_MEMORY;
+        return FJ_STATUS_OUT_OF_MEMORY;
     }
 
-    return FJ_OK;
+    memset(*out_ptr, 0, size);
+
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_alloc_copied(void **out_ptr, void const *source, size_t size)
+enum fj_status fj_alloc_copied(void **out_ptr, void const *source, size_t size, size_t alignment)
 {
-    enum fj_error e;
-    e = fj_alloc_uninit(out_ptr, size);
-    if (e)
-        return e;
+    enum fj_status s;
+
+    s = fj_alloc_uninit(out_ptr, size, alignment);
+    if (s)
+        return s;
 
     memcpy(*out_ptr, source, size);
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-void fj_free(void **ptr)
+void fj_free(void **ptr, size_t size, size_t alignment)
 {
-    free(*ptr);
+    if (ptr == NULL) {
+        FJ_ERROR("failed to free NULL");
+    }
+
+    fj_allocation_callback(*ptr, size, 0, alignment);
     *ptr = NULL;
 }
 
 
-enum fj_error fj_realloc_uninit(void **ptr, uint32_t items_length, size_t item_size)
+enum fj_status fj_realloc_uninit(
+    void **ptr, size_t old_length, size_t new_length, size_t item_size, size_t item_alignment)
 {
     if (item_size == 0) {
-        return FJ_ERROR_INVALID_USAGE;
+        return FJ_STATUS_INVALID_USAGE;
     }
 
-    if (items_length == 0) {
-        if (ptr != NULL) {
-            free((void *) ptr);
-        }
-
-        *ptr = NULL;
-        return FJ_OK;
+    if (new_length == old_length) {
+        return FJ_STATUS_OK;
     }
 
-    size_t size = items_length * item_size;
-
-    if (*ptr == NULL) {
-        return fj_alloc_uninit(ptr, size);
-    }
-
-    void *new_ptr = realloc(*ptr, size);
+    void *new_ptr = fj_allocation_callback(
+        *ptr, old_length * item_size, new_length * item_size, item_alignment);
 
     if (new_ptr == NULL) {
-        return FJ_ERROR_OUT_OF_MEMORY;
+        return FJ_STATUS_OUT_OF_MEMORY;
     }
 
     *ptr = new_ptr;
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
-
-enum fj_error fj_realloc_zeroed(
-    void **ptr, uint32_t old_items_length, uint32_t new_items_length, size_t item_size)
+enum fj_status fj_realloc_zeroed(
+    void **ptr, size_t old_length, size_t new_length, size_t item_size, size_t item_alignment)
 {
-    if (item_size == 0) {
-        return FJ_ERROR_INVALID_USAGE;
+    enum fj_status s = fj_realloc_uninit(ptr, old_length, new_length, item_size, item_alignment);
+
+    if (s)
+        return s;
+
+    if (new_length > old_length) {
+        memset((uint8_t *) *ptr + old_length * item_size, 0, (new_length - old_length) * item_size);
     }
 
-    if (new_items_length == 0) {
-        if (*ptr != NULL) {
-            free((void *) *ptr);
-        }
-
-        *ptr = NULL;
-        return FJ_OK;
-    }
-
-    void *old_ptr = *ptr;
-    size_t old_size = old_items_length * item_size;
-    size_t new_size = new_items_length * item_size;
-
-    if (*ptr == NULL) {
-        return fj_alloc_zeroed(ptr, new_size);
-    }
-
-    void *new_ptr = realloc(old_ptr, new_size);
-
-    if (new_ptr == NULL) {
-        return FJ_ERROR_OUT_OF_MEMORY;
-    }
-
-    if (new_size > old_size) {
-        memset((uint8_t *) new_ptr + old_size, 0, new_size - old_size);
-    }
-
-    *ptr = new_ptr;
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
-
-enum fj_error fj_string_clone(char const *str, char const **out_clone)
+enum fj_status fj_alloc_string_copied(char const **out_clone, char const *source)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    size_t length = strlen(str);
+    size_t length = strlen(source);
 
-    e = FJ_REALLOC_UNINIT(out_clone, length);
+    s = FJ_REALLOC_UNINIT(out_clone, 0, length);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
-    memcpy((void *) *out_clone, (void *) str, length);
+    memcpy((void *) *out_clone, (void *) source, length);
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }

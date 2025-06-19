@@ -14,7 +14,7 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library ty
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
-set(fejix_backends "" CACHE STRING "The backends to enable. If \"detect\", selects the backends common for the target OS")
+set(fejix_backends "auto" CACHE STRING "The backends to enable. If \"auto\", selects the backends common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
@@ -23,7 +23,7 @@ set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI vers
 set(fejix_build_unix_utils OFF)
 
 
-if("${fejix_backends}" STREQUAL "detect")
+if("${fejix_backends}" STREQUAL "auto")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
         set(fejix_backends "winapi")
     elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|FreeBSD|OpenBSD|NetBSD|DragonFly")
@@ -79,13 +79,6 @@ target_compile_definitions(
     PRIVATE
         "FJ_COMPILE_OPT_PRIVATE_CODE"
         "$<$<C_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>")
-
-if("${fejix_backend_count}" EQUAL 1)
-    target_compile_definitions(
-        fejix
-        PRIVATE
-            "FJ_COMPILE_OPT_SINGLE_BACKEND")
-endif()
 
 if("${BUILD_SHARED_LIBS}" AND "${CMAKE_SYSTEM_NAME}" MATCHES "Windows|WindowsStore|MSYS|CYGWIN|WindowsCE|WindowsPhone")
     target_compile_definitions(

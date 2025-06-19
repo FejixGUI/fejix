@@ -15,18 +15,18 @@ static void shift_tail(
 }
 
 
-enum fj_error fj_vector_expand_at(
+enum fj_status fj_vector_expand(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size)
 {
-    enum fj_error e;
+    enum fj_status e;
 
     if (index > *length) {
-        return FJ_ERROR_INVALID_USAGE;
+        return FJ_STATUS_INVALID_USAGE;
     }
 
     if (*length == *capacity) {
         uint32_t new_capacity = fj_u32_max(*capacity * 2, 1);
-        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size, 0);
 
         if (e)
             return e;
@@ -40,17 +40,17 @@ enum fj_error fj_vector_expand_at(
 
     *length += 1;
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-enum fj_error fj_vector_shrink_at(
+enum fj_status fj_vector_shrink(
     void **items, uint32_t *length, uint32_t *capacity, uint32_t index, size_t item_size)
 {
-    enum fj_error e;
+    enum fj_status e;
 
     if (index >= *length) {
-        return FJ_ERROR_INVALID_USAGE;
+        return FJ_STATUS_INVALID_USAGE;
     }
 
     if (index != *length - 1) {
@@ -59,7 +59,7 @@ enum fj_error fj_vector_shrink_at(
 
     if (*length <= *capacity / 4) {
         uint32_t new_capacity = fj_u32_max(*capacity / 2, 1);
-        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size, 0);
         if (e)
             return e;
 
@@ -69,14 +69,14 @@ enum fj_error fj_vector_shrink_at(
 
     *length -= 1;
 
-    return FJ_OK;
+    return FJ_STATUS_OK;
 }
 
 
-void fj_vector_free(void **items, uint32_t *length, uint32_t *capacity)
+void fj_vector_free(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
 {
     if (*items != NULL) {
-        FJ_FREE(items);
+        fj_free(*items, *capacity * item_size, 0);
     }
 
     *length = 0;

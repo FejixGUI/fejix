@@ -1,55 +1,43 @@
 # Fejix
 
-Fejix is a low-level cross-platform GUI base library.
-It wraps system APIs for window output, keyboard, mouse and other input processing etc.
-and can be used to build UI frameworks, game engines and other tools.
+**Fejix** is a cross-platform **GUI base** library.
 
-Fejix is *not* a graphics rendering engine or a widget framework.
+It wraps system APIs (Windows API, Wayland, X11, Cocoa, etc.)
+to provide access to low-level GUI features like
+window management, input handling, system notifications, tray icons and much more.
 
-Features:
+This library is useful for building UI frameworks, game engines or other tools.
 
-* **Feature-rich**:
+**Features:**
 
-    No extension libraries. Fejix has all the functionality you need.
+- **Batteries included**
 
-* **Simple API**:
+    - Fejix has an extensible system of modules that allows it to support as many useful system
+        features as possible.
+        You want a nice shiny system API related to GUI? Suggest it to us!
 
-    It's just C. Use of metaprogramming in public code is limited to just three simple macros or so.
+- **Compatible**
 
-* **Modular API**:
+    - It is possible to port existing projects to Fejix thanks to supplementary modules
+        that implement legacy or not-so-cross-platform features.
+        This would allow other libraries like SDL or Qt to gradually migrate to Fejix.
 
-    The library is divided into many small modules, and each of them may or may not be available at
-    runtime depending on the platform features and the current support of those features in Fejix.
+- **Portable**
 
-    This makes it simpler to design, extend, port, and reimplement the library.
+    - Written in C99
+    - All core modules are designed to be cross-platform and generic
+    - Adding backends is extremely simple because backends are completely independent chunks of
+        code (with the exception of build scripts and the backend loading function)
 
-* **Modular backends**:
 
-    All backends directly expose their functions to the user, no wrappers or abstractions.
-    Thus backends are completely independent of each other and are fairly easy to add,
-    replace, enable/disable for compilation, and select at runtime.
-
-Secondary features:
-
-* **Portability of existing projects**:
-
-    You can straightforwardly port other projects to Fejix.
-    The library has a few modules that implement legacy or not-so-cross-platform behaviors
-    specifically to allow other libraries and programs depending on those behaviors to gradually
-    migrate to Fejix.
-
-* **Clean code**:
-
-    ...to the extent that it remains fairly easy to add nice shiny features to the library, because
-    there a *lot* of nice shiny features in the giant fragmented world of graphical operating
-    systems.
-
-> This library is in its earliest development stage.
+> This project is in its earliest development stage.
+>
 > The most interesting thing to see here is this emoji: 🌸.
+>
 > Yay.
 
 
 ## License
 
-Copyright 2024-2025 Mark Lagodych.
-Licensed under [Apache-2.0](./LICENSE.txt>)
+Copyright © 2024-2025 Mark Lagodych.
+Licensed under [Apache-2.0](./LICENSE.txt)
