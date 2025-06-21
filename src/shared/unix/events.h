@@ -43,7 +43,7 @@ enum fj_error fj_unix_events_remove(struct fj_unix_events *events, int file_desc
 
 enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout);
 
-enum fj_error fj_unix_events_wakeup(struct fj_unix_events *events);
+enum fj_error fj_unix_events_echo(struct fj_unix_events *events);
 
 
 #endif

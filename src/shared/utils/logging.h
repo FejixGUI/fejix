@@ -2,7 +2,7 @@
 #define FEJIX_UTILS_LOGGING_H_
 
 
-#include <fejix/runtime.h>
+#include <fejix/utils.h>
 
 
 #ifdef FJ_COMPILE_OPT_ENABLE_LOGGING

@@ -12,4 +12,5 @@
 #endif
 
 #include <fejix/app.h>
+#include <fejix/timer.h>
 #include <fejix/window.h>

@@ -85,6 +85,14 @@
 #define FJ_API(FUNCTION_NAME, ...) \
     FJ_APIEX(FUNCTION_NAME, enum fj_error, FJ_ERROR_UNIMPLEMENTED, __VA_ARGS__)
 
+/** Defines a public API function that returns void and defaults to no-op. */
+#define FJ_APIVOID(FUNCTION_NAME, ...) FJ_APIEX(FUNCTION_NAME, void, , __VA_ARGS__)
+
+
+#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
+#    define FJ_API_INIT(FUNCTION_NAME) FUNCTION_NAME = FUNCTION_NAME##_;
+#endif
+
 
 /** Status code. */
 enum fj_error {
@@ -127,13 +135,6 @@ enum fj_error {
     FJ_ERROR_ENUM32 = INT32_MAX,
 };
 
-enum fj_log_level {
-    FJ_LOG_LEVEL_INFO,
-    FJ_LOG_LEVEL_WARN,
-    FJ_LOG_LEVEL_ERROR,
-
-    FJ_LOG_LEVEL_ENUM32 = INT32_MAX,
-};
 
 enum fj_orientation {
     /**

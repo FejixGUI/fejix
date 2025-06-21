@@ -1,6 +1,7 @@
+#include <src/shared/utils/logging.h>
 #include <src/shared/utils/memory.h>
 
-#include <fejix/runtime.h>
+#include <fejix/backend.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -40,6 +41,9 @@ static void (*init_funcs[])(void) = {
 };
 
 static uint32_t const backends_length = FJ_LEN(backends) - 1;  // Accounting for the NULL at the end
+
+static char const *selected_backend = NULL;
+
 
 void fj_backend_get_list(char const *const **out_backends, uint32_t *out_backends_length)
 {
@@ -91,12 +95,28 @@ char const *fj_backend_get_default(void)
 
 enum fj_error fj_backend_select(char const *backend_name)
 {
+    if (selected_backend != NULL) {
+        if (strcmp(selected_backend, backend_name) == 0) {
+            return FJ_OK;
+        }
+
+        FJ_ERROR("cannot initialise backend twice");
+        return FJ_ERROR_INVALID_USAGE;
+    }
+
     for (uint32_t i = 0; i < backends_length; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
             init_funcs[i]();
+            selected_backend = backends[i];
             return FJ_OK;
         }
     }
 
     return FJ_ERROR_UNAVAILABLE;
+}
+
+
+char const *fj_get_selected_backend(void)
+{
+    return selected_backend;
 }

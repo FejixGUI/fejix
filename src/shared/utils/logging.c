@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+
 static char const *log_level_to_string(enum fj_log_level level)
 {
     switch (level) {
