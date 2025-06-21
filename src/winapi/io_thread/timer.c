@@ -35,19 +35,19 @@ DWORD fj_winapi_timer_manager_get_sleep_duration(struct fj_io_thread_timer_manag
 }
 
 
-enum fj_status fj_io_thread_timer_create_manager_winapi(
+enum fj_error fj_io_thread_timer_create_manager_winapi(
     struct fj_io_thread *io_thread, struct fj_io_thread_timer_manager **out_manager)
 {
     *out_manager = &io_thread->timer_manager;
     (*out_manager)->callback = fj_io_thread_timer_event_callback_default;
-    return FJ_STATUS_OK;
+    return FJ_OK;
 }
 
 
-enum fj_status fj_io_thread_timer_destroy_manager_winapi(struct fj_io_thread_timer_manager *manager)
+enum fj_error fj_io_thread_timer_destroy_manager_winapi(struct fj_io_thread_timer_manager *manager)
 {
     (void) manager;
-    return FJ_STATUS_OK;
+    return FJ_OK;
 }
 
 
@@ -58,14 +58,14 @@ void fj_io_thread_timer_set_callback_winapi(
 }
 
 
-enum fj_status fj_io_thread_timer_create_winapi(
+enum fj_error fj_io_thread_timer_create_winapi(
     struct fj_io_thread_timer_manager *manager,
     fj_time initial_delay,
     fj_time repeat_period,
     fj_time requested_precision,
     struct fj_io_thread_timer **out_timer)
 {
-    enum fj_status e;
+    enum fj_error e;
 
     e = FJ_ALLOC(out_timer);
 
@@ -93,14 +93,14 @@ enum fj_status fj_io_thread_timer_create_winapi(
         return e;
     }
 
-    return FJ_STATUS_OK;
+    return FJ_OK;
 }
 
 
-enum fj_status fj_io_thread_timer_destroy_winapi(
+enum fj_error fj_io_thread_timer_destroy_winapi(
     struct fj_io_thread_timer_manager *manager, struct fj_io_thread_timer *timer)
 {
-    enum fj_status e;
+    enum fj_error e;
 
     uint32_t index;
     for (index = 0; index < manager->timers.length; index++) {
@@ -116,5 +116,5 @@ enum fj_status fj_io_thread_timer_destroy_winapi(
 
     FJ_FREE(&timer);
 
-    return FJ_STATUS_OK;
+    return FJ_OK;
 }

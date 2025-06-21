@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(
     fejix
     VERSION 0.1.0
-    DESCRIPTION "Cross-platform low-level GUI base library"
+    DESCRIPTION "Cross-platform GUI base library"
     HOMEPAGE_URL "https://github.com/FejixGUI/fejix")
 
 
@@ -14,7 +14,13 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library ty
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
-set(fejix_backends "auto" CACHE STRING "The backends to enable. If \"auto\", selects the backends common for the target OS")
+set(fejix_build_winapi OFF CACHE BOOL "Build the Windows API backend")
+
+set(fejix_build_wayland OFF CACHE BOOL "Build the Wayland backend")
+
+set(fejix_build_x11 OFF CACHE BOOL "Build the X11 backend")
+
+set(fejix_detect_backends OFF CACHE BOOL "Detect the backends which are common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
@@ -23,18 +29,16 @@ set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI vers
 set(fejix_build_unix_utils OFF)
 
 
-if("${fejix_backends}" STREQUAL "auto")
+if("${fejix_detect_backends}" STREQUAL "auto")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
-        set(fejix_backends "winapi")
+        set(fejix_build_winapi ON)
     elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|FreeBSD|OpenBSD|NetBSD|DragonFly")
-        set(fejix_backends "wayland" "x11")
+        set(fejix_build_wayland ON)
+        set(fejix_build_x11 ON)
     else()
         message(WARNING "Fejix could not detect backends for the target OS")
-        set(fejix_backends "")
     endif()
 endif()
-
-list(LENGTH fejix_backends fejix_backend_count)
 
 enable_language("C")
 
@@ -72,7 +76,7 @@ target_compile_options(
     fejix
     PRIVATE
         "$<$<C_COMPILER_ID:MSVC>:/W4>"
-        "$<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-fvisibility=hidden;-Werror=vla;-Wall;-Wextra;-Wpedantic>")
+        "$<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-fvisibility=hidden;-Werror=vla;-Wall;-Wextra;-Wpedantic;-Wno-unused-function>")
 
 target_compile_definitions(
     fejix
@@ -96,26 +100,21 @@ target_include_directories(
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}")
 
-target_sources(
-    fejix
-    PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/src/core.c"
-        "${CMAKE_CURRENT_LIST_DIR}/src/backend.c")
+include("${CMAKE_CURRENT_LIST_DIR}/src/shared/core/build.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/shared/utils/build.cmake")
 
-include("${CMAKE_CURRENT_LIST_DIR}/src/modules/build.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/default/build.cmake")
 
-include("${CMAKE_CURRENT_LIST_DIR}/src/utils/build.cmake")
-
-if("winapi" IN_LIST fejix_backends)
+if("${fejix_build_winapi}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/winapi/build.cmake")
 endif()
 
-if("x11" IN_LIST fejix_backends)
+if("${fejix_build_x11}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/x11/build.cmake")
 endif()
 
 if("${fejix_build_unix_utils}")
-    include("${CMAKE_CURRENT_LIST_DIR}/src/unix/build.cmake")
+    include("${CMAKE_CURRENT_LIST_DIR}/src/shared/unix/build.cmake")
 endif()
 
 install(

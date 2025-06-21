@@ -1,5 +1,5 @@
-#ifndef FEJIX_WINAPI_WINDOW_VIEW_H_INCLUDED
-#define FEJIX_WINAPI_WINDOW_VIEW_H_INCLUDED
+#ifndef FEJIX_WINAPI_WINDOW_VIEW_H_
+#define FEJIX_WINAPI_WINDOW_VIEW_H_
 
 
 #include <src/winapi/window/window.h>
@@ -32,13 +32,13 @@ struct fj_window_view_manager {
 };
 
 
-enum fj_status fj_winapi_view_handle_event(
+enum fj_error fj_winapi_view_handle_event(
     struct fj_window_view_manager *manager,
     struct fj_window_view *view,
     MSG const *msg,
     LONG_PTR *result);
 
-enum fj_status fj_winapi_window_view_sync(
+enum fj_error fj_winapi_window_view_sync(
     struct fj_window_view_manager *manager, struct fj_window_view *view);
 
 

@@ -6,8 +6,8 @@
 # * put trailing commas in enums/structs/arrays that should be split into multiple lines.
 #
 # Unfortunately, clang-format is reasonably good only at the LLVM style.
-# This config implements a similar style in order to never fight against the tooling
-# that is instead supposed to help us.
+# This config implements a somewhat similar style in order not to fight against the tooling
+# that is supposed to help us.
 
 Language: Cpp
 Standard: c++17
@@ -173,10 +173,10 @@ Macros:
     # This tricks clang-format into correctly formatting calling conventions in function pointer
     # declarations and typedefs. The problem is that clang-format does not fully understand the code
     # semantics and poorly handles macro expansions. The expansion here must match the macro name
-    # character count in order for clang-format to handle the column limit correctly.
+    # character length in order for clang-format to handle the column limit correctly.
     # Example usage:
-    # typedef int (MY_CALLING_CONVENTION *some_function_type)(int arg, int arg2);
-    - 'MY_CALLING_CONVENTION=****************const'
+    # typedef int (FJ_OPENGL_CALL *some_function_type)(int arg, int arg2);
+    - 'FJ_OPENGL_CALL=*********const'
 
     # This tricks clang-format into leaving these macros on their own lines.
     # clang-format does not support proper custom attributes as of now.
@@ -185,26 +185,30 @@ Macros:
 IfMacros:
     - 'FJ_TRY'
 
-# Sort includes
+# How to read the includes:
+#   At the top - the most important project headers
+#   At the bottom - the most important external headers
+#
+# The reason is that we strictly put non-project headers AFTER the project headers
+# and putting interesting external headers before the standard headers would make them in the
+# middle of the include mess where it is hard to see them
 IncludeBlocks: Regroup
 IncludeCategories:
-    # Private headers (at the top)
+    # Implicit priority of 0 is reserved for the main header (#include "same-file-name.h")
+
+    -   Regex: '^<src/shared/'
+        Priority: 10
+
     -   Regex: '^<src/'
         Priority: 1
 
-    # Public core headers
-    -   Regex: '^<fejix/core/'
+    -   Regex: '^<fejix/'
         Priority: 20
 
-    # Other public headers (matched if the regex above is not matched)
-    -   Regex: '^<fejix/'
-        Priority: 10
-
-    # Standard includes (at the bottom)
     -   Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|malloc|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype).h>'
-        Priority: 100
+        Priority: 90
         CaseSensitive: true
 
     # Platform-specific headers
     -   Regex: '^.*'
-        Priority: 90
+        Priority: 100

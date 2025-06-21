@@ -4,6 +4,7 @@ string(REGEX MATCH "^[^_]+" fejix_winapi_winnt_version "${fejix_winapi_target_ve
 target_compile_definitions(
     fejix
     PRIVATE
+        "FEJIX_COMPILE_OPT_ENABLE_WINAPI_BACKEND"
         "UNICODE"
         "_UNICODE"
         "WIN32_LEAN_AND_MEAN"

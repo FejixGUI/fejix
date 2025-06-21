@@ -1,5 +1,5 @@
-#ifndef FEJIX_WINAPI_TIMER_H_INCLUDED
-#define FEJIX_WINAPI_TIMER_H_INCLUDED
+#ifndef FEJIX_WINAPI_TIMER_H_
+#define FEJIX_WINAPI_TIMER_H_
 
 #include <fejix/modules/io_thread_timer.h>
 #include <fejix/utils/vector.h>

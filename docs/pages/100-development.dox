@@ -1,0 +1,10 @@
+/**
+
+\page macromagic Macro magic
+
+\tableofcontents
+
+\todo Discuss:
+    FJ_COMPILE_OPT_, FJ_INTERNAL_OPT_, FJ_INCLUDE_OPT_, MACRO_/HEADER_H_ naming etc.
+
+*/

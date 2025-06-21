@@ -1,5 +1,5 @@
-#ifndef FEJIX_WINAPI_IO_THREAD_H_INCLUDED
-#define FEJIX_WINAPI_IO_THREAD_H_INCLUDED
+#ifndef FEJIX_WINAPI_IO_THREAD_H_
+#define FEJIX_WINAPI_IO_THREAD_H_
 
 
 #include <src/winapi/io_thread/timer.h>
