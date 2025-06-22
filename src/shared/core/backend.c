@@ -104,6 +104,14 @@ enum fj_error fj_backend_select(char const *backend_name)
         return FJ_ERROR_INVALID_USAGE;
     }
 
+    if (backend_name == NULL) {
+        backend_name = fj_backend_get_default();
+
+        if (backend_name == NULL) {
+            return FJ_ERROR_UNAVAILABLE;
+        }
+    }
+
     for (uint32_t i = 0; i < backends_length; i++) {
         if (strcmp(backends[i], backend_name) == 0) {
             init_funcs[i]();
@@ -116,7 +124,7 @@ enum fj_error fj_backend_select(char const *backend_name)
 }
 
 
-char const *fj_get_selected_backend(void)
+char const *fj_backend_get_selected(void)
 {
     return selected_backend;
 }

@@ -1,5 +1,6 @@
 #include "events.h"
 
+#include <src/shared/utils/logging.h>
 #include <src/shared/utils/math.h>
 
 #include <math.h>
@@ -55,6 +56,7 @@ enum fj_error fj_unix_events_init(struct fj_unix_events *events, void *callback_
     int pipe_result = pipe((int32_t *) events->wakeup_pipe);
 
     if (pipe_result < 0) {
+        FJ_ERROR("pipe(2) failed");
         return FJ_ERROR_IO_FAILED;
     }
 
@@ -146,6 +148,7 @@ enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_ti
         = poll(events->pollfds.items, events->pollfds.length, into_poll_timeout(opt_timeout));
 
     if (result < 0) {
+        FJ_ERROR("poll(2) failed");
         return FJ_ERROR_IO_FAILED;
     }
 
@@ -157,9 +160,9 @@ enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_ti
 }
 
 
-enum fj_error fj_unix_events_wakeup(struct fj_unix_events *events)
+enum fj_error fj_unix_events_echo(struct fj_unix_events *events)
 {
-    uint8_t buffer[1] = { 42 };  // arbitrary number
+    uint8_t buffer[1] = { 42 };  // arbitrary number, only needs to be read in handle_wakeup
     ssize_t written_count = write(events->wakeup_pipe[1], buffer, 1);
 
     if (written_count < 0) {

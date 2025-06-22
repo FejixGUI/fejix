@@ -28,7 +28,7 @@ static void default_callback(
 {
     fprintf(
         stderr,
-        "[fejix log] %s at %s() in %s@%" PRIu32 ": %s\n",
+        "[fejix log] %s at %s() in %s:%" PRIu32 ": %s\n",
         log_level_to_string(log_level),
         function,
         file,

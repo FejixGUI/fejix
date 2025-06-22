@@ -36,7 +36,7 @@ FJ_API(fj_timer_stop, struct fj_app *app, struct fj_timer *timer)
 /** \returns #FJ_ERROR_INVALID_USAGE if the timer has not been started. */
 FJ_API(fj_timer_get_remaining_time, struct fj_app *app, struct fj_timer *timer, fj_time **out_time)
 
-FJ_APIVOID(fj_timer_timeout_event, struct fj_app *app, struct fj_timer *timer)
+FJ_API_VOID(fj_timer_timeout_event, struct fj_app *app, struct fj_timer *timer)
 
 
 #endif

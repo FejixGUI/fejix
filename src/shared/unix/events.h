@@ -9,6 +9,11 @@
 #include <sys/poll.h>
 
 
+/**
+    The callback needs to handle errors on its own.
+    If gets error events and the errors are fatal, it needs to also return an error in order for
+    fj_unix_events_wait to return an error.
+*/
 typedef enum fj_error (*fj_unix_events_callback)(
     void *callback_data, int file_descriptor, short event_mask);
 

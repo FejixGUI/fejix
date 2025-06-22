@@ -22,15 +22,15 @@ FJ_API(fj_app_request_exit, struct fj_app *app)
 /** This is can be called from other thread provided that the app is not being destroyed. */
 FJ_API(fj_app_request_continue, struct fj_app *app)
 
-FJ_APIVOID(fj_app_continue_event, struct fj_app *app)
+FJ_API_VOID(fj_app_continue_event, struct fj_app *app)
 
-FJ_APIVOID(fj_app_exit_event, struct fj_app *app)
+FJ_API_VOID(fj_app_exit_event, struct fj_app *app)
 
-FJ_APIVOID(fj_app_pause_event, struct fj_app *app)
+FJ_API_VOID(fj_app_pause_event, struct fj_app *app)
 
-FJ_APIVOID(fj_app_suspend_event, struct fj_app *app)
+FJ_API_VOID(fj_app_suspend_event, struct fj_app *app)
 
-FJ_APIVOID(fj_app_resume_event, struct fj_app *app)
+FJ_API_VOID(fj_app_resume_event, struct fj_app *app)
 
 
 #endif

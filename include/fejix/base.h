@@ -68,25 +68,25 @@
 #endif
 
 #if defined(FJ_INTERNAL_OPT_DEFINE_DEFAULT_API_IMPLEMENTATIONS)
-#    define FJ_APIEX(FUNCTION_NAME, RETURN_TYPE, RETURN_VALUE, ...) \
-        static RETURN_TYPE FUNCTION_NAME##_default(__VA_ARGS__)     \
-        {                                                           \
-            return RETURN_VALUE;                                    \
-        }                                                           \
-        FJ_PUBLIC RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__);        \
+#    define FJ_API_EX(FUNCTION_NAME, RETURN_TYPE, RETURN_VALUE, ...) \
+        static RETURN_TYPE FUNCTION_NAME##_default(__VA_ARGS__)      \
+        {                                                            \
+            return RETURN_VALUE;                                     \
+        }                                                            \
+        FJ_PUBLIC RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__);         \
         RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__) = FUNCTION_NAME##_default;
 #else
 /** Defines a public API function with explicit return type and default return value. */
-#    define FJ_APIEX(FUNCTION_NAME, RETURN_TYPE, RETURN_VALUE, ...) \
+#    define FJ_API_EX(FUNCTION_NAME, RETURN_TYPE, RETURN_VALUE, ...) \
         FJ_PUBLIC RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__);
 #endif
 
 /** Defines a public API function that returns fj_error and defaults to #FJ_ERROR_UNIMPLEMENTED. */
 #define FJ_API(FUNCTION_NAME, ...) \
-    FJ_APIEX(FUNCTION_NAME, enum fj_error, FJ_ERROR_UNIMPLEMENTED, __VA_ARGS__)
+    FJ_API_EX(FUNCTION_NAME, enum fj_error, FJ_ERROR_UNIMPLEMENTED, __VA_ARGS__)
 
 /** Defines a public API function that returns void and defaults to no-op. */
-#define FJ_APIVOID(FUNCTION_NAME, ...) FJ_APIEX(FUNCTION_NAME, void, , __VA_ARGS__)
+#define FJ_API_VOID(FUNCTION_NAME, ...) FJ_API_EX(FUNCTION_NAME, void, , __VA_ARGS__)
 
 
 #if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
