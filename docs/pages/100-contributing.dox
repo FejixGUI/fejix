@@ -1,0 +1,161 @@
+/**
+
+\page contributing Contributing
+
+\tableofcontents
+
+
+## Project organisation
+
+\todo Discuss the tools, the development process, the organisation of the project and its backends.
+
+To be written...
+
+## Version changing
+
+When changing the project's version you need to change it in the following files:
+- `include/fejix/base.h` - the code
+- `CMakeLists.txt` - the build configuration
+- `Doxyfile` - the documentation configuration
+
+
+## Code style
+
+These are some code style aspects that cannot be handled by automated tools.
+
+### High-level
+
+#### Error handling
+
+The error handling looks like this:
+
+\code{.c}
+enum fj_error foo()
+{
+    enum fj_error e;
+
+    e = bar();
+    if (e) {
+        // Do something
+        return e; // Pass the error to the caller
+    }
+
+    e = baz();
+    if (e) {
+        // Do something
+        return e; // Pass the error to the caller
+    }
+
+    return FJ_OK;
+}
+\endcode
+
+In many cases it is even like this:
+
+\code{.c}
+enum fj_error foo()
+{
+    enum fj_error e;
+
+    waka(); // This must be cancelled on failure
+
+    e = bar();
+    if (e) {
+        cancel_waka(); // Roll something back if needed
+        FJ_ERROR("foo failed"); // Debug log
+        return e;
+    }
+
+    e = baz();
+    if (e) {
+        cancel_waka(); // Roll something back if needed
+        FJ_ERROR("baz failed"); // Debug log
+        return e;
+    }
+
+    return FJ_OK;
+}
+\endcode
+
+Yes, this is quite some code, but well... idk, error handling is important.
+In such a low-level project this would be inevitable in any programming language out there
+because we just use *so much* system APIs.
+
+#### Constructors and destructors
+
+All destructors (`_del()`, `_deinit()`) *must* correctly destruct a partially constructed object and
+*must* succeed on a newly allocated zero-initialised object.
+
+That makes constructor/destructor code shorter and simpler. This is how it must look like:
+
+\code{.c}
+struct foo {
+    struct bar *bar;
+    struct baz *baz;
+};
+
+enum fj_error foo_new(struct foo **out_foo)
+{
+    enum fj_error e;
+
+    struct foo *foo;
+    e = FJ_ALLOC(&foo);
+    if (e)
+        return e;
+
+    e = bar_new(&foo->bar)
+    if (e) {
+        foo_del(foo);
+        return e;
+    }
+
+    e = baz_new(&foo->baz);
+    if (e) {
+        foo_del(foo);
+        return e;
+    }
+
+    *out_foo = foo;
+    return FJ_OK;
+}
+
+void foo_del(struct foo *foo)
+{
+    // The order of deinitialisation is reverse here,
+    // but in many cases it does not really matter
+
+    if (foo->baz) {
+        baz_del(foo->baz);
+    }
+
+    if (foo->bar) {
+        bar_del(foo->bar);
+    }
+
+    FJ_FREE(&foo);
+}
+\endcode
+
+Notice how error handling code is similar in both cases when `foo->bar` and `foo->baz` fail to
+initialise. If destructors only worked on fully constructed objects, handling errors
+would need to be done inside constructors, which is too hard and bug-prone in C.
+
+### Naming
+
+#### Functions
+
+For constructor/destructor pairs:
+- `_new()`, `_del()` allocate memory and initialise the allocated object
+- `_init()`, `_deinit()` initialise an already allocated object
+
+The `_init()`/`_deinit()` pair is mostly used for internal utility objects like vectors, event
+loops, or application subsystems which are most often already allocated as parts of other objects.
+
+#### Macros
+
+- `FJ_COMPILE_OPT_XXX` - macro definitions defined externally by the build system
+- `FJ_PRIVATE_OPT_XXX` - macro definitions defined by the project code
+- `FJ_INCLUDE_OPT_XXX` - macro definitions defined by the code that includes the project headers
+- `FEJIX_FOO_BAR_BAZ_H_` - a header guard for `<fejix/foo/bar_baz.h>`
+
+*/

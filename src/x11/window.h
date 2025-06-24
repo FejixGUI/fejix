@@ -9,7 +9,8 @@
 
 struct fj_window {
     xcb_window_t window;
-    xcb_visualid_t visualid;  // TODO do we need to put the initialization data here??
+    xcb_visualid_t visualid;
+    xcb_colormap_t colormap;
 };
 
 

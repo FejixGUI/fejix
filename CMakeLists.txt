@@ -117,6 +117,14 @@ if("${fejix_build_unix_utils}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/shared/unix/build.cmake")
 endif()
 
+configure_file(
+    "${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in"
+    "${CMAKE_CURRENT_LIST_DIR}/Doxyfile")
+
+configure_file(
+    "${CMAKE_CURRENT_LIST_DIR}/include/fejix/version.h.in"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fejix/version.h")
+
 install(
     DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/include/fejix"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"

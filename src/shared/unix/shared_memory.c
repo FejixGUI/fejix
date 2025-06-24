@@ -19,7 +19,7 @@
 #include <unistd.h>
 
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 
 static enum fj_error open_shm_file(int32_t *out_fd)
 {
@@ -52,7 +52,7 @@ static enum fj_error open_shm_file(int32_t *out_fd)
 {
     for (uint32_t i = 0; i < 16; i++) {
         char temp_file_name[32];
-        snprintf(temp_file_name, 32, "%e%08x", "/fejix-shared-memory-", rand32());
+        snprintf(temp_file_name, 32, "%s%08x", "/fejix-shared-memory-", rand32());
 
         *out_fd = shm_open(temp_file_name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 

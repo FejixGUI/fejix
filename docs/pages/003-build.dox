@@ -4,7 +4,7 @@
 
 \tableofcontents
 
-\section x11deps X11 dependencies
+## X11 dependencies
 
 To build the X11 backend you should the following libraries:
 

@@ -22,7 +22,7 @@ FJ_PUBLIC
 char const *fj_backend_get_selected(void);
 
 /**
-    \param backend_name If NULL, the default backend is initialised.
+    \param opt_backend_name If NULL, the default backend is initialised.
     \returns Error if the specified backend is not built into the library.
 */
 FJ_PUBLIC

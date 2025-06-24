@@ -1,0 +1,73 @@
+# Build: $ doxygen
+# Check: $ open build/docs/index.html
+# Note:
+# - Every documentation page (.dox) MUST be wrapped with /** ... */
+# - Every public header file (.h) MUST begin with a /** \file ... */
+# - Every public definition MUST have a non-empty /** ... */
+
+PROJECT_NAME = "Fejix"
+PROJECT_BRIEF = "@fejix_DESCRIPTION@"
+PROJECT_NUMBER = "@fejix_VERSION_MAJOR@.@fejix_VERSION_MINOR@.@fejix_VERSION_PATCH@"
+
+QUIET = YES
+
+INPUT = \
+    "include" \
+    "docs/pages"
+
+EXCLUDE_PATTERNS = \
+    ".*" \
+    "*.md"
+
+OUTPUT_DIRECTORY = "build/docs"
+# This is relative to OUTPUT_DIRECTORY
+HTML_OUTPUT = "."
+
+GENERATE_LATEX = NO
+GENERATE_HTML = YES
+
+# Seriously though, why should generating usable C documentation be so cumbersome?
+ALPHABETICAL_INDEX = NO
+DIRECTORY_GRAPH = NO
+FULL_PATH_NAMES = NO
+GRAPHICAL_HIERARCHY = NO
+INCLUDE_GRAPH = NO
+INCLUDED_BY_GRAPH = NO
+JAVADOC_AUTOBRIEF = YES
+MARKDOWN_ID_STYLE = GITHUB
+MARKDOWN_SUPPORT = YES
+AUTOLINK_SUPPORT = YES
+RECURSIVE = YES
+SEPARATE_MEMBER_PAGES = NO
+WARN_IF_UNDOCUMENTED = NO
+GENERATE_TODOLIST = NO
+
+OPTIMIZE_OUTPUT_FOR_C = YES
+EXTRACT_ALL = NO
+EXTRACT_PRIVATE = NO
+# Removes enum values in the overview section
+ENUM_VALUES_PER_LINE = 0
+INLINE_SIMPLE_STRUCTS = YES
+INLINE_GROUPED_CLASSES = YES
+MACRO_EXPANSION = YES
+ENABLE_PREPROCESSING = YES
+PREDEFINED = \
+    "FJ_COMPILE_OPT_DOCS=1" \
+    "FJ_HANDLE(TYPE)=struct TYPE { void *userdata; };"
+
+GENERATE_TREEVIEW = YES
+DISABLE_INDEX = NO
+FULL_SIDEBAR = NO
+LAYOUT_FILE = "docs/templates/layout.xml"
+HTML_HEADER = "docs/templates/header.html"
+HTML_FOOTER = "docs/templates/footer.html"
+HTML_EXTRA_FILES = \
+    "docs/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js" \
+    "docs/doxygen-awesome-css/doxygen-awesome-interactive-toc.js" \
+    "docs/doxygen-awesome-css/doxygen-awesome-paragraph-link.js"
+HTML_EXTRA_STYLESHEET = \
+    "docs/custom/styles.css" \
+    "docs/doxygen-awesome-css/doxygen-awesome.css" \
+    "docs/doxygen-awesome-css/doxygen-awesome-sidebar-only.css" \
+    "docs/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css"
+# HTML_COLORSTYLE = LIGHT

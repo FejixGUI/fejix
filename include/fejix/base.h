@@ -6,14 +6,11 @@
 #define FEJIX_BASE_H_
 
 
+#include <fejix/version.h>
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-
-#define FJ_VERSION_MAJOR (0)
-#define FJ_VERSION_MINOR (1)
-#define FJ_VERSION_PATCH (0)
 
 
 #if defined(FJ_COMPILE_OPT_DOCS)

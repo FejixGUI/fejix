@@ -1,0 +1,10 @@
+/*
+    Disables the annoying side bar navigation schrolling synchronization button.
+    The reason is that it isn't used in our project at all.
+    We don't render page sections in the side bar, so there is nothing to synchronize.
+*/
+#nav-sync {
+    display: none !important;
+    pointer-events: none;
+    user-select: none;
+}

@@ -1,38 +1,28 @@
 # Fejix
 
-**Fejix** is a cross-platform **GUI base** library
-— it wraps system APIs (Windows API, Wayland, X11, Cocoa, etc.)
-to provide access to low-level GUI features like
-window management, input handling, system notifications, clipboard, notifier icons etc.,
-which are useful for building UI frameworks, game engines or other tools.
+Fejix is a cross-platform GUI base library
+— it wraps system GUI APIs (Windows API, Wayland, X11, Cocoa, etc.)
+required to build UI frameworks, game engines or other tools.
 
 Fejix is designed to be a complete GUI system abstraction, resusable by all kinds of cross-platform
-application, yet simple enough to port, extend or even completely reimplement.
+applications, yet simple enough to extend, port or even completely reimplement.
+
+Written in C99.
 
 **Features:**
 
-- **Versatility**
-
-    - Fejix has an extensible system of modules that allows it to support as many useful system
-        features as possible.
-        You want a nice shiny system API related to GUI? Suggest it to us!
-
-- **Compatibility**
-
-    - It is possible to port existing projects to Fejix thanks to supplementary modules
-        that implement legacy and not-so-cross-platform features.
-        The goal is to allow other libraries like SDL or Qt to gradually migrate to Fejix.
-
-- **Portability**
-
-    - Written in C99
-    - All core modules are designed to be minimal, generic and platform-agnostic
-    - Adding backends is simple because backends are completely independent chunks of
-        code (with the exception of build scripts and some common utils)
-    - Adding backends is **extremely** simple because virtually every function is optional,
-        which requires all programs/toolkits to handle initialisation errors correctly, but
-        this only makes them more portable themselves.
-
+- **Full range of GUI capabilities**:
+    window management, input handling, system notifications, clipboard, notifier icons, etc.
+    We would be happy to support as much useful features as reasonably possible.
+- **Compatibility**:
+    we implement some legacy or platform-specific features to allow existing projects
+    (think SDL or Qt) to potencially migrate to Fejix without breaking their code (too much).
+- **Portable backend system**:
+    backends implement the Fejix API directly, but (almost) every function is optional.
+    For unimplemented functions Fejix provides a default no-op fallback.
+    This makes it extrenely simple to add new backends as all you need is to create a file
+    and add it in CMake files. No complicated initialisation logic or dynamic object-oriented
+    magic.
 
 > This project is in its earliest development stage.
 >
