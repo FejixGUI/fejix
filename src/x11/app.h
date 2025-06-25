@@ -1,3 +1,6 @@
+#ifndef FEJIX_X11_APP_H_
+#define FEJIX_X11_APP_H_
+
 #include <src/x11/window.h>
 
 #include <src/shared/unix/events.h>
@@ -8,11 +11,27 @@
 #include <xcb/xcb.h>
 
 
-enum fj_x11_atom {
-    FJ_X11_ATOM_NET_WM_NAME,
-    FJ_X11_ATOM_UTF8_STRING,
-    FJ_X11_ATOM_MAX,
-};
+/**
+    Define FJ_X11_ATOM_LIST_ITEM to make this do whatever you want.
+
+    The atoms are sorted alphabetically here.
+*/
+#define FJ_X11_ATOM_LIST                                \
+    FJ_X11_ATOM_LIST_ITEM(_NET_WM_NAME)                 \
+    FJ_X11_ATOM_LIST_ITEM(_NET_WM_SYNC_REQUEST)         \
+    FJ_X11_ATOM_LIST_ITEM(_NET_WM_SYNC_REQUEST_COUNTER) \
+    FJ_X11_ATOM_LIST_ITEM(UTF8_STRING)                  \
+    FJ_X11_ATOM_LIST_ITEM(WM_DELETE_WINDOW)             \
+    FJ_X11_ATOM_LIST_ITEM(WM_PROTOCOLS)
+
+/** This makes a name for an enumeration member in fj_x11_atom that corresponds to the atom. */
+#define FJ_X11_ATOM_ID(X) FJ_X11_ATOM_##X
+
+#define FJ_X11_GET_ATOM(APP, ATOM_NAME) ((APP)->atoms[FJ_X11_ATOM_ID(ATOM_NAME)])
+
+#define FJ_X11_ATOM_LIST_ITEM(X) FJ_X11_ATOM_ID(X),
+enum fj_x11_atom { FJ_X11_ATOM_LIST FJ_X11_ATOM_MAX };
+#undef FJ_X11_ATOM_LIST_ITEM
 
 
 struct fj_app {
@@ -29,5 +48,10 @@ struct fj_app {
 };
 
 
-int fj_x11_xlib_get_last_error(void);
+uint8_t fj_x11_xlib_get_last_error(void);
 void fj_x11_xlib_clear_last_error(void);
+
+char const *fj_x11_error_into_string(uint8_t error_code);
+char const *fj_x11_xcb_error_into_string(xcb_generic_error_t *error);
+
+#endif

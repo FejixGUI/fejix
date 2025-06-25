@@ -6,15 +6,24 @@
 
 
 #ifdef FJ_COMPILE_OPT_ENABLE_LOGGING
-#    define FJ_LOG(LEVEL, MESSAGE) fj_log_callback(LEVEL, __FILE__, __LINE__, __func__, MESSAGE)
+#    define FJ_LOG(LEVEL, ...) fj_log(LEVEL, __FILE__, __LINE__, __func__, __VA_ARGS__)
 #else
 // This prevents warnings about empty blocks
-#    define FJ_LOG(LEVEL, MESSAGE) (void) MESSAGE;
+#    define FJ_LOG(LEVEL, ...) (void) 0;
 #endif
 
-#define FJ_ERROR(MESSAGE) FJ_LOG(FJ_LOG_LEVEL_ERROR, MESSAGE)
-#define FJ_WARN(MESSAGE) FJ_LOG(FJ_LOG_LEVEL_WARN, MESSAGE)
-#define FJ_INFO(MESSAGE) FJ_LOG(FJ_LOG_LEVEL_INFO, MESSAGE)
+#define FJ_ERROR(...) FJ_LOG(FJ_LOG_LEVEL_ERROR, __VA_ARGS__)
+#define FJ_WARN(...) FJ_LOG(FJ_LOG_LEVEL_WARN, __VA_ARGS__)
+#define FJ_INFO(...) FJ_LOG(FJ_LOG_LEVEL_INFO, __VA_ARGS__)
+
+/** Calls fj_log_callback with the formatted message. */
+void fj_log(
+    enum fj_log_level log_level,
+    char const *file,
+    uint32_t line,
+    char const *function,
+    char const *format,
+    ...);
 
 
 #endif

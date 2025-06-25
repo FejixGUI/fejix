@@ -18,7 +18,7 @@ static enum fj_error fj_window_service_new_(
 
 static enum fj_error fj_window_service_del_(struct fj_window_service *service)
 {
-    (void) service;
+    fj_window_vector_free(&service->windows);
     return FJ_OK;
 }
 
@@ -26,6 +26,13 @@ static enum fj_error fj_window_service_del_(struct fj_window_service *service)
 static enum fj_error fj_window_del_(struct fj_window *window)
 {
     xcb_connection_t *c = window->base.app->connection;
+    struct fj_window_service *service = window->base.service;
+
+    for (uint32_t i = 0; i < service->windows.length; i++) {
+        if (service->windows.items[i] == window) {
+            fj_window_vector_remove(&service->windows, i);
+        }
+    }
 
     if (window->colormap) {
         xcb_void_cookie_t coockie = xcb_free_colormap_checked(c, window->colormap);
@@ -63,6 +70,12 @@ static enum fj_error fj_window_new_(
     if (e)
         return e;
 
+    e = fj_window_vector_push(&service->windows, &window);
+    if (e) {
+        fj_window_del_(window);
+        return e;
+    }
+
     fj_window_init_base(window, service);
 
     *out_window = window;
@@ -72,6 +85,10 @@ static enum fj_error fj_window_new_(
 
 static enum fj_error create_window(struct fj_app *app, struct fj_window *window)
 {
+    // TODO clean up this code once it starts to actually do something useful
+
+    window->id = xcb_generate_id(app->connection);
+
     // TODO Add a module to enumarate screens and allow screen specification here
     xcb_screen_t *default_screen = xcb_setup_roots_iterator(xcb_get_setup(app->connection)).data;
 
@@ -107,13 +124,13 @@ static enum fj_error create_window(struct fj_app *app, struct fj_window *window)
     // TODO Add preferred size retrieval here
     xcb_void_cookie_t coockie = xcb_create_window_checked(
         app->connection,
-        XCB_COPY_FROM_PARENT,
+        window->depth,
         window->id,
         default_screen->root,
         0,
         0,
-        100,
-        70,
+        320,
+        240,
         0,
         XCB_WINDOW_CLASS_INPUT_OUTPUT,
         window->visual,
@@ -121,7 +138,36 @@ static enum fj_error create_window(struct fj_app *app, struct fj_window *window)
         properties);
     xcb_generic_error_t *error = xcb_request_check(app->connection, coockie);
     if (error) {
-        FJ_ERROR("xcb_create_window failed");
+        FJ_ERROR("xcb_create_window failed: %s", fj_x11_xcb_error_into_string(error));
+        free(error);
+        return FJ_ERROR_OPERATION_FAILED;
+    }
+
+    xcb_atom_t protocols[] = {
+        FJ_X11_GET_ATOM(app, _NET_WM_SYNC_REQUEST),
+        FJ_X11_GET_ATOM(app, WM_DELETE_WINDOW),
+    };
+
+    coockie = xcb_change_property_checked(
+        app->connection,
+        XCB_PROP_MODE_REPLACE,
+        window->id,
+        FJ_X11_GET_ATOM(app, WM_PROTOCOLS),
+        XCB_ATOM_ATOM,
+        sizeof(*protocols) * 8,
+        FJ_LEN(protocols),
+        protocols);
+    error = xcb_request_check(app->connection, coockie);
+    if (error) {
+        FJ_ERROR("xcb_change_property failed");
+        free(error);
+        return FJ_ERROR_OPERATION_FAILED;
+    }
+
+    coockie = xcb_map_window_checked(app->connection, window->id);
+    error = xcb_request_check(app->connection, coockie);
+    if (error) {
+        FJ_ERROR("xcb_map_window failed");
         free(error);
         return FJ_ERROR_OPERATION_FAILED;
     }
@@ -137,8 +183,12 @@ static enum fj_error create_window(struct fj_app *app, struct fj_window *window)
 
 static enum fj_error fj_window_commit_(struct fj_window *window)
 {
+    enum fj_error e;
+
     if (window->id == 0) {
-        return create_window(window->base.service->base.app, window);
+        e = create_window(window->base.app, window);
+        if (e)
+            return e;
     }
 
     return FJ_OK;

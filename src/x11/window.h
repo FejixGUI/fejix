@@ -2,14 +2,12 @@
 #define FEJIX_X11_WINDOW_H_
 
 
+#include <src/shared/utils/vector.h>
+
 #include <fejix/window.h>
 
 #include <xcb/xcb.h>
 
-
-struct fj_window_service {
-    struct fj_window_service_base base;
-};
 
 struct fj_window {
     struct fj_window_base base;
@@ -26,6 +24,13 @@ struct fj_window {
     xcb_colormap_t colormap;
 
     uint8_t depth;
+};
+
+FJ_VECTOR(fj_window_vector, struct fj_window *)
+
+struct fj_window_service {
+    struct fj_window_service_base base;
+    struct fj_window_vector windows;
 };
 
 
