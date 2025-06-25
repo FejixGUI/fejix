@@ -50,17 +50,49 @@
 #endif
 
 #if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
-#    define FJ_HANDLE(TYPE) struct TYPE;
+#    define FJ_APP(TYPE)     \
+        struct TYPE;         \
+        struct TYPE##_base { \
+            void *userdata;  \
+        };
+#    define FJ_SERVICE(TYPE)                                                          \
+        struct TYPE;                                                                  \
+        struct TYPE##_base {                                                          \
+            struct fj_app *app;                                                       \
+        };                                                                            \
+        static inline void TYPE##_init_base(struct TYPE *service, struct fj_app *app) \
+        {                                                                             \
+            ((struct TYPE##_base *) service)->app = app;                              \
+        }
+#    define FJ_OBJECT(TYPE)                                                                       \
+        struct TYPE;                                                                              \
+        struct TYPE##_base {                                                                      \
+            void *userdata;                                                                       \
+            struct TYPE##_service *service;                                                       \
+            struct fj_app *app;                                                                   \
+        };                                                                                        \
+        static inline void TYPE##_init_base(struct TYPE *object, struct TYPE##_service *service)  \
+        {                                                                                         \
+            ((struct TYPE##_base *) object)->service = service;                                   \
+            ((struct TYPE##_base *) object)->app = ((struct TYPE##_service_base *) service)->app; \
+        }
 #else
-/**
-    Forward-declares a struct.
-
-    Even though each backend may define the struct in its own way, the first field is always the
-    userdata pointer.
-*/
-#    define FJ_HANDLE(TYPE) \
+/** Defines the application structure and its public fields. */
+#    define FJ_APP(TYPE)    \
         struct TYPE {       \
             void *userdata; \
+        };
+/** Defines the service structure and its public fields. */
+#    define FJ_SERVICE(TYPE)    \
+        struct TYPE {           \
+            struct fj_app *app; \
+        };
+/** Defines the service object structure and its public fields. */
+#    define FJ_OBJECT(TYPE)                 \
+        struct TYPE {                       \
+            void *userdata;                 \
+            struct TYPE##_service *service; \
+            struct fj_app *app;             \
         };
 #endif
 
@@ -133,6 +165,7 @@ enum fj_error {
 };
 
 
+/** A rectangular orientation, with flips and 90-degree rotations. */
 enum fj_orientation {
     /**
         The standard orientation implies that:

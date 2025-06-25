@@ -9,6 +9,14 @@
 
 \todo Discuss the tools, the development process, the organisation of the project and its backends.
 
+\todo Discuss the API_XXX macros and that setting **out_object_pointers to NULL is useless
+\todo   because of the default fallbacks that just leave those pointers uninitialised
+\todo Discuss memory allocation, logging, other internal tools...
+
+\todo Discuss the app, services, objects and state objects,
+\todo   _commit() functions for atomic updates of complex visible state
+\todo   (perhaps, this one not necessarily in this document)
+
 To be written...
 
 ## Version changing

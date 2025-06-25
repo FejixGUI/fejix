@@ -53,7 +53,7 @@ MACRO_EXPANSION = YES
 ENABLE_PREPROCESSING = YES
 PREDEFINED = \
     "FJ_COMPILE_OPT_DOCS=1" \
-    "FJ_HANDLE(TYPE)=struct TYPE { void *userdata; };"
+    "FJ_OBJECT(TYPE)=struct TYPE { void *userdata; };"
 
 GENERATE_TREEVIEW = YES
 DISABLE_INDEX = NO

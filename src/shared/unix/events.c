@@ -30,7 +30,7 @@ static enum fj_error process_events(struct fj_unix_events *events)
 }
 
 
-static enum fj_error handle_wakeup(void *callback_data, int fd, short events)
+static enum fj_error handle_ping(void *callback_data, int fd, short events)
 {
     (void) callback_data;
 
@@ -53,14 +53,14 @@ enum fj_error fj_unix_events_init(struct fj_unix_events *events, void *callback_
         .callback_data = callback_data,
     };
 
-    int pipe_result = pipe((int32_t *) events->wakeup_pipe);
+    int pipe_result = pipe((int32_t *) events->ping_pipe);
 
     if (pipe_result < 0) {
         FJ_ERROR("pipe(2) failed");
         return FJ_ERROR_IO_FAILED;
     }
 
-    e = fj_unix_events_add(events, events->wakeup_pipe[0], POLLIN, handle_wakeup);
+    e = fj_unix_events_add(events, events->ping_pipe[0], POLLIN, handle_ping);
 
     if (e) {
         fj_unix_events_deinit(events);
@@ -73,9 +73,9 @@ enum fj_error fj_unix_events_init(struct fj_unix_events *events, void *callback_
 
 void fj_unix_events_deinit(struct fj_unix_events *events)
 {
-    if (events->wakeup_pipe[0] != 0) {
-        close(events->wakeup_pipe[0]);
-        close(events->wakeup_pipe[1]);
+    if (events->ping_pipe[0] != 0) {
+        close(events->ping_pipe[0]);
+        close(events->ping_pipe[1]);
     }
 
     fj_unix_events_pollfd_vector_free(&events->pollfds);
@@ -160,10 +160,10 @@ enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_ti
 }
 
 
-enum fj_error fj_unix_events_echo(struct fj_unix_events *events)
+enum fj_error fj_unix_events_ping(struct fj_unix_events *events)
 {
-    uint8_t buffer[1] = { 42 };  // arbitrary number, only needs to be read in handle_wakeup
-    ssize_t written_count = write(events->wakeup_pipe[1], buffer, 1);
+    uint8_t buffer[1] = { 42 };  // arbitrary number, only needs to be read in handle_ping
+    ssize_t written_count = write(events->ping_pipe[1], buffer, 1);
 
     if (written_count < 0) {
         return FJ_ERROR_IO_FAILED;

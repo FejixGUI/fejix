@@ -4,6 +4,7 @@
 #include <src/shared/utils/memory.h>
 
 #include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <X11/Xlib-xcb.h>
@@ -44,7 +45,6 @@ static enum fj_error process_event(struct fj_app *app, xcb_generic_event_t *even
             break;
     }
 
-    free(event);
     return FJ_OK;
 }
 
@@ -68,29 +68,11 @@ static enum fj_error process_events(void *callback_data, int file_descriptor, sh
             break;
 
         e = process_event(app, event);
+        free(event);
         if (e)
             return e;  // FIXME What is the best way to handle errors in a loop?
         /** We can alternatively ignore errors unless the user quits the app. */
     }
-
-    return FJ_OK;
-}
-
-
-static enum fj_error init_events(struct fj_app *app)
-{
-    enum fj_error e;
-
-    e = fj_unix_events_init(&app->events, app);
-
-    if (e)
-        return e;
-
-    e = fj_unix_events_add(
-        &app->events, xcb_get_file_descriptor(app->connection), POLLIN, process_events);
-
-    if (e)
-        return e;
 
     return FJ_OK;
 }
@@ -144,65 +126,75 @@ static enum fj_error fj_app_del_(struct fj_app *app)
 static enum fj_error fj_app_new_(struct fj_app **out_app, void *extra_info)
 {
     (void) extra_info;
+    enum fj_error e;
 
-    enum fj_error e = FJ_ALLOC(out_app);
+    struct fj_app *app;
+    e = FJ_ALLOC(&app);
     if (e)
         return e;
 
-    (*out_app)->display = XOpenDisplay(NULL);
-    if ((*out_app)->display == NULL) {
+    app->display = XOpenDisplay(NULL);
+    if (app->display == NULL) {
         FJ_ERROR("cannot open X11 display");
-        fj_app_del_(*out_app);
+        fj_app_del_(app);
         return FJ_ERROR_OPERATION_FAILED;
     }
 
-    (*out_app)->connection = XGetXCBConnection((*out_app)->display);
-    XSetEventQueueOwner((*out_app)->display, XCBOwnsEventQueue);
+    app->connection = XGetXCBConnection(app->display);
+    XSetEventQueueOwner(app->display, XCBOwnsEventQueue);
     XSetErrorHandler(xlib_error_handler);
-    get_atoms(*out_app);
+    get_atoms(app);
 
-    e = init_events(*out_app);
+    e = fj_unix_events_init(&app->events, app);
     if (e) {
-        fj_app_del_(*out_app);
+        fj_app_del_(app);
         return e;
     }
 
+    e = fj_unix_events_add(
+        &app->events, xcb_get_file_descriptor(app->connection), POLLIN, process_events);
+    if (e) {
+        fj_app_del_(app);
+        return e;
+    }
+
+    *out_app = app;
     return FJ_OK;
 }
 
 
-static enum fj_error fj_app_run_and_exit_(struct fj_app *app)
+static enum fj_error fj_app_run_(struct fj_app *app)
 {
     enum fj_error e;
 
     for (;;) {
-        fj_app_continue_event(app);
+        // TODO do timers
 
-        if (app->exit_requested)
+        if (app->should_quit)
             break;
 
         e = fj_unix_events_wait(&app->events, NULL);
         if (e) {
-            fj_app_exit_event(app);
+            fj_app_quit_callback(app);
             return e;
         }
     }
 
-    fj_app_exit_event(app);
+    fj_app_quit_callback(app);
     return FJ_OK;
 }
 
 
-enum fj_error fj_app_request_exit_(struct fj_app *app)
+enum fj_error fj_app_quit_(struct fj_app *app)
 {
-    app->exit_requested = true;
+    app->should_quit = true;
     return FJ_OK;
 }
 
 
-enum fj_error fj_app_request_continue_(struct fj_app *app)
+enum fj_error fj_app_ping_(struct fj_app *app)
 {
-    return fj_unix_events_echo(&app->events);
+    return fj_unix_events_ping(&app->events);
 }
 
 
@@ -210,7 +202,7 @@ void fj_x11_init_app(void)
 {
     FJ_API_INIT(fj_app_new)
     FJ_API_INIT(fj_app_del)
-    FJ_API_INIT(fj_app_run_and_exit)
-    FJ_API_INIT(fj_app_request_exit)
-    FJ_API_INIT(fj_app_request_continue)
+    FJ_API_INIT(fj_app_run)
+    FJ_API_INIT(fj_app_quit)
+    FJ_API_INIT(fj_app_ping)
 }

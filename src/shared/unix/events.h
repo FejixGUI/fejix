@@ -22,7 +22,7 @@ FJ_VECTOR(fj_unix_events_pollfd_vector, struct pollfd)
 FJ_VECTOR(fj_unix_events_callback_vector, fj_unix_events_callback)
 
 struct fj_unix_events {
-    int wakeup_pipe[2];
+    int ping_pipe[2];
     struct fj_unix_events_pollfd_vector pollfds;
     struct fj_unix_events_callback_vector callbacks;
     void *callback_data;
@@ -48,7 +48,9 @@ enum fj_error fj_unix_events_remove(struct fj_unix_events *events, int file_desc
 
 enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout);
 
-enum fj_error fj_unix_events_echo(struct fj_unix_events *events);
+enum fj_error fj_unix_events_ping(struct fj_unix_events *events);
+
+// TODO timers (timerfd on Linux&FreeBSD, timer queue for others)
 
 
 #endif

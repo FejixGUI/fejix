@@ -1,3 +1,5 @@
+#include <src/x11/window.h>
+
 #include <src/shared/unix/events.h>
 
 #include <fejix/app.h>
@@ -14,14 +16,16 @@ enum fj_x11_atom {
 
 
 struct fj_app {
-    void *userdata;
+    struct fj_app_base base;
 
     struct fj_unix_events events;
-    bool exit_requested;
+    bool should_quit;
 
     Display *display;
     xcb_connection_t *connection;
     xcb_atom_t atoms[FJ_X11_ATOM_MAX];
+
+    struct fj_window_service window_service;
 };
 
 
