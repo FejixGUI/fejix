@@ -5,55 +5,23 @@
 # - Every public header file (.h) MUST begin with a /** \file ... */
 # - Every public definition MUST have a non-empty /** ... */
 
+# I've spent so much time figuring out how to customize Doxygen output
+# that I've invented a new word: cucumbersome.
+# It's like cumbersome but cucumber - cucumbersome.
+# ...do with it what you will...
+
 PROJECT_NAME = "Fejix"
 PROJECT_BRIEF = "@fejix_DESCRIPTION@"
 PROJECT_NUMBER = "@fejix_VERSION_MAJOR@.@fejix_VERSION_MINOR@.@fejix_VERSION_PATCH@"
 
-QUIET = YES
-
-INPUT = \
-    "include" \
-    "docs/pages"
-
-EXCLUDE_PATTERNS = \
-    ".*" \
-    "*.md"
-
-OUTPUT_DIRECTORY = "build/docs"
-# This is relative to OUTPUT_DIRECTORY
-HTML_OUTPUT = "."
-
 GENERATE_LATEX = NO
 GENERATE_HTML = YES
+QUIET = YES
 
-# Seriously though, why should generating usable C documentation be so cumbersome?
-ALPHABETICAL_INDEX = NO
-DIRECTORY_GRAPH = NO
-FULL_PATH_NAMES = NO
-GRAPHICAL_HIERARCHY = NO
-INCLUDE_GRAPH = NO
-INCLUDED_BY_GRAPH = NO
-JAVADOC_AUTOBRIEF = YES
-MARKDOWN_ID_STYLE = GITHUB
-MARKDOWN_SUPPORT = YES
-AUTOLINK_SUPPORT = YES
-RECURSIVE = YES
-SEPARATE_MEMBER_PAGES = NO
-WARN_IF_UNDOCUMENTED = NO
-GENERATE_TODOLIST = NO
-
-OPTIMIZE_OUTPUT_FOR_C = YES
-EXTRACT_ALL = NO
-EXTRACT_PRIVATE = NO
-# Removes enum values in the overview section
-ENUM_VALUES_PER_LINE = 0
-INLINE_SIMPLE_STRUCTS = YES
-INLINE_GROUPED_CLASSES = YES
-MACRO_EXPANSION = YES
-ENABLE_PREPROCESSING = YES
-PREDEFINED = \
-    "FJ_COMPILE_OPT_DOCS=1" \
-    "FJ_OBJECT(TYPE)=struct TYPE { void *userdata; };"
+INPUT = "include/fejix" "docs/pages"
+EXCLUDE_PATTERNS = ".*" "*.md"
+OUTPUT_DIRECTORY = "build/docs"
+HTML_OUTPUT = "." # This is relative to OUTPUT_DIRECTORY
 
 GENERATE_TREEVIEW = YES
 DISABLE_INDEX = NO
@@ -71,3 +39,29 @@ HTML_EXTRA_STYLESHEET = \
     "docs/doxygen-awesome-css/doxygen-awesome-sidebar-only.css" \
     "docs/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css"
 # HTML_COLORSTYLE = LIGHT
+
+# Sorted alphabetically
+ALPHABETICAL_INDEX = NO
+AUTOLINK_SUPPORT = YES
+DIRECTORY_GRAPH = NO
+ENABLE_PREPROCESSING = YES
+ENUM_VALUES_PER_LINE = 0 # Removes enum values in the overview section
+EXTRACT_ALL = NO
+EXTRACT_PRIVATE = NO
+FULL_PATH_NAMES = NO
+GENERATE_TODOLIST = NO
+GRAPHICAL_HIERARCHY = NO
+INCLUDE_GRAPH = NO
+INCLUDED_BY_GRAPH = NO
+INLINE_GROUPED_CLASSES = YES
+INLINE_SIMPLE_STRUCTS = YES
+JAVADOC_AUTOBRIEF = YES
+MACRO_EXPANSION = YES
+MARKDOWN_ID_STYLE = GITHUB
+MARKDOWN_SUPPORT = YES
+OPTIMIZE_OUTPUT_FOR_C = YES
+PREDEFINED = "FJ_COMPILE_OPT_DOCS=1"
+RECURSIVE = YES
+SEPARATE_MEMBER_PAGES = NO
+STRIP_FROM_INC_PATH = "include"
+WARN_IF_UNDOCUMENTED = NO

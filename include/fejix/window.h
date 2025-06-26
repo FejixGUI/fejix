@@ -29,6 +29,8 @@ FJ_API(fj_window_commit, struct fj_window *window)
 
 FJ_API(fj_window_set_preferred_size, struct fj_window *window, struct fj_size2d const *size)
 
+FJ_API(fj_window_set_visible, struct fj_window *window, bool visible)
+
 FJ_API(fj_window_set_title, struct fj_window *window, char const *title)
 
 FJ_API(fj_window_request_update, struct fj_window *window)

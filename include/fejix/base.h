@@ -1,5 +1,6 @@
 /**
     \file
+    Defines basic types and macros.
 */
 
 #ifndef FEJIX_BASE_H_

@@ -1,6 +1,6 @@
 /**
 
-\page contributing Contributing
+\page contribute Contribute
 
 \tableofcontents
 
@@ -18,14 +18,6 @@
 \todo   (perhaps, this one not necessarily in this document)
 
 To be written...
-
-## Version changing
-
-When changing the project's version you need to change it in the following files:
-- `include/fejix/base.h` - the code
-- `CMakeLists.txt` - the build configuration
-- `Doxyfile` - the documentation configuration
-
 
 ## Code style
 
@@ -87,7 +79,7 @@ enum fj_error foo()
 
 Yes, this is quite some code, but well... idk, error handling is important.
 In such a low-level project this would be inevitable in any programming language out there
-because we just use *so much* system APIs.
+because we just use *so many* system APIs.
 
 #### Constructors and destructors
 
