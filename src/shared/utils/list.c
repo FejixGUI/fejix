@@ -82,7 +82,7 @@ enum fj_status fj_list_shrink(
 }
 
 
-void fj_list_free(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
+void fj_list_clear(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
 {
     if (*items != NULL) {
         fj_free(items, *capacity * item_size);

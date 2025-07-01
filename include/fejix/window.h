@@ -1,5 +1,5 @@
-#ifndef FEJIX_INTERACTION_H_
-#define FEJIX_INTERACTION_H_
+#ifndef FEJIX_WINDOW_H_
+#define FEJIX_WINDOW_H_
 
 
 #include <fejix/app.h>

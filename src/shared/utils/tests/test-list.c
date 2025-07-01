@@ -32,7 +32,7 @@ int main(void)
 
     assert(l.items[0] == 333 && l.items[1] == 222);
 
-    mylist_free(&l);
+    mylist_clear(&l);
 
     puts("OK");
 

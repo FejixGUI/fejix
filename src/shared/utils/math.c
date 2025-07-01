@@ -63,9 +63,3 @@ size_t fj_size_lower_pow2(size_t x)
 
     return y;
 }
-
-
-size_t fj_size_higher_multiple(uint64_t x, size_t kernel)
-{
-    return x + (kernel - x % kernel);
-}

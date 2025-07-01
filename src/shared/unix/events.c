@@ -35,7 +35,7 @@ static enum fj_status handle_ping(void *callback_data, int fd, short events)
     (void) callback_data;
 
     if (events & (POLLERR | POLLHUP | POLLNVAL)) {
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     uint8_t buffer[1];
@@ -57,7 +57,7 @@ enum fj_status fj_unix_events_init(struct fj_unix_events *events, void *callback
 
     if (pipe_result < 0) {
         FJ_ERROR("pipe(2) failed");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     s = fj_unix_events_add(events, events->ping_pipe[0], POLLIN, handle_ping);
@@ -78,8 +78,8 @@ void fj_unix_events_deinit(struct fj_unix_events *events)
         close(events->ping_pipe[1]);
     }
 
-    fj_unix_events_pollfd_vector_free(&events->pollfds);
-    fj_unix_events_callback_vector_free(&events->callbacks);
+    fj_unix_events_pollfd_list_clear(&events->pollfds);
+    fj_unix_events_callback_list_clear(&events->callbacks);
 }
 
 
@@ -97,12 +97,12 @@ enum fj_status fj_unix_events_add(
         .revents = 0,
     };
 
-    s = fj_unix_events_pollfd_vector_push(&events->pollfds, &pollfd);
+    s = fj_unix_events_pollfd_list_append(&events->pollfds, &pollfd);
 
     if (s)
         return s;
 
-    s = fj_unix_events_callback_vector_push(&events->callbacks, &callback);
+    s = fj_unix_events_callback_list_append(&events->callbacks, &callback);
 
     if (s)
         return s;
@@ -117,11 +117,11 @@ enum fj_status fj_unix_events_remove(struct fj_unix_events *events, int file_des
 
     for (size_t i = 0; i < events->pollfds.length; i++) {
         if (events->pollfds.items[i].fd == file_descriptor) {
-            s = fj_unix_events_pollfd_vector_remove(&events->pollfds, i);
+            s = fj_unix_events_pollfd_list_remove(&events->pollfds, i);
             if (s)
                 return s;
 
-            s = fj_unix_events_callback_vector_remove(&events->callbacks, i);
+            s = fj_unix_events_callback_list_remove(&events->callbacks, i);
             if (s)
                 return s;
 
@@ -149,7 +149,7 @@ enum fj_status fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_t
 
     if (result < 0) {
         FJ_ERROR("poll(2) failed");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     if (result == 0) {
@@ -166,7 +166,7 @@ enum fj_status fj_unix_events_ping(struct fj_unix_events *events)
     ssize_t written_count = write(events->ping_pipe[1], buffer, 1);
 
     if (written_count < 0) {
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     return FJ_OK;

@@ -41,8 +41,11 @@ size_t fj_size_higher_pow2(size_t x);
 /** If x = 0, returns 1. */
 size_t fj_size_lower_pow2(size_t x);
 
-/** Returns a multiple of the kernel higher than x. */
-size_t fj_size_higher_multiple(uint64_t x, size_t kernel);
+/** Returns a multiple of the base that is also higher than x. */
+static inline size_t fj_size_higher_multiple(uint64_t x, size_t base)
+{
+    return x + (base - x % base);
+}
 
 
 #endif

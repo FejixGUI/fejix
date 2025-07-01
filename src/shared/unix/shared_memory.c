@@ -27,7 +27,7 @@ static enum fj_status open_shm_file(int32_t *out_fd)
 
     if (*out_fd == -1) {
         FJ_ERROR("memfd_create failed");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     return FJ_OK;
@@ -62,14 +62,14 @@ static enum fj_status open_shm_file(int32_t *out_fd)
 
         if (*out_fd == -1) {
             FJ_ERROR("shm_open failed");
-            return FJ_ERROR_IO_FAILED;
+            return FJ_IO_FAILED;
         }
 
         shm_unlink(temp_file_name);
         return FJ_OK;
     }
 
-    return FJ_ERROR_IO_FAILED;
+    return FJ_IO_FAILED;
 }
 
 #endif
@@ -78,14 +78,14 @@ static enum fj_status open_shm_file(int32_t *out_fd)
 static enum fj_status shm_map(struct fj_unix_shared_buffer *buffer)
 {
     if (ftruncate(buffer->file, (off_t) buffer->size) == -1) {
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     buffer->data = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->file, 0);
 
     if (buffer->data == MAP_FAILED) {
         FJ_ERROR("mmap failed");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     return FJ_OK;
@@ -96,7 +96,7 @@ static enum fj_status shm_unmap(struct fj_unix_shared_buffer *buffer)
 {
     if (munmap(buffer->data, buffer->size) == -1) {
         FJ_ERROR("nunmap failed");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     return FJ_OK;
@@ -131,7 +131,7 @@ enum fj_status fj_unix_shared_unref(struct fj_unix_shared_buffer *buffer)
 {
     if (close(buffer->file) == -1) {
         FJ_ERROR("close(2) failed");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_IO_FAILED;
     }
 
     buffer->file = -1;

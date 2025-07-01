@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 3.16)
 
 project(
     fejix
-    VERSION 0.1.0
-    DESCRIPTION "Cross-platform GUI base library"
+    VERSION 0.0.1
+    DESCRIPTION "Portable platform abstraction library"
     HOMEPAGE_URL "https://github.com/FejixGUI/fejix")
 
 
 include(GNUInstallDirs)
 
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library type.")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "This is a standard CMake option the sets the library type.")
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
@@ -102,8 +102,6 @@ target_include_directories(
 
 include("${CMAKE_CURRENT_LIST_DIR}/src/shared/core/build.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/shared/utils/build.cmake")
-
-include("${CMAKE_CURRENT_LIST_DIR}/src/default/build.cmake")
 
 if("${fejix_build_winapi}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/winapi/build.cmake")

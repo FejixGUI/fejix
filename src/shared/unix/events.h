@@ -18,13 +18,13 @@ typedef enum fj_status (*fj_unix_events_callback)(
     void *callback_data, int file_descriptor, short event_mask);
 
 
-FJ_VECTOR(fj_unix_events_pollfd_vector, struct pollfd)
-FJ_VECTOR(fj_unix_events_callback_vector, fj_unix_events_callback)
+FJ_LIST(fj_unix_events_pollfd_list, struct pollfd)
+FJ_LIST(fj_unix_events_callback_list, fj_unix_events_callback)
 
 struct fj_unix_events {
     int ping_pipe[2];
-    struct fj_unix_events_pollfd_vector pollfds;
-    struct fj_unix_events_callback_vector callbacks;
+    struct fj_unix_events_pollfd_list pollfds;
+    struct fj_unix_events_callback_list callbacks;
     void *callback_data;
 };
 
