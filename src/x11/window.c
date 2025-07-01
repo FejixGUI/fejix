@@ -8,7 +8,7 @@
 #include <malloc.h>
 
 
-static enum fj_error fj_window_service_new_(
+static enum fj_status fj_window_service_new_(
     struct fj_window_service **out_service, struct fj_app *app)
 {
     fj_window_service_init_base(&app->window_service, app);
@@ -16,14 +16,14 @@ static enum fj_error fj_window_service_new_(
     return FJ_OK;
 }
 
-static enum fj_error fj_window_service_del_(struct fj_window_service *service)
+static enum fj_status fj_window_service_del_(struct fj_window_service *service)
 {
     fj_window_vector_free(&service->windows);
     return FJ_OK;
 }
 
 
-static enum fj_error fj_window_del_(struct fj_window *window)
+static enum fj_status fj_window_del_(struct fj_window *window)
 {
     xcb_connection_t *c = window->base.app->connection;
     struct fj_window_service *service = window->base.service;
@@ -60,20 +60,20 @@ static enum fj_error fj_window_del_(struct fj_window *window)
 }
 
 
-static enum fj_error fj_window_new_(
+static enum fj_status fj_window_new_(
     struct fj_window **out_window, struct fj_window_service *service)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     struct fj_window *window;
-    e = FJ_ALLOC(&window);
-    if (e)
-        return e;
+    s = FJ_ALLOC(&window);
+    if (s)
+        return s;
 
-    e = fj_window_vector_push(&service->windows, &window);
-    if (e) {
+    s = fj_window_vector_push(&service->windows, &window);
+    if (s) {
         fj_window_del_(window);
-        return e;
+        return s;
     }
 
     fj_window_init_base(window, service);
@@ -83,7 +83,7 @@ static enum fj_error fj_window_new_(
 }
 
 
-static enum fj_error create_window(struct fj_app *app, struct fj_window *window)
+static enum fj_status create_window(struct fj_app *app, struct fj_window *window)
 {
     // TODO clean up this code once it starts to actually do something useful
 
@@ -181,14 +181,14 @@ static enum fj_error create_window(struct fj_app *app, struct fj_window *window)
 }
 
 
-static enum fj_error fj_window_commit_(struct fj_window *window)
+static enum fj_status fj_window_commit_(struct fj_window *window)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     if (window->id == 0) {
-        e = create_window(window->base.app, window);
-        if (e)
-            return e;
+        s = create_window(window->base.app, window);
+        if (s)
+            return s;
     }
 
     return FJ_OK;

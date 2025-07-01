@@ -2,6 +2,9 @@
 
 \page architecture Architecture
 
-\todo Discuss multithreading, the limitations of UIKit/iOS, Windows API, X11 etc.
+## Single-threadedness
+
+\todo single-threaded GUIs, weird limitations on different platforms, everything is a single
+\todo connection anyway...
 
 */

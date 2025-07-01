@@ -2,7 +2,7 @@
 #define FEJIX_X11_WINDOW_H_
 
 
-#include <src/shared/utils/vector.h>
+#include <src/shared/utils/list.h>
 
 #include <fejix/window.h>
 

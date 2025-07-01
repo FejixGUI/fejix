@@ -182,9 +182,6 @@ Macros:
     # clang-format does not support proper custom attributes as of now.
     - 'FJ_PUBLIC=[[xxxxx]]'
 
-IfMacros:
-    - 'FJ_TRY'
-
 # How to read the includes:
 #   At the top - the most important project headers
 #   At the bottom - the most important external headers

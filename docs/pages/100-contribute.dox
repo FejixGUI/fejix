@@ -9,13 +9,9 @@
 
 \todo Discuss the tools, the development process, the organisation of the project and its backends.
 
-\todo Discuss the API_XXX macros and that setting **out_object_pointers to NULL is useless
-\todo   because of the default fallbacks that just leave those pointers uninitialised
 \todo Discuss memory allocation, logging, other internal tools...
 
 \todo Discuss the app, services, objects and state objects,
-\todo   _commit() functions for atomic updates of complex visible state
-\todo   (perhaps, this one not necessarily in this document)
 
 To be written...
 
@@ -30,20 +26,20 @@ These are some code style aspects that cannot be handled by automated tools.
 The error handling looks like this:
 
 \code{.c}
-enum fj_error foo()
+enum fj_status foo()
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = bar();
-    if (e) {
+    s = bar();
+    if (s) {
         // Do something
-        return e; // Pass the error to the caller
+        return s; // Pass the error to the caller
     }
 
-    e = baz();
-    if (e) {
+    s = baz();
+    if (s) {
         // Do something
-        return e; // Pass the error to the caller
+        return s; // Pass the error to the caller
     }
 
     return FJ_OK;
@@ -53,24 +49,24 @@ enum fj_error foo()
 In many cases it is even like this:
 
 \code{.c}
-enum fj_error foo()
+enum fj_status foo()
 {
-    enum fj_error e;
+    enum fj_status s;
 
     waka(); // This must be cancelled on failure
 
-    e = bar();
-    if (e) {
+    s = bar();
+    if (s) {
         cancel_waka(); // Roll something back if needed
         FJ_ERROR("foo failed"); // Debug log
-        return e;
+        return s;
     }
 
-    e = baz();
-    if (e) {
+    s = baz();
+    if (s) {
         cancel_waka(); // Roll something back if needed
         FJ_ERROR("baz failed"); // Debug log
-        return e;
+        return s;
     }
 
     return FJ_OK;
@@ -94,25 +90,25 @@ struct foo {
     struct baz *baz;
 };
 
-enum fj_error foo_new(struct foo **out_foo)
+enum fj_status foo_new(struct foo **out_foo)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     struct foo *foo;
-    e = FJ_ALLOC(&foo);
-    if (e)
-        return e;
+    s = FJ_ALLOC(&foo);
+    if (s)
+        return s;
 
-    e = bar_new(&foo->bar)
-    if (e) {
+    s = bar_new(&foo->bar)
+    if (s) {
         foo_del(foo);
-        return e;
+        return s;
     }
 
-    e = baz_new(&foo->baz);
-    if (e) {
+    s = baz_new(&foo->baz);
+    if (s) {
         foo_del(foo);
-        return e;
+        return s;
     }
 
     *out_foo = foo;
@@ -142,20 +138,11 @@ would need to be done inside constructors, which is too hard and bug-prone in C.
 
 ### Naming
 
-#### Functions
-
-For constructor/destructor pairs:
-- `_new()`, `_del()` allocate memory and initialise the allocated object
-- `_init()`, `_deinit()` initialise an already allocated object
-
-The `_init()`/`_deinit()` pair is mostly used for internal utility objects like vectors, event
-loops, or application subsystems which are most often already allocated as parts of other objects.
-
 #### Macros
 
 - `FJ_COMPILE_OPT_XXX` - macro definitions defined externally by the build system
 - `FJ_PRIVATE_OPT_XXX` - macro definitions defined by the project code
-- `FJ_INCLUDE_OPT_XXX` - macro definitions defined by the code that includes the project headers
+- `FJ_INCLUDE_OPT_XXX` - macro definitions defined by the user code that includes the headers
 - `FEJIX_FOO_BAR_BAZ_H_` - a header guard for `<fejix/foo/bar_baz.h>`
 
 */

@@ -1,4 +1,4 @@
-#include "vector.h"
+#include "list.h"
 
 #include <src/shared/utils/logging.h>
 #include <src/shared/utils/math.h>
@@ -17,22 +17,22 @@ static void shift_tail(
 }
 
 
-enum fj_error fj_vector_expand(
+enum fj_status fj_list_expand(
     void **items, uint32_t *length, uint32_t *capacity, size_t item_size, uint32_t index)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     if (index > *length) {
         FJ_ERROR("push index out of range");
-        return FJ_ERROR_INVALID_USAGE;
+        return FJ_INVALID_USAGE;
     }
 
     if (*length == *capacity) {
         uint32_t new_capacity = fj_u32_max(*capacity * 2, 1);
-        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        s = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
 
-        if (e)
-            return e;
+        if (s)
+            return s;
 
         *capacity = new_capacity;
     }
@@ -47,19 +47,19 @@ enum fj_error fj_vector_expand(
 }
 
 
-enum fj_error fj_vector_shrink(
+enum fj_status fj_list_shrink(
     void **items, uint32_t *length, uint32_t *capacity, size_t item_size, uint32_t index)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     if (index >= *length) {
         if (*length == 0) {
-            FJ_ERROR("cannot remove from an empty vector");
+            FJ_ERROR("cannot remove from an empty list");
         } else {
             FJ_ERROR("remove index out of range");
         }
 
-        return FJ_ERROR_INVALID_USAGE;
+        return FJ_INVALID_USAGE;
     }
 
     if (index != *length - 1) {
@@ -68,9 +68,9 @@ enum fj_error fj_vector_shrink(
 
     if (*length <= *capacity / 4) {
         uint32_t new_capacity = fj_u32_max(*capacity / 2, 1);
-        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
-        if (e)
-            return e;
+        s = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        if (s)
+            return s;
 
         *capacity = new_capacity;
     }
@@ -82,7 +82,7 @@ enum fj_error fj_vector_shrink(
 }
 
 
-void fj_vector_free(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
+void fj_list_free(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
 {
     if (*items != NULL) {
         fj_free(items, *capacity * item_size);

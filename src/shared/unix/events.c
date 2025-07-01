@@ -8,20 +8,20 @@
 #include <unistd.h>
 
 
-static enum fj_error process_events(struct fj_unix_events *events)
+static enum fj_status process_events(struct fj_unix_events *events)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     for (size_t i = 0; i < events->pollfds.length; i++) {
         if (events->pollfds.items[i].revents == 0) {
             continue;
         }
 
-        e = events->callbacks.items[i](
+        s = events->callbacks.items[i](
             events->callback_data, events->pollfds.items[i].fd, events->pollfds.items[i].revents);
 
-        if (e)
-            return e;
+        if (s)
+            return s;
 
         events->pollfds.items[i].revents = 0;
     }
@@ -30,7 +30,7 @@ static enum fj_error process_events(struct fj_unix_events *events)
 }
 
 
-static enum fj_error handle_ping(void *callback_data, int fd, short events)
+static enum fj_status handle_ping(void *callback_data, int fd, short events)
 {
     (void) callback_data;
 
@@ -45,9 +45,9 @@ static enum fj_error handle_ping(void *callback_data, int fd, short events)
 }
 
 
-enum fj_error fj_unix_events_init(struct fj_unix_events *events, void *callback_data)
+enum fj_status fj_unix_events_init(struct fj_unix_events *events, void *callback_data)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     *events = (struct fj_unix_events) {
         .callback_data = callback_data,
@@ -60,11 +60,11 @@ enum fj_error fj_unix_events_init(struct fj_unix_events *events, void *callback_
         return FJ_ERROR_IO_FAILED;
     }
 
-    e = fj_unix_events_add(events, events->ping_pipe[0], POLLIN, handle_ping);
+    s = fj_unix_events_add(events, events->ping_pipe[0], POLLIN, handle_ping);
 
-    if (e) {
+    if (s) {
         fj_unix_events_deinit(events);
-        return e;
+        return s;
     }
 
     return FJ_OK;
@@ -83,13 +83,13 @@ void fj_unix_events_deinit(struct fj_unix_events *events)
 }
 
 
-enum fj_error fj_unix_events_add(
+enum fj_status fj_unix_events_add(
     struct fj_unix_events *events,
     int file_descriptor,
     short events_to_watch,
     fj_unix_events_callback callback)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     struct pollfd pollfd = {
         .fd = file_descriptor,
@@ -97,33 +97,33 @@ enum fj_error fj_unix_events_add(
         .revents = 0,
     };
 
-    e = fj_unix_events_pollfd_vector_push(&events->pollfds, &pollfd);
+    s = fj_unix_events_pollfd_vector_push(&events->pollfds, &pollfd);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
-    e = fj_unix_events_callback_vector_push(&events->callbacks, &callback);
+    s = fj_unix_events_callback_vector_push(&events->callbacks, &callback);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     return FJ_OK;
 }
 
 
-enum fj_error fj_unix_events_remove(struct fj_unix_events *events, int file_descriptor)
+enum fj_status fj_unix_events_remove(struct fj_unix_events *events, int file_descriptor)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     for (size_t i = 0; i < events->pollfds.length; i++) {
         if (events->pollfds.items[i].fd == file_descriptor) {
-            e = fj_unix_events_pollfd_vector_remove(&events->pollfds, i);
-            if (e)
-                return e;
+            s = fj_unix_events_pollfd_vector_remove(&events->pollfds, i);
+            if (s)
+                return s;
 
-            e = fj_unix_events_callback_vector_remove(&events->callbacks, i);
-            if (e)
-                return e;
+            s = fj_unix_events_callback_vector_remove(&events->callbacks, i);
+            if (s)
+                return s;
 
             break;
         }
@@ -142,7 +142,7 @@ static int32_t into_poll_timeout(fj_time *opt_timeout)
     return (int32_t) fj_time_into_millis(*opt_timeout);
 }
 
-enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout)
+enum fj_status fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout)
 {
     int32_t result
         = poll(events->pollfds.items, events->pollfds.length, into_poll_timeout(opt_timeout));
@@ -160,7 +160,7 @@ enum fj_error fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_ti
 }
 
 
-enum fj_error fj_unix_events_ping(struct fj_unix_events *events)
+enum fj_status fj_unix_events_ping(struct fj_unix_events *events)
 {
     uint8_t buffer[1] = { 42 };  // arbitrary number, only needs to be read in handle_ping
     ssize_t written_count = write(events->ping_pipe[1], buffer, 1);

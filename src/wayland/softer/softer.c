@@ -52,7 +52,7 @@ static uint32_t from_pixel_format(fj_softer_pixel_format format)
 }
 
 
-static enum fj_error handle_init_event(
+static enum fj_status handle_init_event(
     struct fj_client *client, struct fj_wayland_event_wrapper const *wrapper)
 {
     (void) wrapper;
@@ -70,7 +70,7 @@ static enum fj_error handle_init_event(
 }
 
 
-static enum fj_error handle_format_event(
+static enum fj_status handle_format_event(
     struct fj_client *client, struct fj_wayland_event_wrapper const *wrapper)
 {
     struct wayland_shm_format_event const *event = wrapper->event;
@@ -115,7 +115,7 @@ static void wayland_shm_format(void *_client, struct wl_shm *shm, uint32_t forma
 static struct wl_shm_listener wayland_shm_listener = { .format = wayland_shm_format };
 
 
-static enum fj_error softer_canvas_init_global_data(struct fj_client *client)
+static enum fj_status softer_canvas_init_global_data(struct fj_client *client)
 {
     fj_vec_init(&client->softer->pixel_formats, sizeof(fj_softer_pixel_format));
 
@@ -137,7 +137,7 @@ static enum fj_error softer_canvas_init_global_data(struct fj_client *client)
 }
 
 
-static enum fj_error softer_canvas_init(
+static enum fj_status softer_canvas_init(
     struct fj_client *_client, struct fj_softer_canvas_callbacks const *callbacks)
 {
     struct fj_client *client = (void *) _client;
@@ -170,7 +170,7 @@ static enum fj_error softer_canvas_init(
 }
 
 
-static enum fj_error softer_canvas_deinit(struct fj_client *_client)
+static enum fj_status softer_canvas_deinit(struct fj_client *_client)
 {
     struct fj_client *client = (void *) _client;
 
@@ -196,7 +196,7 @@ static size_t softer_canvas_get_data_size(struct fj_wayland_softer_canvas const 
 }
 
 
-static enum fj_error softer_canvas_create_buffer(
+static enum fj_status softer_canvas_create_buffer(
     struct fj_client *client,
     struct fj_wayland_softer_canvas *canvas,
     struct fj_wayland_softer_canvas_buffer *buffer)
@@ -235,7 +235,7 @@ static enum fj_error softer_canvas_create_buffer(
 }
 
 
-static enum fj_error softer_canvas_destroy_buffer(struct fj_wayland_softer_canvas_buffer *buffer)
+static enum fj_status softer_canvas_destroy_buffer(struct fj_wayland_softer_canvas_buffer *buffer)
 {
     FJ_TRY (fj_unixshm_unref(&buffer->shm)) {
         return fj_result;
@@ -248,7 +248,7 @@ static enum fj_error softer_canvas_destroy_buffer(struct fj_wayland_softer_canva
 }
 
 
-static enum fj_error softer_canvas_resize_buffer(
+static enum fj_status softer_canvas_resize_buffer(
     struct fj_wayland_softer_canvas *canvas, struct fj_wayland_softer_canvas_buffer *buffer)
 {
     FJ_TRY (fj_unixshm_realloc(&buffer->shm, softer_canvas_get_data_size(canvas))) {
@@ -275,7 +275,7 @@ static enum fj_error softer_canvas_resize_buffer(
 }
 
 
-static enum fj_error softer_canvas_create_buffers(
+static enum fj_status softer_canvas_create_buffers(
     struct fj_client *client, struct fj_wayland_softer_canvas *canvas)
 {
     FJ_TRY (softer_canvas_create_buffer(client, canvas, &canvas->buffers[0])) {
@@ -291,7 +291,7 @@ static enum fj_error softer_canvas_create_buffers(
 }
 
 
-static enum fj_error softer_canvas_create(
+static enum fj_status softer_canvas_create(
     struct fj_client *_client,
     fj_softer_canvas * /*? out*/ *_canvas,
     struct fj_softer_canvas_info const *info)
@@ -314,7 +314,7 @@ static enum fj_error softer_canvas_create(
 }
 
 
-static enum fj_error softer_canvas_destroy(struct fj_client *_client, fj_softer_canvas *_canvas)
+static enum fj_status softer_canvas_destroy(struct fj_client *_client, fj_softer_canvas *_canvas)
 {
     (void) _client;
 
@@ -359,7 +359,7 @@ static fj_bool32 softer_canvas_info_changed(
 }
 
 
-static enum fj_error softer_canvas_wait_for_available_buffers(
+static enum fj_status softer_canvas_wait_for_available_buffers(
     struct fj_client *client, struct fj_wayland_softer_canvas *canvas)
 {
     while (canvas->available_buffer_count == 0) {
@@ -376,7 +376,7 @@ static enum fj_error softer_canvas_wait_for_available_buffers(
 }
 
 
-static enum fj_error softer_canvas_update(
+static enum fj_status softer_canvas_update(
     struct fj_client *_client, fj_softer_canvas *_canvas, struct fj_softer_canvas_info const *info)
 {
     struct fj_client *client = (void *) _client;
@@ -411,7 +411,7 @@ static enum fj_error softer_canvas_update(
 }
 
 
-static enum fj_error softer_canvas_present(struct fj_client *_client, fj_softer_canvas *_canvas)
+static enum fj_status softer_canvas_present(struct fj_client *_client, fj_softer_canvas *_canvas)
 {
     struct fj_client *client = (void *) _client;
     struct fj_wayland_softer_canvas *canvas = (void *) _canvas;

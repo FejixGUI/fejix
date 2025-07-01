@@ -9,7 +9,7 @@
 static LONG_PTR __stdcall window_procedure(
     HWND handle, UINT message, UINT_PTR wparam, LONG_PTR lparam)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     if (message == WM_CREATE) {
         CREATESTRUCT *create_info = (void *) lparam;
@@ -28,9 +28,9 @@ static LONG_PTR __stdcall window_procedure(
     };
 
     if (window->view != NULL) {
-        e = fj_winapi_view_handle_event(window->view->manager, window->view, &msg, &result);
+        s = fj_winapi_view_handle_event(window->view->manager, window->view, &msg, &result);
 
-        if (e)  // TODO log errors here, I guess
+        if (s)  // TODO log errors here, I guess
             return DefWindowProc(handle, message, wparam, lparam);
     }
 
@@ -38,15 +38,15 @@ static LONG_PTR __stdcall window_procedure(
 }
 
 
-enum fj_error fj_window_create_manager_winapi(
+enum fj_status fj_window_create_manager_winapi(
     struct fj_io_thread *io_thread, struct fj_window_manager **out_manager)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = FJ_ALLOC(out_manager);
+    s = FJ_ALLOC(out_manager);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     (*out_manager)->io_thread = io_thread;
 
@@ -54,22 +54,22 @@ enum fj_error fj_window_create_manager_winapi(
 }
 
 
-enum fj_error fj_window_destroy_manager_winapi(struct fj_window_manager *manager)
+enum fj_status fj_window_destroy_manager_winapi(struct fj_window_manager *manager)
 {
     (void) manager;
     return FJ_OK;
 }
 
 
-enum fj_error fj_window_create_winapi(
+enum fj_status fj_window_create_winapi(
     struct fj_window_manager *manager, struct fj_window **out_window)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = FJ_ALLOC(out_window);
+    s = FJ_ALLOC(out_window);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     (*out_window)->manager = manager;
 
@@ -86,26 +86,26 @@ enum fj_error fj_window_create_winapi(
         .lpCreateParams = *out_window,
     };
 
-    e = fj_winapi_window_create(&(*out_window)->handle, &class_info, &window_info);
+    s = fj_winapi_window_create(&(*out_window)->handle, &class_info, &window_info);
 
-    if (e) {
+    if (s) {
         FJ_FREE(out_window);
-        return e;
+        return s;
     }
 
     return FJ_OK;
 }
 
 
-enum fj_error fj_window_destroy_winapi(struct fj_window_manager *manager, struct fj_window *window)
+enum fj_status fj_window_destroy_winapi(struct fj_window_manager *manager, struct fj_window *window)
 {
     (void) manager;
-    enum fj_error e;
+    enum fj_status s;
 
-    e = fj_winapi_window_destroy(window->handle);
+    s = fj_winapi_window_destroy(window->handle);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     FJ_FREE(&window);
 
@@ -113,7 +113,7 @@ enum fj_error fj_window_destroy_winapi(struct fj_window_manager *manager, struct
 }
 
 
-enum fj_error fj_window_sync_winapi(struct fj_window_manager *manager, struct fj_window *window)
+enum fj_status fj_window_sync_winapi(struct fj_window_manager *manager, struct fj_window *window)
 {
     if (window->view != NULL) {
         fj_winapi_window_view_sync(window->view->manager, window->view);

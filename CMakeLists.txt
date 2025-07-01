@@ -14,29 +14,29 @@ set(BUILD_SHARED_LIBS OFF CACHE BOOL "Common CMake option for default library ty
 
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
 
-set(fejix_build_winapi OFF CACHE BOOL "Build the Windows API backend")
+set(fejix_build_winapi OFF CACHE BOOL "Build the Windows API platform")
 
-set(fejix_build_wayland OFF CACHE BOOL "Build the Wayland backend")
+set(fejix_build_wayland OFF CACHE BOOL "Build the Wayland platform")
 
-set(fejix_build_x11 OFF CACHE BOOL "Build the X11 backend")
+set(fejix_build_x11 OFF CACHE BOOL "Build the X11 platform")
 
-set(fejix_detect_backends OFF CACHE BOOL "Detect the backends which are common for the target OS")
+set(fejix_detect_platforms OFF CACHE BOOL "Detect the platforms which are common for the target OS")
 
 set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
-# The following variables enable some shared utils and can be enabled in backend build scripts
+# The following variables enable some shared utils and can be enabled in platform build scripts
 
 set(fejix_build_unix_utils OFF)
 
 
-if("${fejix_detect_backends}" STREQUAL "auto")
+if("${fejix_detect_platforms}" STREQUAL "auto")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
         set(fejix_build_winapi ON)
     elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux|GNU|FreeBSD|OpenBSD|NetBSD|DragonFly")
         set(fejix_build_wayland ON)
         set(fejix_build_x11 ON)
     else()
-        message(WARNING "Fejix could not detect backends for the target OS")
+        message(WARNING "Fejix could not detect platforms for the target OS")
     endif()
 endif()
 

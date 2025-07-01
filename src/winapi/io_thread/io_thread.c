@@ -17,12 +17,12 @@ static void enable_dpi_awareness_for_process(void)
 {
     // Using per-process awareness because some GPU drivers have bugs with per-thread awareness.
     // Using Set..DpiAwarenessContext because Set..DpiAwareness is buggy and inconsistent.
-    // Bugs appear e.g. on laptops with integrated Intel + NVidia GPUs.
+    // Bugs appear s.g. on laptops with integrated Intel + NVidia GPUs.
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 }
 
 
-static enum fj_error post_sleep_message(struct fj_io_thread *io_thread)
+static enum fj_status post_sleep_message(struct fj_io_thread *io_thread)
 {
     BOOL result = SendNotifyMessageW(io_thread->message_window, INTERNAL_MESSAGE_ITERATE, 0, 0);
 
@@ -34,7 +34,7 @@ static enum fj_error post_sleep_message(struct fj_io_thread *io_thread)
 }
 
 
-static enum fj_error sleep(struct fj_io_thread *io_thread, DWORD duration)
+static enum fj_status sleep(struct fj_io_thread *io_thread, DWORD duration)
 {
     (void) io_thread;
 
@@ -49,22 +49,22 @@ static enum fj_error sleep(struct fj_io_thread *io_thread, DWORD duration)
 }
 
 
-static enum fj_error iterate(struct fj_io_thread *io_thread)
+static enum fj_status iterate(struct fj_io_thread *io_thread)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     union fj_io_thread_event_data data = { 0 };
     io_thread->callback(io_thread, FJ_IO_THREAD_EVENT_NO_MORE_EVENTS, data);
 
-    e = sleep(io_thread, fj_winapi_timer_manager_get_sleep_duration(&io_thread->timer_manager));
+    s = sleep(io_thread, fj_winapi_timer_manager_get_sleep_duration(&io_thread->timer_manager));
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
-    e = post_sleep_message(io_thread);
+    s = post_sleep_message(io_thread);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     return FJ_OK;
 }
@@ -73,7 +73,7 @@ static enum fj_error iterate(struct fj_io_thread *io_thread)
 static LONG_PTR __stdcall handle_message_window_event(
     HWND window_handle, UINT message, UINT_PTR wparam, LONG_PTR lparam)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     struct fj_io_thread *io_thread = fj_winapi_window_get_data(window_handle);
 
@@ -83,10 +83,10 @@ static LONG_PTR __stdcall handle_message_window_event(
 
     switch (message) {
         case INTERNAL_MESSAGE_ITERATE: {
-            e = iterate(io_thread);
+            s = iterate(io_thread);
 
-            if (e) {
-                PostQuitMessage((int) e);
+            if (s) {
+                PostQuitMessage((int) s);
                 return 0;
             }
 
@@ -118,9 +118,9 @@ static LONG_PTR __stdcall handle_message_window_event(
 }
 
 
-static enum fj_error create_message_window(struct fj_io_thread *io_thread)
+static enum fj_status create_message_window(struct fj_io_thread *io_thread)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     WNDCLASSEX class_info = {
         .lpfnWndProc = handle_message_window_event,
@@ -128,10 +128,10 @@ static enum fj_error create_message_window(struct fj_io_thread *io_thread)
 
     // Creating a normal window instead of a message-only window in order to receive broadcast
     // messages like WM_ENDSESSION.
-    e = fj_winapi_window_create(&io_thread->message_window, &class_info, NULL);
+    s = fj_winapi_window_create(&io_thread->message_window, &class_info, NULL);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     fj_winapi_window_set_data(io_thread->message_window, io_thread);
 
@@ -139,13 +139,13 @@ static enum fj_error create_message_window(struct fj_io_thread *io_thread)
 }
 
 
-static enum fj_error destroy_message_window(struct fj_io_thread *io_thread)
+static enum fj_status destroy_message_window(struct fj_io_thread *io_thread)
 {
     return fj_winapi_window_destroy(io_thread->message_window);
 }
 
 
-enum fj_error fj_io_thread_destroy_winapi(struct fj_io_thread *io_thread)
+enum fj_status fj_io_thread_destroy_winapi(struct fj_io_thread *io_thread)
 {
     if (io_thread->message_window != NULL) {
         destroy_message_window(io_thread);
@@ -157,24 +157,24 @@ enum fj_error fj_io_thread_destroy_winapi(struct fj_io_thread *io_thread)
 }
 
 
-enum fj_error fj_io_thread_create_winapi(struct fj_io_thread **out_io_thread)
+enum fj_status fj_io_thread_create_winapi(struct fj_io_thread **out_io_thread)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = FJ_ALLOC(out_io_thread);
+    s = FJ_ALLOC(out_io_thread);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     (*out_io_thread)->callback = fj_io_thread_event_callback_default;
 
     enable_dpi_awareness_for_process();
 
-    e = create_message_window(*out_io_thread);
+    s = create_message_window(*out_io_thread);
 
-    if (e) {
+    if (s) {
         fj_io_thread_destroy_winapi(*out_io_thread);
-        return e;
+        return s;
     }
 
     return FJ_OK;
@@ -188,14 +188,14 @@ void fj_io_thread_set_callback_winapi(
 }
 
 
-enum fj_error fj_io_thread_start_winapi(struct fj_io_thread *io_thread)
+enum fj_status fj_io_thread_start_winapi(struct fj_io_thread *io_thread)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = post_sleep_message(io_thread);
+    s = post_sleep_message(io_thread);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     while (!io_thread->finished) {
         MSG msg;
@@ -218,7 +218,7 @@ enum fj_error fj_io_thread_start_winapi(struct fj_io_thread *io_thread)
 }
 
 
-enum fj_error fj_io_thread_ping_self_winapi(struct fj_io_thread *io_thread)
+enum fj_status fj_io_thread_ping_self_winapi(struct fj_io_thread *io_thread)
 {
     if (!SendNotifyMessage(io_thread->message_window, INTERNAL_MESSAGE_PING_SELF, 0, 0)) {
         return FJ_ERROR_IO_FAILED;
@@ -228,7 +228,7 @@ enum fj_error fj_io_thread_ping_self_winapi(struct fj_io_thread *io_thread)
 }
 
 
-enum fj_error fj_io_thread_finish_winapi(struct fj_io_thread *io_thread)
+enum fj_status fj_io_thread_finish_winapi(struct fj_io_thread *io_thread)
 {
     io_thread->finished = true;
     PostQuitMessage(0);
@@ -236,7 +236,7 @@ enum fj_error fj_io_thread_finish_winapi(struct fj_io_thread *io_thread)
 }
 
 
-enum fj_error fj_io_thread_sleep_create_manager_winapi(
+enum fj_status fj_io_thread_sleep_create_manager_winapi(
     struct fj_io_thread *io_thread, struct fj_io_thread_sleep_manager **out_manager)
 {
     *out_manager = &io_thread->sleep_manager;
@@ -246,24 +246,24 @@ enum fj_error fj_io_thread_sleep_create_manager_winapi(
 }
 
 
-enum fj_error fj_io_thread_sleep_destroy_manager_winapi(struct fj_io_thread_sleep_manager *manager)
+enum fj_status fj_io_thread_sleep_destroy_manager_winapi(struct fj_io_thread_sleep_manager *manager)
 {
     (void) manager;
     return FJ_OK;
 }
 
 
-enum fj_error fj_io_thread_sleep_winapi(struct fj_io_thread *thread, fj_time const *opt_duration)
+enum fj_status fj_io_thread_sleep_winapi(struct fj_io_thread *thread, fj_time const *opt_duration)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     DWORD duration = opt_duration != NULL ? fj_time_into_millis(*opt_duration) : INFINITE;
 
     if (duration != 0) {
-        e = sleep(thread, duration);
+        s = sleep(thread, duration);
 
-        if (e)
-            return e;
+        if (s)
+            return s;
     }
 
     MSG msg;

@@ -7,30 +7,30 @@
 
 
 /** Each element is a string or NULL if unimplemented. */
-static char const *error_strings[FJ_ERROR_MAX] = {
+static char const *error_strings[FJ_STATUS_MAX] = {
     [FJ_OK] = "success",
-    [FJ_ERROR_OUT_OF_MEMORY] = "out of memory",
-    [FJ_ERROR_UNIMPLEMENTED] = "unimplemented",
-    [FJ_ERROR_OPERATION_FAILED] = "operation failed",
-    [FJ_ERROR_IO_FAILED] = "input/output failed",
-    [FJ_ERROR_UNAVAILABLE] = "feature unavailable on the system",
-    [FJ_ERROR_ACCESS_DENIED] = "access denied",
-    [FJ_ERROR_CONCURRENT_ACCESS] = "concurrent access not permitted",
-    [FJ_ERROR_INVALID_USAGE] = "invalid usage (bug)",
-    [FJ_ERROR_INVALID_OPERATION] = "invalid operation",
-    [FJ_ERROR_INVALID_ENCODING] = "invalid text encoding",
+    [FJ_OUT_OF_MEMORY] = "out of memory",
+    [FJ_UNIMPLEMENTED] = "unimplemented",
+    [FJ_OPERATION_FAILED] = "operation failed",
+    [FJ_IO_FAILED] = "input/output failed",
+    [FJ_UNAVAILABLE] = "feature unavailable on the system",
+    [FJ_ACCESS_DENIED] = "access denied",
+    [FJ_CONCURRENT_ACCESS] = "concurrent access not permitted",
+    [FJ_INVALID_USAGE] = "invalid usage (bug)",
+    [FJ_INVALID_OPERATION] = "invalid operation",
+    [FJ_INVALID_ENCODING] = "invalid text encoding",
 };
 
 
-char const *fj_error_into_string(enum fj_error e)
+char const *fj_status_into_string(enum fj_status s)
 {
-    if (e >= FJ_ERROR_MAX) {
+    if (s >= FJ_STATUS_MAX) {
         return "invalid error ID";
     }
 
-    if (error_strings[e] == NULL) {
+    if (error_strings[s] == NULL) {
         return "unnamed error (did someone forget to write a description?)";
     }
 
-    return error_strings[e];
+    return error_strings[s];
 }

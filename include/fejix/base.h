@@ -50,119 +50,46 @@
 
 #endif
 
-#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
-#    define FJ_APP(TYPE)     \
-        struct TYPE;         \
-        struct TYPE##_base { \
-            void *userdata;  \
-        };
-#    define FJ_SERVICE(TYPE)                                                          \
-        struct TYPE;                                                                  \
-        struct TYPE##_base {                                                          \
-            struct fj_app *app;                                                       \
-        };                                                                            \
-        static inline void TYPE##_init_base(struct TYPE *service, struct fj_app *app) \
-        {                                                                             \
-            ((struct TYPE##_base *) service)->app = app;                              \
-        }
-#    define FJ_OBJECT(TYPE)                                                                       \
-        struct TYPE;                                                                              \
-        struct TYPE##_base {                                                                      \
-            void *userdata;                                                                       \
-            struct TYPE##_service *service;                                                       \
-            struct fj_app *app;                                                                   \
-        };                                                                                        \
-        static inline void TYPE##_init_base(struct TYPE *object, struct TYPE##_service *service)  \
-        {                                                                                         \
-            ((struct TYPE##_base *) object)->service = service;                                   \
-            ((struct TYPE##_base *) object)->app = ((struct TYPE##_service_base *) service)->app; \
-        }
-#else
-/** Defines the application structure and its public fields. */
-#    define FJ_APP(TYPE)    \
-        struct TYPE {       \
-            void *userdata; \
-        };
-/** Defines the service structure and its public fields. */
-#    define FJ_SERVICE(TYPE)    \
-        struct TYPE {           \
-            struct fj_app *app; \
-        };
-/** Defines the service object structure and its public fields. */
-#    define FJ_OBJECT(TYPE)                 \
-        struct TYPE {                       \
-            void *userdata;                 \
-            struct TYPE##_service *service; \
-            struct fj_app *app;             \
-        };
-#endif
-
-#if defined(FJ_INTERNAL_OPT_DEFINE_DEFAULT_API_IMPLEMENTATIONS)
-#    define FJ_API_EX(FUNCTION_NAME, RETURN_TYPE, RETURN_VALUE, ...) \
-        static RETURN_TYPE FUNCTION_NAME##_default(__VA_ARGS__)      \
-        {                                                            \
-            return RETURN_VALUE;                                     \
-        }                                                            \
-        FJ_PUBLIC RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__);         \
-        RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__) = FUNCTION_NAME##_default;
-#else
-/** Defines a public API function with explicit return type and default return value. */
-#    define FJ_API_EX(FUNCTION_NAME, RETURN_TYPE, RETURN_VALUE, ...) \
-        FJ_PUBLIC RETURN_TYPE (*FUNCTION_NAME)(__VA_ARGS__);
-#endif
-
-/** Defines a public API function that returns fj_error and defaults to #FJ_ERROR_UNIMPLEMENTED. */
-#define FJ_API(FUNCTION_NAME, ...) \
-    FJ_API_EX(FUNCTION_NAME, enum fj_error, FJ_ERROR_UNIMPLEMENTED, __VA_ARGS__)
-
-/** Defines a public API function that returns void and defaults to no-op. */
-#define FJ_API_VOID(FUNCTION_NAME, ...) FJ_API_EX(FUNCTION_NAME, void, , __VA_ARGS__)
-
-
-#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
-#    define FJ_API_INIT(FUNCTION_NAME) FUNCTION_NAME = FUNCTION_NAME##_;
-#endif
-
 
 /** Status code. */
-enum fj_error {
+enum fj_status {
     /** Success */
     FJ_OK,
 
     /** The requested operation is not implemented and therefore no work has been done. */
-    FJ_ERROR_UNIMPLEMENTED,
+    FJ_UNIMPLEMENTED,
 
     /** Out of memory */
-    FJ_ERROR_OUT_OF_MEMORY,
+    FJ_OUT_OF_MEMORY,
 
     /** Input/output operation failed. */
-    FJ_ERROR_IO_FAILED,
+    FJ_IO_FAILED,
 
     /** The requested operation or resource are not available on the system. */
-    FJ_ERROR_UNAVAILABLE,
+    FJ_UNAVAILABLE,
 
     /** Access denied to create a file, share memory, connect to a device etc. */
-    FJ_ERROR_ACCESS_DENIED,
+    FJ_ACCESS_DENIED,
 
     /** Concurrent access to the object is not permitted. */
-    FJ_ERROR_CONCURRENT_ACCESS,
+    FJ_CONCURRENT_ACCESS,
 
     /** Invalid usage indicates a programming error like zero allocation size, index out of range,
         removing from an empty vector etc. */
-    FJ_ERROR_INVALID_USAGE,
+    FJ_INVALID_USAGE,
 
     /** The requested operation cannot be done on the specified object. */
-    FJ_ERROR_INVALID_OPERATION,
+    FJ_INVALID_OPERATION,
 
     /** Invalid text encoding. */
-    FJ_ERROR_INVALID_ENCODING,
+    FJ_INVALID_ENCODING,
 
     /** The operation has failed, a generic error returned when concrete reasons are unknown. */
-    FJ_ERROR_OPERATION_FAILED,
+    FJ_OPERATION_FAILED,
 
-    FJ_ERROR_MAX,
+    FJ_STATUS_MAX,
 
-    FJ_ERROR_ENUM32 = INT32_MAX,
+    FJ_STATUS_ENUM32 = INT32_MAX,
 };
 
 
@@ -203,6 +130,14 @@ typedef double fj_density;
     the standard 96 DPI.
 */
 #define FJ_STANDARD_DPI (96.0)
+
+
+/** Version triple. */
+struct fj_version {
+    uint16_t major;
+    uint16_t minor;
+    uint16_t patch;
+};
 
 
 /** 2D absolute position. */
@@ -322,7 +257,7 @@ static inline fj_density fj_density_from_standard_scaling(double scaling_factor)
 
 /** Always returns a valid printable string, even for invalid status IDs. */
 FJ_PUBLIC
-char const *fj_error_into_string(enum fj_error e);
+char const *fj_status_into_string(enum fj_status s);
 
 
 #endif

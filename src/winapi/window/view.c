@@ -14,7 +14,7 @@ enum {
     INTERNAL_MESSAGE_WINDOW_CONTENT_UPDATE = WM_USER,
 };
 
-enum fj_error fj_winapi_window_view_handle_event(
+enum fj_status fj_winapi_window_view_handle_event(
     struct fj_window_view_manager *manager,
     struct fj_window_view *view,
     MSG const *msg,
@@ -42,15 +42,15 @@ enum fj_error fj_winapi_window_view_handle_event(
 }
 
 
-enum fj_error fj_window_view_create_manager_winapi(
+enum fj_status fj_window_view_create_manager_winapi(
     struct fj_drawable_manager *window_manager, struct fj_window_view_manager **out_manager)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = FJ_ALLOC(out_manager);
+    s = FJ_ALLOC(out_manager);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     (*out_manager)->userdata = NULL;
     (*out_manager)->window_manager = window_manager;
@@ -59,7 +59,7 @@ enum fj_error fj_window_view_create_manager_winapi(
 }
 
 
-enum fj_error fj_window_view_destroy_manager_winapi(struct fj_window_view_manager *manager)
+enum fj_status fj_window_view_destroy_manager_winapi(struct fj_window_view_manager *manager)
 {
     (void) manager;
     return FJ_OK;
@@ -73,17 +73,17 @@ void fj_window_view_set_callback_winapi(
 }
 
 
-enum fj_error fj_window_view_create_winapi(
+enum fj_status fj_window_view_create_winapi(
     struct fj_window_view_manager *manager,
     struct fj_drawable *window,
     struct fj_window_view **out_view)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = FJ_ALLOC(out_view);
+    s = FJ_ALLOC(out_view);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     (*out_view)->window = window;
 
@@ -91,7 +91,7 @@ enum fj_error fj_window_view_create_winapi(
 }
 
 
-enum fj_error fj_window_view_destroy_winapi(
+enum fj_status fj_window_view_destroy_winapi(
     struct fj_window_view_manager *manager, struct fj_window_view *view)
 {
     (void) manager;
@@ -102,7 +102,7 @@ enum fj_error fj_window_view_destroy_winapi(
 }
 
 
-enum fj_error fj_window_view_set_hint_winapi(
+enum fj_status fj_window_view_set_hint_winapi(
     struct fj_window_view_manager *manager,
     struct fj_window_view *view,
     enum fj_window_view_hint_type hint_type,
@@ -111,14 +111,14 @@ enum fj_error fj_window_view_set_hint_winapi(
     return FJ_OK;
 }
 
-enum fj_error fj_window_view_request_content_winapi(
+enum fj_status fj_window_view_request_content_winapi(
     struct fj_window_view_manager *manager, struct fj_window_view *view)
 {
     return FJ_OK;
 }
 
 
-enum fj_error fj_winapi_window_view_sync(
+enum fj_status fj_winapi_window_view_sync(
     struct fj_window_view_manager *manager, struct fj_window_view *view)
 {
     if (view->flags & FJ_WINAPI_WINDOW_VIEW_SHOW) {

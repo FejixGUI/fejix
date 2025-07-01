@@ -4,10 +4,9 @@
 
 #include <src/unixpoller/unixpoller.h>
 
+#include <fejix/core/vec.h>
 #include <fejix/interface/client.h>
 #include <fejix/interface/output.h>
-
-#include <fejix/core/vec.h>
 
 #include <wayland-client.h>
 
@@ -48,7 +47,7 @@ struct fj_client {
     struct wl_display *display;
     struct wl_registry *registry;
     union fj_wayland_interface_desc interfaces[FJ_WAYLAND_INTERFACE_MAX];
-    enum fj_error callback_error;
+    enum fj_status callback_error;
 
     struct fj_unixpoller unixpoller;
 
@@ -73,19 +72,19 @@ void fj_wayland_get_global_by_id(
 struct fj_wayland_global const * /*?*/ fj_wayland_get_static_global(
     struct fj_client *client, fj_wayland_interface_id interface_id);
 
-enum fj_error fj_wayland_bind_global(
+enum fj_status fj_wayland_bind_global(
     struct fj_client *client,
     fj_wayland_interface_id interface_id,
     struct fj_wayland_global const *global,
     void * /*? out*/ *object);
 
 /** Waits until all issued requests are processed and dispatches the queue. */
-enum fj_error fj_wayland_roundtrip(struct fj_client *client);
+enum fj_status fj_wayland_roundtrip(struct fj_client *client);
 
 /** Waits for the next event and dispatches the queue. */
-enum fj_error fj_wayland_wait_for_events(struct fj_client *client);
+enum fj_status fj_wayland_wait_for_events(struct fj_client *client);
 
-enum fj_error fj_wayland_handle_events(
+enum fj_status fj_wayland_handle_events(
     struct fj_client *client,
     void * /*?*/ filter_callback_data,
     fj_wayland_event_filter_fn *event_filter);

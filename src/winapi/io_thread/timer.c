@@ -1,9 +1,9 @@
 #include <src/winapi/io_thread/io_thread.h>
 #include <src/winapi/io_thread/timer.h>
 
+#include <fejix/utils/list.h>
 #include <fejix/utils/math.h>
 #include <fejix/utils/memory.h>
-#include <fejix/utils/vector.h>
 
 #include <limits.h>
 
@@ -35,7 +35,7 @@ DWORD fj_winapi_timer_manager_get_sleep_duration(struct fj_io_thread_timer_manag
 }
 
 
-enum fj_error fj_io_thread_timer_create_manager_winapi(
+enum fj_status fj_io_thread_timer_create_manager_winapi(
     struct fj_io_thread *io_thread, struct fj_io_thread_timer_manager **out_manager)
 {
     *out_manager = &io_thread->timer_manager;
@@ -44,7 +44,7 @@ enum fj_error fj_io_thread_timer_create_manager_winapi(
 }
 
 
-enum fj_error fj_io_thread_timer_destroy_manager_winapi(struct fj_io_thread_timer_manager *manager)
+enum fj_status fj_io_thread_timer_destroy_manager_winapi(struct fj_io_thread_timer_manager *manager)
 {
     (void) manager;
     return FJ_OK;
@@ -58,19 +58,19 @@ void fj_io_thread_timer_set_callback_winapi(
 }
 
 
-enum fj_error fj_io_thread_timer_create_winapi(
+enum fj_status fj_io_thread_timer_create_winapi(
     struct fj_io_thread_timer_manager *manager,
     fj_time initial_delay,
     fj_time repeat_period,
     fj_time requested_precision,
     struct fj_io_thread_timer **out_timer)
 {
-    enum fj_error e;
+    enum fj_status s;
 
-    e = FJ_ALLOC(out_timer);
+    s = FJ_ALLOC(out_timer);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     LARGE_INTEGER frequency;
     QueryPerformanceFrequency(&frequency);
@@ -86,21 +86,21 @@ enum fj_error fj_io_thread_timer_create_winapi(
 
     (void) requested_precision;  // TODO precise timers based on SetTimer and timeSetEvent
 
-    e = fj_winapi_timer_vector_push(&manager->timers, out_timer);
+    s = fj_winapi_timer_vector_push(&manager->timers, out_timer);
 
-    if (e) {
+    if (s) {
         FJ_FREE(out_timer);
-        return e;
+        return s;
     }
 
     return FJ_OK;
 }
 
 
-enum fj_error fj_io_thread_timer_destroy_winapi(
+enum fj_status fj_io_thread_timer_destroy_winapi(
     struct fj_io_thread_timer_manager *manager, struct fj_io_thread_timer *timer)
 {
-    enum fj_error e;
+    enum fj_status s;
 
     uint32_t index;
     for (index = 0; index < manager->timers.length; index++) {
@@ -109,10 +109,10 @@ enum fj_error fj_io_thread_timer_destroy_winapi(
         }
     }
 
-    e = fj_winapi_timer_vector_remove(&manager->timers, index);
+    s = fj_winapi_timer_vector_remove(&manager->timers, index);
 
-    if (e)
-        return e;
+    if (s)
+        return s;
 
     FJ_FREE(&timer);
 

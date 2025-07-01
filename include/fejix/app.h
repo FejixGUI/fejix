@@ -9,41 +9,67 @@
 #include <fejix/base.h>
 
 
-FJ_APP(fj_app)
+struct fj_app;
+struct fj_app_system_data;
 
-FJ_API(fj_app_new, struct fj_app **out_app, void *extra_info)
+enum fj_app_message_type {
+    FJ_APP_INIT,
+    FJ_APP_DEINIT,
+    FJ_APP_RUN,
+    FJ_APP_QUIT,
+    FJ_APP_PING,
 
-FJ_API(fj_app_del, struct fj_app *app)
+    /**
+        Wakes up an application that is waiting for events.
+        This asks the system to send a custom event that gets handled with fj_app_ping_callback().
 
-FJ_API(fj_app_run, struct fj_app *app)
+        This can be called from another thread provided that the app is not being destroyed.
 
-FJ_API(fj_app_quit, struct fj_app *app)
+        This is not supposed to be called periodically from the main thread as this goes through an
+        inefficient process of communicating with the system.
+        To regularly invoke a callback use a timer with zero timeout period.
+    */
+    FJ_APP_PING_EVENT,
+    FJ_APP_START_EVENT,
+    FJ_APP_QUIT_EVENT,
+    FJ_APP_ACTIVATE_EVENT,
+    FJ_APP_DEACTIVATE_EVENT,
+    FJ_APP_SUSPEND_EVENT,
+    FJ_APP_RESUME_EVENT,
 
-/**
-    Wakes up an application that is waiting for events.
-    This asks the system to send a custom event that gets handled with fj_app_ping_callback().
+    FJ_APP_REQUEST_MAX,
+    FJ_APP_REQUEST_ENUM32 = INT32_MAX,
+};
 
-    This can be called from another thread provided that the app is not being destroyed.
+struct fj_app_init_message {
+    void *extra_data;
+};
 
-    This is not supposed to be called periodically from the main thread as this goes through an
-    inefficient process of communicating with the system.
-    To regularly invoke a callback use a timer with zero timeout period.
-*/
-FJ_API(fj_app_ping, struct fj_app *app)
+union fj_app_message {
+    struct fj_app_init_message *init;
+    void *deinit;
+    void *run;
+    void *quit;
+    void *ping;
+    void *ping_event;
+};
 
-FJ_API_VOID(fj_app_ping_callback, struct fj_app *app)
+typedef enum fj_status (*fj_app_dispatcher)(
+    struct fj_app *app, enum fj_app_message_type type, union fj_app_message message);
 
-FJ_API_VOID(fj_app_start_callback, struct fj_app *app)
+struct fj_app {
+    /** The app's dispatcher that handles all the messages. */
+    fj_app_dispatcher dispatch;
 
-FJ_API_VOID(fj_app_quit_callback, struct fj_app *app)
+    /** The default dispatcher provided by the platform. This field is for convenience. */
+    fj_app_dispatcher dispatch_default;
 
-FJ_API_VOID(fj_app_pause_callback, struct fj_app *app)
+    /** The user's callback data. */
+    void *custom_data;
 
-FJ_API_VOID(fj_app_resume_callback, struct fj_app *app)
-
-FJ_API_VOID(fj_app_unload_callback, struct fj_app *app)
-
-FJ_API_VOID(fj_app_load_callback, struct fj_app *app)
+    uintptr_t system_id;
+    struct fj_app_system_data *system_data;
+};
 
 
 #endif
