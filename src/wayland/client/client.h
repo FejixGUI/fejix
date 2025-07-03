@@ -13,7 +13,8 @@
 
 typedef uint32_t fj_wayland_interface_id;
 
-enum {
+enum
+{
     FJ_WAYLAND_INTERFACE_COMPOSITOR,
     FJ_WAYLAND_INTERFACE_SHM,
     FJ_WAYLAND_INTERFACE_SEAT,
@@ -23,12 +24,14 @@ enum {
 };
 
 
-struct fj_wayland_global {
+struct fj_wayland_global
+{
     uint32_t id;
     uint32_t version;
 };
 
-union fj_wayland_interface_desc {
+union fj_wayland_interface_desc
+{
     /** Singleton object. */
     struct fj_wayland_global global;
 
@@ -37,7 +40,8 @@ union fj_wayland_interface_desc {
 };
 
 
-struct fj_client {
+struct fj_client
+{
     union fj_tag tag;
 
     struct fj_client_callbacks callbacks;
@@ -47,7 +51,7 @@ struct fj_client {
     struct wl_display *display;
     struct wl_registry *registry;
     union fj_wayland_interface_desc interfaces[FJ_WAYLAND_INTERFACE_MAX];
-    enum fj_status callback_error;
+    fj_err callback_error;
 
     struct fj_unixpoller unixpoller;
 
@@ -72,19 +76,19 @@ void fj_wayland_get_global_by_id(
 struct fj_wayland_global const * /*?*/ fj_wayland_get_static_global(
     struct fj_client *client, fj_wayland_interface_id interface_id);
 
-enum fj_status fj_wayland_bind_global(
+fj_err fj_wayland_bind_global(
     struct fj_client *client,
     fj_wayland_interface_id interface_id,
     struct fj_wayland_global const *global,
     void * /*? out*/ *object);
 
 /** Waits until all issued requests are processed and dispatches the queue. */
-enum fj_status fj_wayland_roundtrip(struct fj_client *client);
+fj_err fj_wayland_roundtrip(struct fj_client *client);
 
 /** Waits for the next event and dispatches the queue. */
-enum fj_status fj_wayland_wait_for_events(struct fj_client *client);
+fj_err fj_wayland_wait_for_events(struct fj_client *client);
 
-enum fj_status fj_wayland_handle_events(
+fj_err fj_wayland_handle_events(
     struct fj_client *client,
     void * /*?*/ filter_callback_data,
     fj_wayland_event_filter_fn *event_filter);

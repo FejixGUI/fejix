@@ -20,6 +20,16 @@ ColumnLimit: 100
 LineEnding: LF
 InsertNewlineAtEOF: true
 
+# enum X
+# {                                     <-
+#     ...
+# }
+#
+# struct X
+# {                                     <-
+#     ...
+# }
+#
 # int x()
 # {                                     <-
 #     if (x) {                          <-
@@ -40,8 +50,14 @@ BreakBeforeBraces: Custom
 BraceWrapping:
     AfterNamespace: true
     AfterClass: true
+    AfterStruct: true
+    AfterEnum: true
+    AfterUnion: true
+    AfterObjCDeclaration: true
     AfterFunction: true
     AfterControlStatement: MultiLine
+    AfterExternBlock: true
+    BeforeLambdaBody: false
     SplitEmptyFunction: false
     SplitEmptyRecord: false
     SplitEmptyNamespace: false

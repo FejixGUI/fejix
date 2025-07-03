@@ -9,14 +9,14 @@
 
 int main(void)
 {
-    enum fj_status s;
+    fj_err e;
 
     {
         LPWSTR wide_string = NULL;
-        s = fj_winapi_into_utf16("", &wide_string);
+        e = fj_winapi_into_utf16("", &wide_string);
 
-        if (s) {
-            fprintf(stderr, "Failed to convert empty string: %s\n", fj_error_get_description(s));
+        if (e) {
+            fprintf(stderr, "Failed to convert empty string: %e\n", fj_error_get_description(e));
             return 1;
         }
 
@@ -25,11 +25,11 @@ int main(void)
 
     {
         LPWSTR wide_string = NULL;
-        s = fj_winapi_into_utf16("Γειά σου", &wide_string);
+        e = fj_winapi_into_utf16("Γειά σου", &wide_string);
 
-        if (s) {
+        if (e) {
             fprintf(
-                stderr, "Failed to convert Greek characters: %s\n", fj_error_get_description(s));
+                stderr, "Failed to convert Greek characters: %e\n", fj_error_get_description(e));
             return 1;
         }
 
@@ -40,11 +40,11 @@ int main(void)
 
     {
         LPWSTR wide_string = NULL;
-        s = fj_winapi_into_utf16("你好", &wide_string);
+        e = fj_winapi_into_utf16("你好", &wide_string);
 
-        if (s) {
+        if (e) {
             fprintf(
-                stderr, "Failed to convert Chinese characters: %s\n", fj_error_get_description(s));
+                stderr, "Failed to convert Chinese characters: %e\n", fj_error_get_description(e));
             return 1;
         }
 

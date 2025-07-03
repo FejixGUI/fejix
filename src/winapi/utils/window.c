@@ -6,10 +6,13 @@
 #include <wchar.h>
 
 
-enum { INTERNAL_CLASS_NAME_LENGTH = 32 };
+enum
+{
+    INTERNAL_CLASS_NAME_LENGTH = 32
+};
 
 
-static enum fj_status get_internal_class_name(WCHAR out_string[INTERNAL_CLASS_NAME_LENGTH])
+static fj_err get_internal_class_name(WCHAR out_string[INTERNAL_CLASS_NAME_LENGTH])
 {
     static unsigned int counter = 0;
     counter++;
@@ -28,7 +31,7 @@ static bool is_of_internal_class(HWND window)
 }
 
 
-static enum fj_status create_window_class(WNDCLASSEX *class_info)
+static fj_err create_window_class(WNDCLASSEX *class_info)
 {
     class_info->cbSize = sizeof(class_info);
 
@@ -61,10 +64,10 @@ static inline bool window_needs_new_class(
 }
 
 
-enum fj_status fj_winapi_window_create(
+fj_err fj_winapi_window_create(
     HWND *out_window, WNDCLASSEX const *opt_class_info, CREATESTRUCT const *opt_window_info)
 {
-    enum fj_status s;
+    fj_err e;
 
     WNDCLASSEX class_info = { 0 };
 
@@ -79,10 +82,10 @@ enum fj_status fj_winapi_window_create(
     }
 
     if (window_needs_new_class(opt_class_info, opt_window_info)) {
-        s = create_window_class(&class_info);
+        e = create_window_class(&class_info);
 
-        if (s)
-            return s;
+        if (e)
+            return e;
     }
 
     if (window_info.hInstance == NULL) {
@@ -123,7 +126,7 @@ enum fj_status fj_winapi_window_create(
 }
 
 
-enum fj_status fj_winapi_window_destroy(HWND window)
+fj_err fj_winapi_window_destroy(HWND window)
 {
     LPWSTR class_name = (void *) GetClassLongPtrW(window, GCW_ATOM);
     bool should_destroy_class = is_of_internal_class(window);

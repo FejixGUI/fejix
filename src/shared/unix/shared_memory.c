@@ -3,9 +3,9 @@
 
 #include "shared_memory.h"
 
-#include <src/shared/utils/logging.h>
-#include <src/shared/utils/math.h>
-#include <src/shared/utils/memory.h>
+#include <src/shared/common/error.h>
+#include <src/shared/common/math.h>
+#include <src/shared/common/memory.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -21,13 +21,13 @@
 
 #if defined(__linux__) || defined(__FreeBSD__)
 
-static enum fj_status open_shm_file(int32_t *out_fd)
+static fj_err open_shm_file(int32_t *out_fd)
 {
     *out_fd = memfd_create("fejix-shared-memory-file", MFD_CLOEXEC);
 
     if (*out_fd == -1) {
         FJ_ERROR("memfd_create failed");
-        return FJ_IO_FAILED;
+        return FJ_ERR_SYSTEM;
     }
 
     return FJ_OK;
@@ -48,11 +48,11 @@ static uint32_t rand32(void)
 }
 
 
-static enum fj_status open_shm_file(int32_t *out_fd)
+static fj_err open_shm_file(int32_t *out_fd)
 {
     for (uint32_t i = 0; i < 16; i++) {
         char temp_file_name[32];
-        snprintf(temp_file_name, 32, "%s%08x", "/fejix-shared-memory-", rand32());
+        snprintf(temp_file_name, 32, "%e%08x", "/fejix-shared-memory-", rand32());
 
         *out_fd = shm_open(temp_file_name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 
@@ -62,76 +62,76 @@ static enum fj_status open_shm_file(int32_t *out_fd)
 
         if (*out_fd == -1) {
             FJ_ERROR("shm_open failed");
-            return FJ_IO_FAILED;
+            return FJ_ERR_SYSTEM;
         }
 
         shm_unlink(temp_file_name);
         return FJ_OK;
     }
 
-    return FJ_IO_FAILED;
+    return FJ_ERR_SYSTEM;
 }
 
 #endif
 
 
-static enum fj_status shm_map(struct fj_unix_shared_buffer *buffer)
+static fj_err shm_map(struct fj_unix_shared_buffer *buffer)
 {
     if (ftruncate(buffer->file, (off_t) buffer->size) == -1) {
-        return FJ_IO_FAILED;
+        return FJ_ERR_SYSTEM;
     }
 
     buffer->data = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->file, 0);
 
     if (buffer->data == MAP_FAILED) {
         FJ_ERROR("mmap failed");
-        return FJ_IO_FAILED;
+        return FJ_ERR_SYSTEM;
     }
 
     return FJ_OK;
 }
 
 
-static enum fj_status shm_unmap(struct fj_unix_shared_buffer *buffer)
+static fj_err shm_unmap(struct fj_unix_shared_buffer *buffer)
 {
     if (munmap(buffer->data, buffer->size) == -1) {
-        FJ_ERROR("nunmap failed");
-        return FJ_IO_FAILED;
+        FJ_ERROR("munmap failed");
+        return FJ_ERR_SYSTEM;
     }
 
     return FJ_OK;
 }
 
 
-enum fj_status fj_unix_shared_alloc(struct fj_unix_shared_buffer *out_buffer, size_t size)
+fj_err fj_unix_shared_alloc(struct fj_unix_shared_buffer *out_buffer, size_t size)
 {
-    enum fj_status s;
+    fj_err e;
 
     out_buffer->size = fj_size_higher_pow2(size);
 
-    s = open_shm_file(&out_buffer->file);
-    if (s)
-        return s;
+    e = open_shm_file(&out_buffer->file);
+    if (e)
+        return e;
 
-    s = shm_map(out_buffer);
+    e = shm_map(out_buffer);
 
-    if (s) {
+    if (e) {
         close(out_buffer->file);
         out_buffer->file = -1;
         out_buffer->size = 0;
         out_buffer->data = NULL;
-        return s;
+        return e;
     }
 
     return FJ_OK;
 }
 
 
-enum fj_status fj_unix_shared_unref(struct fj_unix_shared_buffer *buffer)
+fj_err fj_unix_shared_unref(struct fj_unix_shared_buffer *buffer)
 {
     if (close(buffer->file) == -1) {
         FJ_ERROR("close(2) failed");
-        return FJ_IO_FAILED;
+        return FJ_ERR_SYSTEM;
     }
 
     buffer->file = -1;
@@ -142,22 +142,22 @@ enum fj_status fj_unix_shared_unref(struct fj_unix_shared_buffer *buffer)
 }
 
 
-enum fj_status fj_unix_shared_free(struct fj_unix_shared_buffer *buffer)
+fj_err fj_unix_shared_free(struct fj_unix_shared_buffer *buffer)
 {
-    enum fj_status s;
+    fj_err e;
 
-    s = shm_unmap(buffer);
+    e = shm_unmap(buffer);
 
-    if (s)
-        return s;
+    if (e)
+        return e;
 
     return fj_unix_shared_unref(buffer);
 }
 
 
-enum fj_status fj_unix_shared_realloc(struct fj_unix_shared_buffer *buffer, size_t size)
+fj_err fj_unix_shared_realloc(struct fj_unix_shared_buffer *buffer, size_t size)
 {
-    enum fj_status s;
+    fj_err e;
 
     if (size <= buffer->size) {
         return FJ_OK;
@@ -165,9 +165,9 @@ enum fj_status fj_unix_shared_realloc(struct fj_unix_shared_buffer *buffer, size
 
     buffer->size = fj_size_max(fj_size_higher_pow2(size), buffer->size);
 
-    s = shm_map(buffer);
-    if (s)
-        return s;
+    e = shm_map(buffer);
+    if (e)
+        return e;
 
     return FJ_OK;
 }

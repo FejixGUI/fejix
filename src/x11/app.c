@@ -35,7 +35,7 @@ void fj_x11_xlib_clear_last_error(void)
 char const *fj_x11_error_into_string(uint8_t error_code)
 {
     static char const *const messages[] = {
-        [Success] = "Success: everything's okay",
+        [Success] = "Success: everything is okay",
         [BadRequest] = "BadRequest: bad request code",
         [BadValue] = "BadValue: int parameter out of range",
         [BadWindow] = "BadWindow: parameter not a Window",
@@ -68,7 +68,7 @@ char const *fj_x11_xcb_error_into_string(xcb_generic_error_t *error)
 }
 
 
-static enum fj_status process_event(struct fj_app *app, xcb_generic_event_t *event)
+static fj_err process_event(struct fj_app *app, xcb_generic_event_t *event)
 {
     // TODO delegate window events to some function in window.c
     switch (event->response_type & EVENT_MASK) {
@@ -95,10 +95,10 @@ static enum fj_status process_event(struct fj_app *app, xcb_generic_event_t *eve
 }
 
 
-static enum fj_status process_events(void *callback_data, int file_descriptor, short event_mask)
+static fj_err process_events(void *callback_data, int file_descriptor, short event_mask)
 {
     (void) file_descriptor;
-    enum fj_status s;
+    fj_err e;
 
     if (event_mask & (POLLERR | POLLHUP | POLLNVAL)) {
         FJ_ERROR("got errors while reading events from the X11 display");
@@ -113,10 +113,10 @@ static enum fj_status process_events(void *callback_data, int file_descriptor, s
         if (event == NULL)
             break;
 
-        s = process_event(app, event);
+        e = process_event(app, event);
         free(event);
-        if (s)
-            return s;  // FIXME What is the best way to handle errors in a loop?
+        if (e)
+            return e;  // FIXME What is the best way to handle errors in a loop?
         /** We can alternatively ignore errors unless the user quits the app. */
     }
 
@@ -129,7 +129,7 @@ static void deinit_events(struct fj_app *app)
     fj_unix_events_deinit(&app->events);
 }
 
-static enum fj_status get_atoms(struct fj_app *app)
+static fj_err get_atoms(struct fj_app *app)
 {
 #define FJ_X11_ATOM_LIST_ITEM(X) [FJ_X11_ATOM_ID(X)] = #X,
     static char const *const atom_names[FJ_X11_ATOM_MAX] = { FJ_X11_ATOM_LIST };
@@ -157,14 +157,14 @@ static enum fj_status get_atoms(struct fj_app *app)
 }
 
 
-static enum fj_status fj_app_del_(struct fj_app *app)
+static fj_err fj_app_del_(struct fj_app *app)
 {
     deinit_events(app);
 
     if (app->display != NULL) {
         int result = XCloseDisplay(app->display);
         if (result != 0) {
-            FJ_ERROR("cannot close X11 display: %s", fj_x11_error_into_string(result));
+            FJ_ERROR("cannot close X11 display: %e", fj_x11_error_into_string(result));
         }
     }
 
@@ -174,15 +174,15 @@ static enum fj_status fj_app_del_(struct fj_app *app)
 }
 
 
-static enum fj_status fj_app_new_(struct fj_app **out_app, void *extra_info)
+static fj_err fj_app_new_(struct fj_app **out_app, void *extra_info)
 {
     (void) extra_info;
-    enum fj_status s;
+    fj_err e;
 
     struct fj_app *app;
-    s = FJ_ALLOC(&app);
-    if (s)
-        return s;
+    e = FJ_ALLOC(&app);
+    if (e)
+        return e;
 
     app->display = XOpenDisplay(NULL);
     if (app->display == NULL) {
@@ -196,17 +196,17 @@ static enum fj_status fj_app_new_(struct fj_app **out_app, void *extra_info)
     XSetErrorHandler(xlib_error_handler);
     get_atoms(app);
 
-    s = fj_unix_events_init(&app->events, app);
-    if (s) {
+    e = fj_unix_events_init(&app->events, app);
+    if (e) {
         fj_app_del_(app);
-        return s;
+        return e;
     }
 
-    s = fj_unix_events_add(
+    e = fj_unix_events_add(
         &app->events, xcb_get_file_descriptor(app->connection), POLLIN, process_events);
-    if (s) {
+    if (e) {
         fj_app_del_(app);
-        return s;
+        return e;
     }
 
     *out_app = app;
@@ -214,9 +214,9 @@ static enum fj_status fj_app_new_(struct fj_app **out_app, void *extra_info)
 }
 
 
-static enum fj_status fj_app_run_(struct fj_app *app)
+static fj_err fj_app_run_(struct fj_app *app)
 {
-    enum fj_status s;
+    fj_err e;
 
     fj_app_start_callback(app);
 
@@ -226,10 +226,10 @@ static enum fj_status fj_app_run_(struct fj_app *app)
         if (app->should_quit)
             break;
 
-        s = fj_unix_events_wait(&app->events, NULL);
-        if (s) {
+        e = fj_unix_events_wait(&app->events, NULL);
+        if (e) {
             fj_app_quit_callback(app);
-            return s;
+            return e;
         }
     }
 
@@ -238,14 +238,14 @@ static enum fj_status fj_app_run_(struct fj_app *app)
 }
 
 
-static enum fj_status fj_app_quit_(struct fj_app *app)
+static fj_err fj_app_quit_(struct fj_app *app)
 {
     app->should_quit = true;
     return FJ_OK;
 }
 
 
-static enum fj_status fj_app_ping_(struct fj_app *app)
+static fj_err fj_app_ping_(struct fj_app *app)
 {
     return fj_unix_events_ping(&app->events);
 }

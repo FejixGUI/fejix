@@ -9,13 +9,15 @@
 #include <fejix/base.h>
 
 
-enum fj_dispatcher_type {
+enum fj_dispatcher_type
+{
     FJ_DISPATCHER_APP,
     FJ_DISPATCHER_WINDOW,
     FJ_DISPATCHER_WINDOW_SERVICE,
 };
 
-struct fj_platform {
+struct fj_platform
+{
     char const *name;
     struct fj_version version;
 
@@ -23,11 +25,11 @@ struct fj_platform {
         \returns The dispatcher function, manually convertible to the appropriate function type.
             NULL if the module of the dispatcher is not supported.
     */
-    void (*(*get_dispatcher)(enum fj_dispatcher_type))(void);
+    fj_generic_dispatcher (*get_dispatcher)(enum fj_dispatcher_type);
 };
 
 
-/** \param[out] out_platforms Returns NULL if there are no builtin platforms. */
+/** `out_platforms` returns NULL if there are no builtin platforms. */
 FJ_PUBLIC
 void fj_platform_get_builtin_list(
     struct fj_platform const *const **out_platforms, uint32_t *out_platforms_length);

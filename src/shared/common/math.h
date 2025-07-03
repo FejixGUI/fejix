@@ -1,5 +1,5 @@
-#ifndef FEJIX_UTILS_MATH_H_
-#define FEJIX_UTILS_MATH_H_
+#ifndef FEJIX_COMMON_MATH_H_
+#define FEJIX_COMMON_MATH_H_
 
 
 #include <fejix/base.h>

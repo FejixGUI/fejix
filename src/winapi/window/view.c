@@ -3,7 +3,8 @@
 #include <fejix/utils/memory.h>
 
 
-enum {
+enum
+{
     /**
         lparam contains *HDWP - a pointer to a DeferWindowPos structure handle.
         If a window needs to change its layout through DeferWindowPos, it should do
@@ -14,7 +15,7 @@ enum {
     INTERNAL_MESSAGE_WINDOW_CONTENT_UPDATE = WM_USER,
 };
 
-enum fj_status fj_winapi_window_view_handle_event(
+fj_err fj_winapi_window_view_handle_event(
     struct fj_window_view_manager *manager,
     struct fj_window_view *view,
     MSG const *msg,
@@ -42,15 +43,15 @@ enum fj_status fj_winapi_window_view_handle_event(
 }
 
 
-enum fj_status fj_window_view_create_manager_winapi(
+fj_err fj_window_view_create_manager_winapi(
     struct fj_drawable_manager *window_manager, struct fj_window_view_manager **out_manager)
 {
-    enum fj_status s;
+    fj_err e;
 
-    s = FJ_ALLOC(out_manager);
+    e = FJ_ALLOC(out_manager);
 
-    if (s)
-        return s;
+    if (e)
+        return e;
 
     (*out_manager)->userdata = NULL;
     (*out_manager)->window_manager = window_manager;
@@ -59,7 +60,7 @@ enum fj_status fj_window_view_create_manager_winapi(
 }
 
 
-enum fj_status fj_window_view_destroy_manager_winapi(struct fj_window_view_manager *manager)
+fj_err fj_window_view_destroy_manager_winapi(struct fj_window_view_manager *manager)
 {
     (void) manager;
     return FJ_OK;
@@ -73,17 +74,17 @@ void fj_window_view_set_callback_winapi(
 }
 
 
-enum fj_status fj_window_view_create_winapi(
+fj_err fj_window_view_create_winapi(
     struct fj_window_view_manager *manager,
     struct fj_drawable *window,
     struct fj_window_view **out_view)
 {
-    enum fj_status s;
+    fj_err e;
 
-    s = FJ_ALLOC(out_view);
+    e = FJ_ALLOC(out_view);
 
-    if (s)
-        return s;
+    if (e)
+        return e;
 
     (*out_view)->window = window;
 
@@ -91,7 +92,7 @@ enum fj_status fj_window_view_create_winapi(
 }
 
 
-enum fj_status fj_window_view_destroy_winapi(
+fj_err fj_window_view_destroy_winapi(
     struct fj_window_view_manager *manager, struct fj_window_view *view)
 {
     (void) manager;
@@ -102,7 +103,7 @@ enum fj_status fj_window_view_destroy_winapi(
 }
 
 
-enum fj_status fj_window_view_set_hint_winapi(
+fj_err fj_window_view_set_hint_winapi(
     struct fj_window_view_manager *manager,
     struct fj_window_view *view,
     enum fj_window_view_hint_type hint_type,
@@ -111,14 +112,14 @@ enum fj_status fj_window_view_set_hint_winapi(
     return FJ_OK;
 }
 
-enum fj_status fj_window_view_request_content_winapi(
+fj_err fj_window_view_request_content_winapi(
     struct fj_window_view_manager *manager, struct fj_window_view *view)
 {
     return FJ_OK;
 }
 
 
-enum fj_status fj_winapi_window_view_sync(
+fj_err fj_winapi_window_view_sync(
     struct fj_window_view_manager *manager, struct fj_window_view *view)
 {
     if (view->flags & FJ_WINAPI_WINDOW_VIEW_SHOW) {

@@ -1,13 +1,9 @@
-#include <src/shared/utils/logging.h>
-#include <src/shared/utils/memory.h>
-
 #include <fejix/platform.h>
 
 #include <stdlib.h>
 #include <string.h>
 
 
-// In alphabetic order
 extern struct fj_platform fj_wayland_platform;
 extern struct fj_platform fj_winapi_platform;
 extern struct fj_platform fj_x11_platform;
@@ -52,7 +48,7 @@ static struct fj_platform const *platform_find(char const *name)
 
 struct fj_platform const *fj_platform_load(void)
 {
-    struct fj_platform const *ret = NULL;
+    struct fj_platform const *platform = NULL;
     char const *env;
 
     if (platforms_length == 0) {
@@ -65,33 +61,33 @@ struct fj_platform const *fj_platform_load(void)
 
     env = getenv("FEJIX_PLATFORM");
     if (env) {
-        ret = platform_find(env);
-        if (ret)
-            return ret;
+        platform = platform_find(env);
+        if (platform)
+            return platform;
     }
 
 #if defined(FJ_COMPILE_OPT_ENABLE_WAYLAND) || defined(FJ_COMPILE_OPT_ENABLE_X11)
-    *env = getenv("XDG_SESSION_TYPE");
+    env = getenv("XDG_SESSION_TYPE");
     if (env && (strcmp(env, "wayland") == 0 || strcmp(env, "x11") == 0)) {
-        ret = platform_find(env);
-        if (ret)
-            return ret;
+        platform = platform_find(env);
+        if (platform)
+            return platform;
     }
 #endif
 
 #if defined(FJ_COMPILE_OPT_ENABLE_WAYLAND)
     if (getenv("WAYLAND_DISPLAY") != NULL) {
-        ret = platform_find("wayland");
-        if (ret)
-            return ret;
+        platform = platform_find("wayland");
+        if (platform)
+            return platform;
     }
 #endif
 
 #if defined(FJ_COMPILE_OPT_ENABLE_X11)
     if (getenv("DISPLAY") != NULL) {
-        ret = platform_find("x11");
-        if (ret)
-            return ret;
+        platform = platform_find("x11");
+        if (platform)
+            return platform;
     }
 #endif
 

@@ -9,12 +9,14 @@
 #include <windows.h>
 
 
-enum fj_window_view_flags {
+enum fj_window_view_flags
+{
     FJ_WINAPI_WINDOW_VIEW_SHOW = 1 << 0,
 };
 
 
-struct fj_window_view {
+struct fj_window_view
+{
     void *userdata;
 
     struct fj_window_view_manager *manager;
@@ -23,7 +25,8 @@ struct fj_window_view {
     enum fj_window_view_flags flags;
 };
 
-struct fj_window_view_manager {
+struct fj_window_view_manager
+{
     void *userdata;
 
     fj_window_view_event_callback callback;
@@ -32,13 +35,13 @@ struct fj_window_view_manager {
 };
 
 
-enum fj_status fj_winapi_view_handle_event(
+fj_err fj_winapi_view_handle_event(
     struct fj_window_view_manager *manager,
     struct fj_window_view *view,
     MSG const *msg,
     LONG_PTR *result);
 
-enum fj_status fj_winapi_window_view_sync(
+fj_err fj_winapi_window_view_sync(
     struct fj_window_view_manager *manager, struct fj_window_view *view);
 
 

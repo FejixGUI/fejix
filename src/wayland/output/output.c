@@ -4,7 +4,7 @@
 #include <fejix/core/utils.h>
 
 
-static enum fj_status output_handle_init(
+static fj_err output_handle_init(
     struct fj_client *client, struct fj_wayland_event_wrapper const *event_wrapper)
 {
     (void) event_wrapper;
@@ -13,7 +13,8 @@ static enum fj_status output_handle_init(
         .flags = FJ_OUTPUT_SYNC,
     };
 
-    FJ_TRY (client->output->callbacks.init(client->data, &output_caps)) {
+    FJ_TRY(client->output->callbacks.init(client->data, &output_caps))
+    {
         return fj_result;
     }
 
@@ -21,16 +22,16 @@ static enum fj_status output_handle_init(
 }
 
 
-static enum fj_status output_data_init(struct fj_client *client)
+static fj_err output_data_init(struct fj_client *client)
 {
     struct fj_wayland_global const *compositor_global
         = fj_wayland_get_static_global(client, FJ_WAYLAND_INTERFACE_COMPOSITOR);
 
-    FJ_TRY (fj_wayland_bind_global(
-                client,
-                FJ_WAYLAND_INTERFACE_COMPOSITOR,
-                compositor_global,
-                (void *) &client->output->compositor))
+    FJ_TRY(fj_wayland_bind_global(
+        client,
+        FJ_WAYLAND_INTERFACE_COMPOSITOR,
+        compositor_global,
+        (void *) &client->output->compositor))
     {
         return fj_result;
     }
@@ -43,7 +44,8 @@ static enum fj_status output_data_init(struct fj_client *client)
         .handle = output_handle_init,
     };
 
-    FJ_TRY (fj_wayland_record_event(client, &event_wrapper)) {
+    FJ_TRY(fj_wayland_record_event(client, &event_wrapper))
+    {
         return fj_result;
     }
 
@@ -51,8 +53,7 @@ static enum fj_status output_data_init(struct fj_client *client)
 }
 
 
-static enum fj_status output_init(
-    struct fj_client *_client, struct fj_output_callbacks const *callbacks)
+static fj_err output_init(struct fj_client *_client, struct fj_output_callbacks const *callbacks)
 {
     struct fj_client *client = (void *) _client;
 
@@ -63,13 +64,15 @@ static enum fj_status output_init(
         return callbacks->init(client->data, NULL);
     }
 
-    FJ_TRY (FJ_ALLOC(&client->output)) {
+    FJ_TRY(FJ_ALLOC(&client->output))
+    {
         return fj_result;
     }
 
     client->output->callbacks = *callbacks;
 
-    FJ_TRY (output_data_init(client)) {
+    FJ_TRY(output_data_init(client))
+    {
         FJ_FREE(&client->output);
         return fj_result;
     }
@@ -78,7 +81,7 @@ static enum fj_status output_init(
 }
 
 
-enum fj_status output_deinit(struct fj_client *_client)
+fj_err output_deinit(struct fj_client *_client)
 {
     struct fj_client *client = (void *) _client;
 
@@ -88,7 +91,7 @@ enum fj_status output_deinit(struct fj_client *_client)
 }
 
 
-static enum fj_status output_create(
+static fj_err output_create(
     struct fj_client *_client,
     struct fj_output * /*out*/ *_output,
     fj_canvas_base *_canvas,
@@ -98,7 +101,8 @@ static enum fj_status output_create(
     struct fj_wayland_output **output = (void *) _output;
     struct fj_wayland_canvas_base *canvas = (void *) _canvas;
 
-    FJ_TRY (FJ_ALLOC(output)) {
+    FJ_TRY(FJ_ALLOC(output))
+    {
         return fj_result;
     }
 
@@ -117,7 +121,7 @@ static enum fj_status output_create(
 }
 
 
-static enum fj_status output_destroy(struct fj_client *_client, struct fj_output *_output)
+static fj_err output_destroy(struct fj_client *_client, struct fj_output *_output)
 {
     struct fj_client *client = (void *) _client;
     struct fj_wayland_output *output = (void *) _output;
@@ -130,7 +134,7 @@ static enum fj_status output_destroy(struct fj_client *_client, struct fj_output
 }
 
 
-static enum fj_status output_update(
+static fj_err output_update(
     struct fj_client *_client,
     struct fj_output *_output,
     struct fj_output_info const *output_info,

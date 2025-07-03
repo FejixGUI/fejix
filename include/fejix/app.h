@@ -1,5 +1,7 @@
 /**
     \file
+
+    \defgroup app_messages App messages
 */
 
 #ifndef FEJIX_APP_H_
@@ -12,7 +14,9 @@
 struct fj_app;
 struct fj_app_data;
 
-enum fj_app_message_type {
+enum fj_app_message_type
+{
+    /** Initialize the application. */
     FJ_APP_INIT,
     FJ_APP_DEINIT,
     FJ_APP_RUN,
@@ -44,29 +48,33 @@ enum fj_app_message_type {
     FJ_APP_REQUEST_ENUM32 = INT32_MAX,
 };
 
-struct fj_app_init_message {
+/** \ingroup app_messages */
+struct fj_app_init_message
+{
+    /** A */
     void *extra_data;
 };
 
-struct fj_app_on_set_system_handle_message {
+/** \ingroup app_messages */
+struct fj_app_on_set_system_handle_message
+{
+    /** A */
     uintptr_t system_handle;
 };
 
-// TODO transform everything into a task and add a default waiting function
-union fj_app_message {
+union fj_app_message
+{
     struct fj_app_init_message const *init;
-    void *deinit;
-    void *run;
-    void *quit;
-    void *ping;
-    void *on_ping;
     struct fj_app_on_set_system_handle_message const *on_set_system_handle;
+    void *_unused;
 };
 
-typedef enum fj_status (*fj_app_dispatcher)(
+
+typedef fj_err (*fj_app_dispatcher)(
     struct fj_app *app, enum fj_app_message_type type, union fj_app_message message);
 
-struct fj_app {
+struct fj_app
+{
     /** The app's dispatcher that handles all the messages. */
     fj_app_dispatcher dispatch;
 

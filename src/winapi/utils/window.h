@@ -33,7 +33,7 @@
         * class name: the special name of a newly created class (if it is created).
         * instance: `GetModulehandle(NULL)`.
 */
-enum fj_status fj_winapi_window_create(
+fj_err fj_winapi_window_create(
     HWND *out_window, WNDCLASSEX const *opt_class_info, CREATESTRUCT const *opt_window_info);
 
 /**
@@ -42,7 +42,7 @@ enum fj_status fj_winapi_window_create(
     If the library created a window class for that specific window with
     fj_winapi_window_create(), the class is also destroyed. The check is done by checking the name.
 */
-enum fj_status fj_winapi_window_destroy(HWND window);
+fj_err fj_winapi_window_destroy(HWND window);
 
 void fj_winapi_window_set_data(HWND window, void *data);
 

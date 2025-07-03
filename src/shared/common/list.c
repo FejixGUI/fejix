@@ -1,8 +1,8 @@
 #include "list.h"
 
-#include <src/shared/utils/logging.h>
-#include <src/shared/utils/math.h>
-#include <src/shared/utils/memory.h>
+#include <src/shared/common/error.h>
+#include <src/shared/common/math.h>
+#include <src/shared/common/memory.h>
 
 #include <string.h>
 
@@ -17,22 +17,22 @@ static void shift_tail(
 }
 
 
-enum fj_status fj_list_expand(
+fj_err fj_list_expand(
     void **items, uint32_t *length, uint32_t *capacity, size_t item_size, uint32_t index)
 {
-    enum fj_status s;
+    fj_err e;
 
     if (index > *length) {
         FJ_ERROR("push index out of range");
-        return FJ_INVALID_USAGE;
+        return FJ_ERR_INVALID;
     }
 
     if (*length == *capacity) {
         uint32_t new_capacity = fj_u32_max(*capacity * 2, 1);
-        s = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
 
-        if (s)
-            return s;
+        if (e)
+            return e;
 
         *capacity = new_capacity;
     }
@@ -47,10 +47,10 @@ enum fj_status fj_list_expand(
 }
 
 
-enum fj_status fj_list_shrink(
+fj_err fj_list_shrink(
     void **items, uint32_t *length, uint32_t *capacity, size_t item_size, uint32_t index)
 {
-    enum fj_status s;
+    fj_err e;
 
     if (index >= *length) {
         if (*length == 0) {
@@ -59,7 +59,7 @@ enum fj_status fj_list_shrink(
             FJ_ERROR("remove index out of range");
         }
 
-        return FJ_INVALID_USAGE;
+        return FJ_ERR_INVALID;
     }
 
     if (index != *length - 1) {
@@ -68,9 +68,9 @@ enum fj_status fj_list_shrink(
 
     if (*length <= *capacity / 4) {
         uint32_t new_capacity = fj_u32_max(*capacity / 2, 1);
-        s = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
-        if (s)
-            return s;
+        e = fj_realloc_zeroed(items, *capacity, new_capacity, item_size);
+        if (e)
+            return e;
 
         *capacity = new_capacity;
     }

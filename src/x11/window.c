@@ -8,22 +8,21 @@
 #include <malloc.h>
 
 
-static enum fj_status fj_window_service_new_(
-    struct fj_window_service **out_service, struct fj_app *app)
+static fj_err fj_window_service_new_(struct fj_window_service **out_service, struct fj_app *app)
 {
     fj_window_service_init_base(&app->window_service, app);
     *out_service = &app->window_service;
     return FJ_OK;
 }
 
-static enum fj_status fj_window_service_del_(struct fj_window_service *service)
+static fj_err fj_window_service_del_(struct fj_window_service *service)
 {
     fj_window_vector_free(&service->windows);
     return FJ_OK;
 }
 
 
-static enum fj_status fj_window_del_(struct fj_window *window)
+static fj_err fj_window_del_(struct fj_window *window)
 {
     xcb_connection_t *c = window->base.app->connection;
     struct fj_window_service *service = window->base.service;
@@ -60,20 +59,19 @@ static enum fj_status fj_window_del_(struct fj_window *window)
 }
 
 
-static enum fj_status fj_window_new_(
-    struct fj_window **out_window, struct fj_window_service *service)
+static fj_err fj_window_new_(struct fj_window **out_window, struct fj_window_service *service)
 {
-    enum fj_status s;
+    fj_err e;
 
     struct fj_window *window;
-    s = FJ_ALLOC(&window);
-    if (s)
-        return s;
+    e = FJ_ALLOC(&window);
+    if (e)
+        return e;
 
-    s = fj_window_vector_push(&service->windows, &window);
-    if (s) {
+    e = fj_window_vector_push(&service->windows, &window);
+    if (e) {
         fj_window_del_(window);
-        return s;
+        return e;
     }
 
     fj_window_init_base(window, service);
@@ -83,7 +81,7 @@ static enum fj_status fj_window_new_(
 }
 
 
-static enum fj_status create_window(struct fj_app *app, struct fj_window *window)
+static fj_err create_window(struct fj_app *app, struct fj_window *window)
 {
     // TODO clean up this code once it starts to actually do something useful
 
@@ -138,7 +136,7 @@ static enum fj_status create_window(struct fj_app *app, struct fj_window *window
         properties);
     xcb_generic_error_t *error = xcb_request_check(app->connection, coockie);
     if (error) {
-        FJ_ERROR("xcb_create_window failed: %s", fj_x11_xcb_error_into_string(error));
+        FJ_ERROR("xcb_create_window failed: %e", fj_x11_xcb_error_into_string(error));
         free(error);
         return FJ_ERROR_OPERATION_FAILED;
     }
@@ -181,14 +179,14 @@ static enum fj_status create_window(struct fj_app *app, struct fj_window *window
 }
 
 
-static enum fj_status fj_window_commit_(struct fj_window *window)
+static fj_err fj_window_commit_(struct fj_window *window)
 {
-    enum fj_status s;
+    fj_err e;
 
     if (window->id == 0) {
-        s = create_window(window->base.app, window);
-        if (s)
-            return s;
+        e = create_window(window->base.app, window);
+        if (e)
+            return e;
     }
 
     return FJ_OK;

@@ -1,33 +1,32 @@
 cmake_minimum_required(VERSION 3.16)
-
-project(
-    fejix
-    VERSION 0.0.1
-    DESCRIPTION "Portable platform abstraction library"
-    HOMEPAGE_URL "https://github.com/FejixGUI/fejix")
-
+project(fejix VERSION 0.0.1)
 
 include(GNUInstallDirs)
 
+# ================================================================================
+# BUILD OPTIONS
+# ================================================================================
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "This is a standard CMake option the sets the library type.")
-
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Standard CMake option that sets the library type.")
 set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
+set(fejix_enable_errors ON CACHE BOOL "Enables the library to set the last error message")
+set(fejix_enable_error_locations ON CACHE BOOL "Adds the file name, line and function to every error message")
+set(fejix_detect_platforms OFF CACHE BOOL "Detect the platforms which are common for the target OS")
 
 set(fejix_build_winapi OFF CACHE BOOL "Build the Windows API platform")
+set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
 
 set(fejix_build_wayland OFF CACHE BOOL "Build the Wayland platform")
 
 set(fejix_build_x11 OFF CACHE BOOL "Build the X11 platform")
 
-set(fejix_detect_platforms OFF CACHE BOOL "Detect the platforms which are common for the target OS")
-
-set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
-
 # The following variables enable some shared utils and can be enabled in platform build scripts
-
+set(fejix_build_common_utils OFF)
 set(fejix_build_unix_utils OFF)
 
+# ================================================================================
+# PLATFORM DETECTION
+# ================================================================================
 
 if("${fejix_detect_platforms}" STREQUAL "auto")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
@@ -40,24 +39,23 @@ if("${fejix_detect_platforms}" STREQUAL "auto")
     endif()
 endif()
 
+# ================================================================================
+# BUILD SETUP
+# ================================================================================
+
 enable_language("C")
 
-if("${fejix_build_tests}")
-    enable_testing()
-endif()
-
-
-if("${fejix_build_tests}")
-    add_library(fejix_private_headers INTERFACE)
-
-    target_include_directories(
-        fejix_private_headers
-        INTERFACE
-            "${CMAKE_CURRENT_LIST_DIR}")
-endif()
-
-
 add_library(fejix)
+
+install(
+    DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/include/fejix"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    FILES_MATCHING PATTERN "*.h"
+    PATTERN ".*" EXCLUDE)
+
+install(
+    TARGETS fejix
+    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
 
 set_target_properties(
     fejix
@@ -100,8 +98,35 @@ target_include_directories(
     PRIVATE
         "${CMAKE_CURRENT_LIST_DIR}")
 
-include("${CMAKE_CURRENT_LIST_DIR}/src/shared/core/build.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/src/shared/utils/build.cmake")
+target_sources(
+    fejix
+    PRIVATE
+        "${CMAKE_CURRENT_LIST_DIR}/src/platform.c")
+
+
+configure_file(
+    "${CMAKE_CURRENT_LIST_DIR}/docs/version.py.in"
+    "${CMAKE_CURRENT_LIST_DIR}/docs/version.py")
+
+configure_file(
+    "${CMAKE_CURRENT_LIST_DIR}/include/fejix/version.h.in"
+    "${CMAKE_CURRENT_LIST_DIR}/include/fejix/version.h")
+
+
+if("${fejix_build_tests}")
+    enable_testing()
+
+    add_library(fejix_private_headers INTERFACE)
+
+    target_include_directories(
+        fejix_private_headers
+        INTERFACE
+            "${CMAKE_CURRENT_LIST_DIR}")
+endif()
+
+# ================================================================================
+# PLATFORMS
+# ================================================================================
 
 if("${fejix_build_winapi}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/winapi/build.cmake")
@@ -111,24 +136,17 @@ if("${fejix_build_x11}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/x11/build.cmake")
 endif()
 
+# ================================================================================
+# UTILS
+# ================================================================================
+
+# Utils can themselves enable other utils on which they depend.
+# Here the order of inclusion is important.
+
 if("${fejix_build_unix_utils}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/shared/unix/build.cmake")
 endif()
 
-configure_file(
-    "${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in"
-    "${CMAKE_CURRENT_LIST_DIR}/Doxyfile")
-
-configure_file(
-    "${CMAKE_CURRENT_LIST_DIR}/include/fejix/version.h.in"
-    "${CMAKE_CURRENT_LIST_DIR}/include/fejix/version.h")
-
-install(
-    DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/include/fejix"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-    FILES_MATCHING PATTERN "*.h"
-    PATTERN ".*" EXCLUDE)
-
-install(
-    TARGETS fejix
-    LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}")
+if("${fejix_build_common_utils}")
+    include("${CMAKE_CURRENT_LIST_DIR}/src/shared/common/build.cmake")
+endif()
