@@ -5,8 +5,7 @@
 #include <fejix/base.h>
 
 
-/// \addtogroup app_messages
-/// \{
+/// \begin{app_messages}
 
 
 /** Initializes the application. */
@@ -81,11 +80,10 @@ struct fj_app_sync_wait_message
     uint32_t tasks_length;
 };
 
-/// \}
+/// \end
 
 
-/// \addtogroup app_message_utils
-/// \{
+/// \begin{app_message_utils}
 
 enum fj_app_message_type
 {
@@ -128,10 +126,9 @@ typedef fj_err (*fj_app_dispatcher)(
     enum fj_app_message_type type,
     union fj_app_message message);
 
-/// \}
+/// \end
 
-/// \addtogroup app_definition
-/// \{
+/// \begin{app_definition}
 
 struct fj_app
 {
@@ -148,6 +145,6 @@ struct fj_app
     struct fj_app_internal_data *internal_data;
 };
 
-/// \}
+/// \end
 
 #endif

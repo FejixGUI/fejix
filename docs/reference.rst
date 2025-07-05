@@ -8,4 +8,5 @@ Reference
   :glob:
 
   reference/base
+  reference/platform
   reference/*

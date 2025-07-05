@@ -4,12 +4,13 @@ Base header
 
 `#include <fejix/base.h>`
 
-
 General definitions
 ==========================
 
 .. doxygengroup:: base_general
   :content-only:
+
+.. doxygengroup:: version
 
 
 Geometry
@@ -33,15 +34,22 @@ Error handling
   :content-only:
 
 
-Allocation utils
+Memory management
 ========================
 
-.. doxygengroup:: base_allocation_utils
+.. doxygengroup:: base_memory_management
   :content-only:
 
 
-Async utils
+Message dispatching
 ========================
 
-.. doxygengroup:: base_async_utils
+.. doxygengroup:: base_dispatching
+  :content-only:
+
+
+Asynchronous base
+=====================
+
+.. doxygengroup:: base_async
   :content-only:

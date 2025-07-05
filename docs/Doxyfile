@@ -10,7 +10,14 @@ OUTPUT_DIRECTORY = "../build/docs"
 XML_OUTPUT = "xml" # Relative to OUTPUT_DIRECTORY
 
 MACRO_EXPANSION = YES
-PREDEFINED = "FJ_COMPILE_OPT_DOCS=1"
+PREDEFINED = \
+    "FJ_COMPILE_OPT_DOCS=1" \
+    "FJ_PUBLIC="
 
 EXTRACT_ALL = YES
 EXTRACT_STATIC = YES
+
+ALIASES = \
+    begin{1}="\addtogroup \1^^@{" \
+    begin{2}="\addtogroup \1 \2^^@{" \
+    end="@}"

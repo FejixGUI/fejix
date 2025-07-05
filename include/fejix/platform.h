@@ -5,17 +5,7 @@
 #include <fejix/base.h>
 
 
-/** A generic function type intended for object dispatchers, supposed to be
-    convertible to any other dispatcher function type. */
-typedef void (*fj_generic_dispatcher)(
-    void *object, int32_t message_type, void *message);
-
-enum fj_dispatcher_type
-{
-    FJ_DISPATCHER_APP,
-    FJ_DISPATCHER_WINDOW,
-    FJ_DISPATCHER_WINDOW_SERVICE,
-};
+/// \begin{platform_object}
 
 struct fj_platform
 {
@@ -27,9 +17,12 @@ struct fj_platform
         appropriate function type. NULL if the module of the dispatcher is not
         supported.
     */
-    fj_generic_dispatcher (*get_dispatcher)(enum fj_dispatcher_type);
+    fj_dispatcher (*get_dispatcher)(enum fj_dispatcher_type);
 };
 
+/// \end
+
+/// \begin{platform_loading}
 
 /** `out_platforms` returns NULL if there are no builtin platforms. */
 FJ_PUBLIC
@@ -37,22 +30,23 @@ void fj_platform_get_builtin_list(
     struct fj_platform const *const **out_platforms,
     uint32_t *out_platforms_length);
 
-/**
-    Automatically loads a preferred platform.
+/** Automatically deduces and loads the preferred platform.
 
-    \returns Tries the following cases, whichever succeeds first:
-    0. NULL if there are no available platforms.
-    1. The only platform if there is only one platform.
-    2. The platform specified by `FEJIX_PLATFORM` environment variable
-        if it is defined and such a platform is present.
-    3. The platform guessed from other environment variables, in particular:
+    \returns Tries the following cases, in the following order:
+    1. If there are no available platforms, then NULL.
+    2. If there is only one platform, then that platform.
+    3. If `FEJIX_PLATFORM` environment variable is defined and such a platform
+        is present, then that.
+    4. Tries to deduce from other environment variables, in particular:
         - Wayland and X11 are chosen based on `XDG_SESSION_TYPE`.
-    4. If all of the above fails, returns the first platform on the list.
+    5. If all of the above fails, returns the first platform on the list.
 */
 FJ_PUBLIC
 struct fj_platform const *fj_platform_load(void);
 // TODO Add functions to modify the behavior of the loader, e.g.
 // allowed/disallowed platforms etc.
+
+/// \end
 
 
 #endif

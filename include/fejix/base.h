@@ -9,12 +9,12 @@
 #include <stdint.h>
 
 
-/// \addtogroup base_general
-/// \{
+/// \begin{base_general}
 
 #if defined(FJ_COMPILE_OPT_DOCS)
 
 /** Defines the appropriate external linkage.
+    This is used for all public symbols exported by the library.
 
     This expands to `extern` (`extern "C"` for C++) and adds special attributes
     for shared libraries if needed.
@@ -25,7 +25,7 @@
     headers so that the library gets linked correctly.
     If you are using the library's CMake target, it will automatically do that
     for you. */
-#    define FJ_PUBLIC extern
+#    define FJ_PUBLIC extern /* ... attributes ... */
 
 #else
 
@@ -49,8 +49,11 @@
 
 #endif
 
+#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
 /** Gets the length of a static array. */
-#define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
+#    define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
+#endif
+
 
 struct fj_version
 {
@@ -59,19 +62,18 @@ struct fj_version
     uint16_t patch;
 };
 
-/// \}
+/// \end
 
-/// \addtogroup base_geometry
-/// \{
+/// \begin{base_geometry}
 
 /** The length of a metric inch in metres. */
 #define FJ_INCH_LENGTH (0.0254)
 
 /** Concepts like text/interface scaling factor are mostly derived from the
     ratio to 96 DPI. That is, if the current DPI is 120, the content of the
-    appropriate size is considered to be scaled by 120 / 96 = 125% compared to
-    the "unscaled" ("density-unaware") content rendered at the standard 96
-    DPI. */
+    appropriate size is considered to be scaled by \f$120 \div 96 = 125\%\f$
+    compared to the "unscaled" ("density-unaware") content rendered at the
+    standard 96 DPI. */
 #define FJ_STANDARD_DPI (96.0)
 
 
@@ -174,11 +176,10 @@ static inline fj_density fj_density_from_standard_scaling(double scaling_factor)
     return scaling_factor * FJ_STANDARD_DPI;
 }
 
-/// \}
+/// \end
 
 
-/// \addtogroup base_time
-/// \{
+/// \begin{base_time}
 
 /** Time interval with nanosecond resolution in range from 1 nanosecond to 584
     years. */
@@ -224,10 +225,9 @@ static inline uint64_t fj_time_into_seconds(fj_time time)
     return time / UINT64_C(1000000000);
 }
 
-/// \}
+/// \end
 
-/// \addtogroup base_error_handling
-/// \{
+/// \begin{base_error_handling}
 
 /** Generic error code.
 
@@ -306,10 +306,9 @@ typedef enum
 FJ_PUBLIC
 void (*fj_error_callback)(char const *message);
 
-/// \}
+/// \end
 
-/// \addtogroup base_allocation_utils
-/// \{
+/// \begin{base_memory_management}
 
 /** Called every time the library needs to manage memory allocation.
 
@@ -329,11 +328,36 @@ FJ_PUBLIC
 void *(*fj_allocation_callback)(
     void *pointer, size_t old_size, size_t new_size);
 
-/// \}
+/// \end
 
-/// \addtogroup base_async_utils
-/// \{
+/// \begin{base_dispatching}
 
+/** This function calls the appropriate message handling functions.
+
+    This can be overriden per each object in order to handle event messages,
+    e.g. for input events or hooking into internal object events. */
+typedef void (*fj_dispatcher)(
+    void *object, int32_t message_type, void const *message);
+
+enum fj_dispatcher_type
+{
+    FJ_DISPATCHER_APP,
+    FJ_DISPATCHER_WINDOW,
+    FJ_DISPATCHER_WINDOW_SERVICE,
+};
+
+/// \end
+
+/// \begin{base_async}
+
+/** Represents an asynchronously executed task.
+
+    This is sometimes used for automatically grouped tasks \--- a mechanism
+
+    \note
+    Some tasks cannot be completed without running the event loop,
+    therefore just polling a list of tasks in an infinite loop is undefined
+    behavior and may loop forever. */
 struct fj_task
 {
     void (*poll)(struct fj_task *self);
@@ -361,6 +385,6 @@ struct fj_task
 FJ_PUBLIC
 void fj_task_init_completed(struct fj_task *out_task);
 
-/// \}
+/// \end
 
 #endif
