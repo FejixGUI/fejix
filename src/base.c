@@ -10,7 +10,7 @@ static void cancel_(struct fj_task *task)
     (void) task;
 }
 
-void fj_task_init_completed(struct fj_task *out_task)
+void fj_task_success(struct fj_task *out_task)
 {
     *out_task = (struct fj_task) {
         .poll = poll_,

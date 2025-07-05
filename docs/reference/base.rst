@@ -1,16 +1,25 @@
+:tocdepth: 3
+
 ================
 Base header
 ================
 
-`#include <fejix/base.h>`
+.. doxygenfile:: base.h
+  :sections: briefdescription detaileddescription
 
-General definitions
+Macros
 ==========================
+
+.. doxygengroup:: base_macros
+  :content-only:
+
+.. doxygengroup:: version_macros
+
+General
+==============
 
 .. doxygengroup:: base_general
   :content-only:
-
-.. doxygengroup:: version
 
 
 Geometry

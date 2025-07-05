@@ -1,3 +1,7 @@
+/** \HEADER
+
+    Defines base definitions and utilities. */
+
 #ifndef FEJIX_BASE_H_
 #define FEJIX_BASE_H_
 
@@ -9,7 +13,7 @@
 #include <stdint.h>
 
 
-/// \begin{base_general}
+/// \BEGIN{base_macros}
 
 #if defined(FJ_COMPILE_OPT_DOCS)
 
@@ -49,11 +53,16 @@
 
 #endif
 
+/// \END
+
+
 #if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
 /** Gets the length of a static array. */
 #    define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 #endif
 
+
+/// \BEGIN{base_general}
 
 struct fj_version
 {
@@ -62,9 +71,10 @@ struct fj_version
     uint16_t patch;
 };
 
-/// \end
+/// \END
 
-/// \begin{base_geometry}
+
+/// \BEGIN{base_geometry}
 
 /** The length of a metric inch in metres. */
 #define FJ_INCH_LENGTH (0.0254)
@@ -176,10 +186,10 @@ static inline fj_density fj_density_from_standard_scaling(double scaling_factor)
     return scaling_factor * FJ_STANDARD_DPI;
 }
 
-/// \end
+/// \END
 
 
-/// \begin{base_time}
+/// \BEGIN{base_time}
 
 /** Time interval with nanosecond resolution in range from 1 nanosecond to 584
     years. */
@@ -225,9 +235,9 @@ static inline uint64_t fj_time_into_seconds(fj_time time)
     return time / UINT64_C(1000000000);
 }
 
-/// \end
+/// \END
 
-/// \begin{base_error_handling}
+/// \BEGIN{base_error_handling}
 
 /** Generic error code.
 
@@ -306,9 +316,9 @@ typedef enum
 FJ_PUBLIC
 void (*fj_error_callback)(char const *message);
 
-/// \end
+/// \END
 
-/// \begin{base_memory_management}
+/// \BEGIN{base_memory_management}
 
 /** Called every time the library needs to manage memory allocation.
 
@@ -328,9 +338,9 @@ FJ_PUBLIC
 void *(*fj_allocation_callback)(
     void *pointer, size_t old_size, size_t new_size);
 
-/// \end
+/// \END
 
-/// \begin{base_dispatching}
+/// \BEGIN{base_dispatching}
 
 /** This function calls the appropriate message handling functions.
 
@@ -346,9 +356,9 @@ enum fj_dispatcher_type
     FJ_DISPATCHER_WINDOW_SERVICE,
 };
 
-/// \end
+/// \END
 
-/// \begin{base_async}
+/// \BEGIN{base_async}
 
 /** Represents an asynchronously executed task.
 
@@ -383,8 +393,8 @@ struct fj_task
 };
 
 FJ_PUBLIC
-void fj_task_init_completed(struct fj_task *out_task);
+void fj_task_success(struct fj_task *out_task);
 
-/// \end
+/// \END
 
 #endif

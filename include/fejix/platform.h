@@ -1,3 +1,5 @@
+/** \HEADER */
+
 #ifndef FEJIX_PLATFORM_H_
 #define FEJIX_PLATFORM_H_
 
@@ -5,24 +7,23 @@
 #include <fejix/base.h>
 
 
-/// \begin{platform_object}
+/// \BEGIN{platform_definition}
+
 
 struct fj_platform
 {
     char const *name;
     struct fj_version version;
 
-    /**
-        \returns The dispatcher function, manually convertible to the
-        appropriate function type. NULL if the module of the dispatcher is not
-        supported.
-    */
-    fj_dispatcher (*get_dispatcher)(enum fj_dispatcher_type);
+    /** \param dispatcher_type Identifies what object class to return
+            the dispatcher for.
+        \returns NULL if the module of the dispatcher is not supported. */
+    fj_dispatcher (*get_dispatcher)(enum fj_dispatcher_type dispatcher_type);
 };
 
-/// \end
+/// \END
 
-/// \begin{platform_loading}
+/// \BEGIN{platform_loading}
 
 /** `out_platforms` returns NULL if there are no builtin platforms. */
 FJ_PUBLIC
@@ -46,7 +47,7 @@ struct fj_platform const *fj_platform_load(void);
 // TODO Add functions to modify the behavior of the loader, e.g.
 // allowed/disallowed platforms etc.
 
-/// \end
+/// \END
 
 
 #endif

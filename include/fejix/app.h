@@ -1,3 +1,7 @@
+/** \HEADER
+
+    To run your program you need to create and run the app object. */
+
 #ifndef FEJIX_APP_H_
 #define FEJIX_APP_H_
 
@@ -5,7 +9,7 @@
 #include <fejix/base.h>
 
 
-/// \begin{app_messages}
+/// \BEGIN{app_messages}
 
 
 /** Initializes the application. */
@@ -50,7 +54,7 @@ struct fj_app_system_handle_notify_message
 
 /** Wakes up an application that is waiting for events.
     This asks the system to send a custom event that goes back as
-    #FJ_APP_PING_NOTIFY.
+    #fj_app_ping_notify_message.
 
     This can be called from another thread provided that the app is not
     being destroyed.
@@ -60,6 +64,11 @@ struct fj_app_system_handle_notify_message
     system. To regularly invoke a callback, use a timer with zero timeout
     period. */
 struct fj_app_ping_message
+{
+    uint8_t _noargs;
+};
+
+struct fj_app_ping_notify_message
 {
     uint8_t _noargs;
 };
@@ -79,11 +88,6 @@ struct fj_app_sync_wait_message
     struct fj_task *tasks;
     uint32_t tasks_length;
 };
-
-/// \end
-
-
-/// \begin{app_message_utils}
 
 enum fj_app_message_type
 {
@@ -107,44 +111,26 @@ enum fj_app_message_type
     FJ_APP_MESSAGE_TYPE_ENSURE_INT32 = INT32_MAX,
 };
 
-union fj_app_message
-{
-    struct fj_app_init_message const *init;
-    struct fj_app_system_handle_notify_message const *on_set_system_handle;
-    struct fj_app_run_message const *run;
-    struct fj_app_quit_message const *quit;
-    struct fj_app_start_notify_message const *start_notify;
-    struct fj_app_quit_notify_message const *quit_notify;
-    struct fj_app_ping_message const *ping;
-    struct fj_app_ping_notify_message const *ping_notify;
-    struct fj_app_sync_wait_message const *sync_wait;
-};
 
-struct fj_app;
-typedef fj_err (*fj_app_dispatcher)(
-    struct fj_app *app,
-    enum fj_app_message_type type,
-    union fj_app_message message);
+/// \END
 
-/// \end
-
-/// \begin{app_definition}
+/// \BEGIN{app_definition}
 
 struct fj_app
 {
     /** The app's dispatcher that handles all the messages. */
-    fj_app_dispatcher dispatch;
+    fj_dispatcher dispatch;
 
     /** The default dispatcher provided by the platform. This field is for
         convenience. */
-    fj_app_dispatcher dispatch_default;
+    fj_dispatcher dispatch_default;
 
     /** The user's callback data. */
-    void *custom_data;
+    uintptr_t user_data;
 
     struct fj_app_internal_data *internal_data;
 };
 
-/// \end
+/// \END
 
 #endif

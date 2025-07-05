@@ -28,14 +28,13 @@ breathe_show_include = False
 breathe_show_enumvalue_initializer = True
 breathe_show_define_initializer = True
 breathe_default_members = ('members', 'undoc-members')
+breathe_order_parameters_first = True
 
 html_title = project
 html_last_updated_use_utc = True
 html_last_updated_fmt = '%Y-%m-%d, %H:%M UTC'
 html_theme_options = {
-    'source_repository': _source_url,
-    'source_branch': 'main',
-    'source_directory': 'docs/',
+    'top_of_page_buttons': []
 }
 html_context = {
     'source_url': _source_url

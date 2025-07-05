@@ -18,6 +18,7 @@ EXTRACT_ALL = YES
 EXTRACT_STATIC = YES
 
 ALIASES = \
-    begin{1}="\addtogroup \1^^@{" \
-    begin{2}="\addtogroup \1 \2^^@{" \
-    end="@}"
+    HEADER="\file ^^<code>\#include <fejix/\fileinfo{filename}></code>" \
+    BEGIN{1}="\addtogroup \1^^@{" \
+    BEGIN{2}="\addtogroup \1 \2^^@{" \
+    END="@}"
