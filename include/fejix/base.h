@@ -1,9 +1,3 @@
-/**
-    \file
-
-    Defines basic utilities.
-*/
-
 #ifndef FEJIX_BASE_H_
 #define FEJIX_BASE_H_
 
@@ -15,18 +9,22 @@
 #include <stdint.h>
 
 
+/// \addtogroup base_general
+/// \{
+
 #if defined(FJ_COMPILE_OPT_DOCS)
 
-/**
-    Defines the appropriate external linkage.
+/** Defines the appropriate external linkage.
 
-    This expands to `extern` (`extern "C"` for C++) and adds special attributes for shared libraries
-    if needed.
+    This expands to `extern` (`extern "C"` for C++) and adds special attributes
+    for shared libraries if needed.
 
-    If you are using the library as shared (`.dll`) on Microsoft Windows, you need to define
-    `FJ_INCLUDE_OPT_DLLIMPORT` before including any library headers so that the library gets linked
-    correctly.
-*/
+    \warning
+    If you are using the library as shared (`.dll`) on Microsoft Windows, you
+    need to define `FJ_INCLUDE_OPT_DLLIMPORT` before including any library
+    headers so that the library gets linked correctly.
+    If you are using the library's CMake target, it will automatically do that
+    for you. */
 #    define FJ_PUBLIC extern
 
 #else
@@ -51,140 +49,8 @@
 
 #endif
 
-
 /** Gets the length of a static array. */
 #define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
-
-/** The length of a metric inch in metres. */
-#define FJ_INCH_LENGTH (0.0254)
-
-/**
-    Concepts like text/interface scaling factor are mostly derived from the ratio to 96 DPI.
-    That is, if the current DPI is 120, the content of the appropriate size is considered to be
-    scaled by 120 / 96 = 125% compared to the "unscaled" ("density-unaware") content rendered at
-    the standard 96 DPI.
-*/
-#define FJ_STANDARD_DPI (96.0)
-
-
-/**
-    Generic error code.
-
-    These error codes only indicate generic broad domains of problems that may have happened.
-    To get a detailed error information, set fj_error_callback.
-*/
-typedef enum
-{
-    /** Success */
-    FJ_OK,
-
-    /** Out of memory. */
-    FJ_ERR_MEMORY,
-
-    /**
-        System call failed.
-
-        Indicates that a system operation like I/O (read/write/poll/etc.) has failed.
-    */
-    FJ_ERR_SYSTEM,
-
-    /**
-        Function unimplemented.
-
-        Indicates that the operation is not implemented and therefore no work has been done.
-    */
-    FJ_ERR_UNIMPLEMENTED,
-
-    /**
-        Unsupported feature.
-
-        Indicates that the platform in general or its specific implementation does not support
-        the feature.
-    */
-    FJ_ERR_UNSUPPORTED,
-
-    /**
-        Invalid operation.
-
-        Indicates a programming error like zero allocation size, list index out of range,
-        bad text encoding, removing from an empty list, etc.
-    */
-    FJ_ERR_INVALID,
-
-    /**
-        Host unreachable.
-
-        Indicates that the server (e.g. the graphical system environment) does not respond.
-    */
-    FJ_ERR_UNREACHABLE,
-
-    /**
-        Request rejected.
-
-        Indicates that the server has responded to the request with a rejection error,
-        which may happen because of various reasons from a library bug to invalid API usage.
-
-        When possible, the library provides an error message in such cases.
-    */
-    FJ_ERR_REJECTED,
-
-    /**
-        Request canceled.
-
-        Indicates that the request was intentionally canceled by the user, the cleanup has likely
-        been done but the return arguments have not been set.
-    */
-    FJ_ERR_CANCELED,
-
-    FJ_ERR_MAX,
-
-    FJ_ERR_ENUM32 = INT32_MAX,
-} fj_err;
-
-
-/** A rectangular orientation, with flips and 90-degree rotations. */
-enum fj_orientation
-{
-    /**
-        The standard orientation implies that:
-        - memory-increasing direction of pixels in a row corresponds to RIGHT
-        - memory-increasing direction of rows corresponds to DOWN
-    */
-    FJ_ORIENTATION_STANDARD,
-    FJ_ORIENTATION_ROTATED90,
-    FJ_ORIENTATION_ROTATED180,
-    FJ_ORIENTATION_ROTATED270,
-    /** Represents a horizontal flip, where pixels in rows are reversed. */
-    FJ_ORIENTATION_STANDARD_FLIPPED,
-    FJ_ORIENTATION_ROTATED90_FLIPPED,
-    FJ_ORIENTATION_ROTATED180_FLIPPED,
-    FJ_ORIENTATION_ROTATED270_FLIPPED,
-
-    FJ_ORIENTATION_ENUM32 = INT32_MAX,
-};
-
-
-/** Time interval with nanosecond resolution in range from 1 nanosecond to 584 years. */
-typedef uint64_t fj_time;
-
-/** Dots-per-metres (DPM). */
-typedef double fj_density;
-
-
-/**
-    A generic function type intended for object dispatchers, supposed to be convertible to any
-    other dispatcher function type.
-*/
-typedef void (*fj_generic_dispatcher)(void *object, int32_t message_type, void *message);
-
-struct fj_task
-{
-    fj_err (*poll)(struct fj_task *self);
-    fj_err (*cancel)(struct fj_task *self);
-    uintptr_t data;
-    fj_err result;
-};
-
 
 struct fj_version
 {
@@ -193,6 +59,58 @@ struct fj_version
     uint16_t patch;
 };
 
+/// \}
+
+/// \addtogroup base_geometry
+/// \{
+
+/** The length of a metric inch in metres. */
+#define FJ_INCH_LENGTH (0.0254)
+
+/** Concepts like text/interface scaling factor are mostly derived from the
+    ratio to 96 DPI. That is, if the current DPI is 120, the content of the
+    appropriate size is considered to be scaled by 120 / 96 = 125% compared to
+    the "unscaled" ("density-unaware") content rendered at the standard 96
+    DPI. */
+#define FJ_STANDARD_DPI (96.0)
+
+
+/** A rectangular orientation, with flips and 90-degree rotations. */
+enum fj_orientation
+{
+    /** The standard orientation implies that:
+        - (row 0, pixel 0) is at TOP LEFT
+        - (row 0, pixel 1) points RIGHT
+        - (row 1, pixel 0) points DOWN */
+    FJ_ORIENTATION_STANDARD,
+
+    /** Rotated 90 degrees clockwise. */
+    FJ_ORIENTATION_ROTATED90,
+    /** Rotated 180 degrees clockwise. */
+    FJ_ORIENTATION_ROTATED180,
+    /** Rotated 270 degrees clockwise. */
+    FJ_ORIENTATION_ROTATED270,
+    /** Horizontally flipped (pixels in a row reversed). */
+    FJ_ORIENTATION_FLIPPED_STANDARD,
+    /** First horizontally flipped (pixels in a row reversed),
+        then rotated 90 degrees clockwise. */
+    FJ_ORIENTATION_FLIPPED_ROTATED90,
+    /** First horizontally flipped (pixels in a row reversed),
+        then rotated 180 degrees clockwise. */
+    FJ_ORIENTATION_FLIPPED_ROTATED180,
+    /** First horizontally flipped  (pixels in a row reversed),
+        then rotated 270 degrees clockwise. */
+    FJ_ORIENTATION_FLIPPED_ROTATED270,
+
+    FJ_ORIENTATION_ENSURE_INT32 = INT32_MAX,
+};
+
+
+/** Dots-per-metre (DPM).
+
+    Convertible to dots-per-inch (DPI, see #FJ_INCH_LENGTH)
+    and standard scaling factor (see #FJ_STANDARD_DPI). */
+typedef double fj_density;
 
 struct fj_position2d
 {
@@ -226,6 +144,45 @@ struct fj_viewport2d
     struct fj_size2d size;
 };
 
+static inline double fj_density_into_dpm(fj_density density)
+{
+    return density;
+}
+
+static inline fj_density fj_density_from_dpm(double dpm)
+{
+    return dpm;
+}
+
+static inline double fj_density_into_dpi(fj_density density)
+{
+    return density * FJ_INCH_LENGTH;
+}
+
+static inline fj_density fj_density_from_dpi(double dpi)
+{
+    return dpi / FJ_INCH_LENGTH;
+}
+
+static inline double fj_density_into_standard_scaling(fj_density density)
+{
+    return density / FJ_STANDARD_DPI;
+}
+
+static inline fj_density fj_density_from_standard_scaling(double scaling_factor)
+{
+    return scaling_factor * FJ_STANDARD_DPI;
+}
+
+/// \}
+
+
+/// \addtogroup base_time
+/// \{
+
+/** Time interval with nanosecond resolution in range from 1 nanosecond to 584
+    years. */
+typedef uint64_t fj_time;
 
 static inline fj_time fj_time_from_nanos(uint64_t nanoseconds)
 {
@@ -267,55 +224,94 @@ static inline uint64_t fj_time_into_seconds(fj_time time)
     return time / UINT64_C(1000000000);
 }
 
+/// \}
 
-static inline double fj_density_into_dpm(fj_density density)
+/// \addtogroup base_error_handling
+/// \{
+
+/** Generic error code.
+
+    These error codes only indicate generic broad domains of problems that may
+    have happened. To get a detailed error information, set
+    fj_error_callback(). */
+typedef enum
 {
-    return density;
-}
+    /** Success */
+    FJ_OK,
 
-static inline fj_density fj_density_from_dpm(double dpm)
-{
-    return dpm;
-}
+    /** Out of memory. */
+    FJ_ERR_MEMORY,
 
-static inline double fj_density_into_dpi(fj_density density)
-{
-    return density * FJ_INCH_LENGTH;
-}
+    /** System call failed.
 
-static inline fj_density fj_density_from_dpi(double dpi)
-{
-    return dpi / FJ_INCH_LENGTH;
-}
+        Indicates that a system operation like I/O (read/write/poll/etc.) has
+        failed. */
+    FJ_ERR_SYSTEM,
 
-static inline double fj_density_into_standard_scaling(fj_density density)
-{
-    return density / FJ_STANDARD_DPI;
-}
+    /** Function unimplemented.
 
-static inline fj_density fj_density_from_standard_scaling(double scaling_factor)
-{
-    return scaling_factor * FJ_STANDARD_DPI;
-}
+        Indicates that the operation is not implemented and therefore no work
+        has been done. */
+    FJ_ERR_UNIMPLEMENTED,
 
+    /** Unsupported feature.
 
-/**
-    Called every time the library sets an error message.
+        Indicates that the platform in general or its specific implementation
+        does not support the feature. */
+    FJ_ERR_UNSUPPORTED,
 
-    This is initialized to a default callback that does nothing for release builds and prints
-    errors to stderr for debug builds.
+    /** Invalid operation.
 
-    This function *must not* store the message pointer as the string may be freed immediately
-    afterwards. The string must be copied in order to be stored.
+        Indicates a programming error like zero allocation size, list index out
+        of range, bad text encoding, removing from an empty list, etc. */
+    FJ_ERR_INVALID,
 
-    This should be thread-safe as some operations may be performed from other threads like
-    #FJ_APP_PING.
-*/
+    /** Host unreachable.
+
+        Indicates that the server (e.g. the graphical system environment) does
+        not respond. */
+    FJ_ERR_UNREACHABLE,
+
+    /** Request rejected.
+
+        Indicates that the server has responded to the request with a rejection
+        error, which may happen because of various reasons from a library bug to
+        invalid API usage.
+
+        When possible, the library provides an error message in such cases. */
+    FJ_ERR_REJECTED,
+
+    /** Request canceled.
+
+        Indicates that the request was intentionally canceled by the user, the
+        cleanup has been done but the return arguments have not been set. */
+    FJ_ERR_CANCELED,
+
+    FJ_ERR_MAX,
+
+    FJ_ERR_ENSURE_INT32 = INT32_MAX,
+} fj_err;
+
+/** Called every time the library sets an error message.
+
+    This is initialized to a default callback that does nothing for release
+    builds and prints errors to stderr for debug builds.
+
+    This function *must not* store the message pointer as the string may be
+    freed immediately afterwards. The string must be copied in order to be
+    stored.
+
+    This should be thread-safe as some operations may be performed from other
+    threads like #FJ_APP_PING. */
 FJ_PUBLIC
 void (*fj_error_callback)(char const *message);
 
-/**
-    Called every time the library needs to manage memory allocation.
+/// \}
+
+/// \addtogroup base_allocation_utils
+/// \{
+
+/** Called every time the library needs to manage memory allocation.
 
     \param old_size
         This can be 0 indicating that the memory must be newly allocated.
@@ -327,10 +323,44 @@ void (*fj_error_callback)(char const *message);
     \returns NULL on allocation failure or when freeing.
 
     \todo Allocation thread-safety
-    This does not have to be thread-safe.
-*/
-FJ_PUBLIC
-void *(*fj_allocation_callback)(void *pointer, size_t old_size, size_t new_size);
 
+    This does not have to be thread-safe. */
+FJ_PUBLIC
+void *(*fj_allocation_callback)(
+    void *pointer, size_t old_size, size_t new_size);
+
+/// \}
+
+/// \addtogroup base_async_utils
+/// \{
+
+struct fj_task
+{
+    void (*poll)(struct fj_task *self);
+
+    void (*cancel)(struct fj_task *self);
+
+    /** This is automatically freed on task completion or successful
+        cancellation.
+
+        Theoretically, this cannot be freed if the task is still pending and
+        fails to be canceled because that would indicate that there is no such
+        possibility at all. However, this can never be true as tasks just get
+        canceled when you cancel them. */
+    uintptr_t internal_data;
+
+    /** - If task completes with success, contains #FJ_OK.
+        - If the task fails, contains the completion error.
+        - If the task gets canceled, contains #FJ_ERR_CANCELED.
+        - Otherwise this is undefined. */
+    fj_err result;
+
+    bool completed;
+};
+
+FJ_PUBLIC
+void fj_task_init_completed(struct fj_task *out_task);
+
+/// \}
 
 #endif

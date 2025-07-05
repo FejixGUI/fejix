@@ -3,30 +3,45 @@ project(fejix VERSION 0.0.1)
 
 include(GNUInstallDirs)
 
-# ================================================================================
+# ==============================================================================
 # BUILD OPTIONS
-# ================================================================================
+# ==============================================================================
 
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "Standard CMake option that sets the library type.")
-set(fejix_build_tests OFF CACHE BOOL "Build tests for all enabled modules")
-set(fejix_enable_errors ON CACHE BOOL "Enables the library to set the last error message")
-set(fejix_enable_error_locations ON CACHE BOOL "Adds the file name, line and function to every error message")
-set(fejix_detect_platforms OFF CACHE BOOL "Detect the platforms which are common for the target OS")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL
+    "Standard CMake option that sets the library type.")
 
-set(fejix_build_winapi OFF CACHE BOOL "Build the Windows API platform")
-set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
+set(fejix_build_tests OFF CACHE BOOL
+    "Build tests for all enabled modules")
 
-set(fejix_build_wayland OFF CACHE BOOL "Build the Wayland platform")
+set(fejix_enable_errors ON CACHE BOOL
+    "Enables the library to set the last error message")
 
-set(fejix_build_x11 OFF CACHE BOOL "Build the X11 platform")
+set(fejix_enable_error_locations ON CACHE BOOL
+    "Adds the file name, line and function to every error message")
 
-# The following variables enable some shared utils and can be enabled in platform build scripts
+set(fejix_detect_platforms OFF CACHE BOOL
+    "Detect the platforms which are common for the target OS")
+
+set(fejix_build_winapi OFF CACHE BOOL
+    "Build the Windows API platform")
+
+set(fejix_winapi_target_version "WIN10_RS1" CACHE STRING
+    "Windows API NTDDI version for <sdkddkver.h>. One of: WINXP, WINVISTA, WIN7, WIN8, WINBLUE, WIN10_TH2, WIN10_RS1")
+
+set(fejix_build_wayland OFF CACHE BOOL
+    "Build the Wayland platform")
+
+set(fejix_build_x11 OFF CACHE BOOL
+    "Build the X11 platform")
+
+# The following variables enable some shared utils and can be enabled in
+# platform build scripts
 set(fejix_build_common_utils OFF)
 set(fejix_build_unix_utils OFF)
 
-# ================================================================================
+# ==============================================================================
 # PLATFORM DETECTION
-# ================================================================================
+# ==============================================================================
 
 if("${fejix_detect_platforms}" STREQUAL "auto")
     if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows|MSYS|CYGWIN")
@@ -39,9 +54,9 @@ if("${fejix_detect_platforms}" STREQUAL "auto")
     endif()
 endif()
 
-# ================================================================================
+# ==============================================================================
 # BUILD SETUP
-# ================================================================================
+# ==============================================================================
 
 enable_language("C")
 
@@ -124,9 +139,9 @@ if("${fejix_build_tests}")
             "${CMAKE_CURRENT_LIST_DIR}")
 endif()
 
-# ================================================================================
+# ==============================================================================
 # PLATFORMS
-# ================================================================================
+# ==============================================================================
 
 if("${fejix_build_winapi}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/winapi/build.cmake")
@@ -136,9 +151,9 @@ if("${fejix_build_x11}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/x11/build.cmake")
 endif()
 
-# ================================================================================
+# ==============================================================================
 # UTILS
-# ================================================================================
+# ==============================================================================
 
 # Utils can themselves enable other utils on which they depend.
 # Here the order of inclusion is important.

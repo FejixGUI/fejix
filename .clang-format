@@ -1,13 +1,36 @@
 ---
 # Config for clang-format v17+
 #
-# Tips for coding with this config:
-# * put 2 empty lines between function blocks for good visual separation.
-# * put trailing commas in enums/structs/arrays that should be split into multiple lines.
+# Some notes:
+#
+# * Put 2 empty lines between function blocks for good visual separation.
+#
+# * Put trailing commas inside enums and struct/array initializations that
+#   should be split into multiple lines:
+#
+#    enum { X = 1 }; // no comma here
+#
+#    enum {
+#        X = 1, // notice the comma here
+#    };
+#
+#    struct S s = { .x = 1, .y = 2 }; // no comma after '2' here
+#
+#    struct S s = {
+#        .x = 1,
+#        .y = 2, // <- notice the comma after '2' here
+#    };
+#
+# * Format comments consistently with function declaration parentheses:
+#
+#    /** This is some long long long long long long long long long long long
+#        long long long long long long long comment */
+#    void this_is_some_long_long_long_long_long_long_long_long_function(
+#        int a, int b, int c, int d, int e);
 #
 # Unfortunately, clang-format is reasonably good only at the LLVM style.
-# This config implements a somewhat similar style in order not to fight against the tooling
-# that is supposed to help us.
+# This config implements a somewhat similar style in order not to fight against
+# the tooling that is supposed to help us.
 
 Language: Cpp
 Standard: c++17
@@ -16,7 +39,7 @@ Standard: c++17
 BasedOnStyle: Chromium
 
 IndentWidth: 4
-ColumnLimit: 100
+ColumnLimit: 80
 LineEnding: LF
 InsertNewlineAtEOF: true
 
@@ -67,10 +90,10 @@ AllowShortFunctionsOnASingleLine: None
 # {
 #     ...
 # }
-#                   <- keep empty lines here
+#                   <- keeps empty lines here
 #                   <-
 # int y()
-# {                 <- do not keep empty lines here
+# {                 <- does not keep empty lines here
 #     if (...) {    <-
 #         dosth();  <-
 #     }
@@ -123,8 +146,8 @@ PackConstructorInitializers: NextLine
 # (struct x) {
 #     .s = (struct s) {
 #         .x = 1,
-#         .y = 2,           <- put trailing commas everywhere for the magic to work
-#     },                    <-
+#         .y = 2,           <- put trailing commas everywhere
+#     },                    <- for the magic to work
 # }
 SpaceBeforeCpp11BracedList: true
 Cpp11BracedListStyle: false
@@ -183,15 +206,18 @@ AlignEscapedNewlines: Left
 # #endif
 IndentPPDirectives: AfterHash
 
-# ========== END CODE STYLE, BEGIN PROJECT-SPECIFIC SETTINGS AND WORKAROUNDS  ==========
+# ===== END CODE STYLE, BEGIN PROJECT-SPECIFIC SETTINGS AND WORKAROUNDS  =====
 
 Macros:
-    # This tricks clang-format into correctly formatting calling conventions in function pointer
-    # declarations and typedefs. The problem is that clang-format does not fully understand the code
-    # semantics and poorly handles macro expansions. The expansion here must match the macro name
-    # character length in order for clang-format to handle the column limit correctly.
+    # This tricks clang-format into correctly formatting calling conventions in
+    # function pointer declarations and typedefs. The problem is that
+    # clang-format does not fully understand the code semantics and poorly
+    # handles macro expansions.The expansion here must match the macro name
+    # character length in order for clang-format to handle the column limit
+    # correctly.
+    #
     # Example usage:
-    # typedef int (FJ_OPENGL_CALL *some_function_type)(int arg, int arg2);
+    #   typedef int (FJ_OPENGL_CALL *some_function_type)(int arg, int arg2);
     - 'FJ_OPENGL_CALL=*********const'
 
     # This tricks clang-format into leaving these macros on their own lines.
@@ -202,12 +228,13 @@ Macros:
 #   At the top - the most important project headers
 #   At the bottom - the most important external headers
 #
-# The reason is that we strictly put non-project headers AFTER the project headers
-# and putting interesting external headers before the standard headers would make them in the
-# middle of the include mess where it is hard to see them
+# The reason is that we strictly put non-project headers AFTER the project
+# headers and putting interesting external headers before the standard headers
+# would make them in the middle of the include mess where it is hard to see them
 IncludeBlocks: Regroup
 IncludeCategories:
-    # Implicit priority of 0 is reserved for the main header (#include "same-file-name.h")
+    # Implicit priority of 0 is reserved for the main header
+    # (#include "same-file-name.h")
 
     -   Regex: '^<src/shared/'
         Priority: 10

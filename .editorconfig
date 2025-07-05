@@ -4,10 +4,15 @@ root = true
 charset = utf-8
 indent_style = space
 indent_size = 4
-max_line_length = 100
+max_line_length = 80
 end_of_line = lf
 trim_trailing_whitespace = true
 insert_final_newline = true
 
 [{Makefile,**.mk}]
 indent_style = tab
+
+# ReStructuredText fails to render correctly with Sphinx if the indentation
+# is not 2 spaces
+[*.rst]
+indent_size = 2

@@ -1,8 +1,3 @@
-/**
-    \file
-    The version inserted by the build tool
-*/
-
 // clang-format off
 #define FEJIX_VERSION_MAJOR (@fejix_VERSION_MAJOR@)
 #define FEJIX_VERSION_MINOR (@fejix_VERSION_MINOR@)

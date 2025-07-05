@@ -21,7 +21,17 @@ if("${fejix_enable_error_locations}")
 endif()
 
 if("${fejix_build_tests}")
-    add_executable(fejix_core_list_test "${CMAKE_CURRENT_LIST_DIR}/tests/test-list.c")
-    target_link_libraries(fejix_core_list_test PRIVATE fejix fejix_private_headers)
-    add_test(NAME fejix_core_list_test COMMAND fejix_core_list_test)
+    add_executable(
+        fejix_core_list_test
+        "${CMAKE_CURRENT_LIST_DIR}/tests/test-list.c")
+
+    target_link_libraries(
+        fejix_core_list_test
+        PRIVATE
+            fejix
+            fejix_private_headers)
+
+    add_test(
+        NAME fejix_core_list_test
+        COMMAND fejix_core_list_test)
 endif()

@@ -22,21 +22,25 @@ static struct fj_platform const *const platforms[] = {
     NULL,  // Avoid warnings about the array being empty
 };
 
-// -1 accounts for the NULL at the end
-static uint32_t const platforms_length = FJ_LEN(platforms) - 1;
+enum
+{
+    // -1 accounts for the NULL at the end
+    PLATFORMS_LENGTH = FJ_LEN(platforms) - 1
+};
 
 
 void fj_platform_get_builtin_list(
-    struct fj_platform const *const **out_platforms, uint32_t *out_platforms_length)
+    struct fj_platform const *const **out_platforms,
+    uint32_t *out_platforms_length)
 {
     *out_platforms = platforms;
-    *out_platforms_length = platforms_length;
+    *out_platforms_length = PLATFORMS_LENGTH;
 }
 
 
 static struct fj_platform const *platform_find(char const *name)
 {
-    for (uint32_t i = 0; i < platforms_length; i++) {
+    for (uint32_t i = 0; i < PLATFORMS_LENGTH; i++) {
         if (strcmp(platforms[i]->name, name) == 0) {
             return platforms[i];
         }
@@ -51,11 +55,11 @@ struct fj_platform const *fj_platform_load(void)
     struct fj_platform const *platform = NULL;
     char const *env;
 
-    if (platforms_length == 0) {
+    if (PLATFORMS_LENGTH == 0) {
         return NULL;
     }
 
-    if (platforms_length == 1) {
+    if (PLATFORMS_LENGTH == 1) {
         return platforms[0];
     }
 

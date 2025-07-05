@@ -21,7 +21,8 @@ void *default_callback(void *pointer, size_t old_size, size_t new_size)
     return NULL;
 }
 
-void *(*fj_allocation_callback)(void *pointer, size_t old_size, size_t new_size) = default_callback;
+void *(*fj_allocation_callback)(void *pointer, size_t old_size, size_t new_size)
+    = default_callback;
 
 
 fj_err fj_alloc_uninit(void **out_ptr, size_t size)
@@ -87,7 +88,8 @@ void fj_free(void **ptr, size_t size)
 }
 
 
-fj_err fj_realloc_uninit(void **ptr, size_t old_length, size_t new_length, size_t item_size)
+fj_err fj_realloc_uninit(
+    void **ptr, size_t old_length, size_t new_length, size_t item_size)
 {
     if (item_size == 0) {
         FJ_ERROR("realloc item size is 0");
@@ -98,7 +100,8 @@ fj_err fj_realloc_uninit(void **ptr, size_t old_length, size_t new_length, size_
         return FJ_OK;
     }
 
-    void *new_ptr = fj_allocation_callback(*ptr, old_length * item_size, new_length * item_size);
+    void *new_ptr = fj_allocation_callback(
+        *ptr, old_length * item_size, new_length * item_size);
 
     if (new_ptr == NULL) {
         return FJ_ERR_MEMORY;
@@ -108,7 +111,8 @@ fj_err fj_realloc_uninit(void **ptr, size_t old_length, size_t new_length, size_
     return FJ_OK;
 }
 
-fj_err fj_realloc_zeroed(void **ptr, size_t old_length, size_t new_length, size_t item_size)
+fj_err fj_realloc_zeroed(
+    void **ptr, size_t old_length, size_t new_length, size_t item_size)
 {
     fj_err e = fj_realloc_uninit(ptr, old_length, new_length, item_size);
 
@@ -116,7 +120,10 @@ fj_err fj_realloc_zeroed(void **ptr, size_t old_length, size_t new_length, size_
         return e;
 
     if (new_length > old_length) {
-        memset((uint8_t *) *ptr + old_length * item_size, 0, (new_length - old_length) * item_size);
+        memset(
+            (uint8_t *) *ptr + old_length * item_size,
+            0,
+            (new_length - old_length) * item_size);
     }
 
     return FJ_OK;

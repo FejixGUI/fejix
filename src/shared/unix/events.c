@@ -18,7 +18,9 @@ static fj_err process_events(struct fj_unix_events *events)
         }
 
         e = events->callbacks.items[i](
-            events->callback_data, events->pollfds.items[i].fd, events->pollfds.items[i].revents);
+            events->callback_data,
+            events->pollfds.items[i].fd,
+            events->pollfds.items[i].revents);
 
         if (e)
             return e;
@@ -144,8 +146,10 @@ static int32_t into_poll_timeout(fj_time *opt_timeout)
 
 fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout)
 {
-    int32_t result
-        = poll(events->pollfds.items, events->pollfds.length, into_poll_timeout(opt_timeout));
+    int32_t result = poll(
+        events->pollfds.items,
+        events->pollfds.length,
+        into_poll_timeout(opt_timeout));
 
     if (result < 0) {
         FJ_ERROR("poll failed");
@@ -162,7 +166,8 @@ fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout)
 
 fj_err fj_unix_events_ping(struct fj_unix_events *events)
 {
-    uint8_t buffer[1] = { 42 };  // arbitrary number, only needs to be read in handle_ping
+    // arbitrary number, only needs to be read in handle_ping
+    uint8_t buffer[1] = { 42 };
     ssize_t written_count = write(events->ping_pipe[1], buffer, 1);
 
     if (written_count < 0) {

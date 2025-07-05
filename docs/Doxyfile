@@ -1,52 +1,16 @@
+INPUT = "../include"
+RECURSIVE = YES
+EXCLUDE_PATTERNS = ".*"
+
 GENERATE_XML = YES
 GENERATE_LATEX = NO
 GENERATE_HTML = NO
 
-INPUT = "../include"
-EXCLUDE_PATTERNS = ".*" "__*"
 OUTPUT_DIRECTORY = "../build/docs"
-XML_OUTPUT = "xml" # This is relative to OUTPUT_DIRECTORY
+XML_OUTPUT = "xml" # Relative to OUTPUT_DIRECTORY
 
-GENERATE_TREEVIEW = YES
-DISABLE_INDEX = NO
-FULL_SIDEBAR = NO
-# LAYOUT_FILE = "docs/templates/layout.xml"
-# HTML_HEADER = "docs/templates/header.html"
-# HTML_FOOTER = "docs/templates/footer.html"
-# HTML_EXTRA_FILES = \
-#     "docs/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js" \
-#     "docs/doxygen-awesome-css/doxygen-awesome-interactive-toc.js" \
-#     "docs/doxygen-awesome-css/doxygen-awesome-paragraph-link.js"
-# HTML_EXTRA_STYLESHEET = \
-#     "docs/custom/styles.css" \
-#     "docs/doxygen-awesome-css/doxygen-awesome.css" \
-#     "docs/doxygen-awesome-css/doxygen-awesome-sidebar-only.css" \
-#     "docs/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css"
-# HTML_COLORSTYLE = LIGHT
-
-# Sorted alphabetically
-ALPHABETICAL_INDEX = NO
-AUTOLINK_SUPPORT = YES
-DIRECTORY_GRAPH = NO
-ENABLE_PREPROCESSING = YES
-ENUM_VALUES_PER_LINE = 0 # Removes enum values in the overview section
-EXTRACT_ALL = NO
-EXTRACT_PRIVATE = NO
-EXTRACT_STATIC = YES
-FULL_PATH_NAMES = NO
-GENERATE_TODOLIST = NO
-GRAPHICAL_HIERARCHY = NO
-INCLUDE_GRAPH = NO
-INCLUDED_BY_GRAPH = NO
-INLINE_GROUPED_CLASSES = YES
-INLINE_SIMPLE_STRUCTS = YES
-JAVADOC_AUTOBRIEF = YES
 MACRO_EXPANSION = YES
-MARKDOWN_ID_STYLE = GITHUB
-MARKDOWN_SUPPORT = YES
-OPTIMIZE_OUTPUT_FOR_C = YES
 PREDEFINED = "FJ_COMPILE_OPT_DOCS=1"
-RECURSIVE = YES
-SEPARATE_MEMBER_PAGES = NO
-# STRIP_FROM_INC_PATH = "include"
-WARN_IF_UNDOCUMENTED = NO
+
+EXTRACT_ALL = YES
+EXTRACT_STATIC = YES

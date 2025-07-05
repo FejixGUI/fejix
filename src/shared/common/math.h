@@ -34,8 +34,8 @@ uint32_t fj_u32_higher_pow2(uint32_t x);
     If x = 0, returns 1. */
 uint32_t fj_u32_lower_pow2(uint32_t x);
 
-/** If x is greater than or equal to the highest power of two representable by size_t, returns
-    SIZE_MAX. */
+/** If x is greater than or equal to the highest power of two representable by
+    size_t, returns SIZE_MAX. */
 size_t fj_size_higher_pow2(size_t x);
 
 /** If x = 0, returns 1. */

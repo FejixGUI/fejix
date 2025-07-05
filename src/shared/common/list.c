@@ -8,7 +8,11 @@
 
 
 static void shift_tail(
-    void *ptr, uint32_t length, uint32_t source_index, uint32_t destination_index, size_t item_size)
+    void *ptr,
+    uint32_t length,
+    uint32_t source_index,
+    uint32_t destination_index,
+    size_t item_size)
 {
     void *src = (uint8_t *) ptr + source_index * item_size;
     void *dst = (uint8_t *) ptr + destination_index * item_size;
@@ -18,7 +22,11 @@ static void shift_tail(
 
 
 fj_err fj_list_expand(
-    void **items, uint32_t *length, uint32_t *capacity, size_t item_size, uint32_t index)
+    void **items,
+    uint32_t *length,
+    uint32_t *capacity,
+    size_t item_size,
+    uint32_t index)
 {
     fj_err e;
 
@@ -48,7 +56,11 @@ fj_err fj_list_expand(
 
 
 fj_err fj_list_shrink(
-    void **items, uint32_t *length, uint32_t *capacity, size_t item_size, uint32_t index)
+    void **items,
+    uint32_t *length,
+    uint32_t *capacity,
+    size_t item_size,
+    uint32_t index)
 {
     fj_err e;
 
@@ -82,7 +94,8 @@ fj_err fj_list_shrink(
 }
 
 
-void fj_list_clear(void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
+void fj_list_clear(
+    void **items, uint32_t *length, uint32_t *capacity, size_t item_size)
 {
     if (*items != NULL) {
         fj_free(items, *capacity * item_size);

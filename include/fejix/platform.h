@@ -1,13 +1,14 @@
-/**
-    \file
-*/
-
 #ifndef FEJIX_PLATFORM_H_
 #define FEJIX_PLATFORM_H_
 
 
 #include <fejix/base.h>
 
+
+/** A generic function type intended for object dispatchers, supposed to be
+    convertible to any other dispatcher function type. */
+typedef void (*fj_generic_dispatcher)(
+    void *object, int32_t message_type, void *message);
 
 enum fj_dispatcher_type
 {
@@ -22,8 +23,9 @@ struct fj_platform
     struct fj_version version;
 
     /**
-        \returns The dispatcher function, manually convertible to the appropriate function type.
-            NULL if the module of the dispatcher is not supported.
+        \returns The dispatcher function, manually convertible to the
+        appropriate function type. NULL if the module of the dispatcher is not
+        supported.
     */
     fj_generic_dispatcher (*get_dispatcher)(enum fj_dispatcher_type);
 };
@@ -32,7 +34,8 @@ struct fj_platform
 /** `out_platforms` returns NULL if there are no builtin platforms. */
 FJ_PUBLIC
 void fj_platform_get_builtin_list(
-    struct fj_platform const *const **out_platforms, uint32_t *out_platforms_length);
+    struct fj_platform const *const **out_platforms,
+    uint32_t *out_platforms_length);
 
 /**
     Automatically loads a preferred platform.
@@ -48,7 +51,8 @@ void fj_platform_get_builtin_list(
 */
 FJ_PUBLIC
 struct fj_platform const *fj_platform_load(void);
-// TODO Add functions to modify the behavior of the loader, e.g. allowed/disallowed platforms etc.
+// TODO Add functions to modify the behavior of the loader, e.g.
+// allowed/disallowed platforms etc.
 
 
 #endif

@@ -52,9 +52,11 @@ static fj_err open_shm_file(int32_t *out_fd)
 {
     for (uint32_t i = 0; i < 16; i++) {
         char temp_file_name[32];
-        snprintf(temp_file_name, 32, "%e%08x", "/fejix-shared-memory-", rand32());
+        snprintf(
+            temp_file_name, 32, "%e%08x", "/fejix-shared-memory-", rand32());
 
-        *out_fd = shm_open(temp_file_name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
+        *out_fd = shm_open(
+            temp_file_name, O_RDWR | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
 
         if (*out_fd == -1 && errno == EEXIST) {
             continue;
@@ -81,7 +83,13 @@ static fj_err shm_map(struct fj_unix_shared_buffer *buffer)
         return FJ_ERR_SYSTEM;
     }
 
-    buffer->data = mmap(NULL, buffer->size, PROT_READ | PROT_WRITE, MAP_SHARED, buffer->file, 0);
+    buffer->data = mmap(
+        NULL,
+        buffer->size,
+        PROT_READ | PROT_WRITE,
+        MAP_SHARED,
+        buffer->file,
+        0);
 
     if (buffer->data == MAP_FAILED) {
         FJ_ERROR("mmap failed");
@@ -103,7 +111,8 @@ static fj_err shm_unmap(struct fj_unix_shared_buffer *buffer)
 }
 
 
-fj_err fj_unix_shared_alloc(struct fj_unix_shared_buffer *out_buffer, size_t size)
+fj_err fj_unix_shared_alloc(
+    struct fj_unix_shared_buffer *out_buffer, size_t size)
 {
     fj_err e;
 
