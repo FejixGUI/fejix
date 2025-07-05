@@ -128,7 +128,7 @@ struct fj_app
     /** The user's callback data. */
     uintptr_t user_data;
 
-    struct fj_app_internal_data *internal_data;
+    struct fj_app_private_data *private;
 };
 
 /// \END

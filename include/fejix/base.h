@@ -374,14 +374,16 @@ struct fj_task
 
     void (*cancel)(struct fj_task *self);
 
-    /** This is automatically freed on task completion or successful
+    /** The task data used by fj_task::poll and fj_task::cancel.
+
+        This is automatically freed on task completion or successful
         cancellation.
 
         Theoretically, this cannot be freed if the task is still pending and
         fails to be canceled because that would indicate that there is no such
         possibility at all. However, this can never be true as tasks just get
         canceled when you cancel them. */
-    uintptr_t internal_data;
+    uintptr_t data;
 
     /** - If task completes with success, contains #FJ_OK.
         - If the task fails, contains the completion error.
@@ -393,7 +395,7 @@ struct fj_task
 };
 
 FJ_PUBLIC
-void fj_task_success(struct fj_task *out_task);
+void fj_task_init_succeeded(struct fj_task *out_task);
 
 /// \END
 
