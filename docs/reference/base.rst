@@ -55,10 +55,3 @@ Message dispatching
 
 .. doxygengroup:: base_dispatching
   :content-only:
-
-
-Asynchronous base
-=====================
-
-.. doxygengroup:: base_async
-  :content-only:

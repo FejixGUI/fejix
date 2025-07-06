@@ -1,24 +1,25 @@
 INPUT = "../include"
+STRIP_FROM_PATH = "../include" # Affects \fileinfo{}
+EXCLUDE_PATTERNS = ".*" # Ignores hidden files
 RECURSIVE = YES
-EXCLUDE_PATTERNS = ".*"
+
+OUTPUT_DIRECTORY = "../build/docs"
+XML_OUTPUT = "xml" # Relative to OUTPUT_DIRECTORY
 
 GENERATE_XML = YES
 GENERATE_LATEX = NO
 GENERATE_HTML = NO
 
-OUTPUT_DIRECTORY = "../build/docs"
-XML_OUTPUT = "xml" # Relative to OUTPUT_DIRECTORY
-
 MACRO_EXPANSION = YES
-PREDEFINED = \
-    "FJ_COMPILE_OPT_DOCS=1" \
-    "FJ_PUBLIC="
+PREDEFINED += FJ_COMPILE_OPT_DOCS=1
+PREDEFINED += FJ_PUBLIC=
 
 EXTRACT_ALL = YES
 EXTRACT_STATIC = YES
 
-ALIASES = \
-    HEADER="\file ^^<code>\#include <fejix/\fileinfo{filename}></code>" \
-    BEGIN{1}="\addtogroup \1^^@{" \
-    BEGIN{2}="\addtogroup \1 \2^^@{" \
-    END="@}"
+ALIASES += HEADER="\file ^^<code href=\"\fileinfo{}\">\#include <\fileinfo{}></code>^^"
+ALIASES += BEGIN{1}="\addtogroup \1^^@{"
+ALIASES += BEGIN{2}="\addtogroup \1 \2^^@{"
+ALIASES += END="@}"
+ALIASES += RST="^^\verbatim embed:rst^^"
+ALIASES += ENDRST="\endverbatim"

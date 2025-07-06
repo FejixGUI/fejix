@@ -1,5 +1,4 @@
 /** \HEADER
-
     Defines base definitions and utilities. */
 
 #ifndef FEJIX_BASE_H_
@@ -358,45 +357,5 @@ enum fj_dispatcher_type
 
 /// \END
 
-/// \BEGIN{base_async}
-
-/** Represents an asynchronously executed task.
-
-    This is sometimes used for automatically grouped tasks \--- a mechanism
-
-    \note
-    Some tasks cannot be completed without running the event loop,
-    therefore just polling a list of tasks in an infinite loop is undefined
-    behavior and may loop forever. */
-struct fj_task
-{
-    void (*poll)(struct fj_task *self);
-
-    void (*cancel)(struct fj_task *self);
-
-    /** The task data used by fj_task::poll and fj_task::cancel.
-
-        This is automatically freed on task completion or successful
-        cancellation.
-
-        Theoretically, this cannot be freed if the task is still pending and
-        fails to be canceled because that would indicate that there is no such
-        possibility at all. However, this can never be true as tasks just get
-        canceled when you cancel them. */
-    uintptr_t data;
-
-    /** - If task completes with success, contains #FJ_OK.
-        - If the task fails, contains the completion error.
-        - If the task gets canceled, contains #FJ_ERR_CANCELED.
-        - Otherwise this is undefined. */
-    fj_err result;
-
-    bool completed;
-};
-
-FJ_PUBLIC
-void fj_task_init_succeeded(struct fj_task *out_task);
-
-/// \END
 
 #endif

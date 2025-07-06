@@ -1,5 +1,4 @@
 /** \HEADER
-
     To run your program you need to create and run the app object. */
 
 #ifndef FEJIX_APP_H_
@@ -21,7 +20,7 @@ struct fj_app_init_message
 
 struct fj_app_run_message
 {
-    struct fj_task *out_task;
+    uint8_t _noargs;
 };
 
 struct fj_app_quit_message
@@ -31,25 +30,17 @@ struct fj_app_quit_message
 
 struct fj_app_start_notify_message
 {
-    /** By default initialized to an already completed task so that if your
-        code is synchronous, you do not have to touch it. */
-    struct fj_task *out_task;
+    uint8_t _noargs;
 };
 struct fj_app_quit_notify_message
 {
-    /** By default initialized to an already completed task so that if your
-        code is synchronous, you do not have to touch it. */
-    struct fj_task *out_task;
+    uint8_t _noargs;
 };
 
 /** Supplies the system handle for the app. */
 struct fj_app_system_handle_notify_message
 {
     uintptr_t system_handle;
-
-    /** By default initialized to an already completed task so that if your
-        code is synchronous, you do not have to touch it. */
-    struct fj_task *out_task;
 };
 
 /** Wakes up an application that is waiting for events.
@@ -85,8 +76,7 @@ struct fj_app_ping_notify_message
     - X11, Wayland: this is compatible with all possible tasks. */
 struct fj_app_sync_wait_message
 {
-    struct fj_task *tasks;
-    uint32_t tasks_length;
+    // TODO
 };
 
 enum fj_app_message_type
