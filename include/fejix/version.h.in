@@ -3,8 +3,8 @@
     use fj_platform::version. */
 /// \BEGIN{version_macros,Library header version}
 // clang-format off
-#define FEJIX_VERSION_MAJOR (@fejix_VERSION_MAJOR@)
-#define FEJIX_VERSION_MINOR (@fejix_VERSION_MINOR@)
-#define FEJIX_VERSION_PATCH (@fejix_VERSION_PATCH@)
+#define FJ_VERSION_MAJOR (@fejix_VERSION_MAJOR@)
+#define FJ_VERSION_MINOR (@fejix_VERSION_MINOR@)
+#define FJ_VERSION_PATCH (@fejix_VERSION_PATCH@)
 // clang-format on
 /// \END

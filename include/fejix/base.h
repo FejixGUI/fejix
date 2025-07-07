@@ -290,12 +290,6 @@ typedef enum
         When possible, the library provides an error message in such cases. */
     FJ_ERR_REJECTED,
 
-    /** Request canceled.
-
-        Indicates that the request was intentionally canceled by the user, the
-        cleanup has been done but the return arguments have not been set. */
-    FJ_ERR_CANCELED,
-
     FJ_ERR_MAX,
 
     FJ_ERR_ENSURE_INT32 = INT32_MAX,
@@ -339,20 +333,24 @@ void *(*fj_allocation_callback)(
 
 /// \END
 
-/// \BEGIN{base_dispatching}
+/// \BEGIN{base_messaging}
 
 /** This function calls the appropriate message handling functions.
 
     This can be overriden per each object in order to handle event messages,
     e.g. for input events or hooking into internal object events. */
-typedef void (*fj_dispatcher)(
-    void *object, int32_t message_type, void const *message);
+typedef void (*fj_sender)(
+    void *object, int32_t message, void const *message_data);
 
-enum fj_dispatcher_type
+/// \END
+
+/// \BEGIN{base_objects}
+
+enum fj_object_type
 {
-    FJ_DISPATCHER_APP,
-    FJ_DISPATCHER_WINDOW,
-    FJ_DISPATCHER_WINDOW_SERVICE,
+    FJ_OBJECT_TYPE_APP,
+    FJ_OBJECT_TYPE_WINDOW,
+    FJ_OBJECT_TYPE_WINDOW_SERVICE,
 };
 
 /// \END

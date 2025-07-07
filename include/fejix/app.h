@@ -8,119 +8,130 @@
 #include <fejix/base.h>
 
 
-/// \BEGIN{app_messages}
-
-
-/** Initializes the application. */
-struct fj_app_init_message
-{
-    /** This is for future compatibility. Set to NULL. */
-    void *extra_data;
-};
-
-struct fj_app_run_message
-{
-    uint8_t _noargs;
-};
-
-struct fj_app_quit_message
-{
-    uint8_t _noargs;
-};
-
-struct fj_app_start_notify_message
-{
-    uint8_t _noargs;
-};
-struct fj_app_quit_notify_message
-{
-    uint8_t _noargs;
-};
-
-/** Supplies the system handle for the app. */
-struct fj_app_system_handle_notify_message
-{
-    uintptr_t system_handle;
-};
-
-/** Wakes up an application that is waiting for events.
-    This asks the system to send a custom event that goes back as
-    #fj_app_ping_notify_message.
-
-    This can be called from another thread provided that the app is not
-    being destroyed.
-
-    This is not supposed to be called periodically from the main thread as
-    this goes through an inefficient process of communicating with the
-    system. To regularly invoke a callback, use a timer with zero timeout
-    period. */
-struct fj_app_ping_message
-{
-    uint8_t _noargs;
-};
-
-struct fj_app_ping_notify_message
-{
-    uint8_t _noargs;
-};
-
-/** Waits for all the tasks to complete.
-
-    This typically involves running a message loop.
-    The message loop functionality and therefore the support and specific
-    behavior of this request is platform-defined.
-
-    \note
-    The support of this message as well as the support for each individual
-    task type for waiting is platform-defined.
-    - X11, Wayland: this is compatible with all possible tasks. */
-struct fj_app_sync_wait_message
-{
-    // TODO
-};
-
-enum fj_app_message_type
-{
-
-    FJ_APP_INIT,
-    FJ_APP_DEINIT,
-    FJ_APP_RUN,
-    FJ_APP_QUIT,
-    FJ_APP_PING,
-    FJ_APP_PING_NOTIFY,
-    FJ_APP_START_NOTIFY,
-    FJ_APP_QUIT_NOTIFY,
-    FJ_APP_ACTIVATE_NOTIFY,
-    FJ_APP_DEACTIVATE_NOTIFY,
-    FJ_APP_SUSPEND_NOTIFY,
-    FJ_APP_RESUME_NOTIFY,
-    FJ_APP_SYSTEM_HANDLE_NOTIFY,
-    FJ_APP_SYNC_WAIT,
-
-    FJ_APP_MESSAGE_TYPE_MAX,
-    FJ_APP_MESSAGE_TYPE_ENSURE_INT32 = INT32_MAX,
-};
-
-
-/// \END
-
 /// \BEGIN{app_definition}
 
 struct fj_app
 {
-    /** The app's dispatcher that handles all the messages. */
-    fj_dispatcher dispatch;
+    /** The app's message sender function. */
+    fj_sender send;
 
-    /** The default dispatcher provided by the platform. This field is for
+    /** The default sender provided by the platform. This field is only for
         convenience. */
-    fj_dispatcher dispatch_default;
+    fj_sender _send;
 
     /** The user's callback data. */
     uintptr_t user_data;
 
-    struct fj_app_private_data *private;
+    struct fj_app_private_data *private_data;
 };
 
 /// \END
+
+
+/// \BEGIN{app_other}
+
+enum fj_app_loop_flags
+{
+    /** Indicates that #FJ_APP_LOOP can be run from the program's entrypoint to
+        run the application. If not present, means that the app is run by some
+        other mechanism, externally, not from within the main function and
+        definitely not using the #FJ_APP_LOOP message. */
+    FJ_APP_LOOP_FLAG_TOPLEVEL = 1 << 0,
+
+    /** Indicates that #FJ_APP_LOOP can be called multiple times, even within
+        itself to wait for events at arbitrary times. */
+    FJ_APP_LOOP_FLAG_REENTRANT = 1 << 1,
+
+    /** Indicates that the #FJ_APP_STOP_LOOP message is supported.
+
+        \note
+        - **UIKit**: the loop is not stoppable. The only way to forcefully exit
+            the program is to call the exit function, which is
+            [considered a bad practice by Apple
+            ](https://developer.apple.com/library/archive/qa/qa1561/_index.html).
+        */
+    FJ_APP_LOOP_FLAG_STOPPABLE = 1 << 2,
+
+    /** Indicates that stopping the loop will result into some visible
+        consequences, potencially resulting into some problems.
+        If not present, means that stopping the loop is always done gracefully
+        and with no possible harm to the app's visual state.
+
+        \note
+        - **WinAPI**: if the loop is stopped while a window is being resized
+            by the user, the resizing will stop. This is because window resizing
+            is implemented on the client side (not by the system) and works by
+            [running an internal event loop
+            ](https://stackoverflow.com/a/21201822) to track the user's pointer
+            position to resize the window.
+            All the events still get processed by the library,
+            however stopping the loop will cause the resizing to stop.
+            */
+    FJ_APP_LOOP_FLAG_STOP_VISIBLE = 1 << 3,
+};
+
+/// \END
+
+
+/// \BEGIN{app_messages}
+
+enum fj_app_message
+{
+    /** Initializes the application.
+        \param[in] extra_init_data Points to extra platform-defined
+            initialization data (set to NULL to ignore). */
+    FJ_APP_INIT,
+
+    FJ_APP_DEINIT,
+
+    /** Runs the message loop awaiting the #FJ_APP_STOP_LOOP.
+        The support for this message and its exact behavior is
+        platform-defined. To get a detailed information about that, use
+        #FJ_APP_GET_LOOP_FLAGS. */
+    FJ_APP_LOOP,
+
+    FJ_APP_DID_START_LOOP,
+    FJ_APP_STOP_LOOP,
+    FJ_APP_DID_STOP_LOOP,
+
+    /** Gets the loop capability flags in case #FJ_APP_LOOP is supported.
+        If this message is unsupported, that means that #FJ_APP_LOOP is
+        unsupported, too.
+
+        \param[out] flags Returns #fj_app_loop_flags. */
+    FJ_APP_GET_LOOP_FLAGS,
+
+    /** Wakes up an application that is waiting for events.
+        This asks the system to send a custom event that goes back as
+        #FJ_APP_DID_PING.
+
+        This can be called from another thread provided that the app is not
+        being destroyed.
+
+        This is not supposed to be called periodically from the main thread as
+        this goes through an inefficient process of communicating with the
+        system. To regularly invoke a callback, use a timer with zero timeout
+        period. */
+    FJ_APP_PING,
+
+    FJ_APP_DID_PING,
+    FJ_APP_DID_ACTIVATE,
+    FJ_APP_DID_DEACTIVATE,
+    FJ_APP_DID_SUSPEND,
+    FJ_APP_DID_RESUME,
+
+    /** Provides an internal system handle of the app.
+        This is sent on app initialization.
+
+        \param[in] system_handle Platform-defined. */
+    FJ_APP_DID_SET_SYSTEM_HANDLE,
+
+    FJ_APP_MESSAGE_MAX,
+    FJ_APP_MESSAGE_ENSURE_INT32 = INT32_MAX,
+};
+
+
+/// \END
+
 
 #endif

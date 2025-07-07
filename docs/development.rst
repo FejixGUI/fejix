@@ -18,14 +18,19 @@ See the ``Makefile`` in the ``docs`` folder.
 .. TODO Discuss the setup process and the documentation style/structure.
 
 .. tip::
-  Use project's Doxygen command aliases:
+  Use the project's Doxygen command aliases:
 
-  * ``\begin{GROUP_NAME}``
-  * ``\begin{GROUP_NAME,GROUP_TITLE}``
-  * ``\end``
+  * ``\HEADER``
+
+  instead of ``\file`` because it additionally generates a short include
+  statement in the header description, and
+
+  * ``\BEGIN{GROUP_NAME}``
+  * ``\BEGIN{GROUP_NAME,GROUP_TITLE}``
+  * ``\END``
 
   instead of repeating ``\addtogroup`` and ``\{`` on separate lines.
-  To add a group description, just put a doc comment right above the ``\begin``
+  To add a group description, just put a doc comment right above the ``\BEGIN``
   command.
 
 

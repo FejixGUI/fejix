@@ -50,8 +50,14 @@ Memory management
   :content-only:
 
 
-Message dispatching
+Messaging
 ========================
 
-.. doxygengroup:: base_dispatching
+.. doxygengroup:: base_messaging
+  :content-only:
+
+Objects
+==========================
+
+.. doxygengroup:: base_objects
   :content-only:

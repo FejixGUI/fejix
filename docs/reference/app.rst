@@ -23,3 +23,8 @@ Messages
 .. doxygengroup:: app_messages
   :content-only:
 
+Other
+------------
+
+.. doxygengroup:: app_other
+  :content-only:
