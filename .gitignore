@@ -3,6 +3,7 @@
 __*
 
 # Allow important configuration files
+!.gitattributes
 !.gitmodules
 !.gitignore
 !.gitkeep
@@ -17,7 +18,3 @@ compile_flags.txt
 # Binary output directories
 _build*/
 build*/
-/dist*/
-/out*/
-/target*/
-/bin*/

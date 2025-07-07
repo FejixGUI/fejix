@@ -1,29 +1,28 @@
-.PHONY: all setup build check-venv open-preview clean
+.PHONY: all setup build clean preview check-python-venv
 
-all: setup build
+all: build
 
-check-venv:
-	@test -n "$(VIRTUAL_ENV)" \
-		|| ( \
-			echo "You need to set up a Python virtual environment:" \
-			&& echo "$$ python3 -m venv .venv" \
-			&& echo "$$ source .venv/bin/activate    # add .fish/.csh/.ps1 for other shells" \
-			&& exit 1 \
-		)
+setup: check-python-venv ../build/docs
 
-setup: check-venv .setup-done
-
-# To install the dependencies you could also you could try:
-# $ python3 -m pip install sphinx breathe furo
-.setup-done:
-	python3 -m pip install -r requirements.txt && touch .setup-done
-
-build: check-venv
+build: setup ./Doxyfile ./conf.py
 	doxygen -q
 	sphinx-build -q . ../build/docs/html
 
-open-preview:
-	open ../build/docs/html/index.html
-
 clean:
 	rm -rf ../build/docs
+
+preview:
+	open ../build/docs/html/index.html
+
+check-python-venv:
+	@test -n "$(VIRTUAL_ENV)" \
+		|| ( \
+			echo "Error: you need to set up a Python virtual environment:" \
+			&& echo "  $$ python3 -m venv .venv" \
+			&& echo "  $$ source .venv/bin/activate    # add .fish/.csh/.ps1 for other shells" \
+			&& exit 1 \
+		)
+
+../build/docs: ./requirements.txt
+	python3 -m pip install -r requirements.txt && mkdir -p ../build/docs
+

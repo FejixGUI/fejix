@@ -272,7 +272,9 @@ typedef enum
     /** Invalid operation.
 
         Indicates a programming error like zero allocation size, list index out
-        of range, bad text encoding, removing from an empty list, etc. */
+        of range, bad text encoding, removing from an empty list,
+        a thread-unsafe operation done from another thread, etc.
+        This may often indicate a bug. */
     FJ_ERR_INVALID,
 
     /** Host unreachable.
@@ -283,9 +285,10 @@ typedef enum
 
     /** Request rejected.
 
-        Indicates that the server has responded to the request with a rejection
-        error, which may happen because of various reasons from a library bug to
-        invalid API usage.
+        Indicates that the server has responded to the request with an error,
+        often indicating that the request has been rejected,
+        which may happen because of various reasons from a library bug to
+        invalid library usage.
 
         When possible, the library provides an error message in such cases. */
     FJ_ERR_REJECTED,
@@ -339,8 +342,7 @@ void *(*fj_allocation_callback)(
 
     This can be overriden per each object in order to handle event messages,
     e.g. for input events or hooking into internal object events. */
-typedef void (*fj_sender)(
-    void *object, int32_t message, void const *message_data);
+typedef fj_err (*fj_sender)(void *object, int32_t message, void *message_data);
 
 /// \END
 

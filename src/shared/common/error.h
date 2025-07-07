@@ -7,7 +7,8 @@
 
 #ifdef FJ_COMPILE_OPT_ENABLE_ERRORS
 #    ifdef FJ_COMPILE_OPT_ENABLE_ERROR_LOCATIONS
-#        define FJ_ERROR(MESSAGE) fj_error_callback(MESSAGE)
+#        define FJ_ERROR(MESSAGE) \
+            fj_format_error("[%s:%d@%s] " MESSAGE, __FILE__, __LINE__, __func__)
 #        define FJ_ERRORF(FORMAT, ...) \
             fj_format_error(           \
                 "[%s:%d@%s] " FORMAT,  \

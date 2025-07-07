@@ -28,6 +28,8 @@ struct fj_unix_events
 };
 
 
+// TODO ping callback
+
 fj_err fj_unix_events_init(struct fj_unix_events *events, void *callback_data);
 
 void fj_unix_events_deinit(struct fj_unix_events *events);

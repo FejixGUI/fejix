@@ -13,9 +13,45 @@ The project documentation is built using:
 * `Breathe <https://breathe.readthedocs.io/en/latest/index.html>`_
 * `Furo <https://pradyunsg.me/furo/>`_
 
-See the ``Makefile`` in the ``docs`` folder.
+Setup
+------------
 
-.. TODO Discuss the setup process and the documentation style/structure.
+#. Install Doxygen.
+
+#. `Create <https://docs.python.org/3/library/venv.html#creating-virtual-environments>`_
+   and `activate <https://docs.python.org/3/library/venv.html#how-venvs-work>`_
+   a Python virtual environment:
+
+   .. code-block:: shell
+
+     python3 -m venv .venv
+     source .venv/bin/activate  # or activate.fish, or activate.csh
+
+   The activation script path depends on the OS and the Python version.
+
+Build
+------------
+
+Run ``Make`` from the ``docs`` directory:
+
+.. code-block:: shell
+
+  cd docs && make
+  # -or- (shorter)
+  make -C docs
+
+To preview the docs in your browser you can run:
+
+.. code-block:: shell
+
+  make -C docs preview
+
+this opens ``build/docs/html/index.html``.
+
+Markup
+------------
+
+.. TODO give an overview of how the docs are structured
 
 .. tip::
   Use the project's Doxygen command aliases:

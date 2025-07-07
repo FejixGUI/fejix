@@ -1,5 +1,4 @@
-/** \HEADER
-    To run your program you need to create and run the app object. */
+/** \HEADER */
 
 #ifndef FEJIX_APP_H_
 #define FEJIX_APP_H_
@@ -10,6 +9,37 @@
 
 /// \BEGIN{app_definition}
 
+/** This object manages the application lifecycle and all of its resources.
+
+    \note
+    This should generally be a instantiated once per program.
+    Whether it can be instantiated multiple times is implementation-defined.
+    - **Wayland**, **X11**: an application object can be instantiated as many
+        times as you want.
+    - **WindowsAPI**: instantiating this multiple times is not a strict error
+        if you are careful with requests that affect some global process state.
+
+    \note
+    This should generally be intantiated on the main thread.
+    Whether it can be instantiated on other threads is platform-defined.
+    - **UIKit**: this *must* be instatiated on the main thread and all messsages
+        where thread-safety is not specified *must* be sent from the main
+        thread.
+    - **WindowsAPI**, **Wayland**, **X11**: this can be instantiated on any
+        thread.
+
+    \note
+    This should generally be run on the same thread where instantiated.
+    Whether or not it can be run on other threads is platform-defined.
+    - **Wayland**, **X11**: this can be run from any thread.
+    - **WindowsAPI**: there are restrictions that limit event handling to the
+        thread that has created all the objects that may receive events.
+        This is because [event queues are thread-local
+        ](https://learn.microsoft.com/en-us/windows/win32/winmsg/using-messages-and-message-queues)
+        and windows are [bound to thread event queues at creation
+        ](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-peekmessagew).
+        Because of this, it is better to create the app and all other objects
+        on the same thread that handles them. */
 struct fj_app
 {
     /** The app's message sender function. */
@@ -20,9 +50,9 @@ struct fj_app
     fj_sender _send;
 
     /** The user's callback data. */
-    uintptr_t user_data;
+    uintptr_t data;
 
-    struct fj_app_private_data *private_data;
+    struct fj_app_private_data *_data;
 };
 
 /// \END
@@ -53,9 +83,13 @@ enum fj_app_loop_flags
     FJ_APP_LOOP_FLAG_STOPPABLE = 1 << 2,
 
     /** Indicates that stopping the loop will result into some visible
-        consequences, potencially resulting into some problems.
+        consequences, potencially looking like glitches.
         If not present, means that stopping the loop is always done gracefully
         and with no possible harm to the app's visual state.
+
+        To avoid problems connected with this flag, you should minize your
+        usage of event loops and instead structure your code so that it just
+        responds to messages.
 
         \note
         - **WinAPI**: if the loop is stopped while a window is being resized
@@ -82,6 +116,7 @@ enum fj_app_message
             initialization data (set to NULL to ignore). */
     FJ_APP_INIT,
 
+    /** All created objects should be destroyed before destroying the app. */
     FJ_APP_DEINIT,
 
     /** Runs the message loop awaiting the #FJ_APP_STOP_LOOP.
@@ -91,7 +126,16 @@ enum fj_app_message
     FJ_APP_LOOP,
 
     FJ_APP_DID_START_LOOP,
+
+    /** Indicates that the most recently started loop should stop as soon as
+        possible.
+
+        Stopping the loop may not stop the event processing immediately as it
+        is often done in batches using queues. Therefore some events can still
+        be processed before stopping. */
     FJ_APP_STOP_LOOP,
+
+    /** This is sent right before returning from the running loop. */
     FJ_APP_DID_STOP_LOOP,
 
     /** Gets the loop capability flags in case #FJ_APP_LOOP is supported.
@@ -105,13 +149,13 @@ enum fj_app_message
         This asks the system to send a custom event that goes back as
         #FJ_APP_DID_PING.
 
-        This can be called from another thread provided that the app is not
+        This can be sent from another thread provided that the app is not
         being destroyed.
 
         This is not supposed to be called periodically from the main thread as
         this goes through an inefficient process of communicating with the
-        system. To regularly invoke a callback, use a timer with zero timeout
-        period. */
+        system. To regularly invoke a user callback on the main thread,
+        use a timer with zero timeout period. */
     FJ_APP_PING,
 
     FJ_APP_DID_PING,

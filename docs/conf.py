@@ -17,7 +17,8 @@ copyright = f'{_creation_year}-%Y {author}'
 time_fmt = '%Y-%m-%d'
 primary_domain = 'c'
 highlight_language = 'C'
-pygments_style = 'monokai'
+pygments_style = 'tango'
+pygments_dark_style = 'dracula'
 html_theme = 'furo'
 extensions = ['breathe']
 
@@ -31,6 +32,7 @@ breathe_default_members = ('members', 'undoc-members')
 breathe_order_parameters_first = True
 
 html_title = project
+html_static_path = ['_static']
 html_last_updated_use_utc = True
 html_last_updated_fmt = '%Y-%m-%d, %H:%M UTC'
 html_theme_options = {

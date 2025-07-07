@@ -1,8 +1,6 @@
 #ifndef FEJIX_X11_APP_H_
 #define FEJIX_X11_APP_H_
 
-#include <src/x11/window.h>
-
 #include <src/shared/unix/events.h>
 
 #include <fejix/app.h>
@@ -24,32 +22,33 @@
     FJ_X11_ATOM_LIST_ITEM(WM_DELETE_WINDOW)             \
     FJ_X11_ATOM_LIST_ITEM(WM_PROTOCOLS)
 
-/** This makes a name for an enumeration member in fj_x11_atom that corresponds to the atom. */
+/** This makes a name for an enumeration member in fj_x11_atom that corresponds
+ * to the atom. */
 #define FJ_X11_ATOM_ID(X) FJ_X11_ATOM_##X
 
-#define FJ_X11_GET_ATOM(APP, ATOM_NAME) ((APP)->atoms[FJ_X11_ATOM_ID(ATOM_NAME)])
+#define FJ_X11_GET_ATOM(APP, ATOM_NAME) \
+    ((APP)->_data->atoms[FJ_X11_ATOM_ID(ATOM_NAME)])
 
 #define FJ_X11_ATOM_LIST_ITEM(X) FJ_X11_ATOM_ID(X),
-enum fj_x11_atom { FJ_X11_ATOM_LIST FJ_X11_ATOM_MAX };
+enum fj_x11_atom
+{
+    FJ_X11_ATOM_LIST FJ_X11_ATOM_MAX
+};
 #undef FJ_X11_ATOM_LIST_ITEM
 
 
-struct fj_app {
-    struct fj_app_base base;
-
+struct fj_app_private_data
+{
     struct fj_unix_events events;
-    bool should_quit;
+    bool should_stop;
 
     Display *display;
     xcb_connection_t *connection;
     xcb_atom_t atoms[FJ_X11_ATOM_MAX];
 
-    struct fj_window_service window_service;
+    // struct fj_window_service window_service;
 };
 
-
-uint8_t fj_x11_xlib_get_last_error(void);
-void fj_x11_xlib_clear_last_error(void);
 
 char const *fj_x11_error_into_string(uint8_t error_code);
 char const *fj_x11_xcb_error_into_string(xcb_generic_error_t *error);

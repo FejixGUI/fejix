@@ -1,7 +1,7 @@
 #include "app.h"
 
-#include <src/shared/utils/logging.h>
-#include <src/shared/utils/memory.h>
+#include <src/shared/common/error.h>
+#include <src/shared/common/memory.h>
 
 #include <malloc.h>
 #include <stdlib.h>
@@ -12,25 +12,6 @@
 
 #define EVENT_MASK (~0x80)  // Just a weirdness of XCB
 
-
-static uint8_t xlib_last_error = Success;
-
-static int xlib_error_handler(Display *display, XErrorEvent *error)
-{
-    (void) display;
-    xlib_last_error = error->error_code;
-    return 0;
-}
-
-uint8_t fj_x11_xlib_get_last_error(void)
-{
-    return xlib_last_error;
-}
-
-void fj_x11_xlib_clear_last_error(void)
-{
-    xlib_last_error = Success;
-}
 
 char const *fj_x11_error_into_string(uint8_t error_code)
 {
@@ -62,6 +43,14 @@ char const *fj_x11_error_into_string(uint8_t error_code)
     return messages[error_code];
 }
 
+
+static int xlib_error_handler(Display *display, XErrorEvent *error)
+{
+    (void) display;
+    FJ_ERRORF("Xlib error: %s", fj_x11_error_into_string(error->error_code));
+    return 0;
+}
+
 char const *fj_x11_xcb_error_into_string(xcb_generic_error_t *error)
 {
     return fj_x11_error_into_string(error->error_code);
@@ -75,40 +64,47 @@ static fj_err process_event(struct fj_app *app, xcb_generic_event_t *event)
         default:
             break;
 
-        case XCB_CLIENT_MESSAGE: {
-            xcb_client_message_event_t *client_message = (void *) event;
-            uint32_t *data = client_message->data.data32;
-            uint32_t message_type = data[0];
+            // case XCB_CLIENT_MESSAGE: {
+            //     xcb_client_message_event_t *client_message = (void *) event;
+            //     uint32_t *data = client_message->data.data32;
+            //     uint32_t message_type = data[0];
 
-            for (uint32_t i = 0; i < app->window_service.windows.length; i++) {
-                if (app->window_service.windows.items[i]->id == client_message->window) {
-                    if (message_type == FJ_X11_GET_ATOM(app, WM_DELETE_WINDOW)) {
-                        fj_window_close_callback(app->window_service.windows.items[i]);
-                    }
-                    break;
-                }
-            }
-        }
+            //     for (uint32_t i = 0; i < app->window_service.windows.length;
+            //     i++) {
+            //         if (app->window_service.windows.items[i]->id
+            //             == client_message->window)
+            //         {
+            //             if (message_type == FJ_X11_GET_ATOM(app,
+            //             WM_DELETE_WINDOW))
+            //             {
+            //                 fj_window_close_callback(
+            //                     app->window_service.windows.items[i]);
+            //             }
+            //             break;
+            //         }
+            //     }
+            // }
     }
 
     return FJ_OK;
 }
 
 
-static fj_err process_events(void *callback_data, int file_descriptor, short event_mask)
+static fj_err process_events(
+    void *callback_data, int file_descriptor, short event_mask)
 {
     (void) file_descriptor;
     fj_err e;
 
     if (event_mask & (POLLERR | POLLHUP | POLLNVAL)) {
         FJ_ERROR("got errors while reading events from the X11 display");
-        return FJ_ERROR_IO_FAILED;
+        return FJ_ERR_SYSTEM;
     }
 
     struct fj_app *app = callback_data;
 
     for (;;) {
-        xcb_generic_event_t *event = xcb_poll_for_event(app->connection);
+        xcb_generic_event_t *event = xcb_poll_for_event(app->_data->connection);
 
         if (event == NULL)
             break;
@@ -116,8 +112,7 @@ static fj_err process_events(void *callback_data, int file_descriptor, short eve
         e = process_event(app, event);
         free(event);
         if (e)
-            return e;  // FIXME What is the best way to handle errors in a loop?
-        /** We can alternatively ignore errors unless the user quits the app. */
+            return e;
     }
 
     return FJ_OK;
@@ -126,7 +121,7 @@ static fj_err process_events(void *callback_data, int file_descriptor, short eve
 
 static void deinit_events(struct fj_app *app)
 {
-    fj_unix_events_deinit(&app->events);
+    fj_unix_events_deinit(&app->_data->events);
 }
 
 static fj_err get_atoms(struct fj_app *app)
@@ -138,17 +133,20 @@ static fj_err get_atoms(struct fj_app *app)
     xcb_intern_atom_cookie_t coockies[FJ_X11_ATOM_MAX];
 
     for (enum fj_x11_atom atom = 0; atom < FJ_X11_ATOM_MAX; atom++) {
-        coockies[atom]
-            = xcb_intern_atom(app->connection, 1, strlen(atom_names[atom]), atom_names[atom]);
+        coockies[atom] = xcb_intern_atom(
+            app->_data->connection,
+            1,
+            strlen(atom_names[atom]),
+            atom_names[atom]);
     }
 
-    xcb_flush(app->connection);
+    xcb_flush(app->_data->connection);
 
     for (enum fj_x11_atom atom = 0; atom < FJ_X11_ATOM_MAX; atom++) {
-        xcb_intern_atom_reply_t *reply
-            = xcb_intern_atom_reply(app->connection, coockies[atom], NULL);
+        xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(
+            app->_data->connection, coockies[atom], NULL);
 
-        app->atoms[atom] = reply->atom;
+        app->_data->atoms[atom] = reply->atom;
 
         free(reply);
     }
@@ -157,105 +155,132 @@ static fj_err get_atoms(struct fj_app *app)
 }
 
 
-static fj_err fj_app_del_(struct fj_app *app)
+static fj_err deinit_(struct fj_app *app)
 {
     deinit_events(app);
 
-    if (app->display != NULL) {
-        int result = XCloseDisplay(app->display);
+    if (app->_data->display != NULL) {
+        int result = XCloseDisplay(app->_data->display);
         if (result != 0) {
-            FJ_ERROR("cannot close X11 display: %e", fj_x11_error_into_string(result));
+            FJ_ERRORF(
+                "cannot close X11 display: %s",
+                fj_x11_error_into_string(result));
         }
     }
 
-    FJ_FREE(&app);
+    FJ_FREE(&app->_data);
 
     return FJ_OK;
 }
 
 
-static fj_err fj_app_new_(struct fj_app **out_app, void *extra_info)
+static fj_err init_(struct fj_app *app, void *extra_init_data)
 {
-    (void) extra_info;
+    (void) extra_init_data;
     fj_err e;
 
-    struct fj_app *app;
-    e = FJ_ALLOC(&app);
+    e = FJ_ALLOC(&app->_data);
     if (e)
         return e;
 
-    app->display = XOpenDisplay(NULL);
-    if (app->display == NULL) {
+    app->_data->display = XOpenDisplay(NULL);
+    if (app->_data->display == NULL) {
         FJ_ERROR("cannot open X11 display");
-        fj_app_del_(app);
-        return FJ_ERROR_OPERATION_FAILED;
+        deinit_(app);
+        return FJ_ERR_SYSTEM;
     }
 
-    app->connection = XGetXCBConnection(app->display);
-    XSetEventQueueOwner(app->display, XCBOwnsEventQueue);
+    app->_data->connection = XGetXCBConnection(app->_data->display);
+    XSetEventQueueOwner(app->_data->display, XCBOwnsEventQueue);
     XSetErrorHandler(xlib_error_handler);
     get_atoms(app);
 
-    e = fj_unix_events_init(&app->events, app);
+    e = fj_unix_events_init(&app->_data->events, app);
     if (e) {
-        fj_app_del_(app);
+        deinit_(app);
         return e;
     }
 
     e = fj_unix_events_add(
-        &app->events, xcb_get_file_descriptor(app->connection), POLLIN, process_events);
+        &app->_data->events,
+        xcb_get_file_descriptor(app->_data->connection),
+        POLLIN,
+        process_events);
     if (e) {
-        fj_app_del_(app);
+        deinit_(app);
         return e;
     }
 
-    *out_app = app;
     return FJ_OK;
 }
 
 
-static fj_err fj_app_run_(struct fj_app *app)
+static fj_err loop_(struct fj_app *app)
 {
     fj_err e;
 
-    fj_app_start_callback(app);
+    app->send(app, FJ_APP_DID_START_LOOP, NULL);
 
     for (;;) {
-        // TODO do timers
+        // TODO implement timers
 
-        if (app->should_quit)
+        if (app->_data->should_stop)
             break;
 
-        e = fj_unix_events_wait(&app->events, NULL);
+        e = fj_unix_events_wait(&app->_data->events, NULL);
         if (e) {
-            fj_app_quit_callback(app);
+            app->send(app, FJ_APP_DID_STOP_LOOP, NULL);
             return e;
         }
     }
 
-    fj_app_quit_callback(app);
+    app->send(app, FJ_APP_DID_STOP_LOOP, NULL);
     return FJ_OK;
 }
 
 
-static fj_err fj_app_quit_(struct fj_app *app)
+static fj_err stop_loop_(struct fj_app *app)
 {
-    app->should_quit = true;
+    app->_data->should_stop = true;
     return FJ_OK;
 }
 
 
-static fj_err fj_app_ping_(struct fj_app *app)
+static void get_loop_flags_(enum fj_app_loop_flags *out_flags)
 {
-    return fj_unix_events_ping(&app->events);
+    *out_flags = FJ_APP_LOOP_FLAG_TOPLEVEL | FJ_APP_LOOP_FLAG_REENTRANT
+        | FJ_APP_LOOP_FLAG_STOPPABLE;
 }
 
 
-void fj_x11_init_app(void)
+static fj_err ping_(struct fj_app *app)
 {
-    FJ_API_INIT(fj_app_new)
-    FJ_API_INIT(fj_app_del)
-    FJ_API_INIT(fj_app_run)
-    FJ_API_INIT(fj_app_quit)
-    FJ_API_INIT(fj_app_ping)
+    return fj_unix_events_ping(&app->_data->events);
+}
+
+
+fj_err fj_x11_app_sender(void *app, int32_t message, void *data)
+{
+    switch (message) {
+        case FJ_APP_INIT:
+            return init_(app, data);
+
+        case FJ_APP_DEINIT:
+            return deinit_(app);
+
+        case FJ_APP_LOOP:
+            return loop_(app);
+
+        case FJ_APP_STOP_LOOP:
+            return stop_loop_(app);
+
+        case FJ_APP_GET_LOOP_FLAGS:
+            get_loop_flags_(data);
+
+        case FJ_APP_PING:
+            return ping_(app);
+
+        default:
+            return FJ_ERR_UNIMPLEMENTED;
+    }
 }
