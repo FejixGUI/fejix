@@ -8,52 +8,10 @@
 #include <unistd.h>
 
 
-static fj_err process_events(struct fj_unix_events *events)
+static fj_err init_ping(
+    struct fj_unix_events *events, fj_unix_events_callback ping_callback)
 {
     fj_err e;
-
-    for (size_t i = 0; i < events->pollfds.length; i++) {
-        if (events->pollfds.items[i].revents == 0) {
-            continue;
-        }
-
-        e = events->callbacks.items[i](
-            events->callback_data,
-            events->pollfds.items[i].fd,
-            events->pollfds.items[i].revents);
-
-        if (e)
-            return e;
-
-        events->pollfds.items[i].revents = 0;
-    }
-
-    return FJ_OK;
-}
-
-
-static fj_err handle_ping(void *callback_data, int fd, short events)
-{
-    (void) callback_data;
-
-    if (events & (POLLERR | POLLHUP | POLLNVAL)) {
-        return FJ_ERR_SYSTEM;
-    }
-
-    uint8_t buffer[1];
-    read(fd, buffer, 1);
-
-    return FJ_OK;
-}
-
-
-fj_err fj_unix_events_init(struct fj_unix_events *events, void *callback_data)
-{
-    fj_err e;
-
-    *events = (struct fj_unix_events) {
-        .callback_data = callback_data,
-    };
 
     int pipe_result = pipe((int32_t *) events->ping_pipe);
 
@@ -62,8 +20,26 @@ fj_err fj_unix_events_init(struct fj_unix_events *events, void *callback_data)
         return FJ_ERR_SYSTEM;
     }
 
-    e = fj_unix_events_add(events, events->ping_pipe[0], POLLIN, handle_ping);
+    e = fj_unix_events_add(events, events->ping_pipe[0], POLLIN, ping_callback);
 
+    if (e)
+        return e;
+
+    return FJ_OK;
+}
+
+fj_err fj_unix_events_init(
+    struct fj_unix_events *events,
+    void *callback_data,
+    fj_unix_events_callback ping_callback)
+{
+    fj_err e;
+
+    *events = (struct fj_unix_events) {
+        .callback_data = callback_data,
+    };
+
+    e = init_ping(events, ping_callback);
     if (e) {
         fj_unix_events_deinit(events);
         return e;
@@ -135,6 +111,33 @@ fj_err fj_unix_events_remove(struct fj_unix_events *events, int file_descriptor)
 }
 
 
+fj_err fj_unix_events_ping(struct fj_unix_events *events)
+{
+    // arbitrary number, only needs to be read in fj_unix_events_handle_ping
+    uint8_t buffer[1] = { 42 };
+    ssize_t written_count = write(events->ping_pipe[1], buffer, 1);
+
+    if (written_count < 0) {
+        return FJ_ERR_SYSTEM;
+    }
+
+    return FJ_OK;
+}
+
+
+fj_err fj_unix_events_handle_ping(int file_descriptor, short event_mask)
+{
+    if (event_mask & (POLLERR | POLLHUP | POLLNVAL)) {
+        return FJ_ERR_SYSTEM;
+    }
+
+    uint8_t buffer[1];
+    read(file_descriptor, buffer, 1);
+
+    return FJ_OK;
+}
+
+
 static int32_t into_poll_timeout(fj_time *opt_timeout)
 {
     if (opt_timeout == NULL) {
@@ -144,34 +147,40 @@ static int32_t into_poll_timeout(fj_time *opt_timeout)
     return (int32_t) fj_time_into_millis(*opt_timeout);
 }
 
-fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout)
+fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *timeout)
 {
     int32_t result = poll(
         events->pollfds.items,
         events->pollfds.length,
-        into_poll_timeout(opt_timeout));
+        into_poll_timeout(timeout));
 
     if (result < 0) {
         FJ_ERROR("poll failed");
         return FJ_ERR_SYSTEM;
     }
 
-    if (result == 0) {
-        return FJ_OK;
-    }
-
-    return process_events(events);
+    return FJ_OK;
 }
 
 
-fj_err fj_unix_events_ping(struct fj_unix_events *events)
+fj_err fj_unix_events_process(struct fj_unix_events *events)
 {
-    // arbitrary number, only needs to be read in handle_ping
-    uint8_t buffer[1] = { 42 };
-    ssize_t written_count = write(events->ping_pipe[1], buffer, 1);
+    fj_err e;
 
-    if (written_count < 0) {
-        return FJ_ERR_SYSTEM;
+    for (size_t i = 0; i < events->pollfds.length; i++) {
+        if (events->pollfds.items[i].revents == 0) {
+            continue;
+        }
+
+        e = events->callbacks.items[i](
+            events->callback_data,
+            events->pollfds.items[i].fd,
+            events->pollfds.items[i].revents);
+
+        if (e)
+            return e;
+
+        events->pollfds.items[i].revents = 0;
     }
 
     return FJ_OK;

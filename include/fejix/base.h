@@ -55,12 +55,6 @@
 /// \END
 
 
-#if defined(FJ_COMPILE_OPT_PRIVATE_CODE)
-/** Gets the length of a static array. */
-#    define FJ_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
-#endif
-
-
 /// \BEGIN{base_general}
 
 struct fj_version
@@ -113,7 +107,7 @@ enum fj_orientation
         then rotated 270 degrees clockwise. */
     FJ_ORIENTATION_FLIPPED_ROTATED270,
 
-    FJ_ORIENTATION_ENSURE_INT32 = INT32_MAX,
+    _fj_orientation_ensure_int32 = INT32_MAX,
 };
 
 
@@ -273,7 +267,9 @@ typedef enum
 
         Indicates a programming error like zero allocation size, list index out
         of range, bad text encoding, removing from an empty list,
-        a thread-unsafe operation done from another thread, etc.
+        a thread-unsafe operation done from another thread, using a result
+        from an uncompleted task, canceling a completed task etc.
+
         This may often indicate a bug. */
     FJ_ERR_INVALID,
 
@@ -293,9 +289,12 @@ typedef enum
         When possible, the library provides an error message in such cases. */
     FJ_ERR_REJECTED,
 
+    /** Task canceled. */
+    FJ_ERR_CANCELED,
+
     FJ_ERR_MAX,
 
-    FJ_ERR_ENSURE_INT32 = INT32_MAX,
+    _fj_err_ensure_int32 = INT32_MAX,
 } fj_err;
 
 /** Called every time the library sets an error message.
@@ -322,12 +321,12 @@ void (*fj_error_callback)(char const *message);
         This can be 0 indicating that the memory must be newly allocated.
 
     \param new_size
-        This is never equal to `old_size`.
+        This is never equal to \p old_size.
         This can be 0 indicating that the memory must be freed.
 
     \returns NULL on allocation failure or when freeing.
 
-    \todo Allocation thread-safety
+    \noop TODO Allocation thread-safety
 
     This does not have to be thread-safe. */
 FJ_PUBLIC
@@ -336,23 +335,70 @@ void *(*fj_allocation_callback)(
 
 /// \END
 
-/// \BEGIN{base_messaging}
+
+/// \BEGIN{base_async_base}
+
+
+struct fj_task
+{
+    /** This is automatically freed when the task is completed (with success,
+        failure or cancellation error). */
+    uintptr_t data;
+
+    /** Polls for the current task state.
+
+        This may update *any* field of the task,
+        including the fj_task::poll and fj_task::cancel methods.
+
+        This is fine to call even after the task has been completed or
+        canceled. */
+    void (*poll)(struct fj_task *self);
+
+    /** Requests the task to be canceled.
+
+        The task still needs to be polled in order to update its state.
+
+        This may update *any* field of the task,
+        including the fj_task::poll and fj_task::cancel methods.
+
+        This may silently fail as it can be too late or impossible to stop
+        an already running task. */
+    void (*cancel)(struct fj_task *self);
+
+    /** This is only valid when fj_task::completed is true. */
+    fj_err result;
+
+    bool completed;
+};
+
+/// \END
+
+
+/// \BEGIN{base_oop_base}
 
 /** This function calls the appropriate message handling functions.
 
     This can be overriden per each object in order to handle event messages,
-    e.g. for input events or hooking into internal object events. */
-typedef fj_err (*fj_sender)(void *object, int32_t message, void *message_data);
+    e.g. for input events or hooking into internal object events.
 
-/// \END
+    \param[inout] message_data (optional)
+        See the documentation of each message.
+    \param[out] out_task (optional)
+        Mandatory for asynchronous operations, see the documentation for each
+        message. */
+typedef fj_err (*fj_dispatcher)(
+    void *object,
+    int32_t message,
+    void *message_data,
+    struct fj_task *out_task);
 
-/// \BEGIN{base_objects}
-
-enum fj_object_type
+enum fj_type
 {
-    FJ_OBJECT_TYPE_APP,
-    FJ_OBJECT_TYPE_WINDOW,
-    FJ_OBJECT_TYPE_WINDOW_SERVICE,
+    FJ_APP,
+    FJ_WINDOW,
+    FJ_WINDOW_SERVICE,
+
+    _fj_type_ensure_int32 = INT32_MAX,
 };
 
 /// \END

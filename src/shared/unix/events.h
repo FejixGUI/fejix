@@ -10,8 +10,9 @@
 
 
 /** The callback needs to handle errors on its own.
-    If gets error events and the errors are fatal, it needs to also return an
-    error in order for fj_unix_events_wait to return an error. */
+    If this gets error events and if the errors are fatal,
+    it needs to also return an error in order for fj_unix_events_wait to
+    return an error. */
 typedef fj_err (*fj_unix_events_callback)(
     void *callback_data, int file_descriptor, short event_mask);
 
@@ -21,16 +22,19 @@ FJ_LIST(fj_unix_events_callback_list, fj_unix_events_callback)
 
 struct fj_unix_events
 {
-    int ping_pipe[2];
+    void *callback_data;
+
     struct fj_unix_events_pollfd_list pollfds;
     struct fj_unix_events_callback_list callbacks;
-    void *callback_data;
+    int ping_pipe[2];
 };
 
 
-// TODO ping callback
-
-fj_err fj_unix_events_init(struct fj_unix_events *events, void *callback_data);
+/** \param ping_callback This *must* call fj_unix_events_handle_ping */
+fj_err fj_unix_events_init(
+    struct fj_unix_events *events,
+    void *callback_data,
+    fj_unix_events_callback ping_callback);
 
 void fj_unix_events_deinit(struct fj_unix_events *events);
 
@@ -40,13 +44,19 @@ fj_err fj_unix_events_add(
     short events_to_watch,
     fj_unix_events_callback callback);
 
+fj_err fj_unix_events_handle_ping(int file_descriptor, short event_mask);
+
 /** Ensures that the file descriptor is not being watched.
     If the file descriptor has not beed added to the watching list, this
     returns `FJ_OK`. */
 fj_err fj_unix_events_remove(
     struct fj_unix_events *events, int file_descriptor);
 
-fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *opt_timeout);
+/** \param timeout (optional)
+    If NULL, waits forever until any events are received. */
+fj_err fj_unix_events_wait(struct fj_unix_events *events, fj_time *timeout);
+
+fj_err fj_unix_events_process(struct fj_unix_events *events);
 
 fj_err fj_unix_events_ping(struct fj_unix_events *events);
 

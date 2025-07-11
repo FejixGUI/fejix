@@ -1,5 +1,3 @@
-set(fejix_build_common_utils ON)
-
 target_sources(
     fejix
     PRIVATE

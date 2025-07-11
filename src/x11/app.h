@@ -1,47 +1,43 @@
 #ifndef FEJIX_X11_APP_H_
 #define FEJIX_X11_APP_H_
 
+#include <src/x11/x11.h>
+
+#include <src/shared/common/macros.h>
 #include <src/shared/unix/events.h>
 
 #include <fejix/app.h>
 
-#include <X11/Xlib.h>
-#include <xcb/xcb.h>
 
+// The atoms are sorted alphabetically here.
 
-/**
-    Define FJ_X11_ATOM_LIST_ITEM to make this do whatever you want.
+// clang-format off
+#define FJ_X11_ATOM_MACROLIST \
+    FJ_MACROLIST( \
+        FJ_MACROITEM(_NET_WM_NAME) \
+        FJ_MACROITEM(_NET_WM_SYNC_REQUEST) \
+        FJ_MACROITEM(_NET_WM_SYNC_REQUEST_COUNTER) \
+        FJ_MACROITEM(UTF8_STRING) \
+        FJ_MACROITEM(WM_DELETE_WINDOW) \
+        FJ_MACROITEM(WM_PROTOCOLS))
+// clang-format on
 
-    The atoms are sorted alphabetically here.
-*/
-#define FJ_X11_ATOM_LIST                                \
-    FJ_X11_ATOM_LIST_ITEM(_NET_WM_NAME)                 \
-    FJ_X11_ATOM_LIST_ITEM(_NET_WM_SYNC_REQUEST)         \
-    FJ_X11_ATOM_LIST_ITEM(_NET_WM_SYNC_REQUEST_COUNTER) \
-    FJ_X11_ATOM_LIST_ITEM(UTF8_STRING)                  \
-    FJ_X11_ATOM_LIST_ITEM(WM_DELETE_WINDOW)             \
-    FJ_X11_ATOM_LIST_ITEM(WM_PROTOCOLS)
-
-/** This makes a name for an enumeration member in fj_x11_atom that corresponds
- * to the atom. */
-#define FJ_X11_ATOM_ID(X) FJ_X11_ATOM_##X
+#undef FJ_MACROLIST
+#undef FJ_MACROITEM
+#define FJ_MACROITEM(ITEM) FJ_X11_ATOM_##ITEM,
+#define FJ_MACROLIST(...)           \
+    enum fj_x11_atom                \
+    {                               \
+        __VA_ARGS__ FJ_X11_ATOM_MAX \
+    };
+FJ_X11_ATOM_MACROLIST
 
 #define FJ_X11_GET_ATOM(APP, ATOM_NAME) \
-    ((APP)->_data->atoms[FJ_X11_ATOM_ID(ATOM_NAME)])
-
-#define FJ_X11_ATOM_LIST_ITEM(X) FJ_X11_ATOM_ID(X),
-enum fj_x11_atom
-{
-    FJ_X11_ATOM_LIST FJ_X11_ATOM_MAX
-};
-#undef FJ_X11_ATOM_LIST_ITEM
-
+    ((APP)->data->atoms[FJ_X11_ATOM_##ATOM_NAME])
 
 struct fj_app_private_data
 {
     struct fj_unix_events events;
-    bool should_stop;
-
     Display *display;
     xcb_connection_t *connection;
     xcb_atom_t atoms[FJ_X11_ATOM_MAX];
@@ -49,8 +45,5 @@ struct fj_app_private_data
     // struct fj_window_service window_service;
 };
 
-
-char const *fj_x11_error_into_string(uint8_t error_code);
-char const *fj_x11_xcb_error_into_string(xcb_generic_error_t *error);
 
 #endif

@@ -40,7 +40,7 @@ UI frameworks, browsers, and game engines.
 
   * System compositor integration
 
-  * Atomic screen updates
+  * Transactional screen updates
 
   * Asynchronous operations
 

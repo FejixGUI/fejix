@@ -15,10 +15,10 @@ struct fj_platform
     char const *name;
     struct fj_version version;
 
-    /** \param type Identifies what object type to return the message sender
-            for.
+    /** \param type Identifies what object type to return the message
+            dispatcher for.
         \returns NULL if the object type is not supported. */
-    fj_sender (*get_sender)(enum fj_object_type type);
+    fj_dispatcher (*get_dispatcher)(enum fj_type type);
 };
 
 /// \END

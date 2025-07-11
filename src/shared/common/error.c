@@ -1,5 +1,7 @@
 #include "error.h"
 
+#include <src/shared/common/macros.h>
+
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>

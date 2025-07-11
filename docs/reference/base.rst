@@ -50,14 +50,14 @@ Memory management
   :content-only:
 
 
-Messaging
-========================
-
-.. doxygengroup:: base_messaging
-  :content-only:
-
-Objects
+OOP base
 ==========================
 
-.. doxygengroup:: base_objects
+.. doxygengroup:: base_oop_base
+  :content-only:
+
+Asynchronous base
+========================
+
+.. doxygengroup:: base_async_base
   :content-only:

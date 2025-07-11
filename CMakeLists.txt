@@ -36,7 +36,6 @@ set(fejix_build_x11 OFF CACHE BOOL
 
 # The following variables enable some shared utils and can be enabled in
 # platform build scripts
-set(fejix_build_common_utils OFF)
 set(fejix_build_unix_utils OFF)
 
 # ==============================================================================
@@ -155,6 +154,10 @@ endif()
 # UTILS
 # ==============================================================================
 
+# These utils are always built
+include("${CMAKE_CURRENT_LIST_DIR}/src/shared/common/build.cmake")
+
+
 # Utils can themselves enable other utils on which they depend.
 # Here the order of inclusion is important.
 
@@ -162,6 +165,3 @@ if("${fejix_build_unix_utils}")
     include("${CMAKE_CURRENT_LIST_DIR}/src/shared/unix/build.cmake")
 endif()
 
-if("${fejix_build_common_utils}")
-    include("${CMAKE_CURRENT_LIST_DIR}/src/shared/common/build.cmake")
-endif()

@@ -3,6 +3,45 @@ Development
 ===================
 
 
+Platforms
+===============
+
+Platform names
+----------------
+
+The codename of the platform is the C "namespace", the value of the
+:c:member:`fj_platform.name` field, and used everywhere throughout the codebase.
+
+The codename should be max. 6 characters long.
+
+.. list-table::
+  :header-rows: 1
+
+  * - Full name
+    - Codename
+  * - Windows API
+    - ``winapi``
+  * - Windows Runtime
+    - ``winrt``
+  * - X11
+    - ``x11``
+  * - Wayland
+    - ``wl``
+  * - Apple Cocoa
+    - ``cocoa``
+  * - Apple UIKit
+    - ``uikit``
+  * - Android Native Development Kit
+    - ``andk``
+  * - WebAssembly
+    - ``wasm``
+  * - Linux Framebuffer
+    - ``lxfb``
+  * - Linux Direct Rendering Manager
+    - ``lxdrm``
+  * - BSD Framebuffer
+    - ``bsdfb``
+
 Documentation
 =================
 
@@ -88,5 +127,66 @@ Markup
     * - ``\---``
       - ``---``
       - ---
+
+
+Coding style
+===============
+
+TODO, FIXME, XXX
+----------------------------
+
+Mark the important things with the following set of markers:
+
+* For a work in progress use ``TODO``:
+
+  In ordinary C comments:
+
+  .. code-block:: c
+
+    // TODO <message>
+
+  In Doxygen comments:
+
+  .. code-block:: c
+
+    /** \noop TODO <message> */
+
+  In RST documentation:
+
+  .. code-block:: rst
+
+    .. TODO <message>
+
+* For bugs that need to be fixed use ``FIXME`` near the code they appear:
+
+  In C comments:
+
+  .. code-block:: c
+
+    // FIXME <message>
+
+  In RST documentation:
+
+  .. code-block:: rst
+
+    .. FIXME <message>
+
+* For important implementation notes use ``XXX`` near the code that relies on
+  or works around some badly documented or surprising platform features:
+
+  .. code-block:: c
+
+    // XXX <message>
+
+This makes it easy to search for places in code that require attention with
+``ripgrep``:
+
+.. code-block:: shell
+
+  rg 'TODO|FIXME|XXX'
+
+Only use ``\note``, ``\warning``, ``\bug``, or similar tags in public
+documentation for things that users need to know about.
+Do not use these tags in private code.
 
 

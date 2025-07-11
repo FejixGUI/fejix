@@ -4,7 +4,8 @@ target_sources(
         "${CMAKE_CURRENT_LIST_DIR}/error.c"
         "${CMAKE_CURRENT_LIST_DIR}/list.c"
         "${CMAKE_CURRENT_LIST_DIR}/math.c"
-        "${CMAKE_CURRENT_LIST_DIR}/memory.c")
+        "${CMAKE_CURRENT_LIST_DIR}/memory.c"
+        "${CMAKE_CURRENT_LIST_DIR}/task.c")
 
 if("${fejix_enable_errors}")
     target_compile_definitions(

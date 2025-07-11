@@ -42,17 +42,36 @@
         on the same thread that handles them. */
 struct fj_app
 {
-    /** The app's message sender function. */
-    fj_sender send;
+    /** The app's message dispatcher function.
 
-    /** The default sender provided by the platform. This field is only for
-        convenience. */
-    fj_sender _send;
+        Override this to handle user input and internal library events.
+        This *must* call the default dispatcher for unhandled messages. */
+    fj_dispatcher dispatch;
 
-    /** The user's callback data. */
-    uintptr_t data;
+    /** The default dispatcher provided by the platform.
 
-    struct fj_app_private_data *_data;
+        This field is only for convenience, it must be set manually and is
+        supposed to be called for unhandled messages in fj_app::send. */
+    fj_dispatcher dispatch_default;
+
+    uintptr_t user_data;
+
+    struct fj_app_private_data *data;
+
+    /** This is the user's task that is polled and canceled by the
+        fj_app::main_task. Polling happens once per fj_app::main_task's poll,
+        most likely before processing events. Canceling happens when the
+        fj_app::main_task gets canceled.
+
+        This can be used to execute code at the start, at the end, and at
+        each iteration of the event loop.
+
+        Completing this task has no affect on the event loop,
+        to quit the app, cancel fj_app::main_task (in case it's supported). */
+    struct fj_task user_task;
+
+    /** The event loop task. \noop TODO app execution model docs  */
+    struct fj_task main_task;
 };
 
 /// \END
@@ -60,48 +79,46 @@ struct fj_app
 
 /// \BEGIN{app_other}
 
-enum fj_app_loop_flags
+enum fj_app_task_flags
 {
-    /** Indicates that #FJ_APP_LOOP can be run from the program's entrypoint to
-        run the application. If not present, means that the app is run by some
-        other mechanism, externally, not from within the main function and
-        definitely not using the #FJ_APP_LOOP message. */
-    FJ_APP_LOOP_FLAG_TOPLEVEL = 1 << 0,
+    /** Indicates that the app supports the #FJ_APP_AWAIT message.
+        If not present, means that the app is run externally (e.g. when it is
+        embedded into the actual executable that handles the event processing),
+        which means that the app's entrypoint should return as soon as it
+        finishes initializing the app in order for the app to start running. */
+    FJ_APP_TASK_FLAG_AWAITABLE = 1 << 0,
 
-    /** Indicates that #FJ_APP_LOOP can be called multiple times, even within
-        itself to wait for events at arbitrary times. */
-    FJ_APP_LOOP_FLAG_REENTRANT = 1 << 1,
-
-    /** Indicates that the #FJ_APP_STOP_LOOP message is supported.
+    /** Indicates that fj_app::main_task is cancelable.
+        If not present, means that canceling fj_app::main_task has no effect,
+        which happens on platforms where the application is managed by the
+        system and cannot quit whenever it wants, but when the system decides.
 
         \note
-        - **UIKit**: the loop is not stoppable. The only way to forcefully exit
-            the program is to call the exit function, which is
-            [considered a bad practice by Apple
+        - **UIKit**: the app task is not supposed to be cancelable.
+            The only way to forcefully exit the program is to call the exit
+            function, which is [considered a bad practice by Apple
             ](https://developer.apple.com/library/archive/qa/qa1561/_index.html).
+        - **WASM**: the app task is not cancelable.
         */
-    FJ_APP_LOOP_FLAG_STOPPABLE = 1 << 2,
+    FJ_APP_TASK_FLAG_CANCELABLE = 1 << 1,
 
-    /** Indicates that stopping the loop will result into some visible
-        consequences, potencially looking like glitches.
-        If not present, means that stopping the loop is always done gracefully
-        and with no possible harm to the app's visual state.
+    /** This flag is only meaningful when #FJ_APP_TASK_FLAG_AWAITABLE is
+        present.
 
-        To avoid problems connected with this flag, you should minize your
-        usage of event loops and instead structure your code so that it just
-        responds to messages.
+        Indicates that the app can be run just by polling fj_app::main_task in a
+        loop. If not present, means that to run the app you need to await
+        its task.
 
         \note
-        - **WinAPI**: if the loop is stopped while a window is being resized
-            by the user, the resizing will stop. This is because window resizing
-            is implemented on the client side (not by the system) and works by
-            [running an internal event loop
-            ](https://stackoverflow.com/a/21201822) to track the user's pointer
-            position to resize the window.
-            All the events still get processed by the library,
-            however stopping the loop will cause the resizing to stop.
-            */
-    FJ_APP_LOOP_FLAG_STOP_VISIBLE = 1 << 3,
+        - **UIKit**: the pollable flag is never specified as you need to enter
+            the await function to run the app, but it is in fact pollable
+            when inside that function. The reason is that the toplevel call
+            to #FJ_APP_AWAIT runs `UIApplicationMain()` which allows the app
+            to run, but inside it other mechanisms are available for running
+            the app by just polling in a loop. */
+    FJ_APP_TASK_FLAG_POLLABLE = 1 << 2,
+
+    _fj_app_task_flags_ensure_int32 = INT32_MAX,
 };
 
 /// \END
@@ -111,39 +128,34 @@ enum fj_app_loop_flags
 
 enum fj_app_message
 {
-    /** Initializes the application.
-        \param[in] extra_init_data Points to extra platform-defined
-            initialization data (set to NULL to ignore). */
+    /** Initializes the application. */
     FJ_APP_INIT,
 
-    /** All created objects should be destroyed before destroying the app. */
+    /** Deinitializes the application.
+
+        This message is not intended for quitting the app as the quitting
+        process can be complicated and on some platforms even asynchronous.
+        Cancel fj_app::main_task instead (see #FJ_APP_DID_SET_TASK_FLAGS).
+
+        All created objects should be destroyed before destroying the app. */
     FJ_APP_DEINIT,
 
-    /** Runs the message loop awaiting the #FJ_APP_STOP_LOOP.
+    /** Awaits until a task completes by processing system events.
+
+        \param[in] task (optional) A pointer to a ::fj_task to await.
+
+        This always polls for fj_app::main_task to continue processing events,
+        thus specifying the task parameter is not necessary.
+        Awaiting will always finish when the application task gets canceled.
+
         The support for this message and its exact behavior is
-        platform-defined. To get a detailed information about that, use
-        #FJ_APP_GET_LOOP_FLAGS. */
-    FJ_APP_LOOP,
+        platform-defined. See #FJ_APP_DID_SET_TASK_FLAGS. */
+    FJ_APP_AWAIT,
 
-    FJ_APP_DID_START_LOOP,
+    /** \noop TODO app execution model docs
 
-    /** Indicates that the most recently started loop should stop as soon as
-        possible.
-
-        Stopping the loop may not stop the event processing immediately as it
-        is often done in batches using queues. Therefore some events can still
-        be processed before stopping. */
-    FJ_APP_STOP_LOOP,
-
-    /** This is sent right before returning from the running loop. */
-    FJ_APP_DID_STOP_LOOP,
-
-    /** Gets the loop capability flags in case #FJ_APP_LOOP is supported.
-        If this message is unsupported, that means that #FJ_APP_LOOP is
-        unsupported, too.
-
-        \param[out] flags Returns #fj_app_loop_flags. */
-    FJ_APP_GET_LOOP_FLAGS,
+        \param[in] flags Provides #fj_app_task_flags. */
+    FJ_APP_DID_SET_TASK_FLAGS,
 
     /** Wakes up an application that is waiting for events.
         This asks the system to send a custom event that goes back as
@@ -167,11 +179,17 @@ enum fj_app_message
     /** Provides an internal system handle of the app.
         This is sent on app initialization.
 
-        \param[in] system_handle Platform-defined. */
+        \param[in] system_handle Platform-defined.
+
+        \note
+        - **X11**: the handle is the Xlib's `Display*`.
+        - **Wayland**: the handle is `wl_display`.
+        - **Windows API*: the handle is the current `HINSTANCE`. */
     FJ_APP_DID_SET_SYSTEM_HANDLE,
 
     FJ_APP_MESSAGE_MAX,
-    FJ_APP_MESSAGE_ENSURE_INT32 = INT32_MAX,
+
+    _fj_app_message_ensure_int32 = INT32_MAX,
 };
 
 

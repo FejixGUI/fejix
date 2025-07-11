@@ -1,3 +1,5 @@
+#include <src/shared/common/macros.h>
+
 #include <fejix/platform.h>
 
 #include <stdlib.h>
