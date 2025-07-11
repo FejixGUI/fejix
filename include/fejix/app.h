@@ -16,7 +16,7 @@
     Whether it can be instantiated multiple times is implementation-defined.
     - **Wayland**, **X11**: an application object can be instantiated as many
         times as you want.
-    - **WindowsAPI**: instantiating this multiple times is not a strict error
+    - **Windows API**: instantiating this multiple times is not a strict error
         if you are careful with requests that affect some global process state.
 
     \note
@@ -25,14 +25,14 @@
     - **UIKit**: this *must* be instatiated on the main thread and all messsages
         where thread-safety is not specified *must* be sent from the main
         thread.
-    - **WindowsAPI**, **Wayland**, **X11**: this can be instantiated on any
+    - **Windows API**, **Wayland**, **X11**: this can be instantiated on any
         thread.
 
     \note
     This should generally be run on the same thread where instantiated.
     Whether or not it can be run on other threads is platform-defined.
     - **Wayland**, **X11**: this can be run from any thread.
-    - **WindowsAPI**: there are restrictions that limit event handling to the
+    - **Windows API**: there are restrictions that limit event handling to the
         thread that has created all the objects that may receive events.
         This is because [event queues are thread-local
         ](https://learn.microsoft.com/en-us/windows/win32/winmsg/using-messages-and-message-queues)
@@ -59,18 +59,53 @@ struct fj_app
     struct fj_app_private_data *data;
 
     /** This is the user's task that is polled and canceled by the
-        fj_app::main_task. Polling happens once per fj_app::main_task's poll,
-        most likely before processing events. Canceling happens when the
-        fj_app::main_task gets canceled.
+        fj_app::main_task.
 
         This can be used to execute code at the start, at the end, and at
         each iteration of the event loop.
-
         Completing this task has no affect on the event loop,
-        to quit the app, cancel fj_app::main_task (in case it's supported). */
+        to quit the app, cancel fj_app::main_task (in case it's supported).
+
+        \noop TODO Is the order of user_task.poll() and processing the events
+        \noop   important?  */
     struct fj_task user_task;
 
-    /** The event loop task. \noop TODO app execution model docs  */
+    /** The event loop task.
+
+        There are several ways of running the app depending on the platform
+        and your limitations:
+
+        1. *Exiting the program*.
+
+            Yes, exiting the main function right after the
+            initialization. This works on platforms like WebAssembly where
+            your code is basically a library that is run by a wrapper like the
+            actual JavaScript program.
+
+            This method *must be* used when the #FJ_APP_TASK_FLAG_AWAITABLE
+            is *not* set in the #FJ_APP_DID_SET_TASK_FLAGS message.
+
+        2. *Awaiting the main task*.
+
+            This means calling #FJ_APP_AWAIT with no arguments \---
+            fj_app::main_task is always awaited with whatever task you specify
+            in order to actually run the tasks that depend on the event loop.
+
+            This is the default and recommended method for cases when
+            #FJ_APP_TASK_FLAG_AWAITABLE is set in
+            the #FJ_APP_DID_SET_TASK_FLAGS message.
+
+        3. *Manually polling the main task*.
+
+            This gives you the ability to run a legacy-style event loop like
+            the ones in e.g. SDL2, GLFW and Raylib.
+            This approach is not portable and can have quite unexpected
+            behaviors on some platforms.
+
+            This is possible if #FJ_APP_TASK_FLAG_POLLABLE is set in
+            the #FJ_APP_DID_SET_TASK_FLAGS message.
+
+        \see fj_app_task_flags, FJ_APP_DID_SET_TASK_FLAGS */
     struct fj_task main_task;
 };
 
@@ -79,13 +114,18 @@ struct fj_app
 
 /// \BEGIN{app_other}
 
+/** \see fj_app::main_task */
 enum fj_app_task_flags
 {
     /** Indicates that the app supports the #FJ_APP_AWAIT message.
         If not present, means that the app is run externally (e.g. when it is
         embedded into the actual executable that handles the event processing),
         which means that the app's entrypoint should return as soon as it
-        finishes initializing the app in order for the app to start running. */
+        finishes initializing the app in order for the app to start running.
+
+        \note
+        - **WebAssembly**: unsupported; you should exit after initializing
+            the application in order for JavaScript code to run it.*/
     FJ_APP_TASK_FLAG_AWAITABLE = 1 << 0,
 
     /** Indicates that fj_app::main_task is cancelable.
@@ -94,12 +134,12 @@ enum fj_app_task_flags
         system and cannot quit whenever it wants, but when the system decides.
 
         \note
-        - **UIKit**: the app task is not supposed to be cancelable.
-            The only way to forcefully exit the program is to call the exit
-            function, which is [considered a bad practice by Apple
+        - **Wayland**, **X11**, **Windows API**: supported.
+        - **UIKit**: unsupported, though it is in theory possible to exit
+            the program by calling the exit function. This, however, is
+            [considered a bad practice by Apple
             ](https://developer.apple.com/library/archive/qa/qa1561/_index.html).
-        - **WASM**: the app task is not cancelable.
-        */
+        - **WASM**: unsupported. */
     FJ_APP_TASK_FLAG_CANCELABLE = 1 << 1,
 
     /** This flag is only meaningful when #FJ_APP_TASK_FLAG_AWAITABLE is
@@ -110,12 +150,26 @@ enum fj_app_task_flags
         its task.
 
         \note
-        - **UIKit**: the pollable flag is never specified as you need to enter
-            the await function to run the app, but it is in fact pollable
-            when inside that function. The reason is that the toplevel call
-            to #FJ_APP_AWAIT runs `UIApplicationMain()` which allows the app
-            to run, but inside it other mechanisms are available for running
-            the app by just polling in a loop. */
+        - **Wayland**, **X11**: supported.
+        - **Windows API**: supported with a platform-specific behavior:
+            when the user starts resizing a window, the main task freezes
+            in its fj_task::poll method. This is because the
+            [DefWindowProc
+            ](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-defwindowprocw)
+            function implements all the window resizing logic in
+            a client-side event loop,
+            which continues to process asynchronous tasks,
+            but blocks until the resizing is finished.
+            If you implement drawing inside a custom event loop that polls
+            the main task, it will result in freezes during window
+            resizing.
+        - **UIKit**: unsupported, but usable with a platform-specific
+            limitation: even though the pollable flag is never specified, you
+            can poll the main task to process events, but only from within
+            a blocking call to #FJ_APP_AWAIT.
+            The reason is that the toplevel call to #FJ_APP_AWAIT
+            calls `UIApplicationMain()` that is necessary to run the app,
+            but inside it manual polling is allowed.*/
     FJ_APP_TASK_FLAG_POLLABLE = 1 << 2,
 
     _fj_app_task_flags_ensure_int32 = INT32_MAX,
@@ -128,7 +182,10 @@ enum fj_app_task_flags
 
 enum fj_app_message
 {
-    /** Initializes the application. */
+    /** Initializes the application.
+
+        You must initialize all the fields except fj_app::main_task and
+        fj_app::data *before* dispatching this message.*/
     FJ_APP_INIT,
 
     /** Deinitializes the application.
@@ -149,12 +206,13 @@ enum fj_app_message
         Awaiting will always finish when the application task gets canceled.
 
         The support for this message and its exact behavior is
-        platform-defined. See #FJ_APP_DID_SET_TASK_FLAGS. */
+        platform-defined.
+
+        \see fj_app::main_task, fj_app_task_flags */
     FJ_APP_AWAIT,
 
-    /** \noop TODO app execution model docs
-
-        \param[in] flags Provides #fj_app_task_flags. */
+    /** \param[in] flags Provides #fj_app_task_flags.
+        \see fj_app::main_task, fj_app_task_flags */
     FJ_APP_DID_SET_TASK_FLAGS,
 
     /** Wakes up an application that is waiting for events.
@@ -179,12 +237,12 @@ enum fj_app_message
     /** Provides an internal system handle of the app.
         This is sent on app initialization.
 
-        \param[in] system_handle Platform-defined.
+        \param[in] system_handle A pointer to a platform-dependent handle.
 
         \note
         - **X11**: the handle is the Xlib's `Display*`.
-        - **Wayland**: the handle is `wl_display`.
-        - **Windows API*: the handle is the current `HINSTANCE`. */
+        - **Wayland**: the handle is `wl_display*`.
+        - **Windows API**: the handle is the current `HINSTANCE`. */
     FJ_APP_DID_SET_SYSTEM_HANDLE,
 
     FJ_APP_MESSAGE_MAX,

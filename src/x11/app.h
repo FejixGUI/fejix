@@ -10,7 +10,6 @@
 
 
 // The atoms are sorted alphabetically here.
-
 // clang-format off
 #define FJ_X11_ATOM_MACROLIST \
     FJ_MACROLIST( \

@@ -10,11 +10,12 @@ Introduction
   quick-start
   tutorials
   architecture
-  feature-support
+  features-and-plans
   build
   reference
   Source <https://github.com/FejixGUI/fejix>
   development
+  changelog
 
 .. TODO:
 .. Change this wordy marketing text to an actually useful index page

@@ -88,7 +88,7 @@ target_compile_options(
     fejix
     PRIVATE
         "$<$<C_COMPILER_ID:MSVC>:/W4>"
-        "$<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-fvisibility=hidden;-Werror=vla;-Wall;-Wextra;-Wpedantic;-Wno-unused-function>")
+        "$<$<C_COMPILER_ID:GNU,Clang,AppleClang>:-fvisibility=hidden;-Werror=vla;-Wall;-Wextra;-Wpedantic>")
 
 target_compile_definitions(
     fejix
