@@ -107,7 +107,8 @@ enum fj_orientation
         then rotated 270 degrees clockwise. */
     FJ_ORIENTATION_FLIPPED_ROTATED270,
 
-    _fj_orientation_ensure_int32 = INT32_MAX,
+    FJ_ORIENTATION_COUNT,
+    FJ_ORIENTATION_ENUM_MAX = INT32_MAX,
 };
 
 
@@ -292,9 +293,8 @@ typedef enum
     /** Task canceled. */
     FJ_ERR_CANCELED,
 
-    FJ_ERR_MAX,
-
-    _fj_err_ensure_int32 = INT32_MAX,
+    FJ_ERR_COUNT,
+    FJ_ERR_ENUM_MAX = INT32_MAX,
 } fj_err;
 
 /** Called every time the library sets an error message.
@@ -336,11 +336,15 @@ void *(*fj_allocation_callback)(
 /// \END
 
 
-/// \BEGIN{base_async_base}
+/// \BEGIN{base_async}
 
 
 struct fj_task
 {
+    /** This is often used to refer to the object that the task was created
+        for. */
+    void *object;
+
     /** This is automatically freed when the task is completed (with success,
         failure or cancellation error). */
     uintptr_t data;
@@ -374,7 +378,23 @@ struct fj_task
 /// \END
 
 
-/// \BEGIN{base_oop_base}
+/// \BEGIN{base_object_oriented}
+
+/** This type is designed to be compatible with all enums that define
+    message IDs. */
+typedef uint32_t fj_message;
+
+enum fj_message_limits
+{
+    /** This is for messages used internally in the library, such messages
+        should be dispatched with the default dispatcher and not handled in any
+        other way. */
+    FJ_PRIVATE_MESSAGE_MIN = 5000,
+
+    /** You can implement your own custom messages that start from
+        #FJ_USER_MESSAGE_MIN (if you really need to). */
+    FJ_USER_MESSAGE_MIN = 10000,
+};
 
 /** This function calls the appropriate message handling functions.
 
@@ -388,17 +408,18 @@ struct fj_task
         message. */
 typedef fj_err (*fj_dispatcher)(
     void *object,
-    int32_t message,
+    fj_message message,
     void *message_data,
     struct fj_task *out_task);
 
 enum fj_type
 {
-    FJ_APP,
-    FJ_WINDOW,
-    FJ_WINDOW_SERVICE,
+    FJ_TYPE_APP,
+    FJ_TYPE_WINDOW,
+    FJ_TYPE_WINDOW_SERVICE,
 
-    _fj_type_ensure_int32 = INT32_MAX,
+    FJ_TYPE_COUNT,
+    FJ_TYPE_ENUM_MAX = INT32_MAX,
 };
 
 /// \END

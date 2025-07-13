@@ -14,14 +14,12 @@ App object
 Definition
 -------------
 
-.. doxygengroup:: app_definition
-  :content-only:
+.. doxygenstruct:: fj_app
 
 Messages
 ------------
 
-.. doxygengroup:: app_messages
-  :content-only:
+.. doxygenenum:: fj_app_message
 
 Other
 ------------

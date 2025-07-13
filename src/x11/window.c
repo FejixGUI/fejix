@@ -1,177 +1,124 @@
 #include "window.h"
 
 #include <src/x11/app.h>
+#include <src/x11/x11.h>
 
-#include <src/shared/utils/logging.h>
-#include <src/shared/utils/memory.h>
+#include <src/shared/common/error.h>
+#include <src/shared/common/memory.h>
+#include <src/shared/common/task.h>
 
-#include <malloc.h>
 
-
-static fj_err fj_window_service_new_(struct fj_window_service **out_service, struct fj_app *app)
+enum
 {
-    fj_window_service_init_base(&app->window_service, app);
-    *out_service = &app->window_service;
-    return FJ_OK;
+    NORMAL_WINDOW_EVENT_MASK = XCB_EVENT_MASK_EXPOSURE
+        | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_KEY_PRESS
+        | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_FOCUS_CHANGE
+        | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE
+        | XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_MOTION
+        | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW
+        | XCB_EVENT_MASK_VISIBILITY_CHANGE,
+};
+
+
+static fj_err window_add_to_service(struct fj_window *window)
+{
+    return fj_window_list_append(&window->service->data->windows, &window);
 }
 
-static fj_err fj_window_service_del_(struct fj_window_service *service)
+static fj_err window_remove_from_service(struct fj_window *window)
 {
-    fj_window_vector_free(&service->windows);
-    return FJ_OK;
-}
+    struct fj_window_list *windows = &window->service->data->windows;
 
-
-static fj_err fj_window_del_(struct fj_window *window)
-{
-    xcb_connection_t *c = window->base.app->connection;
-    struct fj_window_service *service = window->base.service;
-
-    for (uint32_t i = 0; i < service->windows.length; i++) {
-        if (service->windows.items[i] == window) {
-            fj_window_vector_remove(&service->windows, i);
+    for (uint32_t i = 0; i < windows->length; i++) {
+        if (windows->items[i] == window) {
+            return fj_window_list_remove(windows, i);
         }
     }
 
-    if (window->colormap) {
-        xcb_void_cookie_t coockie = xcb_free_colormap_checked(c, window->colormap);
-        xcb_generic_error_t *error = xcb_request_check(c, coockie);
-        if (error) {
-            FJ_WARN("xcb_free_colormap failed");
-            free(error);
-            // Proceed to window deletion
-        }
-    }
-
-    if (window->id) {
-        xcb_void_cookie_t coockie = xcb_destroy_window_checked(c, window->id);
-        xcb_generic_error_t *error = xcb_request_check(c, coockie);
-
-        if (error) {
-            FJ_ERROR("xcb_destroy_window failed");
-            free(error);
-            return FJ_ERROR_OPERATION_FAILED;
-        }
-    }
-
-    FJ_FREE(&window);
     return FJ_OK;
 }
 
 
-static fj_err fj_window_new_(struct fj_window **out_window, struct fj_window_service *service)
+fj_err window_deinit(struct fj_window *window)
 {
     fj_err e;
 
-    struct fj_window *window;
-    e = FJ_ALLOC(&window);
-    if (e)
-        return e;
+    struct fj_app_private_data *app_data = window->service->app->data;
+    xcb_connection_t *c = app_data->connection;
 
-    e = fj_window_vector_push(&service->windows, &window);
-    if (e) {
-        fj_window_del_(window);
-        return e;
+    if (window->data->id) {
+        e = fj_x11_check(c, xcb_destroy_window_checked(c, window->data->id));
+        if (e)
+            return e;
     }
 
-    fj_window_init_base(window, service);
+    window_remove_from_service(window);
+    FJ_FREE(&window);
 
-    *out_window = window;
     return FJ_OK;
 }
 
 
-static fj_err create_window(struct fj_app *app, struct fj_window *window)
+fj_err window_init(struct fj_window *window)
 {
-    // TODO clean up this code once it starts to actually do something useful
+    fj_err e;
 
-    window->id = xcb_generate_id(app->connection);
+    struct fj_app_private_data *app_data = window->service->app->data;
+    xcb_connection_t *c = app_data->connection;
 
-    // TODO Add a module to enumarate screens and allow screen specification here
-    xcb_screen_t *default_screen = xcb_setup_roots_iterator(xcb_get_setup(app->connection)).data;
+    e = FJ_ALLOC(&window->data);
+    if (e)
+        return e;
 
-    xcb_colormap_t colormap = window->colormap;
-
-    if (colormap == 0) {
-        colormap = default_screen->default_colormap;
+    e = window_add_to_service(window);
+    if (e) {
+        window_deinit(window);
+        return e;
     }
 
-    if (window->depth == 0) {
-        window->depth = default_screen->root_depth;
-    }
-
-    if (window->visual == 0) {
-        window->visual = default_screen->root_visual;
-    }
-
-    // TODO Research whether XCB_CW_BACKING_STORE is useful
-    uint32_t property_mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
-
-    uint32_t properties[] = {
-        default_screen->black_pixel,
-
-        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_KEY_PRESS
-            | XCB_EVENT_MASK_KEY_RELEASE | XCB_EVENT_MASK_FOCUS_CHANGE | XCB_EVENT_MASK_BUTTON_PRESS
-            | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION
-            | XCB_EVENT_MASK_BUTTON_MOTION | XCB_EVENT_MASK_ENTER_WINDOW
-            | XCB_EVENT_MASK_LEAVE_WINDOW | XCB_EVENT_MASK_VISIBILITY_CHANGE,
-
-        colormap,
-    };
+    window->data->id = xcb_generate_id(c);
 
     // TODO Add preferred size retrieval here
-    xcb_void_cookie_t coockie = xcb_create_window_checked(
-        app->connection,
-        window->depth,
-        window->id,
-        default_screen->root,
-        0,
-        0,
-        320,
-        240,
-        0,
-        XCB_WINDOW_CLASS_INPUT_OUTPUT,
-        window->visual,
-        property_mask,
-        properties);
-    xcb_generic_error_t *error = xcb_request_check(app->connection, coockie);
-    if (error) {
-        FJ_ERROR("xcb_create_window failed: %e", fj_x11_xcb_error_into_string(error));
-        free(error);
-        return FJ_ERROR_OPERATION_FAILED;
-    }
 
-    xcb_atom_t protocols[] = {
-        FJ_X11_GET_ATOM(app, _NET_WM_SYNC_REQUEST),
-        FJ_X11_GET_ATOM(app, WM_DELETE_WINDOW),
+    struct fj_x11_create_window_data data = {
+        .window = window->data->id,
+        .viewport = { { 0, 0 }, { 500, 400 } },
+        .event_mask = NORMAL_WINDOW_EVENT_MASK,
     };
 
-    coockie = xcb_change_property_checked(
-        app->connection,
-        XCB_PROP_MODE_REPLACE,
-        window->id,
-        FJ_X11_GET_ATOM(app, WM_PROTOCOLS),
-        XCB_ATOM_ATOM,
-        sizeof(*protocols) * 8,
-        FJ_LEN(protocols),
-        protocols);
-    error = xcb_request_check(app->connection, coockie);
-    if (error) {
-        FJ_ERROR("xcb_change_property failed");
-        free(error);
-        return FJ_ERROR_OPERATION_FAILED;
+    e = fj_x11_check(c, fj_x11_create_window(c, NULL, &data));
+    if (e) {
+        window_deinit(window);
+        return e;
     }
 
-    coockie = xcb_map_window_checked(app->connection, window->id);
-    error = xcb_request_check(app->connection, coockie);
-    if (error) {
-        FJ_ERROR("xcb_map_window failed");
-        free(error);
-        return FJ_ERROR_OPERATION_FAILED;
+    xcb_atom_t protocols_property = app_data->atoms[FJ_X11_ATOM(WM_PROTOCOLS)];
+    xcb_atom_t protocols[] = {
+        app_data->atoms[FJ_X11_ATOM(_NET_WM_SYNC_REQUEST)],
+        app_data->atoms[FJ_X11_ATOM(WM_DELETE_WINDOW)],
+    };
+
+    e = fj_x11_check(
+        c,
+        xcb_change_property_checked(
+            c,
+            XCB_PROP_MODE_REPLACE,
+            window->data->id,
+            protocols_property,
+            XCB_ATOM_ATOM,
+            sizeof(*protocols) * 8 /*bits*/,
+            FJ_LEN(protocols),
+            protocols));
+    if (e) {
+        window_deinit(window);
+        return e;
     }
 
-    // TODO Should windows be initially visible or hidden? If visible, then add cached visiblity
-    // state retrieval here.
+    e = fj_x11_check(c, xcb_map_window_checked(c, window->data->id));
+    if (e) {
+        window_deinit(window);
+        return e;
+    }
 
     // TODO Add initial events (size, orientation, density, visibility) here
 
@@ -179,26 +126,23 @@ static fj_err create_window(struct fj_app *app, struct fj_window *window)
 }
 
 
-static fj_err fj_window_commit_(struct fj_window *window)
+fj_err fj_x11_window_dispatch(
+    void *window, fj_message message, void *data, struct fj_task *task)
 {
     fj_err e;
 
-    if (window->id == 0) {
-        e = create_window(window->base.app, window);
-        if (e)
+    switch (message) {
+        case FJ_WINDOW_INIT:
+            e = window_init(window);
+            fj_task_set_completed(task, e);
             return e;
+
+        case FJ_WINDOW_DEINIT:
+            e = window_deinit(window);
+            fj_task_set_completed(task, e);
+            return e;
+
+        default:
+            return FJ_ERR_UNIMPLEMENTED;
     }
-
-    return FJ_OK;
-}
-
-// TODO
-
-void fj_x11_init_window(void)
-{
-    FJ_API_INIT(fj_window_service_new)
-    FJ_API_INIT(fj_window_service_del)
-    FJ_API_INIT(fj_window_new)
-    FJ_API_INIT(fj_window_del)
-    FJ_API_INIT(fj_window_commit)
 }

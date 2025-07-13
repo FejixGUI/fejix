@@ -7,8 +7,6 @@
 #include <fejix/base.h>
 
 
-/// \BEGIN{app_definition}
-
 /** This object manages the application lifecycle and all of its resources.
 
     \note
@@ -51,7 +49,7 @@ struct fj_app
     /** The default dispatcher provided by the platform.
 
         This field is only for convenience, it must be set manually and is
-        supposed to be called for unhandled messages in fj_app::send. */
+        supposed to be called for unhandled messages in fj_app::dispatch. */
     fj_dispatcher dispatch_default;
 
     uintptr_t user_data;
@@ -109,76 +107,6 @@ struct fj_app
     struct fj_task main_task;
 };
 
-/// \END
-
-
-/// \BEGIN{app_other}
-
-/** \see fj_app::main_task */
-enum fj_app_task_flags
-{
-    /** Indicates that the app supports the #FJ_APP_AWAIT message.
-        If not present, means that the app is run externally (e.g. when it is
-        embedded into the actual executable that handles the event processing),
-        which means that the app's entrypoint should return as soon as it
-        finishes initializing the app in order for the app to start running.
-
-        \note
-        - **WebAssembly**: unsupported; you should exit after initializing
-            the application in order for JavaScript code to run it.*/
-    FJ_APP_TASK_FLAG_AWAITABLE = 1 << 0,
-
-    /** Indicates that fj_app::main_task is cancelable.
-        If not present, means that canceling fj_app::main_task has no effect,
-        which happens on platforms where the application is managed by the
-        system and cannot quit whenever it wants, but when the system decides.
-
-        \note
-        - **Wayland**, **X11**, **Windows API**: supported.
-        - **UIKit**: unsupported, though it is in theory possible to exit
-            the program by calling the exit function. This, however, is
-            [considered a bad practice by Apple
-            ](https://developer.apple.com/library/archive/qa/qa1561/_index.html).
-        - **WASM**: unsupported. */
-    FJ_APP_TASK_FLAG_CANCELABLE = 1 << 1,
-
-    /** This flag is only meaningful when #FJ_APP_TASK_FLAG_AWAITABLE is
-        present.
-
-        Indicates that the app can be run just by polling fj_app::main_task in a
-        loop. If not present, means that to run the app you need to await
-        its task.
-
-        \note
-        - **Wayland**, **X11**: supported.
-        - **Windows API**: supported with a platform-specific behavior:
-            when the user starts resizing a window, the main task freezes
-            in its fj_task::poll method. This is because the
-            [DefWindowProc
-            ](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-defwindowprocw)
-            function implements all the window resizing logic in
-            a client-side event loop,
-            which continues to process asynchronous tasks,
-            but blocks until the resizing is finished.
-            If you implement drawing inside a custom event loop that polls
-            the main task, it will result in freezes during window
-            resizing.
-        - **UIKit**: unsupported, but usable with a platform-specific
-            limitation: even though the pollable flag is never specified, you
-            can poll the main task to process events, but only from within
-            a blocking call to #FJ_APP_AWAIT.
-            The reason is that the toplevel call to #FJ_APP_AWAIT
-            calls `UIApplicationMain()` that is necessary to run the app,
-            but inside it manual polling is allowed.*/
-    FJ_APP_TASK_FLAG_POLLABLE = 1 << 2,
-
-    _fj_app_task_flags_ensure_int32 = INT32_MAX,
-};
-
-/// \END
-
-
-/// \BEGIN{app_messages}
 
 enum fj_app_message
 {
@@ -245,9 +173,73 @@ enum fj_app_message
         - **Windows API**: the handle is the current `HINSTANCE`. */
     FJ_APP_DID_SET_SYSTEM_HANDLE,
 
-    FJ_APP_MESSAGE_MAX,
+    FJ_APP_MESSAGE_COUNT,
+    FJ_APP_MESSAGE_ENUM_MAX = INT32_MAX,
+};
 
-    _fj_app_message_ensure_int32 = INT32_MAX,
+
+/// \BEGIN{app_other}
+
+
+/** \see fj_app::main_task */
+enum fj_app_task_flags
+{
+    /** Indicates that the app supports the #FJ_APP_AWAIT message.
+        If not present, means that the app is run externally (e.g. when it is
+        embedded into the actual executable that handles the event processing),
+        which means that the app's entrypoint should return as soon as it
+        finishes initializing the app in order for the app to start running.
+
+        \note
+        - **WebAssembly**: unsupported; you should exit after initializing
+            the application in order for JavaScript code to run it.*/
+    FJ_APP_TASK_FLAG_AWAITABLE = 1 << 0,
+
+    /** Indicates that fj_app::main_task is cancelable.
+        If not present, means that canceling fj_app::main_task has no effect,
+        which happens on platforms where the application is managed by the
+        system and cannot quit whenever it wants, but when the system decides.
+
+        \note
+        - **Wayland**, **X11**, **Windows API**: supported.
+        - **UIKit**: unsupported, though it is in theory possible to exit
+            the program by calling the exit function. This, however, is
+            [considered a bad practice by Apple
+            ](https://developer.apple.com/library/archive/qa/qa1561/_index.html).
+        - **WASM**: unsupported. */
+    FJ_APP_TASK_FLAG_CANCELABLE = 1 << 1,
+
+    /** This flag is only meaningful when #FJ_APP_TASK_FLAG_AWAITABLE is
+        present.
+
+        Indicates that the app can be run just by polling fj_app::main_task in a
+        loop. If not present, means that to run the app you need to await
+        its task.
+
+        \note
+        - **Wayland**, **X11**: supported.
+        - **Windows API**: supported with a platform-specific behavior:
+            when the user starts resizing a window, the main task freezes
+            in its fj_task::poll method. This is because the
+            [DefWindowProc
+            ](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-defwindowprocw)
+            function implements all the window resizing logic in
+            a client-side event loop,
+            which continues to process asynchronous tasks,
+            but blocks until the resizing is finished.
+            If you implement drawing inside a custom event loop that polls
+            the main task, it will result in freezes during window
+            resizing.
+        - **UIKit**: unsupported, but usable with a platform-specific
+            limitation: even though the pollable flag is never specified, you
+            can poll the main task to process events, but only from within
+            a blocking call to #FJ_APP_AWAIT.
+            The reason is that the toplevel call to #FJ_APP_AWAIT
+            calls `UIApplicationMain()` that is necessary to run the app,
+            but inside it manual polling is allowed.*/
+    FJ_APP_TASK_FLAG_POLLABLE = 1 << 2,
+
+    FJ_APP_TASK_FLAG_ENUM_MAX = INT32_MAX,
 };
 
 

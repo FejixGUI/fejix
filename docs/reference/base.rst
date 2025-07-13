@@ -50,14 +50,14 @@ Memory management
   :content-only:
 
 
-OOP base
+Object-oriented
 ==========================
 
-.. doxygengroup:: base_oop_base
+.. doxygengroup:: base_object_oriented
   :content-only:
 
-Asynchronous base
+Asynchronous
 ========================
 
-.. doxygengroup:: base_async_base
+.. doxygengroup:: base_async
   :content-only:

@@ -4,20 +4,11 @@
 #include <src/shared/common/memory.h>
 #include <src/shared/common/task.h>
 
-#include <malloc.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <X11/Xlib-xcb.h>
-
-
-#define EVENT_MASK (~0x80)  // Just a weirdness of XCB
-
 
 static fj_err process_event(struct fj_app *app, xcb_generic_event_t *event)
 {
     // TODO delegate window events to some function in window.c
-    switch (event->response_type & EVENT_MASK) {
+    switch (fj_x11_get_event_type(event)) {
         default:
             break;
 
@@ -53,117 +44,25 @@ static fj_err process_events(
     (void) file_descriptor;
     fj_err e;
 
-    if (event_mask & (POLLERR | POLLHUP | POLLNVAL)) {
+    if (event_mask & POLLHUP) {
+        FJ_ERROR("display closed");
+        return FJ_ERR_UNREACHABLE;
+    }
+
+    if (event_mask & (POLLERR | POLLNVAL)) {
         FJ_ERROR("got errors while reading events from the X11 display");
         return FJ_ERR_SYSTEM;
     }
 
     struct fj_app *app = callback_data;
 
-    for (;;) {
-        xcb_generic_event_t *event = xcb_poll_for_event(app->data->connection);
-
-        if (event == NULL)
-            break;
-
+    xcb_generic_event_t *event;
+    while ((event = xcb_poll_for_event(app->data->connection))) {
         e = process_event(app, event);
         free(event);
         if (e)
             return e;
     }
-
-    return FJ_OK;
-}
-
-
-static void deinit_events(struct fj_app *app)
-{
-    fj_unix_events_deinit(&app->data->events);
-}
-
-static fj_err get_atoms(struct fj_app *app)
-{
-#undef FJ_MACROLIST
-#undef FJ_MACROITEM
-#define FJ_MACROITEM(ITEM) [FJ_X11_ATOM_##ITEM] = #ITEM,
-#define FJ_MACROLIST(...) \
-    static char const *const atom_names[FJ_X11_ATOM_MAX] = { __VA_ARGS__ };
-
-    FJ_X11_ATOM_MACROLIST
-
-    xcb_intern_atom_cookie_t coockies[FJ_X11_ATOM_MAX];
-
-    for (enum fj_x11_atom atom = 0; atom < FJ_X11_ATOM_MAX; atom++) {
-        coockies[atom] = xcb_intern_atom(
-            app->data->connection,
-            1,
-            strlen(atom_names[atom]),
-            atom_names[atom]);
-    }
-
-    xcb_flush(app->data->connection);
-
-    for (enum fj_x11_atom atom = 0; atom < FJ_X11_ATOM_MAX; atom++) {
-        xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(
-            app->data->connection, coockies[atom], NULL);
-
-        app->data->atoms[atom] = reply->atom;
-
-        free(reply);
-    }
-
-    return FJ_OK;
-}
-
-
-static fj_err app_deinit(struct fj_app *app)
-{
-    deinit_events(app);
-
-    if (app->data->display != NULL) {
-        int result = XCloseDisplay(app->data->display);
-        if (result != 0) {
-            FJ_ERRORF(
-                "cannot close X11 display: %s",
-                fj_x11_error_into_string(result));
-        }
-    }
-
-    FJ_FREE(&app->data);
-
-    return FJ_OK;
-}
-
-
-static int xlib_error_handler(Display *display, XErrorEvent *error)
-{
-    (void) display;
-    FJ_ERRORF("Xlib error: %s", fj_x11_error_into_string(error->error_code));
-    return 0;
-}
-
-static fj_err init_connection(struct fj_app *app)
-{
-    fj_err e;
-
-    app->data->display = XOpenDisplay(NULL);
-    if (app->data->display == NULL) {
-        FJ_ERROR("cannot open X11 display");
-        return FJ_ERR_SYSTEM;
-    }
-
-    app->data->connection = XGetXCBConnection(app->data->display);
-    XSetEventQueueOwner(app->data->display, XCBOwnsEventQueue);
-    XSetErrorHandler(xlib_error_handler);
-    get_atoms(app);
-
-    e = fj_unix_events_add(
-        &app->data->events,
-        xcb_get_file_descriptor(app->data->connection),
-        POLLIN,
-        process_events);
-    if (e)
-        return e;
 
     return FJ_OK;
 }
@@ -205,7 +104,46 @@ static void main_task_cancel(struct fj_task *task)
         app->user_task.cancel(&app->user_task);
 }
 
-static fj_err app_init(struct fj_app *app)
+
+static fj_err deinit(struct fj_app *app)
+{
+    fj_unix_events_deinit(&app->data->events);
+
+    if (app->data->display != NULL) {
+        fj_x11_disconnect(app->data->display);
+    }
+
+    FJ_FREE(&app->data);
+
+    return FJ_OK;
+}
+
+
+static fj_err init_connection(struct fj_app *app)
+{
+    fj_err e;
+
+    e = fj_x11_connect(&app->data->display, &app->data->connection);
+    if (e)
+        return e;
+
+    e = fj_x11_get_atoms(app->data->connection, app->data->atoms);
+    if (e)
+        return e;
+
+    e = fj_unix_events_add(
+        &app->data->events,
+        xcb_get_file_descriptor(app->data->connection),
+        POLLIN,
+        process_events);
+    if (e)
+        return e;
+
+    return FJ_OK;
+}
+
+
+static fj_err init(struct fj_app *app)
 {
     fj_err e;
 
@@ -222,7 +160,7 @@ static fj_err app_init(struct fj_app *app)
 
     e = init_connection(app);
     if (e) {
-        app_deinit(app);
+        deinit(app);
         return e;
     }
 
@@ -238,12 +176,16 @@ static fj_err app_init(struct fj_app *app)
 
 static fj_err await(struct fj_app *app, struct fj_task *task)
 {
-    // Here we are trying to complete the specified task without processing
+    // XXX Here we are trying to complete the specified task without processing
     // the events as soon as possible. If the task completes on the second
     // poll (like the window update tasks or a dummy task that is programmed
     // that way), the event loop (the main task) is not touched.
 
     fj_err e;
+
+    e = fj_x11_flush(app->data->connection);
+    if (e)
+        return e;
 
     if (task) {
         task->poll(task);
@@ -253,6 +195,7 @@ static fj_err await(struct fj_app *app, struct fj_task *task)
     }
 
     for (;;) {
+        // TODO timers
         e = fj_unix_events_wait(&app->data->events, NULL);
         if (e)
             return e;
@@ -284,10 +227,10 @@ fj_err fj_x11_app_dispatcher(void *app, int32_t message, void *data)
 {
     switch (message) {
         case FJ_APP_INIT:
-            return app_init(app);
+            return init(app);
 
         case FJ_APP_DEINIT:
-            return app_deinit(app);
+            return deinit(app);
 
         case FJ_APP_AWAIT:
             return await(app, data);

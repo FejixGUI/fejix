@@ -8,7 +8,8 @@
 #ifdef FJ_COMPILE_OPT_ENABLE_ERRORS
 #    ifdef FJ_COMPILE_OPT_ENABLE_ERROR_LOCATIONS
 #        define FJ_ERROR(MESSAGE) \
-            fj_format_error("[%s:%d@%s] " MESSAGE, __FILE__, __LINE__, __func__)
+            fj_format_error(      \
+                "[%s:%d@%s] %s", __FILE__, __LINE__, __func__, MESSAGE)
 #        define FJ_ERRORF(FORMAT, ...) \
             fj_format_error(           \
                 "[%s:%d@%s] " FORMAT,  \
@@ -17,8 +18,9 @@
                 __func__,              \
                 __VA_ARGS__)
 #    else
-#        define FJ_ERROR(MESSAGE) fj_error_callback(MESSAGE)
-#        define FJ_ERRORF(FORMAT, ...) fj_format_error(FORMAT, __VA_ARGS__)
+#        define FJ_ERROR(MESSAGE) fj_format_error("[%s] %s", __func__, MESSAGE)
+#        define FJ_ERRORF(FORMAT, ...) \
+            fj_format_error("[%s] " FORMAT, __func__, __VA_ARGS__)
 #    endif
 #else
 // The expansion prevents warnings about empty blocks and identical if-else

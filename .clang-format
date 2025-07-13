@@ -228,26 +228,21 @@ Macros:
     # clang-format does not support proper custom attributes as of now.
     - 'FJ_PUBLIC=[[aaaaa]]'
 
-# How to read the includes:
-#   At the top - the most important project headers
-#   At the bottom - the most important external headers
-#
-# The reason is that we strictly put non-project headers AFTER the project
-# headers and putting interesting external headers before the standard headers
-# would make them in the middle of the include mess where it is hard to see them
+
+# This list goes from the most to the least interesting headers (subjectively)
 IncludeBlocks: Regroup
 IncludeCategories:
-    # Implicit priority of 0 is reserved for the main header
-    # (#include "same-file-name.h")
+    # Implicit priority of 0 is reserved for the main header:
+    #     #include "same-file-name.h"
 
     -   Regex: '^<src/shared/'
-        Priority: 10
+        Priority: 30
 
     -   Regex: '^<src/'
-        Priority: 1
+        Priority: 20
 
     -   Regex: '^<fejix/'
-        Priority: 20
+        Priority: 10
 
     -   Regex: '^<(assert|complex|ctype|errno|fenv|float|inttypes|limits|locale|malloc|math|setjmp|signal|stdarg|stdbool|stddef|stdint|stdio|stdlib|string|tgmath|time|wchar|wctype).h>'
         Priority: 90
@@ -255,4 +250,4 @@ IncludeCategories:
 
     # Platform-specific headers
     -   Regex: '^.*'
-        Priority: 100
+        Priority: 5

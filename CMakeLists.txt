@@ -17,7 +17,7 @@ set(fejix_enable_errors ON CACHE BOOL
     "Enables the library to set the last error message")
 
 set(fejix_enable_error_locations ON CACHE BOOL
-    "Adds the file name, line and function to every error message")
+    "Adds the file name and line number to every error message")
 
 set(fejix_detect_platforms OFF CACHE BOOL
     "Detect the platforms which are common for the target OS")

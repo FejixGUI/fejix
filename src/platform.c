@@ -1,6 +1,6 @@
-#include <src/shared/common/macros.h>
-
 #include <fejix/platform.h>
+
+#include <src/shared/common/macros.h>
 
 #include <stdlib.h>
 #include <string.h>

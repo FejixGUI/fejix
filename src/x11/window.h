@@ -2,35 +2,24 @@
 #define FEJIX_X11_WINDOW_H_
 
 
-#include <src/shared/utils/list.h>
+#include <xcb/xcb.h>
 
 #include <fejix/window.h>
 
-#include <xcb/xcb.h>
+#include <src/shared/common/list.h>
 
 
-struct fj_window {
-    struct fj_window_base base;
+FJ_LIST(fj_window_list, struct fj_window *)
 
-    /** This is zero if the window has not been commited yet. */
-    xcb_window_t id;
-
-    xcb_visualid_t visual;
-
-    /**
-        If zero, the default colormap for the target screen is used.
-        If non-zero, the colormap is freed when the window is deleted.
-    */
-    xcb_colormap_t colormap;
-
-    uint8_t depth;
+struct fj_window_service_private_data
+{
+    struct fj_window_list windows;
 };
 
-FJ_VECTOR(fj_window_vector, struct fj_window *)
 
-struct fj_window_service {
-    struct fj_window_service_base base;
-    struct fj_window_vector windows;
+struct fj_window_private_data
+{
+    xcb_window_t id;
 };
 
 

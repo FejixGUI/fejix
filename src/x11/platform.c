@@ -1,24 +1,29 @@
 #include <fejix/platform.h>
 
-
-fj_err fj_x11_app_dispatcher(void *, int32_t, void *, struct fj_task *);
-fj_err fj_x11_timer_dispatcher(void *, int32_t, void *, struct fj_task *);
-fj_err fj_x11_window_dispatcher(void *, int32_t, void *, struct fj_task *);
+#include <src/shared/common/macros.h>
 
 
-fj_dispatcher get_dispatcher_(enum fj_type type)
+typedef fj_err(dispatcher)(void *, fj_message, void *, struct fj_task *);
+
+dispatcher fj_x11_app_dispatcher, fj_x11_window_service_dispatcher,
+    fj_x11_window_dispatcher;
+
+static fj_dispatcher const dispatchers[] = {
+    [FJ_TYPE_APP] = fj_x11_app_dispatcher,
+    [FJ_TYPE_WINDOW_SERVICE] = fj_x11_window_service_dispatcher,
+    [FJ_TYPE_WINDOW] = fj_x11_window_dispatcher,
+};
+
+static fj_dispatcher get_dispatcher(enum fj_type type)
 {
-    switch (type) {
-        case FJ_APP:
-            return fj_x11_app_dispatcher;
+    if (type >= FJ_LEN(dispatchers) || dispatchers[type] == NULL)
+        return NULL;
 
-        default:
-            return NULL;
-    }
+    return dispatchers[type];
 }
 
 struct fj_platform fj_x11_platform = {
     .name = "x11",
     .version = { FJ_VERSION_MAJOR, FJ_VERSION_MINOR, FJ_VERSION_PATCH },
-    .get_dispatcher = get_dispatcher_,
+    .get_dispatcher = get_dispatcher,
 };
