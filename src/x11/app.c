@@ -4,6 +4,8 @@
 #include <src/shared/common/memory.h>
 #include <src/shared/common/task.h>
 
+#include <malloc.h>
+
 
 static fj_err process_event(struct fj_app *app, xcb_generic_event_t *event)
 {

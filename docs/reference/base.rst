@@ -55,9 +55,3 @@ Object-oriented
 
 .. doxygengroup:: base_object_oriented
   :content-only:
-
-Asynchronous
-========================
-
-.. doxygengroup:: base_async
-  :content-only:

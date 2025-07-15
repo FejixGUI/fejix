@@ -9,10 +9,6 @@
 
 #include <fejix/base.h>
 
-#include <src/shared/common/error.h>
-
-#include <malloc.h>
-
 
 // The atoms are sorted alphabetically here.
 // clang-format off

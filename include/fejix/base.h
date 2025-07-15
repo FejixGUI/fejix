@@ -57,6 +57,9 @@
 
 /// \BEGIN{base_general}
 
+/** A generic type for function pointers. Convert it to whatever you need. */
+typedef void (*fj_function)(void);
+
 struct fj_version
 {
     uint16_t major;
@@ -336,53 +339,7 @@ void *(*fj_allocation_callback)(
 /// \END
 
 
-/// \BEGIN{base_async}
-
-
-struct fj_task
-{
-    /** This is often used to refer to the object that the task was created
-        for. */
-    void *object;
-
-    /** This is automatically freed when the task is completed (with success,
-        failure or cancellation error). */
-    uintptr_t data;
-
-    /** Polls for the current task state.
-
-        This may update *any* field of the task,
-        including the fj_task::poll and fj_task::cancel methods.
-
-        This is fine to call even after the task has been completed or
-        canceled. */
-    void (*poll)(struct fj_task *self);
-
-    /** Requests the task to be canceled.
-
-        The task still needs to be polled in order to update its state.
-
-        This may update *any* field of the task,
-        including the fj_task::poll and fj_task::cancel methods.
-
-        This may silently fail as it can be too late or impossible to stop
-        an already running task. */
-    void (*cancel)(struct fj_task *self);
-
-    /** This is only valid when fj_task::completed is true. */
-    fj_err result;
-
-    bool completed;
-};
-
-/// \END
-
-
 /// \BEGIN{base_object_oriented}
-
-/** This type is designed to be compatible with all enums that define
-    message IDs. */
-typedef uint32_t fj_message;
 
 enum fj_message_limits
 {
@@ -395,22 +352,6 @@ enum fj_message_limits
         #FJ_USER_MESSAGE_MIN (if you really need to). */
     FJ_USER_MESSAGE_MIN = 10000,
 };
-
-/** This function calls the appropriate message handling functions.
-
-    This can be overriden per each object in order to handle event messages,
-    e.g. for input events or hooking into internal object events.
-
-    \param[inout] message_data (optional)
-        See the documentation of each message.
-    \param[out] out_task (optional)
-        Mandatory for asynchronous operations, see the documentation for each
-        message. */
-typedef fj_err (*fj_dispatcher)(
-    void *object,
-    fj_message message,
-    void *message_data,
-    struct fj_task *out_task);
 
 enum fj_type
 {
