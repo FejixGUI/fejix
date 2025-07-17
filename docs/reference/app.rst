@@ -1,28 +1,36 @@
 :tocdepth: 4
 
 ==================
-App module
+<fejix/app.h>
 ==================
 
 .. doxygenfile:: app.h
   :sections: briefdescription detaileddescription
 
 
-App object
+App
 ===========
 
 Definition
 -------------
 
-.. doxygenstruct:: fj_app
+.. doxygengroup:: app_definition
+  :content-only:
 
 Messages
 ------------
 
-.. doxygenenum:: fj_app_message
+.. doxygengroup:: app_messages
+  :content-only:
 
-Other
-------------
+Dispatching
+---------------
 
-.. doxygengroup:: app_other
+.. doxygengroup:: app_dispatching
+  :content-only:
+
+Utils
+-------------------
+
+.. doxygengroup:: app_utils
   :content-only:

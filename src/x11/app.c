@@ -2,7 +2,6 @@
 
 #include <src/shared/common/error.h>
 #include <src/shared/common/memory.h>
-#include <src/shared/common/task.h>
 
 #include <malloc.h>
 
@@ -74,7 +73,8 @@ static fj_err handle_ping(void *callback_data, int fd, short events)
 {
     struct fj_app *app = callback_data;
 
-    app->dispatch(app, FJ_APP_DID_PING, NULL, NULL);
+    union fj_app_message m = { .on_ping = NULL };
+    app->dispatch(app, FJ_APP_ON_PING, m);
 
     return fj_unix_events_handle_ping(fd, events);
 }

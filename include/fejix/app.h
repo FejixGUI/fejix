@@ -1,4 +1,6 @@
-/** \HEADER */
+/** \file
+
+    TODO running the app... */
 
 #ifndef FEJIX_APP_H_
 #define FEJIX_APP_H_
@@ -7,102 +9,92 @@
 #include <fejix/base.h>
 
 
-enum fj_app_message
+struct fj_app;
+
+
+/// \addtogroup app_utils
+/// \{
+
+enum fj_app_run_caps
 {
-    /** Initializes the application.
+    FJ_APP_RUN_CAPS_RUNNABLE = 1 << 0,
+    FJ_APP_RUN_CAPS_QUITTABLE = 1 << 1,
+    FJ_APP_RUN_CAPS_ITERABLE = 1 << 2,
+    FJ_APP_RUN_CAPS_AWAITABLE = 1 << 3,
 
-        You must initialize all the fields except fj_app::main_task and
-        fj_app::data *before* dispatching this message.*/
+    FJ_APP_RUN_CAPS_ENUM_MAX = INT32_MAX,
+};
+
+/// \}
+
+
+/// \addtogroup app_dispatching
+/// \{
+
+enum fj_app_message_type
+{
     FJ_APP_INIT,
-
-    /** Deinitializes the application.
-
-        This message is not intended for quitting the app as the quitting
-        process can be complicated and on some platforms even asynchronous.
-        Cancel fj_app::main_task instead (see #FJ_APP_DID_SET_TASK_FLAGS).
-
-        All created objects should be destroyed before destroying the app. */
     FJ_APP_DEINIT,
-
-    /** \param[in] flags Provides #fj_app_task_flags.
-        \see fj_app::main_task, fj_app_task_flags */
-    FJ_APP_ON_SET_LOOP_CAPS,
-
-    /** Wakes up an application that is waiting for events.
-        This asks the system to send a custom event that goes back as
-        #FJ_APP_DID_PING.
-
-        This can be sent from another thread provided that the app is not
-        being destroyed.
-
-        This is not supposed to be called periodically from the main thread as
-        this goes through an inefficient process of communicating with the
-        system. To regularly invoke a user callback on the main thread,
-        use a timer with zero timeout period. */
+    FJ_APP_ON_SET_RUN_CAPS,
+    FJ_APP_RUN,
+    FJ_APP_QUIT,
+    FJ_APP_ITERATE,
+    FJ_APP_AWAIT,
+    FJ_APP_ON_ITERATE,
+    FJ_APP_ON_QUIT,
     FJ_APP_PING,
-
     FJ_APP_ON_PING,
     FJ_APP_ON_ACTIVATE,
     FJ_APP_ON_DEACTIVATE,
     FJ_APP_ON_SUSPEND,
     FJ_APP_ON_RESUME,
-
-    /** Provides an internal system handle of the app.
-        This is sent on app initialization.
-
-        \param[in] system_handle A pointer to a platform-dependent handle.
-
-        \note
-        - **X11**: the handle is the Xlib's `Display*`.
-        - **Wayland**: the handle is `wl_display*`.
-        - **Windows API**: the handle is the current `HINSTANCE`. */
     FJ_APP_ON_SET_SYSTEM_HANDLE,
 
     FJ_APP_MESSAGE_COUNT,
     FJ_APP_MESSAGE_ENUM_MAX = INT32_MAX,
 };
 
-
-/// \BEGIN{app_other}
-
-
-enum fj_app_loop_caps
-{
-    FJ_APP_LOOP_CAPS_RUNNABLE = 1 << 0,
-    FJ_APP_LOOP_CAPS_BREAKABLE = 1 << 1,
-    FJ_APP_LOOP_CAPS_ITERATABLE = 1 << 2,
-    FJ_APP_LOOP_CAPS_ENUM_MAX = INT32_MAX,
-};
-
-union fj_app_message_data
-{
-    enum fj_app_loop_caps loop_caps;
-    uintptr_t system_handle;
-    void *_unused;
-};
-
-struct fj_app;
+/** \param[inout] message (optional)
+        This can be NULL for messages that are empty or are explicitly
+        documented to accept NULL. */
 typedef fj_err (*fj_app_dispatcher)(
-    struct fj_app *app,
-    enum fj_app_message message,
-    union fj_app_message_data *data);
+    struct fj_app *app, enum fj_app_message_type message_type, void *message);
+
+/// \}
 
 
-/// \END
+/// \addtogroup app_definition
+/// \{
 
+struct fj_app_base
+{
+    /** This is intended to be overridden by the user to provide a custom
+        dispatcher for specific message types. */
+    fj_app_dispatcher dispatch;
+
+    /** This is optional and is not used by the library in any way.
+
+        This is for your convenience to store the default platform dispatcher
+        that you should call for messages that are not handled by the
+        fj_app_base::dispatch. */
+    fj_app_dispatcher dispatch_default;
+
+    /** This is optional and is not used by the library in any way.
+
+        This is for your convenience to store your own data. */
+    void *user_data;
+};
 
 /** This object manages the application lifecycle and all of its resources.
 
     \note
     This should generally be a instantiated once per program.
     Whether it can be instantiated multiple times is implementation-defined.
-    - **Wayland**, **X11**: an application object can be instantiated as many
-        times as you want.
-    - **Windows API**: instantiating this multiple times is not a strict error
-        if you are careful with requests that affect some global process state.
+    - **Windows API**, **Wayland**, **X11**: an application object can be
+        instantiated as many times as you want.
 
     \note
-    This should generally be intantiated on the main thread.
+    This should generally be instantiated on the main thread.
     Whether it can be instantiated on other threads is platform-defined.
     - **UIKit**: this *must* be instatiated on the main thread and all messsages
         where thread-safety is not specified *must* be sent from the main
@@ -123,23 +115,137 @@ typedef fj_err (*fj_app_dispatcher)(
         Because of this, it is better to create the app and all other objects
         on the same thread that handles them. */
 struct fj_app
+#ifndef FJ_OPT_PRIVATE
 {
-    /** The app's message dispatcher function.
+    struct fj_app_base base;
+}
+#endif
+;
 
-        Override this to handle user input and internal library events.
-        This *must* call the default dispatcher for unhandled messages. */
-    fj_app_dispatcher dispatch;
+/// \}
 
-    /** The default dispatcher provided by the platform.
 
-        This field is only for convenience, it must be set manually and is
-        supposed to be called for unhandled messages in fj_app::dispatch. */
-    fj_app_dispatcher dispatch_default;
+/// \addtogroup app_messages
+/// \{
 
-    uintptr_t user_data;
+/** Initializes the application.
 
-    struct fj_app_private_data *data;
+    This can dispatch some initial events, they should be handled
+    immediately. */
+struct fj_app_init_message
+{
+    /** \returns A newly created app, undefined on failure.
+            To check for errors, never check the returned pointer for NULL,
+            handle the return value. */
+    struct fj_app *out_app;
+
+    /** This is taken as the base of the app. */
+    struct fj_app_base base;
 };
+
+/** Deinitializes the application.
+
+    This message is not intended for quitting the app as the quitting
+    process can be complicated and on some platforms even asynchronous.
+    Use ::fj_app_quit_message instead.
+
+    All created objects should be destroyed before destroying the app.
+ */
+struct fj_app_deinit_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_set_run_caps_message
+{
+    enum fj_app_run_caps const caps;
+};
+
+struct fj_app_run_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_quit_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_iterate_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_await_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_iterate_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_quit_message
+{
+    uint8_t _empty;
+};
+
+
+/** Wakes up an application that is waiting for events.
+    This asks the system to send a custom event that goes back as
+    fj_app_message::on_ping.
+
+    This can be sent from another thread provided that the app is not
+    being destroyed.
+
+    This is not supposed to be called periodically from the main thread
+    as this goes through an inefficient process of communicating with the
+    system. To regularly invoke a user callback on the main thread,
+    use a timer with zero timeout period. */
+struct fj_app_ping_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_ping_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_activate_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_deactivate_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_suspend_message
+{
+    uint8_t _empty;
+};
+
+struct fj_app_on_resume_message
+{
+    uint8_t _empty;
+};
+
+/** Provides an internal system handle of the app.
+    This is sent on app initialization.
+
+    \note
+    - **X11**: the handle is the Xlib's `Display*`.
+    - **Wayland**: the handle is `wl_display*`.
+    - **Windows API**: the handle is the current `HINSTANCE`. */
+struct fj_app_on_set_system_handle_message
+{
+    uintptr_t handle;
+};
+
+/// \}
 
 
 #endif

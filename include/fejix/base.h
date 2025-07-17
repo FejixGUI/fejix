@@ -1,4 +1,4 @@
-/** \HEADER
+/** \file
     Defines base definitions and utilities. */
 
 #ifndef FEJIX_BASE_H_
@@ -12,9 +12,10 @@
 #include <stdint.h>
 
 
-/// \BEGIN{base_macros}
+/// \addtogroup base_api
+/// \{
 
-#if defined(FJ_COMPILE_OPT_DOCS)
+#if defined(FJ_OPT_DOCS)
 
 /** Defines the appropriate external linkage.
     This is used for all public symbols exported by the library.
@@ -24,7 +25,7 @@
 
     \warning
     If you are using the library as shared (`.dll`) on Microsoft Windows, you
-    need to define `FJ_INCLUDE_OPT_DLLIMPORT` before including any library
+    need to define `FJ_OPT_DLLIMPORT` before including any library
     headers so that the library gets linked correctly.
     If you are using the library's CMake target, it will automatically do that
     for you. */
@@ -38,9 +39,9 @@
 #        define FJ_PUBLIC_LINKAGE extern
 #    endif
 
-#    if defined(FJ_COMPILE_OPT_DLLEXPORT)
+#    if defined(FJ_OPT_DLLEXPORT)
 #        define FJ_PUBLIC_VISIBILITY __declspec(dllexport)
-#    elif defined(FJ_INCLUDE_OPT_DLLIMPORT)
+#    elif defined(FJ_OPT_DLLIMPORT)
 #        define FJ_PUBLIC_VISIBILITY __declspec(dllimport)
 #    elif defined(__GNUC__) && __GNUC__ >= 4
 #        define FJ_PUBLIC_VISIBILITY __attribute__((visibility("default")))
@@ -52,13 +53,18 @@
 
 #endif
 
-/// \END
+
+#if defined(FJ_OPT_PRIVATE_CODE)
+#    define FJ_PUBLICLY(X)
+#else
+#    define FJ_PUBLICLY(X) X
+#endif
+
+/// \}
 
 
-/// \BEGIN{base_general}
-
-/** A generic type for function pointers. Convert it to whatever you need. */
-typedef void (*fj_function)(void);
+/// \addtogroup base_version
+/// \{
 
 struct fj_version
 {
@@ -67,10 +73,11 @@ struct fj_version
     uint16_t patch;
 };
 
-/// \END
+/// \}
 
 
-/// \BEGIN{base_geometry}
+/// \addtogroup base_geometry
+/// \{
 
 /** The length of a metric inch in metres. */
 #define FJ_INCH_LENGTH (0.0254)
@@ -183,10 +190,11 @@ static inline fj_density fj_density_from_standard_scaling(double scaling_factor)
     return scaling_factor * FJ_STANDARD_DPI;
 }
 
-/// \END
+/// \}
 
 
-/// \BEGIN{base_time}
+/// \addtogroup base_time
+/// \{
 
 /** Time interval with nanosecond resolution in range from 1 nanosecond to 584
     years. */
@@ -232,9 +240,10 @@ static inline uint64_t fj_time_into_seconds(fj_time time)
     return time / UINT64_C(1000000000);
 }
 
-/// \END
+/// \}
 
-/// \BEGIN{base_error_handling}
+/// \addtogroup base_error_handling
+/// \{
 
 /** Generic error code.
 
@@ -293,9 +302,6 @@ typedef enum
         When possible, the library provides an error message in such cases. */
     FJ_ERR_REJECTED,
 
-    /** Task canceled. */
-    FJ_ERR_CANCELED,
-
     FJ_ERR_COUNT,
     FJ_ERR_ENUM_MAX = INT32_MAX,
 } fj_err;
@@ -314,9 +320,10 @@ typedef enum
 FJ_PUBLIC
 void (*fj_error_callback)(char const *message);
 
-/// \END
+/// \}
 
-/// \BEGIN{base_memory_management}
+/// \addtogroup base_memory_management
+/// \{
 
 /** Called every time the library needs to manage memory allocation.
 
@@ -336,10 +343,23 @@ FJ_PUBLIC
 void *(*fj_allocation_callback)(
     void *pointer, size_t old_size, size_t new_size);
 
-/// \END
+/// \}
 
 
-/// \BEGIN{base_object_oriented}
+/// \addtogroup base_object_oriented
+/// \{
+
+/** A generic dispatcher type.
+
+    You should not call dispatchers with this type directly, but convert it
+    to the specific dispatcher type you need. The reason is that calling
+    functions through pointers of the wrong type is UB in C and is compiler
+    and platform-dependent. However, on some platforms, this may work.
+
+    \noop TODO On what platforms does this work? */
+typedef fj_err (*fj_generic_dispatcher)(
+    void *object, uint32_t message, void *message_data);
+
 
 enum fj_message_limits
 {
@@ -363,7 +383,7 @@ enum fj_type
     FJ_TYPE_ENUM_MAX = INT32_MAX,
 };
 
-/// \END
+/// \}
 
 
 #endif

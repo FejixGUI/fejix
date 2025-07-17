@@ -11,15 +11,8 @@ GENERATE_LATEX = NO
 GENERATE_HTML = NO
 
 MACRO_EXPANSION = YES
-PREDEFINED += FJ_COMPILE_OPT_DOCS=1
-PREDEFINED += FJ_PUBLIC=
+PREDEFINED += "FJ_OPT_DOCS=1"
+PREDEFINED += "FJ_PUBLIC"
 
 EXTRACT_ALL = YES
 EXTRACT_STATIC = YES
-
-ALIASES += HEADER="\file ^^<code href=\"\fileinfo{}\">\#include <\fileinfo{}></code>^^"
-ALIASES += BEGIN{1}="\addtogroup \1^^@{"
-ALIASES += BEGIN{2}="\addtogroup \1 \2^^@{"
-ALIASES += END="@}"
-ALIASES += RST="^^\verbatim embed:rst^^"
-ALIASES += ENDRST="\endverbatim"

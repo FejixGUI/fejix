@@ -5,8 +5,8 @@
 #include <fejix/base.h>
 
 
-#ifdef FJ_COMPILE_OPT_ENABLE_ERRORS
-#    ifdef FJ_COMPILE_OPT_ENABLE_ERROR_LOCATIONS
+#ifdef FJ_OPT_ENABLE_ERRORS
+#    ifdef FJ_OPT_ENABLE_ERROR_LOCATIONS
 #        define FJ_ERROR(MESSAGE) \
             fj_format_error(      \
                 "[%s:%d@%s] %s", __FILE__, __LINE__, __func__, MESSAGE)

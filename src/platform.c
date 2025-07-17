@@ -6,19 +6,19 @@
 #include <string.h>
 
 
-extern struct fj_platform fj_wayland_platform;
+extern struct fj_platform fj_wl_platform;
 extern struct fj_platform fj_winapi_platform;
 extern struct fj_platform fj_x11_platform;
 
 // In alphabetic order
 static struct fj_platform const *const platforms[] = {
-#ifdef FJ_COMPILE_OPT_ENABLE_WAYLAND
-    &fj_wayland_platform,
+#ifdef FJ_OPT_WAYLAND
+    &fj_wl_platform,
 #endif
-#ifdef FJ_COMPILE_OPT_ENABLE_WINAPI
+#ifdef FJ_OPT_WINAPI
     &fj_winapi_platform,
 #endif
-#ifdef FJ_COMPILE_OPT_ENABLE_X11
+#ifdef FJ_OPT_X11
     &fj_x11_platform,
 #endif
     NULL,  // Avoid warnings about the array being empty
@@ -72,7 +72,7 @@ struct fj_platform const *fj_platform_load(void)
             return platform;
     }
 
-#if defined(FJ_COMPILE_OPT_ENABLE_WAYLAND) || defined(FJ_COMPILE_OPT_ENABLE_X11)
+#if defined(FJ_OPT_WAYLAND) || defined(FJ_OPT_X11)
     env = getenv("XDG_SESSION_TYPE");
     if (env && (strcmp(env, "wayland") == 0 || strcmp(env, "x11") == 0)) {
         platform = platform_find(env);
@@ -81,7 +81,7 @@ struct fj_platform const *fj_platform_load(void)
     }
 #endif
 
-#if defined(FJ_COMPILE_OPT_ENABLE_WAYLAND)
+#if defined(FJ_OPT_WAYLAND)
     if (getenv("WAYLAND_DISPLAY") != NULL) {
         platform = platform_find("wayland");
         if (platform)
@@ -89,7 +89,7 @@ struct fj_platform const *fj_platform_load(void)
     }
 #endif
 
-#if defined(FJ_COMPILE_OPT_ENABLE_X11)
+#if defined(FJ_OPT_X11)
     if (getenv("DISPLAY") != NULL) {
         platform = platform_find("x11");
         if (platform)

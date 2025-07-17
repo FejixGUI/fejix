@@ -9,38 +9,88 @@ Platforms
 Platform names
 ----------------
 
-The codename of the platform is the C "namespace", the value of the
-:c:member:`fj_platform.name` field, and used everywhere throughout the codebase.
+Use full platform names as-is in documentation/comments.
 
-The codename should be max. 6 characters long.
+Use full platform names in lowercase everywhere in code, except for namespacing
+C macros, types, and functions.
+
+The C "namespace" is shortened to be max. 6 characters long.
 
 .. list-table::
   :header-rows: 1
 
-  * - Full name
-    - Codename
-  * - Windows API
-    - ``winapi``
-  * - Windows Runtime
-    - ``winrt``
-  * - X11
-    - ``x11``
-  * - Wayland
-    - ``wl``
-  * - Apple Cocoa
-    - ``cocoa``
-  * - Apple UIKit
-    - ``uikit``
-  * - Android Native Development Kit
+  * - Platform
+    - C namespace
+    - Description
+  * - Android NDK
     - ``andk``
-  * - WebAssembly
-    - ``wasm``
-  * - Linux Framebuffer
-    - ``lxfb``
-  * - Linux Direct Rendering Manager
-    - ``lxdrm``
+    - Android Native Development Kit.
   * - BSD Framebuffer
     - ``bsdfb``
+    - Used in the BSD family of operating systems without a graphical
+      environment for rendering with no hardware acceleration.
+  * - Cocoa
+    - ``cocoa``
+    - Apple Cocoa, used in macOS.
+  * - Linux DRM
+    - ``lxdrm``
+    - Used in Linux without a graphical environment for rendering with
+      hardware acceleration.
+  * - Linux Framebuffer
+    - ``lxfb``
+    - Used in Linux without a graphical environment for rendering with no
+      hardware acceleration.
+  * - UIKit
+    - ``uikit``
+    - Apple UIKit, a modern successor to Cocoa, used in all Apple operating
+      systems.
+  * - WebAssembly
+    - ``wasm``
+    - Used in browsers.
+  * - Windows API
+    - ``winapi``
+    - Used in Microsoft Windows desktop OS.
+  * - Wayland
+    - ``wl``
+    - A modern replacement for X11.
+  * - X11
+    - ``x11``
+    - The X Window System, version 11, used in Unix-like operating systems.
+
+Full names
+''''''''''''''''
+
+Do:
+
+* ``FJ_OPT_WAYLAND``
+* ``#include <src/wayland/something.h>``
+
+Don't:
+
+* ``FJ_OPT_WL``
+* ``#include <src/wl/something.h>``
+
+C namespaces
+'''''''''''''''''''''
+
+Do:
+
+* ``fj_wl_create_window()``
+* ``struct fj_wl_window_data { ... };``
+
+Don't:
+
+* ``fj_wayland_create_window()``
+* ``struct fj_wayland_window_data { ... };``
+
+Check your understanding
+'''''''''''''''''''''''''
+
+.. code-block:: c
+
+  struct fj_platform fj_wl_platform {
+      .name = "wayland"
+  };
 
 Documentation
 =================
@@ -75,39 +125,20 @@ Run ``Make`` from the ``docs`` directory:
 
 .. code-block:: shell
 
-  cd docs && make
-  # -or- (shorter)
-  make -C docs
+  cd docs && make && make preview
 
-To preview the docs in your browser you can run:
+or:
 
 .. code-block:: shell
 
-  make -C docs preview
+  make -C docs && make preview -C docs
 
-this opens ``build/docs/html/index.html``.
+``make preview`` opens ``build/docs/html/index.html``.
 
 Markup
 ------------
 
 .. TODO give an overview of how the docs are structured
-
-.. tip::
-  Use the project's Doxygen command aliases:
-
-  * ``\HEADER``
-
-  instead of ``\file`` because it additionally generates a short include
-  statement in the header description, and
-
-  * ``\BEGIN{GROUP_NAME}``
-  * ``\BEGIN{GROUP_NAME,GROUP_TITLE}``
-  * ``\END``
-
-  instead of repeating ``\addtogroup`` and ``\{`` on separate lines.
-  To add a group description, just put a doc comment right above the ``\BEGIN``
-  command.
-
 
 .. tip::
   Write ``\---`` instead of ``---`` for mdashes in Doxygen comments

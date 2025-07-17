@@ -1,8 +1,8 @@
 :tocdepth: 4
 
-=================
-Platform header
-=================
+====================
+<fejix/platform.h>
+====================
 
 .. doxygenfile:: platform.h
   :sections: briefdescription detaileddescription

@@ -4,24 +4,23 @@ target_sources(
         "${CMAKE_CURRENT_LIST_DIR}/error.c"
         "${CMAKE_CURRENT_LIST_DIR}/list.c"
         "${CMAKE_CURRENT_LIST_DIR}/math.c"
-        "${CMAKE_CURRENT_LIST_DIR}/memory.c"
-        "${CMAKE_CURRENT_LIST_DIR}/task.c")
+        "${CMAKE_CURRENT_LIST_DIR}/memory.c")
 
-if("${fejix_enable_errors}")
+if("${fejix_errors}")
     target_compile_definitions(
         fejix
         PRIVATE
-            "FJ_COMPILE_OPT_ENABLE_ERRORS")
+            "FJ_OPT_ENABLE_ERRORS")
 endif()
 
-if("${fejix_enable_error_locations}")
+if("${fejix_error_locations}")
     target_compile_definitions(
         fejix
         PRIVATE
-            "FJ_COMPILE_OPT_ENABLE_ERROR_LOCATIONS")
+            "FJ_OPT_ENABLE_ERROR_LOCATIONS")
 endif()
 
-if("${fejix_build_tests}")
+if("${fejix_tests}")
     add_executable(
         fejix_core_list_test
         "${CMAKE_CURRENT_LIST_DIR}/tests/test-list.c")

@@ -4,7 +4,7 @@ string(REGEX MATCH "^[^_]+" fejix_winapi_winnt_version "${fejix_winapi_target_ve
 target_compile_definitions(
     fejix
     PRIVATE
-        "FJ_COMPILE_OPT_ENABLE_WINAPI"
+        "FJ_OPT_WINAPI"
         "UNICODE"
         "_UNICODE"
         "WIN32_LEAN_AND_MEAN"
@@ -22,7 +22,7 @@ target_sources(
         "${CMAKE_CURRENT_LIST_DIR}/window/view.c")
 
 
-if("${fejix_build_tests}")
+if("${fejix_tests}")
     add_executable(fejix_winapi_utils_test_exe "${CMAKE_CURRENT_LIST_DIR}/tests/test-utils.c")
     target_link_libraries(fejix_winapi_utils_test_exe fejix fejix_private_headers)
     add_test(NAME fejix_winapi_utils_test COMMAND fejix_winapi_utils_test_exe)

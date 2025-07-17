@@ -5,7 +5,9 @@
 #include <src/shared/common/error.h>
 #include <src/shared/common/macros.h>
 
+#include <malloc.h>
 #include <string.h>
+
 
 // From <Xproto.h>
 // Maps the request opcodes to their names

@@ -1,4 +1,4 @@
-/** \HEADER */
+/** \file */
 
 #ifndef FEJIX_PLATFORM_H_
 #define FEJIX_PLATFORM_H_
@@ -7,7 +7,8 @@
 #include <fejix/base.h>
 
 
-/// \BEGIN{platform_definition}
+/// \addtogroup platform_definition
+/// \{
 
 
 struct fj_platform
@@ -17,13 +18,16 @@ struct fj_platform
 
     /** \param type Identifies what object type to return the message
             dispatcher for.
-        \returns NULL if the object type is not supported. */
-    fj_dispatcher (*get_dispatcher)(enum fj_type type);
+        \returns The dispatcher function pointer that should be converted to the
+            appropriate dispatcher type.
+            NULL if the object type is not supported. */
+    fj_generic_dispatcher (*get_dispatcher)(enum fj_type type);
 };
 
-/// \END
+/// \}
 
-/// \BEGIN{platform_loading}
+/// \addtogroup platform_loading
+/// \{
 
 /** `out_platforms` returns NULL if there are no builtin platforms. */
 FJ_PUBLIC
@@ -47,7 +51,7 @@ struct fj_platform const *fj_platform_load(void);
 // TODO Add functions to modify the behavior of the loader, e.g.
 // allowed/disallowed platforms etc.
 
-/// \END
+/// \}
 
 
 #endif

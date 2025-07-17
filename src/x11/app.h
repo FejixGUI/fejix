@@ -9,7 +9,7 @@
 #include <src/shared/unix/events.h>
 
 
-struct fj_app_private_data
+struct fj_app_data
 {
     struct fj_unix_events events;
     Display *display;
