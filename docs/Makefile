@@ -1,20 +1,8 @@
-.PHONY: all setup build clean preview check-python-venv
+.PHONY: build autobuild clean
 
-all: build
-
-setup: check-python-venv ../build/docs
-
-build: setup ./Doxyfile ./conf.py
-	doxygen -q
-	sphinx-build -q . ../build/docs/html
-
-clean:
-	rm -rf ../build/docs
-
-preview:
-	open ../build/docs/html/index.html
-
-check-python-venv:
+# This installs all the dependencies and rebuilds the entire thing.
+# This is supposed to reliably work at all times.
+build:
 	@test -n "$(VIRTUAL_ENV)" \
 		|| ( \
 			echo "Error: you need to set up a Python virtual environment:" \
@@ -23,6 +11,13 @@ check-python-venv:
 			&& exit 1 \
 		)
 
-../build/docs: ./requirements.txt
-	python3 -m pip install -r requirements.txt && mkdir -p ../build/docs
+	pip install --quiet sphinx furo
+	sphinx-build . build --quiet --write-all
+
+autobuild: build
+	pip install --quiet sphinx-autobuild
+	sphinx-autobuild . build --quiet --no-initial --open-browser
+
+clean:
+	rm -rf build
 

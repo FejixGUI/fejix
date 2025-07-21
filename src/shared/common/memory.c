@@ -21,7 +21,7 @@ void *default_callback(void *pointer, size_t old_size, size_t new_size)
     return NULL;
 }
 
-void *(*fj_allocation_callback)(void *pointer, size_t old_size, size_t new_size)
+void *(*fj_allocate_cb)(void *pointer, size_t old_size, size_t new_size)
     = default_callback;
 
 
@@ -33,7 +33,7 @@ fj_err fj_alloc_uninit(void **out_ptr, size_t size)
         return FJ_ERR_INVALID;
     }
 
-    *out_ptr = fj_allocation_callback(NULL, 0, size);
+    *out_ptr = fj_allocate_cb(NULL, 0, size);
 
     if (*out_ptr == NULL) {
         return FJ_ERR_MEMORY;
@@ -51,7 +51,7 @@ fj_err fj_alloc_zeroed(void **out_ptr, size_t size)
         return FJ_ERR_INVALID;
     }
 
-    *out_ptr = fj_allocation_callback(NULL, 0, size);
+    *out_ptr = fj_allocate_cb(NULL, 0, size);
 
     if (*out_ptr == NULL) {
         return FJ_ERR_MEMORY;
@@ -83,7 +83,7 @@ void fj_free(void **ptr, size_t size)
         FJ_ERROR("failed to free NULL");
     }
 
-    fj_allocation_callback(*ptr, size, 0);
+    fj_allocate_cb(*ptr, size, 0);
     *ptr = NULL;
 }
 
@@ -100,8 +100,8 @@ fj_err fj_realloc_uninit(
         return FJ_OK;
     }
 
-    void *new_ptr = fj_allocation_callback(
-        *ptr, old_length * item_size, new_length * item_size);
+    void *new_ptr
+        = fj_allocate_cb(*ptr, old_length * item_size, new_length * item_size);
 
     if (new_ptr == NULL) {
         return FJ_ERR_MEMORY;

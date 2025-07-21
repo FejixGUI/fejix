@@ -115,7 +115,8 @@ target_include_directories(
 target_sources(
     fejix
     PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/src/platform.c")
+        "${CMAKE_CURRENT_LIST_DIR}/src/platform.c"
+        "${CMAKE_CURRENT_LIST_DIR}/src/api_fallbacks.c")
 
 
 configure_file(

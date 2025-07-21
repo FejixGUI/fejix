@@ -9,12 +9,5 @@ end_of_line = lf
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[{Makefile,**.mk}]
+[{Makefile,**.make,**.mk}]
 indent_style = tab
-
-# ReStructuredText fails to render correctly with Sphinx if the indentation
-# is not 2 spaces in most directives.
-# However, RST has individual indentation width for each markup element (yikes!)
-# For example, "#."-lists must be indented with 3 spaces while "*"-lists with 2
-[*.rst]
-indent_size = 2

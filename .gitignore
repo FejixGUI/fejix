@@ -13,8 +13,8 @@ __*
 # Build directories
 build/
 _build/
-build[-_.]*/
-_build[-_.]*/
+build.*/
+_build.*/
 
 !.gitattributes
 !.gitmodules
