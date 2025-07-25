@@ -52,7 +52,7 @@ static struct fj_platform const *platform_find(char const *name)
 }
 
 
-struct fj_platform const *fj_platform_load(void)
+struct fj_platform const *fj_platform_get_builtin_default(void)
 {
     struct fj_platform const *platform = NULL;
     char const *env;
