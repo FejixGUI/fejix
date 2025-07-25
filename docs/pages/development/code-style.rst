@@ -23,7 +23,7 @@ Mark the important things with the following set of markers:
 
         .. TODO <message>
 
-* For bugs that need to be fixed use ``FIXME`` near the code they appear:
+*   For bugs that need to be fixed use ``FIXME`` near the code they appear:
 
     In C comments:
 
@@ -37,8 +37,8 @@ Mark the important things with the following set of markers:
 
         .. FIXME <message>
 
-* For important implementation notes use ``XXX`` near the code that relies on
-  or works around some badly documented or surprising platform features:
+*   For important implementation notes use ``XXX`` near the code that relies on
+    or works around some badly documented or surprising platform features:
 
     ..  code-block:: c
 

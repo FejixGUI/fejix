@@ -16,7 +16,7 @@ static void default_callback(char const *message)
 #endif
 }
 
-void (*fj_error_cb)(char const *message) = default_callback;
+void (*fj_error_callback)(char const *message) = default_callback;
 
 
 void fj_format_error(char const *format, ...)
@@ -27,5 +27,5 @@ void fj_format_error(char const *format, ...)
     vsnprintf(message, FJ_LEN(message), format, args);
     va_end(args);
 
-    fj_error_cb(message);
+    fj_error_callback(message);
 }

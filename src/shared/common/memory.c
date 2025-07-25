@@ -30,13 +30,13 @@ fj_err fj_alloc_uninit(void **out_ptr, size_t size)
     if (size == 0) {
         *out_ptr = NULL;
         FJ_ERROR("failed to allocate 0 bytes");
-        return FJ_ERR_INVALID;
+        return FJ_ERR_INVALID_USAGE;
     }
 
     *out_ptr = fj_allocate_cb(NULL, 0, size);
 
     if (*out_ptr == NULL) {
-        return FJ_ERR_MEMORY;
+        return FJ_ERR_INSUFFICIENT_MEMORY;
     }
 
     return FJ_OK;
@@ -48,13 +48,13 @@ fj_err fj_alloc_zeroed(void **out_ptr, size_t size)
     if (size == 0) {
         *out_ptr = NULL;
         FJ_ERROR("failed to allocate 0 bytes");
-        return FJ_ERR_INVALID;
+        return FJ_ERR_INVALID_USAGE;
     }
 
     *out_ptr = fj_allocate_cb(NULL, 0, size);
 
     if (*out_ptr == NULL) {
-        return FJ_ERR_MEMORY;
+        return FJ_ERR_INSUFFICIENT_MEMORY;
     }
 
     memset(*out_ptr, 0, size);
@@ -93,7 +93,7 @@ fj_err fj_realloc_uninit(
 {
     if (item_size == 0) {
         FJ_ERROR("realloc item size is 0");
-        return FJ_ERR_INVALID;
+        return FJ_ERR_INVALID_USAGE;
     }
 
     if (new_length == old_length) {
@@ -104,7 +104,7 @@ fj_err fj_realloc_uninit(
         = fj_allocate_cb(*ptr, old_length * item_size, new_length * item_size);
 
     if (new_ptr == NULL) {
-        return FJ_ERR_MEMORY;
+        return FJ_ERR_INSUFFICIENT_MEMORY;
     }
 
     *ptr = new_ptr;

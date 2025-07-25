@@ -32,7 +32,7 @@ fj_err fj_list_expand(
 
     if (index > *length) {
         FJ_ERROR("push index out of range");
-        return FJ_ERR_INVALID;
+        return FJ_ERR_INVALID_USAGE;
     }
 
     if (*length == *capacity) {
@@ -71,7 +71,7 @@ fj_err fj_list_shrink(
             FJ_ERROR("remove index out of range");
         }
 
-        return FJ_ERR_INVALID;
+        return FJ_ERR_INVALID_USAGE;
     }
 
     if (index != *length - 1) {

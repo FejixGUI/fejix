@@ -1,23 +1,16 @@
-.PHONY: build autobuild clean
+.PHONY: build dev clean
 
 # This installs all the dependencies and rebuilds the entire thing.
-# This is supposed to reliably work at all times.
 build:
-	@test -n "$(VIRTUAL_ENV)" \
-		|| ( \
-			echo "Error: you need to set up a Python virtual environment:" \
-			&& echo "  $$ python3 -m venv .venv" \
-			&& echo "  $$ source .venv/bin/activate    # add .fish/.csh/.ps1 for other shells" \
-			&& exit 1 \
-		)
+	python3 -m pip install sphinx furo hawkmoth --quiet
+	sphinx-build ./ ./build/ --write-all --quiet
 
-	pip install --quiet sphinx furo
-	sphinx-build . build --quiet --write-all
-
-autobuild: build
-	pip install --quiet sphinx-autobuild
-	sphinx-autobuild . build --quiet --no-initial --open-browser
+# This runs a local server that incrementally rebuilds the documentation
+# automatically when files change.
+dev: build
+	python3 -m pip install sphinx-autobuild --quiet
+	sphinx-autobuild ./ ./build/ --watch ../include --no-initial --open-browser --quiet
 
 clean:
-	rm -rf build
+	rm -rf ./build/
 
